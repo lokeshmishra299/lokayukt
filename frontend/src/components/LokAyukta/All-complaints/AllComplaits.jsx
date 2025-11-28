@@ -124,8 +124,8 @@ const CustomSearchableSelect = ({
               <>
                 {/* Dealing Assistant Header */}
                 <div className="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50 border-b flex items-center">
-                  <FaUsers className="w-4 h-4 text-blue-500" />
-                  <span className="ml-2">Dealing Assistant</span>
+                  {/* <FaUsers className="w-4 h-4 text-blue-500" />
+                 <span className="ml-2">Dealing Assistant</span>*/}
                 </div>
                 
                 {/* Dealing Assistant Options - केवल name दिखेगा */}
@@ -182,7 +182,8 @@ const ForwardModal = ({
       
       setIsLoadingOptions(true);
       try {
-        const response = await api.get("/lokayukt/get-dealing-assistant");
+        // const response = await api.get("/lokayukt/get-dealing-assistant");
+        const response = await api.get("/lokayukt/get-users");
         
         if (response.data && Array.isArray(response.data)) {
           // Options बनाते time: value में ID (string), display में name
@@ -235,9 +236,9 @@ const ForwardModal = ({
     setIsSubmitting(true);
     
     try {
-      const response = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
-        forward_to_d_a: parseInt(formData.forwardTo),
-        remarks: formData.remarks
+      const response = await api.post(`/../lokayukt/forward-by-lokayukt/${complaintId}`, {
+        forward_to: parseInt(formData.forwardTo),
+        remark: formData.remarks
       });
 
       console.log("API Response:", response.data);
@@ -325,14 +326,14 @@ const ForwardModal = ({
                 </div>
               ) : (
                 <CustomSearchableSelect
-                  name="forward_to_d_a"
+                  name="forward_to"
                   value={formData.forwardTo}
                   onChange={(value) => {
                     console.log("Selected ID:", value);
                     setFormData(prev => ({ ...prev, forwardTo: value }))
                   }}
                   options={dropdownOptions}
-                  placeholder="Select Dealing Assistant"
+                  placeholder="Select Users"
                   required
                 />
               )}
@@ -1040,7 +1041,7 @@ const AllComplaints = () => {
                       <div className="mt-5 pt-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         {/* Approval Badges */}
                         <div className="flex flex-wrap gap-2 sm:max-w-[90%]">
-                          {approvalStatuses.map((status, index) => (
+                         {/* {approvalStatuses.map((status, index) => (
                             <span
                               key={index}
                               className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium text-white ${status.color}`}
@@ -1048,7 +1049,7 @@ const AllComplaints = () => {
                               <FaCheck className="w-3 h-3 mr-1" />
                               {status.label}
                             </span>
-                          ))}
+                          ))}*/}
                         </div>
 
                         {/* Action Buttons */}
