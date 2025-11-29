@@ -237,7 +237,7 @@ const TabsContent = ({ value, children, activeTab, className, ...props }) => {
 };
 
 
-// Custom Tooltip Components
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -255,11 +255,10 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 
-// Main Dashboard Component
+
 const Dashboard = ({ userRole = "lokayukt" }) => {
 
   const navigate = useNavigate()
-  //  API State Management + Date Picker State
   const [dashboardData, setDashboardData] = useState(null);
   const [monthlyData, setMonthlyData] = useState([]);
   const [statusData, setStatusData] = useState([]);
@@ -268,13 +267,12 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
   const [weeklyData, setWeeklyData] = useState([]); //  Weekly data state
   const [showMonthlyTab, setShowMonthlyTab] = useState(false);
   
-  //  Date Picker State
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7));
 
 
-  //  NEW: Fetch Weekly Graph Data
   const fetchWeeklyData = async () => {
     try {
       console.log('Fetching weekly graph data...');
@@ -284,7 +282,6 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
       if (response.data && response.data.labels) {
         const { labels, progress, disposed, ui } = response.data;
         
-        //  Transform API data to chart format (without total)
         const weeklyChartData = labels.map((label, index) => ({
           day: label,
           progress: progress[index] || 0,
@@ -297,7 +294,6 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
       }
     } catch (error) {
       console.error('Error fetching weekly data:', error);
-      // Fallback data if API fails
       setWeeklyData([
         { day: 'Mon', progress: 0, disposed: 0, underInvestigation: 0 },
         { day: 'Tue', progress: 0, disposed: 0, underInvestigation: 0 },
@@ -311,17 +307,14 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
   };
 
 
-  //  API Data Fetching Function
   const fetchDashboardData = async (monthParam) => {
     try {
-      // 1. Dashboard Stats API
       const dashResponse = await api.get(`/lokayukt/dashboard/${monthParam}`);
       if (dashResponse.data.status) {
         setDashboardData(dashResponse.data.dataDashboard);
       }
 
 
-      // 2. Monthly Complaint API
       const monthlyResponse = await api.get('/lokayukt/montly-complaint');
       if (monthlyResponse.data) {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -334,8 +327,6 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
         setMonthlyData(monthlyTrends);
       }
 
-
-      // 3. Status Distribution API
       const statusResponse = await api.get('/lokayukt/status-distribution');
       if (statusResponse.data && statusResponse.data.data) {
         const statusInfo = statusResponse.data.data;
@@ -364,8 +355,6 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
         setStatusData(statusDistribution);
       }
 
-
-      // 4. Department-wise API
       const deptResponse = await api.get('/lokayukt/department-wise-complaint');
       if (deptResponse.data.status) {
         const deptData = Object.entries(deptResponse.data.data).map(([department, complaints]) => ({
@@ -377,7 +366,6 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
       }
 
 
-      // 5. District-wise API
       const districtResponse = await api.get('/lokayukt/district-wise-company-type');
       if (districtResponse.data) {
         const { district, total, allegations, grievances } = districtResponse.data;
@@ -390,8 +378,6 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
         setDistrictData(districtFormatted);
       }
 
-
-      //  6. Fetch Weekly Data
       await fetchWeeklyData();
 
 
@@ -400,24 +386,20 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
     }
   };
 
-
-  //  Initial Data Fetch
   useEffect(() => {
     fetchDashboardData(currentMonth);
   }, [currentMonth]);
 
 
-  //  Handle Date Picker Change
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setShowDatePicker(false);
-    const newMonth = date.toISOString().slice(0, 7); // YYYY-MM format
+    const newMonth = date.toISOString().slice(0, 7); 
     setCurrentMonth(newMonth);
     fetchDashboardData(newMonth);
   };
 
 
-  //  Refresh to Current Month
   const handleRefresh = () => {
     const now = new Date();
     setSelectedDate(now);
@@ -427,7 +409,6 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
   };
 
 
-  // Sample data for charts with realistic values (keeping original for other tabs)
   const processingTimeData = [
     { stage: 'Entry to Verification', avg: 2.3, target: 3 },
     { stage: 'Verification to Forward', avg: 4.1, target: 5 },
@@ -456,7 +437,6 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
   ];
 
 
-  // Add CSS class for cursor pointer on chart elements
   const chartStyles = `
     .recharts-bar-rectangle,
     .recharts-line-dot,
@@ -471,7 +451,7 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
     }
   `;
 
-  // Custom styles for the date picker
+
   const datePickerCustomStyles = `
     .custom-datepicker-wrapper .react-datepicker {
       border: none !important;
@@ -530,26 +510,30 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
       {/* Add custom styles for date picker */}
       <style>{datePickerCustomStyles}</style>
       
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
-          <p className="text-gray-600">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
+          <p className="text-sm sm:text-base text-gray-600 break-words">
             Welcome Back, {userRole} • Last Updated: {new Date().toLocaleString()}
           </p>
         </div>
-        <div className="flex gap-2 relative">
-          {/*  Month-Year Picker Button */}
+        <div className="flex gap-2 relative justify-start sm:justify-end">
+          {/*  Month-Year Picker Button */}
           <Button 
             variant="outline" 
             size="sm"
             onClick={() => setShowDatePicker(!showDatePicker)}
           >
             <FaCalendarAlt className="h-4 w-4 mr-2 text-blue-500" />
-            {selectedDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
+            <span className="hidden xs:inline-block">
+              {selectedDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
+            </span>
+            <span className="inline-block xs:hidden">
+              {selectedDate.toLocaleDateString('default', { month: 'short', year: '2-digit' })}
+            </span>
           </Button>
 
-
-          {/*  Date Picker Dropdown (IMPROVED DESIGN) */}
+          {/*  Date Picker Dropdown (IMPROVED DESIGN) */}
           {showDatePicker && (
             <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg">
               <div className="custom-datepicker-wrapper">
@@ -567,8 +551,7 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
             </div>
           )}
 
-
-          {/*  Refresh Button */}
+          {/*  Refresh Button */}
           <Button variant="outline" size="sm" onClick={handleRefresh}>
             <FaChartLine className="h-4 w-4 mr-2 text-green-500" />
             Refresh

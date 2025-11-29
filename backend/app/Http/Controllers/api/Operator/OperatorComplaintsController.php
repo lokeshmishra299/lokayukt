@@ -4,10 +4,7 @@ namespace App\Http\Controllers\api\Operator;
 
 use App\Http\Controllers\Controller;
 use App\Models\ComplainDetails;
-<<<<<<< HEAD
-=======
 use App\Models\ComplainDocuments;
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
 use App\Models\Complaint;
 use App\Models\ComplaintAction;
 use App\Models\ComplainType;
@@ -191,8 +188,7 @@ class OperatorComplaintsController extends Controller
      
       
     }
-<<<<<<< HEAD
-=======
+
     public function uploadDocument(Request $request)
     {
         // dd($request->all());
@@ -240,7 +236,7 @@ class OperatorComplaintsController extends Controller
         }
 
     }
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
+
 
     public function checkduplicateStoreComplain(Request $request)
     {

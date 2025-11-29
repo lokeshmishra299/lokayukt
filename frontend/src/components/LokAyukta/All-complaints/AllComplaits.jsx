@@ -124,13 +124,8 @@ const CustomSearchableSelect = ({
               <>
                 {/* Dealing Assistant Header */}
                 <div className="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50 border-b flex items-center">
-<<<<<<< HEAD
                   <FaUsers className="w-4 h-4 text-blue-500" />
                   <span className="ml-2">Dealing Assistant</span>
-=======
-                  {/* <FaUsers className="w-4 h-4 text-blue-500" />
-                 <span className="ml-2">Dealing Assistant</span>*/}
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                 </div>
                 
                 {/* Dealing Assistant Options - केवल name दिखेगा */}
@@ -187,15 +182,9 @@ const ForwardModal = ({
       
       setIsLoadingOptions(true);
       try {
-<<<<<<< HEAD
         const response = await api.get("/lokayukt/get-dealing-assistant");
-=======
-        // const response = await api.get("/lokayukt/get-dealing-assistant");
-        const response = await api.get("/lokayukt/get-users");
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
         
         if (response.data && Array.isArray(response.data)) {
-          // Options बनाते time: value में ID (string), display में name
           const assistantOptions = response.data.map(assistant => ({
             value: assistant.id.toString(), 
             displayName: assistant.name,    
@@ -245,15 +234,9 @@ const ForwardModal = ({
     setIsSubmitting(true);
     
     try {
-<<<<<<< HEAD
       const response = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
         forward_to_d_a: parseInt(formData.forwardTo),
         remarks: formData.remarks
-=======
-      const response = await api.post(`/../lokayukt/forward-by-lokayukt/${complaintId}`, {
-        forward_to: parseInt(formData.forwardTo),
-        remark: formData.remarks
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
       });
 
       console.log("API Response:", response.data);
@@ -341,22 +324,14 @@ const ForwardModal = ({
                 </div>
               ) : (
                 <CustomSearchableSelect
-<<<<<<< HEAD
                   name="forward_to_d_a"
-=======
-                  name="forward_to"
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                   value={formData.forwardTo}
                   onChange={(value) => {
                     console.log("Selected ID:", value);
                     setFormData(prev => ({ ...prev, forwardTo: value }))
                   }}
                   options={dropdownOptions}
-<<<<<<< HEAD
                   placeholder="Select Dealing Assistant"
-=======
-                  placeholder="Select Users"
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                   required
                 />
               )}
@@ -946,42 +921,51 @@ const AllComplaints = () => {
         </div>
 
         {/* JUSTIFY-BETWEEN TABS COMPONENT */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden mb-4 sm:mb-6">
-          <div className="">
-            <div className="flex items-center justify-between rounded-md bg-gray-100 p-1 text-gray-500">
-              <button
-                onClick={() => handleTabChange('all')}
-                className={`flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === "all"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                All Complaints
-              </button>
-              <button
-                onClick={() => handleTabChange('pending')}
-                className={`flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === "pending"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                Pending Complaints
-              </button>
-              <button
-                onClick={() => handleTabChange('approved')}
-                className={`flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === "approved"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                Approved Complaints
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden mb-4 sm:mb-6">
+  <div className="">
+    <div
+      className="
+        grid grid-cols-1 sm:grid-cols-3 
+        gap-1 
+        rounded-md bg-gray-100 p-1 text-gray-500
+      "
+    >
+      <button
+        onClick={() => handleTabChange('all')}
+        className={`w-full inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
+          activeTab === "all"
+            ? "bg-white text-gray-900 shadow-sm"
+            : "hover:bg-gray-200"
+        }`}
+      >
+        All Complaints
+      </button>
+
+      <button
+        onClick={() => handleTabChange('pending')}
+        className={`w-full inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
+          activeTab === "pending"
+            ? "bg-white text-gray-900 shadow-sm"
+            : "hover:bg-gray-200"
+        }`}
+      >
+        Pending Complaints
+      </button>
+
+      <button
+        onClick={() => handleTabChange('approved')}
+        className={`w-full inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
+          activeTab === "approved"
+            ? "bg-white text-gray-900 shadow-sm"
+            : "hover:bg-gray-200"
+        }`}
+      >
+        Approved Complaints
+      </button>
+    </div>
+  </div>
+</div>
+
 
         {/* Loading State */}
         {isLoading ? (
@@ -1064,11 +1048,7 @@ const AllComplaints = () => {
                       <div className="mt-5 pt-4 border-t border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         {/* Approval Badges */}
                         <div className="flex flex-wrap gap-2 sm:max-w-[90%]">
-<<<<<<< HEAD
                           {approvalStatuses.map((status, index) => (
-=======
-                         {/* {approvalStatuses.map((status, index) => (
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                             <span
                               key={index}
                               className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium text-white ${status.color}`}
@@ -1076,11 +1056,7 @@ const AllComplaints = () => {
                               <FaCheck className="w-3 h-3 mr-1" />
                               {status.label}
                             </span>
-<<<<<<< HEAD
                           ))}
-=======
-                          ))}*/}
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                         </div>
 
                         {/* Action Buttons */}
@@ -1114,11 +1090,8 @@ const AllComplaints = () => {
   )
 }
 
-<<<<<<< HEAD
-=======
                         
 
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                           {isForwarded(complaint) ? (
                             <span className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium bg-green-500 text-white cursor-default">
                               ✓ Forwarded

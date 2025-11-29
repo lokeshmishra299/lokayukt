@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
 
-// Create axios instance with token if it exists
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -26,7 +26,7 @@ const PendingComplaints = () => {
   const [complaintToApprove, setComplaintToApprove] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
 
-  // ✅ Fetch complaints data from API
+
   useEffect(() => {
     const fetchComplaints = async () => {
       try {
@@ -47,26 +47,26 @@ const PendingComplaints = () => {
     fetchComplaints();
   }, []);
 
-  // ✅ Handle view details with navigation - Only button click
+  
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation(); // Prevent any parent event
     navigate(`/lokayukt/search-reports/view/${complaintId}`);
   };
 
-  // ✅ Handle modal view - Only for modal
+
   const handleModalView = (complaint) => {
     setSelectedComplaint(complaint);
     setIsModalOpen(true);
   };
 
-  // ✅ Handle approve button click - Show confirmation
+
   const handleApproveClick = (e, complaint) => {
     e.stopPropagation();
     setComplaintToApprove(complaint);
     setIsConfirmModalOpen(true);
   };
 
-  // ✅ Handle approval confirmation with react-toastify
+
   const handleConfirmApproval = async () => {
     if (!complaintToApprove) return;
     
@@ -76,7 +76,7 @@ const PendingComplaints = () => {
       const response = await api.post(`/lokayukt/approved-by-ro/${complaintToApprove.id}`);
       
       if (response.data.success || response.status === 200) {
-        // Show success toast using react-toastify
+       
         toast.success("Approved Successfully!", {
           position: "top-right",
           autoClose: 3000,
@@ -86,7 +86,7 @@ const PendingComplaints = () => {
           draggable: true,
         });
         
-        // Update complaint approved_by_ro status in local state
+
         setComplaintsData(prevData => 
           prevData.map(complaint => 
             complaint.id === complaintToApprove.id 
@@ -137,7 +137,7 @@ const PendingComplaints = () => {
     });
   };
 
-  // ✅ Get status color
+
   const getStatusTextColor = (status) => {
     switch (status?.toLowerCase()) {
       case 'in progress':
@@ -151,7 +151,6 @@ const PendingComplaints = () => {
     }
   };
 
-  // ✅ Check if complaint is approved by RO (Regional Officer)
   const isApprovedByRO = (complaint) => {
     return complaint.approved_by_ro === 1;
   };
@@ -168,7 +167,6 @@ const PendingComplaints = () => {
 
   return (
     <>
-      {/* ✅ React-Toastify Container */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -184,19 +182,19 @@ const PendingComplaints = () => {
       />
 
       <div className="min-h-screen p-2 sm:p-4">
-        {/* ✅ Header - Responsive */}
+      
         <div className="mb-4 sm:mb-6">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Pending Complaints</h1>
         </div>
 
-        {/* ✅ Mobile-First Responsive Card Layout */}
+        
         <div className="space-y-3 sm:space-y-4">
           {complaintsData.map((complaint) => (
             <div
               key={complaint.id}
               className="w-full bg-white shadow-md sm:shadow-lg hover:shadow-lg sm:hover:shadow-xl rounded-lg border border-gray-300 transition-shadow duration-300"
             >
-              {/* ✅ Row 1 - Only Complaint No is bold */}
+           
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 p-3 sm:p-4 text-sm border-b sm:border-b-0 border-gray-100">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
                   <span className="font-semibold text-blue-600 text-xs sm:text-sm mb-1 sm:mb-0">
@@ -216,7 +214,7 @@ const PendingComplaints = () => {
                 </div>
               </div>
 
-              {/* ✅ Row 2 - All labels normal (not bold) */}
+           
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 px-3 sm:px-4 pb-3 sm:pb-4 text-sm border-b sm:border-b-0 border-gray-100">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
                   <span className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-0">Complainant:</span>
@@ -236,7 +234,7 @@ const PendingComplaints = () => {
                 </div>
               </div>
 
-              {/* ✅ Row 3 - All labels normal (not bold) */}
+           
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 px-3 sm:px-4 pb-3 sm:pb-4 border-b sm:border-b-0 border-gray-100">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2">
                   <span className="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-0">Created Date:</span>
@@ -247,7 +245,7 @@ const PendingComplaints = () => {
                 <div className="hidden sm:block"></div>
               </div>
 
-              {/* ✅ Row 4 - Action Buttons with conditional rendering based on approved_by_ro */}
+              
               <div className="px-3 sm:px-4 pb-3 sm:pb-4">
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 sm:justify-end">
                   <button
@@ -256,8 +254,7 @@ const PendingComplaints = () => {
                   >
                     View Details
                   </button>
-                  
-                  {/* ✅ Conditional rendering based on approved_by_ro field */}
+              
                   {isApprovedByRO(complaint) ? (
                     <button
                       disabled
@@ -279,7 +276,7 @@ const PendingComplaints = () => {
           ))}
         </div>
 
-        {/* ✅ Empty State */}
+    
         {complaintsData.length === 0 && (
           <div className="text-center py-8 sm:py-12">
             <p className="text-gray-500 text-sm sm:text-base">No pending complaints found</p>
@@ -287,7 +284,7 @@ const PendingComplaints = () => {
         )}
       </div>
 
-      {/* ✅ Confirmation Modal */}
+
       {isConfirmModalOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
@@ -329,11 +326,10 @@ const PendingComplaints = () => {
         </div>
       )}
 
-      {/* ✅ Mobile Responsive Modal */}
+ 
       {isModalOpen && selectedComplaint && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-start sm:items-center p-2 sm:p-4">
           <div className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-lg sm:rounded-2xl bg-white mt-2 sm:mt-0">
-            {/* Modal Header - Mobile Responsive */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-start sm:items-center">
               <div className="pr-4">
                 <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Complaint Details</h2>

@@ -26,9 +26,9 @@ const Sidebar = ({
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
   const [isHindi, setIsHindi] = useState(false);
-  const sidebarRef = useRef(null); //  Added ref for outside click detection
+  const sidebarRef = useRef(null); 
 
-  // Simple translation object with updated route names
+
   const translations = {
     english: {
       title: "LokAyukta",
@@ -58,10 +58,10 @@ const Sidebar = ({
     },
   };
 
-  // Get current translations
+
   const t = isHindi ? translations.hindi : translations.english;
 
-  //  Outside click handler for mobile menu
+
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (
@@ -76,7 +76,7 @@ const Sidebar = ({
 
     if (isMobile && isMobileMenuOpen) {
       document.addEventListener("mousedown", handleOutsideClick);
-      document.addEventListener("touchstart", handleOutsideClick); //  Added for mobile touch
+      document.addEventListener("touchstart", handleOutsideClick); 
     }
 
     return () => {
@@ -85,13 +85,13 @@ const Sidebar = ({
     };
   }, [isMobile, isMobileMenuOpen, toggleMobileMenu]);
 
-  // Check screen size and set mobile state
+
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       
-      //  Auto-close mobile menu on desktop resize
+
       if (!mobile && isMobileMenuOpen) {
         toggleMobileMenu();
       }
@@ -105,17 +105,17 @@ const Sidebar = ({
     };
   }, [isMobileMenuOpen, toggleMobileMenu]);
 
-  // Toggle language function
+
   const toggleLanguage = () => {
     setIsHindi(!isHindi);
   };
 
   const scroleTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
-  // Add any other logic here
+
 };
 
-  // Simple isActive function for lokayukt routes
+
   const isActive = (href) => {
     const fullPath = `/lokayukt${href}`;
 
@@ -125,7 +125,7 @@ const Sidebar = ({
     return location.pathname.startsWith(fullPath);
   };
 
-  // Close mobile menu when clicking link
+
 const handleLinkClick = () => {
   if (isMobile && isMobileMenuOpen) {
     toggleMobileMenu();
@@ -135,7 +135,6 @@ const handleLinkClick = () => {
 };
 
 
-  //  Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isMobile && isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -148,7 +147,7 @@ const handleLinkClick = () => {
     };
   }, [isMobile, isMobileMenuOpen]);
 
-  // Custom Scrollbar CSS
+
   const scrollbarStyles = `
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
@@ -172,10 +171,10 @@ const handleLinkClick = () => {
 
   return (
     <>
-      {/* Custom Scrollbar Styles */}
+    
       <style>{scrollbarStyles}</style>
 
-      {/*  Mobile Overlay with higher z-index */}
+
       {isMobile && isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
@@ -184,7 +183,7 @@ const handleLinkClick = () => {
         />
       )}
 
-      {/*  Sidebar with proper z-index and ref */}
+    
       <div
         ref={sidebarRef}
         className={`fixed left-0 top-0 h-full min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl transition-all duration-300 flex flex-col ${
@@ -193,7 +192,7 @@ const handleLinkClick = () => {
             : `${isCollapsed ? "w-16" : "w-72"} z-30`
         }`}
       >
-        {/* Mobile Close Button */}
+   
         {isMobile && isMobileMenuOpen && (
           <button
             onClick={toggleMobileMenu}
@@ -204,7 +203,6 @@ const handleLinkClick = () => {
           </button>
         )}
 
-        {/* Desktop Toggle Button */}
         {!isMobile && (
           <button
             onClick={toggleSidebar}
@@ -221,13 +219,13 @@ const handleLinkClick = () => {
           </button>
         )}
 
-        {/* Header Section */}
+      
         <div
           className={`border-b border-slate-700 transition-all duration-300 flex-shrink-0 ${
             !isMobile && isCollapsed ? "p-3" : "p-6"
           }`}
         >
-          {/* Logo */}
+      
           <div
             className={`flex items-center mb-4 transition-all duration-300 ${
               !isMobile && isCollapsed ? "justify-center gap-0" : "gap-3"
@@ -251,10 +249,10 @@ const handleLinkClick = () => {
             )}
           </div>
 
-          {/* lokayukt Badge & Header Actions Layout */}
+    \
           <div className="flex justify-between">
             <div>
-              {/* lokayukt Badge */}
+        
               {(isMobile || !isCollapsed) && (
                 <div className="mb-3 transition-all duration-300">
                   <span className="bg-[#133973] text-white px-3 py-1 rounded-full text-xs font-medium">
@@ -265,7 +263,7 @@ const handleLinkClick = () => {
             </div>
 
             <div>
-              {/* Header Actions */}
+    
               {(isMobile || !isCollapsed) && (
                 <div className="flex gap-2 transition-all duration-300">
                   <button
@@ -282,7 +280,7 @@ const handleLinkClick = () => {
                 </div>
               )}
 
-              {/* Collapsed Header Actions */}
+      
               {!isMobile && isCollapsed && (
                 <div className="flex flex-col gap-2 items-center transition-all duration-300">
                   <button
@@ -301,14 +299,14 @@ const handleLinkClick = () => {
           </div>
         </div>
 
-        {/* Navigation Menu - Updated with custom-scrollbar */}
+   
         <nav
           className={`flex-1 transition-all duration-300 overflow-y-auto custom-scrollbar ${
             !isMobile && isCollapsed ? "py-4" : "py-6"
           }`}
         >
           <ul className="space-y-1">
-            {/* Dashboard */}
+         
             <li>
               <Link
                 to="/lokayukt/dashboard"
@@ -333,7 +331,7 @@ const handleLinkClick = () => {
               </Link>
             </li>
 
-            {/* All Complaints */}
+        
             <li>
               <Link
                 to="/lokayukt/all-complaints"
@@ -360,7 +358,7 @@ const handleLinkClick = () => {
               </Link>
             </li>
 
-            {/* Progress Register */}
+   
             <li>
               <Link
                 to="/lokayukt/progress-register"
@@ -385,7 +383,6 @@ const handleLinkClick = () => {
               </Link>
             </li>
 
-            {/* Search & Reports */}
             <li>
               
               <Link
@@ -413,7 +410,7 @@ const handleLinkClick = () => {
           </ul>
         </nav>
 
-        {/* Footer */}
+  
         {(isMobile || !isCollapsed) && (
           <div className="p-6 border-t border-slate-700 text-center transition-all duration-300 flex-shrink-0 mt-auto">
             <p className="text-xs text-slate-400">{t.copyright}</p>

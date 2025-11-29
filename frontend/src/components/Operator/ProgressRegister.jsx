@@ -849,7 +849,7 @@ const ProgressRegister = () => {
         style={{ zIndex: 9999 }}
       />
 
-      <div className="px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-full">
+      <div className="px-2 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6 max-w-full">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="min-w-0 flex-1">

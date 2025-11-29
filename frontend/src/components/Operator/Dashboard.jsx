@@ -524,57 +524,60 @@ const Dashboard = ({ userRole = "operator" }) => {
 
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+    <div className="p-2 space-y-6 bg-gray-50 min-h-screen">
       {/* Add styles for chart cursor pointer */}
       <style>{chartStyles}</style>
       {/* Add custom styles for date picker */}
       <style>{datePickerCustomStyles}</style>
       
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
-          <p className="text-gray-600">
-            Welcome Back, {userRole} • Last Updated: {new Date().toLocaleString()}
-          </p>
-        </div>
-        <div className="flex gap-2 relative">
-          {/*  Month-Year Picker Button */}
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setShowDatePicker(!showDatePicker)}
-          >
-            <FaCalendarAlt className="h-4 w-4 mr-2 text-blue-500" />
-            {selectedDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
-          </Button>
-
-
-          {/*  Date Picker Dropdown (IMPROVED DESIGN) */}
-          {showDatePicker && (
-            <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg">
-              <div className="custom-datepicker-wrapper">
-                <DatePicker
-                    selected={selectedDate}
-                    onChange={handleDateChange}
-                    dateFormat="MM/yyyy"
-                    showMonthYearPicker
-                    showFullMonthYearPicker
-                    minDate={new Date('2022-01-01')}
-                    maxDate={new Date('2025-12-31')}
-                    inline
-                />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
+                <p className="text-sm sm:text-base text-gray-600 break-words">
+                  Welcome Back, {userRole} • Last Updated: {new Date().toLocaleString()}
+                </p>
+              </div>
+              <div className="flex gap-2 relative justify-start sm:justify-end">
+                {/*  Month-Year Picker Button */}
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowDatePicker(!showDatePicker)}
+                >
+                  <FaCalendarAlt className="h-4 w-4 mr-2 text-blue-500" />
+                  <span className="hidden xs:inline-block">
+                    {selectedDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
+                  </span>
+                  <span className="inline-block xs:hidden">
+                    {selectedDate.toLocaleDateString('default', { month: 'short', year: '2-digit' })}
+                  </span>
+                </Button>
+      
+                {/*  Date Picker Dropdown (IMPROVED DESIGN) */}
+                {showDatePicker && (
+                  <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg">
+                    <div className="custom-datepicker-wrapper">
+                      <DatePicker
+                          selected={selectedDate}
+                          onChange={handleDateChange}
+                          dateFormat="MM/yyyy"
+                          showMonthYearPicker
+                          showFullMonthYearPicker
+                          minDate={new Date('2022-01-01')}
+                          maxDate={new Date('2025-12-31')}
+                          inline
+                      />
+                    </div>
+                  </div>
+                )}
+      
+                {/*  Refresh Button */}
+                <Button variant="outline" size="sm" onClick={handleRefresh}>
+                  <FaChartLine className="h-4 w-4 mr-2 text-green-500" />
+                  Refresh
+                </Button>
               </div>
             </div>
-          )}
-
-
-          {/*  Refresh Button */}
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <FaChartLine className="h-4 w-4 mr-2 text-green-500" />
-            Refresh
-          </Button>
-        </div>
-      </div>
 
 
       {/* Monthly Tab */}

@@ -940,42 +940,47 @@ const PendingComplaints = () => {
           </h1>
         </div>
 
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden mb-4 sm:mb-6">
-          <div className="">
-            <div className="flex items-center justify-between rounded-md bg-gray-100 p-1 text-gray-500">
-              <button
-                onClick={() => handleTabChange('all')}
-                className={`flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === "all"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                All Complaints
-              </button>
-              <button
-                onClick={() => handleTabChange('pending')}
-                className={`flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === "pending"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                Pending Complaints
-              </button>
-              <button
-                onClick={() => handleTabChange('approved')}
-                className={`flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === "approved"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                Approved Complaints
-              </button>
-            </div>
-          </div>
-        </div>
+       <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden mb-4 sm:mb-6">
+  <div className="">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1 rounded-md bg-gray-100 p-1 text-gray-500">
+      
+      <button
+        onClick={() => handleTabChange('all')}
+        className={`w-full inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
+          activeTab === "all"
+            ? "bg-white text-gray-900 shadow-sm"
+            : "hover:bg-gray-200"
+        }`}
+      >
+        All Complaints
+      </button>
+
+      <button
+        onClick={() => handleTabChange('pending')}
+        className={`w-full inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
+          activeTab === "pending"
+            ? "bg-white text-gray-900 shadow-sm"
+            : "hover:bg-gray-200"
+        }`}
+      >
+        Pending Complaints
+      </button>
+
+      <button
+        onClick={() => handleTabChange('approved')}
+        className={`w-full inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
+          activeTab === "approved"
+            ? "bg-white text-gray-900 shadow-sm"
+            : "hover:bg-gray-200"
+        }`}
+      >
+        Approved Complaints
+      </button>
+
+    </div>
+  </div>
+</div>
+
 
         {isLoading ? (
           <div className="flex justify-center items-center py-12">

@@ -14,7 +14,7 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Create axios instance with token
+
   const getApiInstance = () => {
     const token = localStorage.getItem("access_token");
     return axios.create({
@@ -26,7 +26,7 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
     });
   };
 
-  // Check screen size
+
   useEffect(() => {
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -40,7 +40,7 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
     };
   }, []);
 
-  // Update time every minute
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentDateTime(new Date());
@@ -49,7 +49,6 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Format date and time exactly like in image: "25 Sep 2025, 12:48 am"
   const formatDateTime = () => {
     const now = currentDateTime;
     const day = now.getDate();
@@ -66,7 +65,7 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
     return `${day} ${month} ${year}, ${hours}:${minutesStr} ${ampm}`;
   };
 
-  // Logout function with API call
+
   const handleLogout = async () => {
     if (isLoggingOut) return;
     
@@ -107,7 +106,6 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
     window.location.reload();
   };
 
-  // ✅ Safe user data parsing with error handling
   const getUserData = () => {
     try {
       const userData = localStorage.getItem('user');
@@ -118,7 +116,7 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
     }
   };
 
-  // ✅ Safe role parsing from localStorage
+
   const getUserRole = () => {
     try {
       const role = localStorage.getItem('role');
@@ -147,7 +145,7 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
         style={{ zIndex: 9999 }}
       />
 
-      {/* ✅ RESPONSIVE Header - Mobile First Design */}
+  
       <header 
         className="bg-white border-b border-gray-200 relative z-20"
         style={{
@@ -157,7 +155,7 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
       >
         <div className={`flex justify-between items-center ${isMobile ? 'px-3 py-3' : 'px-6 py-4'}`}>
           
-          {/* ✅ LEFT SIDE - Mobile Menu + Clock + DateTime */}
+        
           <div className="flex items-center gap-2 sm:gap-3">
             {/* ✅ MOBILE: Hamburger Menu Button */}
             {isMobile && (
@@ -189,13 +187,11 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
             </span>
           </div>
 
-          {/* ✅ RIGHT SIDE - User Info + Actions (Responsive) */}
           <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
-            
-            {/* ✅ User Details - Hidden on very small screens */}
+  
             {!isMobile && (
               <div className="flex flex-col">
-                {/* User Name & Role */}
+         
                 <div className="flex items-center">
                   <FaUser className="w-4 h-4 mr-2 text-gray-600" />
                   <span className="text-sm font-medium text-gray-900">
@@ -215,7 +211,6 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
               </div>
             )}
 
-            {/* ✅ MOBILE: User Icon Only */}
             {isMobile && (
               <div className="flex items-center gap-1">
                 <FaUser className="w-4 h-4 text-gray-600" />
@@ -225,9 +220,8 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
               </div>
             )}
 
-            {/* ✅ Action Buttons - Responsive */}
             <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
-              {/* Refresh Icon */}
+      
               <button
                 onClick={handleRefresh}
                 className={`text-blue-500 rounded-lg hover:bg-gray-100 transition-colors ${
@@ -238,7 +232,6 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
                 <FaSync className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
               </button>
 
-              {/* Logout Icon */}
               <button 
                 className={`text-red-600 transition-colors rounded-lg hover:bg-gray-100 ${
                   isMobile ? 'p-1.5' : 'p-2'

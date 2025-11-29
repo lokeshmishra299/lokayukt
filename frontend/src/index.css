@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Animated gradient background */
+
 
 @layer base {
   * {
@@ -30,15 +30,14 @@
     50% { filter: hue-rotate(10deg) brightness(1.06); }
   }
 
-  /* Cursor blink for typewriter */
+
   .animate-cursor { animation: cursorBlink 1s steps(2, start) infinite; }
   @keyframes cursorBlink { 0%,100% { border-color: transparent; } 50% { border-color: #f9a8d4; } }
 
-  /* Floating hearts (use class animate-float wherever needed) */
   @keyframes float { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.04); } }
   .animate-float { animation: float 3.8s ease-in-out infinite; }
 
-  /* Entrances */
+
   @keyframes cardIn { from { transform: translateY(14px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
   .animate-cardIn { animation: cardIn .6s ease-out both; }
 
@@ -48,7 +47,6 @@
   @keyframes popIn { 0% { opacity: 0; transform: scale(.98) translateY(6px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
   .animate-popIn { animation: popIn .35s ease-out both; }
 
-  /* Confetti pieces (spawn from JS) */
   @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: .95; } }
   @keyframes sway { 0% { margin-left: 0; } 50% { margin-left: 25px; } 100% { margin-left: 0; } }
   .confetti-piece {
@@ -61,41 +59,10 @@
     z-index: 50;
   }
 
-  /* Motion safety: users who prefer reduced motion */
+
   @media (prefers-reduced-motion: reduce) {
     .bg-animated { animation: none; }
     .animate-cursor { animation: none; }
     .animate-float, .animate-cardIn, .animate-fadeIn, .animate-popIn { animation: none; }
   }
 }
-<<<<<<< HEAD
-
-
-
-/* ************************************************************** */
-
-main {
-  margin-left: 0 !important;
-}
-
-
-/* Perfect thin scrollbar (same as screenshot) */
-.customScrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.customScrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.customScrollbar::-webkit-scrollbar-thumb {
-  background: #b5b5b5;
-  border-radius: 10px;
-}
-
-.customScrollbar::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
-=======
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
