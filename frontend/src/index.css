@@ -68,6 +68,7 @@
     .animate-float, .animate-cardIn, .animate-fadeIn, .animate-popIn { animation: none; }
   }
 }
+<<<<<<< HEAD
 
 
 
@@ -96,3 +97,5 @@ main {
 .customScrollbar::-webkit-scrollbar-thumb:hover {
   background: #999;
 }
+=======
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392

@@ -15,7 +15,11 @@ class SubRolesSeeder extends Seeder
     {
          DB::table('sub_roles')->insert([
             ['role_id' =>'2','name' => 'ro-aro',      'label' => 'RO/ARO'],
+<<<<<<< HEAD
             ['role_id' =>'2','name' => 'entry-operator',      'label' => 'Entry Operator'],
+=======
+            ['role_id' =>'2','name' => 'record-keeper',      'label' => 'Entry Operator'],
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
             ['role_id' =>'2','name' => 'review-operator',      'label' => 'Review Operator'],
             ['role_id' =>'3','name' => 'so-us',      'label' => 'Section Officer / Under Secretary'],
             ['role_id' =>'3','name' => 'ds-js',      'label' => 'Deputy Secretary / Joint Secretary'],
