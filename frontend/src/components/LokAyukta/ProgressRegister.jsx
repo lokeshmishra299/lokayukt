@@ -40,16 +40,16 @@ const ProgressRegister = () => {
   const [error, setError] = useState(null);
   const [expandedNotes, setExpandedNotes] = useState(new Set());
 
-  // Loading states for each tab
+
   const [loadingMovements, setLoadingMovements] = useState(true);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [loadingAnalytics, setLoadingAnalytics] = useState(true);
 
-  // Pagination states
+
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
-  // Toggle note expansion
+
   const toggleNoteExpansion = (id) => {
     const newExpandedNotes = new Set(expandedNotes);
     if (newExpandedNotes.has(id)) {
@@ -60,12 +60,12 @@ const ProgressRegister = () => {
     setExpandedNotes(newExpandedNotes);
   };
 
-  // Check if note text is long (more than 50 characters)
+
   const isLongNote = (note) => {
     return note && note.length > 50;
   };
 
-  // Export functionality - File Movements
+
   const handleExportMovements = () => {
     try {
       const fileMovements = transformToFileMovements(complaintsData);
@@ -108,7 +108,7 @@ const ProgressRegister = () => {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-      // Header styling
+
       const headerStyle = {
         font: { bold: true, color: { rgb: "000000" } },
         alignment: { horizontal: "center" },
@@ -122,7 +122,6 @@ const ProgressRegister = () => {
         ws[cellAddress].s = headerStyle;
       }
 
-      // Column widths
       ws["!cols"] = [
         { wch: 8 },
         { wch: 15 },
@@ -157,7 +156,7 @@ const ProgressRegister = () => {
     }
   };
 
-  // Export functionality - Current Status
+
   const handleExportStatus = () => {
     try {
       const complaintStatus = transformCurrentReportToStatus(currentReportData);
@@ -202,7 +201,7 @@ const ProgressRegister = () => {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-      // Header styling
+
       const headerStyle = {
         font: { bold: true, color: { rgb: "000000" } },
         alignment: { horizontal: "center" },
@@ -216,7 +215,7 @@ const ProgressRegister = () => {
         ws[cellAddress].s = headerStyle;
       }
 
-      // Column widths
+
       ws["!cols"] = [
         { wch: 8 },
         { wch: 15 },
@@ -253,7 +252,7 @@ const ProgressRegister = () => {
     }
   };
 
-  // Export functionality - Analytics
+  
   const handleExportAnalytics = () => {
     try {
       if (!analyticsData) {
@@ -276,7 +275,7 @@ const ProgressRegister = () => {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-      // Header styling
+   
       const headerStyle = {
         font: { bold: true, color: { rgb: "000000" } },
         alignment: { horizontal: "center" },
@@ -290,7 +289,7 @@ const ProgressRegister = () => {
         ws[cellAddress].s = headerStyle;
       }
 
-      // Column widths
+ 
       ws["!cols"] = [{ wch: 25 }, { wch: 15 }];
 
       XLSX.utils.book_append_sheet(wb, ws, "Analytics");
@@ -316,7 +315,7 @@ const ProgressRegister = () => {
     }
   };
 
-  // Main export handler based on active tab
+
   const handleExport = () => {
     switch (activeTab) {
       case "movements":
@@ -333,7 +332,7 @@ const ProgressRegister = () => {
     }
   };
 
-  // Fetch complaints data from API for movements tab
+
   useEffect(() => {
     const fetchComplaints = async () => {
       setLoadingMovements(true);

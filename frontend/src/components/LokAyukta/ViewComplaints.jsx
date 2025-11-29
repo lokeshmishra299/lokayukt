@@ -33,7 +33,7 @@ const APP_URL = BASE_URL.replace("/api", "");
 const token = localStorage.getItem("access_token");
 const subRole = localStorage.getItem("subrole");
 
-// Create axios instance with token if it exists
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -53,7 +53,7 @@ const ViewPendingComplaints = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch complaint data
+
   useEffect(() => {
     const fetchData = async () => {
       if (!id) {
@@ -65,7 +65,7 @@ const ViewPendingComplaints = () => {
       try {
         setLoading(true);
 
-        // Fetch complaint data using edit endpoint for consistency
+        
         const complaintResponse = await api.get(
           `/lokayukt/view-complaint/${id}`
         );
@@ -74,7 +74,7 @@ const ViewPendingComplaints = () => {
           setComplaintData(complaintResponse.data.data);
           console.log("Complaint Data:", complaintResponse.data.data);
 
-          // Fetch file preview data
+ 
           try {
             const fileResponse = await api.get(
               `/lokayukt/get-file-preview/${id}`
@@ -105,7 +105,7 @@ const ViewPendingComplaints = () => {
     fetchData();
   }, [id]);
 
-  // Get status color
+
   const getStatusColor = (status) => {
     switch (status) {
       case "Disposed - Accepted":
@@ -123,7 +123,7 @@ const ViewPendingComplaints = () => {
     }
   };
 
-  // Format date
+
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
@@ -137,19 +137,19 @@ const ViewPendingComplaints = () => {
     });
   };
 
-  // Handle file download
+
   const handleFileDownload = (filePath) => {
     if (!filePath) {
       toast.error("No file available for download");
       return;
     }
     
-    // Open file in new tab for download
+  
     const fileUrl = `${APP_URL}${filePath}`;
     window.open(fileUrl, "_blank");
   };
 
-  // Handle file preview
+
   const handleFilePreview = (filePath) => {
     if (filePath) {
       setCurrentPreviewFile(filePath);
@@ -159,7 +159,7 @@ const ViewPendingComplaints = () => {
     }
   };
 
-  // Handle edit navigation
+
   const handleEditNavigation = () => {
     if (id && complaintData) {
       console.log("Navigating to edit with ID:", id);
@@ -170,17 +170,16 @@ const ViewPendingComplaints = () => {
     }
   };
 
-  // Check if file is PDF
+
   const isPDF = (filePath) => {
     return filePath && filePath.toLowerCase().endsWith(".pdf");
   };
 
-  // Check if file is image
+
   const isImage = (filePath) => {
     return filePath && /\.(jpg|jpeg|png|gif|webp)$/i.test(filePath);
   };
 
-  // PDF Preview Modal Component
   const PDFPreviewModal = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -242,7 +241,7 @@ const ViewPendingComplaints = () => {
     );
   };
 
-  // Loading state
+
   if (loading) {
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
@@ -253,7 +252,7 @@ const ViewPendingComplaints = () => {
     );
   }
 
-  // Error state
+
   if (error) {
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
@@ -275,7 +274,7 @@ const ViewPendingComplaints = () => {
     <div className="p-3 sm:p-4 md:p-6 bg-gray-50 min-h-screen">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* Header - Same as edit form with Edit Button */}
+      
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
@@ -283,7 +282,7 @@ const ViewPendingComplaints = () => {
             <p className="text-xs sm:text-sm text-gray-600">शिकायत विवरण देखें</p>
           </div>
           <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
-            {/* Edit Button - Show based on subRole */}
+      
             {subRole === "review-operator" && (
               <button
                 onClick={handleEditNavigation}
@@ -307,10 +306,9 @@ const ViewPendingComplaints = () => {
         </div>
       </div>
 
-      {/* Main Content - Same structure as edit form */}
+
       {complaintData && (
         <div className="space-y-4 sm:space-y-6">
-          {/* Top Row: Complainant Details + Security Fee */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
             
             {/* Complainant Details */}
@@ -324,9 +322,9 @@ const ViewPendingComplaints = () => {
               </div>
 
               <div className="space-y-4">
-                {/* Name and Mobile Row */}
+        
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Name */}
+         
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Name / नाम *
@@ -336,7 +334,7 @@ const ViewPendingComplaints = () => {
                     </div>
                   </div>
 
-                  {/* Mobile */}
+           
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Mobile / मोबाइल *
@@ -347,7 +345,6 @@ const ViewPendingComplaints = () => {
                   </div>
                 </div>
 
-                {/* Address */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Address / पता *
@@ -357,9 +354,9 @@ const ViewPendingComplaints = () => {
                   </div>
                 </div>
 
-                {/* District and Email Row */}
+     
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* District */}
+        
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       District / जिला *
@@ -369,7 +366,7 @@ const ViewPendingComplaints = () => {
                     </div>
                   </div>
 
-                  {/* Email */}
+       
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Email *
@@ -382,7 +379,7 @@ const ViewPendingComplaints = () => {
               </div>
             </div>
 
-            {/* Security Fee Section */}
+      
             <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center gap-3 mb-4">
                 <FaRupeeSign className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
@@ -393,7 +390,6 @@ const ViewPendingComplaints = () => {
               </div>
               
               <div className="space-y-3 sm:space-y-4">
-                {/* Fee Exempted Checkbox - Read Only */}
                 <div>
                   <div className="flex items-center rounded-md space-x-2">
                     <input
@@ -409,10 +405,9 @@ const ViewPendingComplaints = () => {
                   </div>
                 </div>
 
-                {/* Show Amount, Challan No, Date when fee is NOT exempted */}
+           
                 {complaintData.fee_exempted !== 1 && (
                   <>
-                    {/* Amount */}
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                         Amount / राशि *
@@ -422,7 +417,6 @@ const ViewPendingComplaints = () => {
                       </div>
                     </div>
 
-                    {/* Challan No */}
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                         Challan No. / चालान नं. *
@@ -432,7 +426,6 @@ const ViewPendingComplaints = () => {
                       </div>
                     </div>
 
-                    {/* Date of Birth */}
                     <div>
                       <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                         Date of Birth / जन्म तिथि *

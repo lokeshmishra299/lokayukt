@@ -10,15 +10,15 @@ const Layout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check screen size
+
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       
-      //  FIXED: Don't auto-collapse on mobile, just detect mobile state
+      
       if (mobile) {
-        setIsCollapsed(false); // Keep expanded for mobile functionality
+        setIsCollapsed(false); 
       }
     };
 
@@ -63,7 +63,6 @@ const Layout = () => {
         </main>
       </div>
       
-      {/* Footer को यहाँ add करें - sidebar के साथ sync होगा */}
       <div 
         className="transition-all duration-300"
         style={{

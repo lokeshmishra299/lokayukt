@@ -488,7 +488,7 @@ const [isCompareClicked, setIsCompareClicked] = useState(false);
   };
 
   return (
-    <div className="p-3 sm:p-4 md:p-6 bg-gray-50 min-h-screen">
+    <div className="p-2 sm:p-2 md:p-6 bg-gray-50 min-h-screen">
       <ToastContainer
         position="top-right"
         autoClose={3000}

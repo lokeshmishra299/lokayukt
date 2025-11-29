@@ -50,11 +50,7 @@ const api = axios.create({
 const mapRoleToDisplayName = (apiRole) => {
   const roleMapping = {
     'ro-aro': 'RO/ARO',
-<<<<<<< HEAD
     'entry-operator': 'Entry Operator',
-=======
-    'record-keeper': 'Entry Operator',
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
     'review-operator': 'Review Operator', 
     'so-us': 'Section Officer',
     'ds-js': 'DS/JS',

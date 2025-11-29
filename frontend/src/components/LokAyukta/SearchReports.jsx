@@ -986,7 +986,7 @@ const SearchReports = () => {
               {activeTab === "search" && (
                 <div className="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                   <div className="space-y-3 sm:space-y-4 overflow-hidden">
-                    <div className="bg-white sm:p-4 shadow-sm">
+                    <div className="bg-white p-2 sm:p-4 shadow-sm">
                       <div className="flex items-center gap-2 mb-3">
                         <FaSearch className="w-5 h-5 text-gray-700 relative sm:bottom-3 md:bottom-3 lg:bottom-3" />
                         <h3 className="text-2xl sm:text-xl md:text-2xl relative sm:bottom-3 md:bottom-3 lg:bottom-3 font-semibold text-gray-900">
@@ -1289,14 +1289,14 @@ const SearchReports = () => {
               )}
 
               {activeTab === "statistical" && (
-                <div className="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                <div className="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 p-2">
                   {isLoadingStatistical ? (
                     <div className="text-center py-8">
                       <div className="text-gray-500 font-semibold text-md">Loading...</div>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 overflow-hidden">
-                      <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+                      <div className="bg-white p-4 sm:p-6  rounded-lg border border-gray-200">
                         <div className="flex items-center gap-2 mb-4">
                           <FaChartBar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                           <h3 className="text-base sm:text-lg font-semibold text-gray-900">Monthly Trends</h3>

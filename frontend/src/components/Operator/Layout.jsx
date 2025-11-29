@@ -16,14 +16,8 @@ const Layout = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       
-<<<<<<< HEAD
       if (mobile) {
         setIsCollapsed(false);
-=======
-      // ✅ FIXED: Don't auto-collapse on mobile, just detect mobile state
-      if (mobile) {
-        setIsCollapsed(false); // Keep expanded for mobile functionality
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
       }
     };
 
@@ -46,7 +40,6 @@ const Layout = () => {
   };
 
   return (
-<<<<<<< HEAD
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
       <Sidebar
@@ -76,45 +69,10 @@ const Layout = () => {
         </main>
 
         {/* Footer */}
-=======
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <Header 
-        toggleMobileMenu={toggleMobileMenu} 
-        toggleSidebar={toggleSidebar}
-        isCollapsed={isCollapsed}
-      />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          isMobileMenuOpen={isMobileMenuOpen} 
-          toggleMobileMenu={toggleMobileMenu} 
-          isCollapsed={isCollapsed}
-          toggleSidebar={toggleSidebar}
-        />
-        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${
-          isMobile ? 'p-4' : 'p-6'
-        }`} style={{
-          marginLeft: !isMobile ? (isCollapsed ? '4rem' : '18rem') : '0'
-        }}>
-          <Outlet />
-        </main>
-      </div>
-      
-      {/* Footer को यहाँ add करें - sidebar के साथ sync होगा */}
-      <div 
-        className="transition-all duration-300"
-        style={{
-          marginLeft: !isMobile ? (isCollapsed ? '4rem' : '18rem') : '0'
-        }}
-      >
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
         <Footer />
       </div>
     </div>
   );
 };
 
-<<<<<<< HEAD
-export default Layout;
-=======
 export default Layout;
->>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
