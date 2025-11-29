@@ -6,6 +6,7 @@ import {
   FaFileAlt,
   FaChartBar,
   FaSearch,
+<<<<<<< HEAD
   FaBell,
   FaTimes,
   FaSave,
@@ -14,6 +15,20 @@ import {
 } from "react-icons/fa";
 import { FaInbox } from "react-icons/fa6";
 import { IoIosSend } from "react-icons/io";
+=======
+  FaUsers,
+  FaDatabase,
+  FaBell,
+  FaGlobe,
+  FaChevronLeft,
+  FaChevronRight,
+  FaTimes,
+  FaClock,
+  FaCheckCircle,
+  FaListUl,
+} from "react-icons/fa";
+import { FaSave } from "react-icons/fa";
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
 
 const Sidebar = ({
   isMobileMenuOpen,
@@ -23,9 +38,59 @@ const Sidebar = ({
 }) => {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
+<<<<<<< HEAD
   
   const subrole = localStorage.getItem("subrole") || "Operator";
 
+=======
+  const [isHindi, setIsHindi] = useState(false);
+  
+  // ✅ Get subrole from localStorage
+  const subrole = localStorage.getItem("subrole") || "Operator";
+
+  // Simple translation object with updated route names
+  const translations = {
+    english: {
+      title: "LokAyukta",
+      subtitle: "CRMS",
+      description: "Complaint Management",
+      dashboard: "Dashboard",
+      complaints: "New Complaints",
+      allComplaints: "Complaints",
+      draft: "Drafts",
+      // pendingComplaints: "Pending Complaints",
+      // approvedComplaints: "Verified Complaints",
+      progressRegister: "Progress Register",
+      searchReports: "Search & Reports",
+      userManagement: "User Management",
+      masterData: "Master Data",
+      // copyright: "© 2025 LokAyukta Office",
+      // version: "v1.0.0",
+    },
+    hindi: {
+      title: "लोकायुक्त",
+      subtitle: "CRMS",
+      description: "शिकायत प्रबंधन",
+      dashboard: "डैशबोर्ड",
+      complaints: "नई शिकायतें",
+      allComplaints: "सभी शिकायतें",
+      draft: "ड्राफ्ट",
+      // pendingComplaints: "लंबित शिकायतें",
+      // approvedComplaints: "स्वीकृत शिकायतें",
+      progressRegister: "प्रगति रजिस्टर",
+      searchReports: "खोज और रिपोर्ट",
+      userManagement: "उपयोगकर्ता प्रबंधन",
+      masterData: "मुख्य डेटा",
+      // copyright: "© 2025 लोकायुक्त कार्यालय",
+      // version: "v1.0.0",
+    },
+  };
+
+  // Get current translations
+  const t = isHindi ? translations.hindi : translations.english;
+
+  // Check screen size and set mobile state
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
@@ -40,6 +105,15 @@ const Sidebar = ({
     };
   }, []);
 
+<<<<<<< HEAD
+=======
+  // Toggle language function
+  const toggleLanguage = () => {
+    setIsHindi(!isHindi);
+  };
+
+  // ✅ Simple isActive function for operator routes
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
   const isActive = (href) => {
     const fullPath = `/operator${href}`;
 
@@ -49,6 +123,7 @@ const Sidebar = ({
     return location.pathname.startsWith(fullPath);
   };
 
+<<<<<<< HEAD
   const handleLinkClick = () => {
     if (isMobile && isMobileMenuOpen) {
       toggleMobileMenu();
@@ -56,6 +131,19 @@ const Sidebar = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+=======
+  // Close mobile menu when clicking link
+
+
+  const handleLinkClick = () => {
+  if (isMobile && isMobileMenuOpen) {
+    toggleMobileMenu();
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+  // Custom Scrollbar CSS
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
   const scrollbarStyles = `
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
@@ -64,6 +152,7 @@ const Sidebar = ({
       background: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
+<<<<<<< HEAD
       background-color: #cbd5e1;
       border-radius: 10px;
     }
@@ -73,14 +162,33 @@ const Sidebar = ({
     .custom-scrollbar {
       scrollbar-width: thin;
       scrollbar-color: #cbd5e1 transparent;
+=======
+      background-color: #475569;
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background-color: #64748b;
+    }
+    /* For Firefox */
+    .custom-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #475569 transparent;
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
     }
   `;
 
   return (
     <>
+<<<<<<< HEAD
       <style>{scrollbarStyles}</style>
 
       {/* Mobile Overlay */}
+=======
+      {/* Custom Scrollbar Styles */}
+      <style>{scrollbarStyles}</style>
+
+      {/* ✅ FIXED: Mobile Overlay with higher z-index */}
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
       {isMobile && isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden"
@@ -88,19 +196,32 @@ const Sidebar = ({
         />
       )}
 
+<<<<<<< HEAD
       {/* Sidebar - LIGHT DESIGN */}
       <div
         className={`fixed left-0 top-0 h-full min-h-screen bg-[#E7ECF5] text-gray-700 shadow-xl transition-all duration-300 flex flex-col ${
           isMobile
             ? `w-64 z-50 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`
             : `${isCollapsed ? "w-16" : "w-64"} z-30`
+=======
+      {/* ✅ FIXED: Sidebar with proper z-index and positioning */}
+      <div
+        className={`fixed left-0 top-0 h-full min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl transition-all duration-300 flex flex-col ${
+          isMobile
+            ? `w-72 z-50 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`
+            : `${isCollapsed ? "w-16" : "w-72"} z-30`
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
         }`}
       >
         {/* Mobile Close Button */}
         {isMobile && isMobileMenuOpen && (
           <button
             onClick={toggleMobileMenu}
+<<<<<<< HEAD
             className="absolute top-4 right-4 p-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors z-50"
+=======
+            className="absolute top-4 right-4 p-2 text-white hover:bg-slate-700 rounded-lg transition-colors z-50"
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
             aria-label="Close menu"
           >
             <FaTimes className="w-5 h-5" />
@@ -111,7 +232,11 @@ const Sidebar = ({
         {!isMobile && (
           <button
             onClick={toggleSidebar}
+<<<<<<< HEAD
             className={`absolute bg-white text-gray-600 rounded-full shadow-lg hover:bg-gray-50 border border-gray-300 transition-all duration-300 z-10 ${
+=======
+            className={`absolute bg-white text-slate-600 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-300 z-10 ${
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
               isCollapsed ? "-right-3 top-6 p-2" : "-right-4 top-6 p-3"
             }`}
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -125,6 +250,7 @@ const Sidebar = ({
         )}
 
         {/* Header Section */}
+<<<<<<< HEAD
         <div className={`px-6 py-6 flex-shrink-0 ${!isMobile && isCollapsed ? "px-3" : ""}`}>
           {/* Logo */}
           <div className={`flex items-center mb-4 ${!isMobile && isCollapsed ? "justify-center" : "gap-3"}`}>
@@ -134,10 +260,38 @@ const Sidebar = ({
                 <h3 className="text-lg font-bold text-gray-800">LokAyukta</h3>
                 <h4 className="text-sm font-semibold text-gray-700">CRMS</h4>
                 <span className="text-xs text-gray-500">Complaint Management</span>
+=======
+        <div
+          className={`border-b border-slate-700 transition-all duration-300 flex-shrink-0 ${
+            !isMobile && isCollapsed ? "p-3" : "p-6"
+          }`}
+        >
+          {/* Logo */}
+          <div
+            className={`flex items-center mb-4 transition-all duration-300 ${
+              !isMobile && isCollapsed ? "justify-center gap-0" : "gap-3"
+            }`}
+          >
+            <div
+              className={`transition-all duration-300 ${
+                !isMobile && isCollapsed ? "text-2xl" : "text-3xl"
+              }`}
+            >
+              ⚖️
+            </div>
+            {(isMobile || !isCollapsed) && (
+              <div className="transition-all duration-300">
+                <h3 className="text-xl font-bold text-white">{t.title}</h3>
+                <h4 className="text-lg font-semibold text-slate-200">
+                  {t.subtitle}
+                </h4>
+                <span className="text-xs text-slate-400">{t.description}</span>
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
               </div>
             )}
           </div>
 
+<<<<<<< HEAD
           {/* Subrole Badge & Actions */}
           <div className="flex justify-between items-center mb-4">
             {(isMobile || !isCollapsed) && (
@@ -168,11 +322,70 @@ const Sidebar = ({
           )}
 
           <ul className="space-y-2 mb-6">
+=======
+          {/* ✅ Subrole Badge - Showing localStorage value */}
+          <div className="flex justify-between">
+            <div>
+              {(isMobile || !isCollapsed) && (
+                <div className="mb-3 transition-all duration-300">
+                  <span className="hover:bg-[#133973] cursor-pointer bg-[#e69a0c] text-white px-3 py-1 rounded-full text-xs font-medium capitalize">
+                    {subrole == "review-operator" ? "RO" : "EO"}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div>
+              {/* Header Actions */}
+              {(isMobile || !isCollapsed) && (
+                <div className="flex gap-2 transition-all duration-300">
+                  <button
+                    onClick={toggleLanguage}
+                    className="flex items-center gap-1 px-2 py-1 border border-slate-600 rounded text-xs hover:bg-slate-700 transition-colors"
+                  >
+                    <FaGlobe className="w-3 h-3" />
+                    {isHindi ? "EN" : "हि"}
+                  </button>
+                  <button className="relative flex items-center px-2 py-1 border border-slate-600 rounded text-xs hover:bg-slate-700 transition-colors">
+                    <FaBell className="w-3 h-3" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
+                  </button>
+                </div>
+              )}
+
+              {/* Collapsed Header Actions */}
+              {!isMobile && isCollapsed && (
+                <div className="flex flex-col gap-2 items-center transition-all duration-300">
+                  <button
+                    onClick={toggleLanguage}
+                    className="p-1.5 border border-slate-600 rounded hover:bg-slate-700 transition-colors"
+                  >
+                    <FaGlobe className="w-3 h-3" />
+                  </button>
+                  <button className="relative p-1.5 border border-slate-600 rounded hover:bg-slate-700 transition-colors">
+                    <FaBell className="w-3 h-3" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ✅ Navigation Menu - Updated with custom-scrollbar */}
+        <nav
+          className={`flex-1 transition-all duration-300 overflow-y-auto custom-scrollbar ${
+            !isMobile && isCollapsed ? "py-4" : "py-6"
+          }`}
+        >
+          <ul className="space-y-1">
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
             {/* Dashboard */}
             <li>
               <Link
                 to="/operator/dashboard"
                 onClick={handleLinkClick}
+<<<<<<< HEAD
                 className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
                   isActive("/dashboard")
                     ? "bg-blue-600 text-white shadow-md"
@@ -188,15 +401,38 @@ const Sidebar = ({
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
                     <div className="w-4 h-4 bg-white rounded-full"></div>
                   </div>
+=======
+                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                  isActive("/dashboard")
+                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
+                    : "text-slate-300 hover:text-white hover:bg-gray-700"
+                } ${
+                  !isMobile && isCollapsed
+                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
+                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
+                }`}
+                title={!isMobile && isCollapsed ? t.dashboard : ""}
+              >
+                <FaHome className="w-5 h-5 flex-shrink-0" />
+                {(isMobile || !isCollapsed) && (
+                  <span className="transition-all duration-300">
+                    {t.dashboard}
+                  </span>
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                 )}
               </Link>
             </li>
 
+<<<<<<< HEAD
             {/* New Complaints */}
+=======
+            {/* New Complaints - KEEPING FaFileAlt (no change) */}
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
             <li>
               <Link
                 to="/operator/complaints"
                 onClick={handleLinkClick}
+<<<<<<< HEAD
                 className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
                   isActive("/complaints")
                     ? "bg-blue-600 text-white shadow-md"
@@ -212,15 +448,38 @@ const Sidebar = ({
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
                     <div className="w-4 h-4 bg-white rounded-full"></div>
                   </div>
+=======
+                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                  isActive("/complaints")
+                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
+                    : "text-slate-300 hover:text-white hover:bg-gray-700"
+                } ${
+                  !isMobile && isCollapsed
+                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
+                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
+                }`}
+                title={!isMobile && isCollapsed ? t.complaints : ""}
+              >
+                <FaFileAlt className="w-5 h-5 flex-shrink-0" />
+                {(isMobile || !isCollapsed) && (
+                  <span className="transition-all duration-300">
+                    {t.complaints}
+                  </span>
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                 )}
               </Link>
             </li>
 
+<<<<<<< HEAD
             {/* Inbox */}
+=======
+            {/* All Complaints - CHANGED to FaListUl */}
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
             <li>
               <Link
                 to="/operator/all-complaints"
                 onClick={handleLinkClick}
+<<<<<<< HEAD
                 className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
                  isActive("/all-complaints")
                     ? "bg-blue-600 text-white shadow-md"
@@ -272,10 +531,36 @@ const Sidebar = ({
             </li>
 
             {/* Draft with Badge */}
+=======
+                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                  ["/all-complaints", "/pending-complaints", "/approved-complaints"].some(path =>
+                    isActive(path)
+                  )
+                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
+                    : "text-slate-300 hover:text-white hover:bg-gray-700"
+                } ${
+                  !isMobile && isCollapsed
+                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
+                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
+                }`}
+                title={!isMobile && isCollapsed ? t.allComplaints : ""}
+              >
+                <FaListUl className="w-5 h-5 flex-shrink-0" />
+                {(isMobile || !isCollapsed) && (
+                  <span className="transition-all duration-300">
+                    {t.allComplaints}
+                  </span>
+                )}
+              </Link>
+            </li>
+
+            {/* Draft */}
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
             <li>
               <Link
                 to="/operator/draft"
                 onClick={handleLinkClick}
+<<<<<<< HEAD
                 className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
                   isActive("/draft")
                     ? "bg-blue-600 text-white shadow-md"
@@ -303,11 +588,84 @@ const Sidebar = ({
           )}
 
           <ul className="space-y-2">
+=======
+                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                  isActive("/draft")
+                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
+                    : "text-slate-300 hover:text-white hover:bg-gray-700"
+                } ${
+                  !isMobile && isCollapsed
+                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
+                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
+                }`}
+                title={!isMobile && isCollapsed ? t.draft : ""}
+              >
+                <FaSave className="w-5 h-5 flex-shrink-0" />
+                {(isMobile || !isCollapsed) && (
+                  <span className="transition-all duration-300">
+                    {t.draft}
+                  </span>
+                )}
+              </Link>
+            </li>
+
+            {/* ✅ COMMENTED: Pending Complaints */}
+            {/* <li>
+              <Link
+                to="/operator/pending-complaints"
+                onClick={handleLinkClick}
+                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                  isActive("/pending")
+                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
+                    : "text-slate-300 hover:text-white hover:bg-gray-700"
+                } ${
+                  !isMobile && isCollapsed
+                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
+                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
+                }`}
+                title={!isMobile && isCollapsed ? t.pendingComplaints : ""}
+              >
+                <FaClock className="w-5 h-5 flex-shrink-0" />
+                {(isMobile || !isCollapsed) && (
+                  <span className="transition-all duration-300">
+                    {t.pendingComplaints}
+                  </span>
+                )}
+              </Link>
+            </li> */}
+
+            {/* ✅ COMMENTED: Approved Complaints */}
+            {/* <li>
+              <Link
+                to="/operator/approved-complaints"
+                onClick={handleLinkClick}
+                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                  isActive("/approved")
+                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
+                    : "text-slate-300 hover:text-white hover:bg-gray-700"
+                } ${
+                  !isMobile && isCollapsed
+                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
+                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
+                }`}
+                title={!isMobile && isCollapsed ? t.approvedComplaints : ""}
+              >
+                <FaCheckCircle className="w-5 h-5 flex-shrink-0" />
+                {(isMobile || !isCollapsed) && (
+                  <span className="transition-all duration-300">
+                    {t.approvedComplaints}
+                  </span>
+                )}
+              </Link>
+            </li> */}
+
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
             {/* Progress Register */}
             <li>
               <Link
                 to="/operator/progress-register"
                 onClick={handleLinkClick}
+<<<<<<< HEAD
                 className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
                   isActive("/progress-register")
                     ? "bg-blue-600 text-white shadow-md"
@@ -323,6 +681,24 @@ const Sidebar = ({
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
                     <div className="w-4 h-4 bg-white rounded-full"></div>
                   </div>
+=======
+                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                  isActive("/progress-register")
+                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
+                    : "text-slate-300 hover:text-white hover:bg-gray-700"
+                } ${
+                  !isMobile && isCollapsed
+                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
+                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
+                }`}
+                title={!isMobile && isCollapsed ? t.progressRegister : ""}
+              >
+                <FaChartBar className="w-5 h-5 flex-shrink-0" />
+                {(isMobile || !isCollapsed) && (
+                  <span className="transition-all duration-300">
+                    {t.progressRegister}
+                  </span>
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                 )}
               </Link>
             </li>
@@ -332,6 +708,7 @@ const Sidebar = ({
               <Link
                 to="/operator/search-reports"
                 onClick={handleLinkClick}
+<<<<<<< HEAD
                 className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
                   isActive("/search-reports")
                     ? "bg-blue-600 text-white shadow-md"
@@ -347,11 +724,40 @@ const Sidebar = ({
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
                     <div className="w-4 h-4 bg-white rounded-full"></div>
                   </div>
+=======
+                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                  isActive("/search-reports")
+                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
+                    : "text-slate-300 hover:text-white hover:bg-gray-700"
+                } ${
+                  !isMobile && isCollapsed
+                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
+                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
+                }`}
+                title={!isMobile && isCollapsed ? t.searchReports : ""}
+              >
+                <FaSearch className="w-5 h-5 flex-shrink-0" />
+                {(isMobile || !isCollapsed) && (
+                  <span className="transition-all duration-300">
+                    {t.searchReports}
+                  </span>
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
                 )}
               </Link>
             </li>
           </ul>
         </nav>
+<<<<<<< HEAD
+=======
+
+        {/* Footer */}
+        {(isMobile || !isCollapsed) && (
+          <div className="p-6 border-t border-slate-700 text-center transition-all duration-300 flex-shrink-0 mt-auto">
+            <p className="text-xs text-slate-400">{t.copyright}</p>
+            <p className="text-xs text-slate-500">{t.version}</p>
+          </div>
+        )}
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
       </div>
     </>
   );

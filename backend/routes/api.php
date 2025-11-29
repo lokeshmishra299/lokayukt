@@ -151,7 +151,11 @@ Route::middleware('auth:sanctum')->group(function(){
    * Operator
    */  
 
+<<<<<<< HEAD
    Route::middleware('role:operator:entry-operator|review-operator')->prefix('operator')->group(function () {
+=======
+   Route::middleware('role:operator:record-keeper|review-operator')->prefix('operator')->group(function () {
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
         
         // Route::prefix('admin')->group(function () {
         
@@ -162,6 +166,10 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/rejections',[OperatorCommonController::class,'fetch_rejection']);
         Route::get('/complainstype',[OperatorCommonController::class,'fetch_complainstype']);
         Route::post('/add-complaint',[OperatorComplaintsController::class,'addComplaint']);
+<<<<<<< HEAD
+=======
+        Route::post('/upload-document',[OperatorComplaintsController::class,'uploadDocument']);
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
         Route::get('/all-complaints',[OperatorComplaintsController::class,'allComplainsDashboard']);
         Route::get('/all-draft',[OperatorComplaintsController::class,'allDraft']);
         Route::get('/all-pending-complaints',[OperatorComplaintsController::class,'allComplainspending']);
@@ -258,6 +266,10 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-users',[LokAyuktComplaintsController::class,'getSubROleUsers']);
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyda']);
+<<<<<<< HEAD
+=======
+        Route::post('/forward-by-lokayukt/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbylokayukt']);
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
         Route::post('/request-report/{complainId}',[LokAyuktReportController::class,'requestReport']);
         Route::get('/request-list/{complainId}',[LokAyuktReportController::class,'requestReportList']);
                 Route::get('/request-list-cio/{complainId}',[LokAyuktReportController::class,'requestinvestigationReport']);
@@ -288,6 +300,10 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/district-wise-company-type',[LokAyuktDashboardController::class,'getdistrictWiseCompanyTypeGraph']);
         Route::get('/status-distribution',[LokAyuktDashboardController::class,'gestatusDistribution']);
         // Route::get('/status-distribution',action: [SupervisorDashboardController::class,'gestatusDistribution']);
+<<<<<<< HEAD
+=======
+       
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
     });
 
        Route::middleware('role:up-lok-ayukt')->prefix('uplokayukt')->group(function () {

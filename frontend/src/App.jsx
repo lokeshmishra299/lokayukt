@@ -32,7 +32,10 @@ import OperatorEditApprovedCoplaints from './components/Operator/Approved-compla
 import OperatorPendingComplaints from './components/Operator/Pending-complaints/PendingComplaints/';
 import OperatorViewPendingComplaint from './components/Operator/Pending-complaints/ViewPendingComplaint';
 import OperatorEditPendingComplaints from './components/Operator/Pending-complaints/EditPendingComplaints';
+<<<<<<< HEAD
 import Newcomplaints from './components/Operator/Newcomplaints';
+=======
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
 import AllDraft from './components/Operator/Draft/AllDraft';
 import ViewDraft from './components/Operator/Draft/ViewDraft';
 import EditDraft from './components/Operator/Draft/EditDraft';
@@ -212,8 +215,13 @@ function App() {
           <Route path="progress-register" element={<OperatorProgressRegister />} />
           <Route path="search-reports" element={<OperatorSearchReports />} />
           <Route path="search-reports/view/:id" element={<OperatorViewComplaints />} />
+<<<<<<< HEAD
           <Route path="search-reports/edit/:id" element={<OperatorEditComplaints />} />
         <Route path="approved-complaints/edit/:id" element={<OperatorEditApprovedCoplaints />} />
+=======
+             <Route path="search-reports/edit/:id" element={<OperatorEditComplaints />} />
+             <Route path="approved-complaints/edit/:id" element={<OperatorEditApprovedCoplaints />} />
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
              <Route path="pending-complaints/edit/:id" element={<OperatorEditPendingComplaints />} />
              <Route path="all-complaints/edit/:id" element={<OperatorAllComplaintsEdit />} />
              <Route path="all-complaints" element={<OperatorAllComplaits />} />
@@ -226,7 +234,10 @@ function App() {
              <Route path="draft/view/:id" element={<ViewDraft />} />
              <Route path="draft/edit/:id" element={<EditDraft />} />
              {/* <Route path="/operator/complaints/Cheekdublicate" element={<Cheekdublicate />} /> */}
+<<<<<<< HEAD
              <Route path="newcomplaints" element={<Newcomplaints />} />
+=======
+>>>>>>> 3f6088c87450ffc20c3101fd9a714a51e4121392
 
         </Route>
       )}
