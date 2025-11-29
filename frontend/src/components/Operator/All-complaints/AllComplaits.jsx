@@ -186,21 +186,48 @@ const AllComplaits = () => {
                     <p className="text-sm font-semibold text-gray-800">
                       File No. {complaint.complain_no}
                     </p>
+                    <div className="flex flex-col">
                     <div className="flex gap-2 text-xs">
                       <span
-                        className={`px-2 py-0.5 rounded ${getStatusColor(
+                        className={`px-2 py-0.5 rounded bg-blue-50 text-blue-700 ${getStatusColor(
                           complaint.status
                         )}`}
                       >
                         New Case
                       </span>
-                      {complaint.fee_exempted === 1 && (
+                      <span
+                        className={`px-2 py-0.5 rounded bg-purple-50 text-purple-700 ${getStatusColor(
+                          complaint.status
+                        )}`}
+                      >
+                       With Lokayukt
+                      </span>
+                      {/* {complaint.fee_exempted === 1 && (
                         <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded">
                           With Lokayukt
                         </span>
-                      )}
+                      )} */}
                     </div>
+                    <div className="flex gap-2 text-xs mt-3">
+                       <span
+                        className={`px-2 py-0.5 rounded bg-gray-50 text-blue-700 ${getStatusColor(
+                          complaint.status
+                        )}`}
+                      >
+                        2 days
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded bg-purple-50 text-purple-700 ${getStatusColor(
+                          complaint.status
+                        )}`}
+                      >
+                      Fee Partial
+                      </span>
+                    </div>
+                 </div>
                   </div>
+
+
 
                   <p className="text-sm text-gray-700 mb-2">
                     {complaint.remark || "No description available"}
