@@ -1,0 +1,52 @@
+// const result = await api.post('/operator/check-duplicate', {
+//   name: formData.name,
+//   title: formData.title
+// })
+
+
+// const result = await api.get('/operator/check-duplicate', {
+//   params: {
+//     name: formData.name,
+//     title: formData.title
+//   }
+// })
+
+
+// Haan, bilkul sahi samjha tune.
+
+// GET Request me Data Kaise Jata Hai?
+// GET request me data URL ke end me query parameters ki form me jata hai.
+
+// Matlab URL kuch aise dikhega:
+// http://localhost:8000/api/operator/check-duplicate?name=skss&title=dkdkdk
+
+// Isliye GET request me data bhejne ke liye axios me params object use karna padta hai.
+
+// Ye query string ke through data backend tak pahunchta hai.
+
+// POST Request me Data Kaise Jata Hai?
+// POST request me data request body me jata hai, URL me nahi.
+
+// Isme hum seedha json body me data bhejte hain.
+
+// Backend is data ko body se read karta hai, URL me query string nahi dekhta.
+
+// Summary
+
+// Haan bilkul, agar GET se data bhejna hai toh params use hota hai jo ki URL ke query string me add hota hai.
+
+// Example syntax Axios me:
+
+// js
+// const result = await api.get('/operator/check-duplicate', {
+//   params: {
+//     name: formData.name,
+//     title: formData.title
+//   }
+// })
+// Iska matlab URL browser me kuch aise dikhega:
+
+// text
+// http://localhost:8000/api/operator/check-duplicate?name=skss&title=dkdkdk
+// Yeh query parameters backend ko pata chale ki kaunse data ke liye request hai. GET request me body nahi hoti isliye data params (query string) ke through hi bhejna padta hai.
+
