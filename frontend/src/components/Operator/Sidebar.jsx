@@ -1,7 +1,10 @@
 // components/Sidebar.js
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { AiOutlineHome } from "react-icons/ai";
+import {FiInbox,FiSend,FiFileText,FiBarChart2,FiSearch}  from "react-icons/fi";
 import {
+  
   FaHome,
   FaFileAlt,
   FaChartBar,
@@ -12,8 +15,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
 } from "react-icons/fa";
-import { FaInbox } from "react-icons/fa6";
-import { IoIosSend } from "react-icons/io";
+
 
 const Sidebar = ({
   isMobileMenuOpen,
@@ -83,17 +85,17 @@ const Sidebar = ({
       {/* Mobile Overlay */}
       {isMobile && isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={toggleMobileMenu}
         />
       )}
 
-      {/* Sidebar - LIGHT DESIGN */}
+      {/* Sidebar - Now starts below header */}
       <div
-        className={`fixed left-0 top-0 h-full min-h-screen bg-[#E7ECF5] text-gray-700 shadow-xl transition-all duration-300 flex flex-col ${
+        className={`fixed left-0 bg-[#E7ECF5] text-gray-700 shadow-xl transition-all duration-300 flex flex-col ${
           isMobile
-            ? `w-64 z-50 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`
-            : `${isCollapsed ? "w-16" : "w-64"} z-30`
+            ? `w-64 z-50 top-0 bottom-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`
+            : `${isCollapsed ? "w-16" : "w-64"} z-30 top-16 bottom-0`
         }`}
       >
         {/* Mobile Close Button */}
@@ -108,7 +110,7 @@ const Sidebar = ({
         )}
 
         {/* Desktop Toggle Button */}
-        {!isMobile && (
+        {/* {!isMobile && (
           <button
             onClick={toggleSidebar}
             className={`absolute bg-white text-gray-600 rounded-full shadow-lg hover:bg-gray-50 border border-gray-300 transition-all duration-300 z-10 ${
@@ -122,12 +124,12 @@ const Sidebar = ({
               <FaChevronLeft className="w-4 h-4" />
             )}
           </button>
-        )}
+        )} */}
 
         {/* Header Section */}
         <div className={`px-6 py-6 flex-shrink-0 ${!isMobile && isCollapsed ? "px-3" : ""}`}>
           {/* Logo */}
-          <div className={`flex items-center mb-4 ${!isMobile && isCollapsed ? "justify-center" : "gap-3"}`}>
+          {/* <div className={`flex items-center mb-4 ${!isMobile && isCollapsed ? "justify-center" : "gap-3"}`}>
             <div className={`${!isMobile && isCollapsed ? "text-2xl" : "text-3xl"}`}>⚖️</div>
             {(isMobile || !isCollapsed) && (
               <div>
@@ -136,12 +138,12 @@ const Sidebar = ({
                 <span className="text-xs text-gray-500">Complaint Management</span>
               </div>
             )}
-          </div>
+          </div> */}
 
           {/* Subrole Badge & Actions */}
-          <div className="flex justify-between items-center mb-4">
+          {/* <div className="flex justify-between items-center mb-4">
             {(isMobile || !isCollapsed) && (
-              <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs font-medium capitalize">
+              <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs  capitalize">
                 {subrole === "review-operator" ? "RO" : "EO"}
               </span>
             )}
@@ -154,17 +156,14 @@ const Sidebar = ({
                 </button>
               </div>
             )}
-          </div>
-
-          {/* Navigation Header */}
-        
+          </div> */}
         </div>
 
         {/* Navigation Menu with Sections */}
         <nav className="flex-1 px-6 overflow-y-auto custom-scrollbar">
           {/* Workbox Section */}
           {(isMobile || !isCollapsed) && (
-            <p className="text-xs font-semibold text-gray-500 mb-3">Workbox</p>
+            <p className="text-[13px]  text-gray-800 mb-2 ml-2">Workbox</p>
           )}
 
           <ul className="space-y-2 mb-6">
@@ -173,7 +172,7 @@ const Sidebar = ({
               <Link
                 to="/operator/dashboard"
                 onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
                   isActive("/dashboard")
                     ? "bg-blue-600 text-white shadow-md"
                     : "text-gray-700 hover:bg-gray-200"
@@ -181,7 +180,7 @@ const Sidebar = ({
                 title={!isMobile && isCollapsed ? "Dashboard" : ""}
               >
                 <div className="flex items-center gap-3">
-                  <FaHome className="w-[18px] h-[18px] flex-shrink-0" />
+                  <AiOutlineHome className="w-[18px] h-[18px] flex-shrink-0" />
                   {(isMobile || !isCollapsed) && <span>Dashboard</span>}
                 </div>
                 {isActive("/dashboard") && (isMobile) && (
@@ -197,7 +196,7 @@ const Sidebar = ({
               <Link
                 to="/operator/complaints"
                 onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
                   isActive("/complaints")
                     ? "bg-blue-600 text-white shadow-md"
                     : "text-gray-700 hover:bg-gray-200"
@@ -205,10 +204,10 @@ const Sidebar = ({
                 title={!isMobile && isCollapsed ? "New Complaints" : ""}
               >
                 <div className="flex items-center gap-3">
-                  <FaFileAlt className="w-[18px] h-[18px] flex-shrink-0" />
+                  <FiFileText size={20} className="w-[18px] h-[18px] flex-shrink-0" />
                   {(isMobile || !isCollapsed) && <span>New Complaints</span>}
                 </div>
-                {isActive("/complaints") && (isMobile ) && (
+                {isActive("/complaints") && (isMobile) && (
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
                     <div className="w-4 h-4 bg-white rounded-full"></div>
                   </div>
@@ -221,62 +220,55 @@ const Sidebar = ({
               <Link
                 to="/operator/all-complaints"
                 onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
-                 isActive("/all-complaints")
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                  isActive("/all-complaints")
                     ? "bg-blue-600 text-white shadow-md"
                     : "text-gray-700 hover:bg-gray-200"
                 } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
                 title={!isMobile && isCollapsed ? "Inbox" : ""}
               >
                 <div className="flex items-center gap-3">
-                  <FaInbox className="w-[18px] h-[18px] flex-shrink-0" />
+                    <FiInbox size={18} className="w-[18px] h-[18px] flex-shrink-0" />
                   {(isMobile || !isCollapsed) && <span>Inbox</span>}
                 </div>
-                {["/all-complaints", "/pending-complaints", "/approved-complaints"].some((path) =>
-                  isActive(path)
-                ) &&
-                  (isMobile ) && (
-                    <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                      <div className="w-4 h-4 bg-white rounded-full"></div>
-                    </div>
-                  )}
+                {isActive("/all-complaints") && (isMobile) && (
+                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                )}
               </Link>
             </li>
 
-
-  <li>
+            {/* Send */}
+            <li>
               <Link
-                to="/operator/pending-complaints"
+                to="/operator/approved-complaints"
                 onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
-                 isActive("/pending-complaints")
-                  
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                  isActive("/approved-complaints")
                     ? "bg-blue-600 text-white shadow-md"
                     : "text-gray-700 hover:bg-gray-200"
                 } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                title={!isMobile && isCollapsed ? "Inbox" : ""}
+                title={!isMobile && isCollapsed ? "Send" : ""}
               >
                 <div className="flex items-center gap-3">
-                  <IoIosSend className="w-[18px] h-[18px] flex-shrink-0" />
+                  <FiSend size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
                   {(isMobile || !isCollapsed) && <span>Send</span>}
                 </div>
-                {["/all-complaints", "/pending-complaints", "/approved-complaints"].some((path) =>
-                  isActive(path)
-                ) &&
-                  (isMobile ) && (
-                    <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                      <div className="w-4 h-4 bg-white rounded-full"></div>
-                    </div>
-                  )}
+                {isActive("/approved-complaints") && (isMobile) && (
+                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                )}
               </Link>
             </li>
 
-            {/* Draft with Badge */}
+            {/* Drafts */}
             <li>
               <Link
                 to="/operator/draft"
                 onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
                   isActive("/draft")
                     ? "bg-blue-600 text-white shadow-md"
                     : "text-gray-700 hover:bg-gray-200"
@@ -284,10 +276,9 @@ const Sidebar = ({
                 title={!isMobile && isCollapsed ? "Drafts" : ""}
               >
                 <div className="flex items-center gap-3">
-                  <FaSave className="w-[18px] h-[18px] flex-shrink-0" />
+                    <FiFileText size={18} className="w-[18px] h-[18px] flex-shrink-0" />
                   {(isMobile || !isCollapsed) && <span>Drafts</span>}
                 </div>
-               
                 {isActive("/draft") && (isMobile) && (
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
                     <div className="w-4 h-4 bg-white rounded-full"></div>
@@ -299,7 +290,7 @@ const Sidebar = ({
 
           {/* Case & Administration Section */}
           {(isMobile || !isCollapsed) && (
-            <p className="text-xs font-semibold text-gray-500 mb-3 mt-6">Case & Administration</p>
+            <p className="text-[13px]  text-gray-800 mb-3 mt-6">Case & Administration</p>
           )}
 
           <ul className="space-y-2">
@@ -308,7 +299,7 @@ const Sidebar = ({
               <Link
                 to="/operator/progress-register"
                 onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
                   isActive("/progress-register")
                     ? "bg-blue-600 text-white shadow-md"
                     : "text-gray-700 hover:bg-gray-200"
@@ -316,7 +307,7 @@ const Sidebar = ({
                 title={!isMobile && isCollapsed ? "Progress Register" : ""}
               >
                 <div className="flex items-center gap-3">
-                  <FaChartBar className="w-[18px] h-[18px] flex-shrink-0" />
+                  <FiBarChart2 size={20} className="w-[18px] h-[18px] flex-shrink-0" />
                   {(isMobile || !isCollapsed) && <span>Progress Register</span>}
                 </div>
                 {isActive("/progress-register") && (isMobile) && (
@@ -332,7 +323,7 @@ const Sidebar = ({
               <Link
                 to="/operator/search-reports"
                 onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm font-medium transition-all duration-200 rounded-lg ${
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
                   isActive("/search-reports")
                     ? "bg-blue-600 text-white shadow-md"
                     : "text-gray-700 hover:bg-gray-200"
@@ -340,7 +331,7 @@ const Sidebar = ({
                 title={!isMobile && isCollapsed ? "Search & Reports" : ""}
               >
                 <div className="flex items-center gap-3">
-                  <FaSearch className="w-[18px] h-[18px] flex-shrink-0" />
+                  <FiSearch size={20}  className="w-[18px] h-[18px] flex-shrink-0" />
                   {(isMobile || !isCollapsed) && <span>Search & Reports</span>}
                 </div>
                 {isActive("/search-reports") && (isMobile) && (
