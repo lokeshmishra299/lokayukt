@@ -1,569 +1,371 @@
-"use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { IoSearchOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useQuery } from "@tanstack/react-query";
 
-const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
-const token = localStorage.getItem("access_token");
-  // const subRole = localStorage.getItem("subrole")
-
-// Create axios instance with token if it exists
-const api = axios.create({
-  baseURL: BASE_URL,
-  headers: {
-    ...(token && { Authorization: `Bearer ${token}` }),
-  },
-});
-
-const ApprovedComplaints = () => {
+const AllComplaints = () => {
   const navigate = useNavigate();
-  
-  // State for tabs and data
-  const [activeTab, setActiveTab] = useState("approved"); // Default to approved since this is ApprovedComplaints
-  const [complaintsData, setComplaintsData] = useState([]);
-  const [allComplaintsData, setAllComplaintsData] = useState([]);
-  const [pendingData, setPendingData] = useState([]);
-  const [error, setError] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [allComplaints, setAllComplaints] = useState([]);
+  const [filteredComplaints, setFilteredComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [complaintToForward, setComplaintToForward] = useState(null);
-  const [isForwarding, setIsForwarding] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState("desc");
 
-  // Loading states for each tab
-  const [isLoadingAll, setIsLoadingAll] = useState(false);
-  const [isLoadingPending, setIsLoadingPending] = useState(false);
-  const [isLoadingApproved, setIsLoadingApproved] = useState(false);
+  const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
+  const token = localStorage.getItem("access_token");
 
-  // Handle tab change with routing
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-    
-    // Route navigation
-    switch(tab) {
-      case 'all':
-        navigate('/operator/all-complaints');
-        break;
-      case 'pending':
-        navigate('/operator/pending-complaints');
-        break;
-      case 'approved':
-        navigate('/operator/approved-complaints');
-        break;
-      default:
-        navigate('/operator/approved-complaints');
-    }
+  const api = axios.create({
+    baseURL: BASE_URL,
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+
+  // AllComplaints API Call
+  const getAllComplaints = async () => {
+    const res = await api.get("/operator/all-approved-complaints");
+    return res.data.data;
   };
 
-  // Fetch all complaints data
-  const fetchAllComplaints = async () => {
-    setIsLoadingAll(true);
-    try {
-      const response = await api.get("/operator/all-complaints");
-      
-      if (response.data.status === true) {
-        setAllComplaintsData(response.data.data);
-        setError("");
-      } else {
-        setAllComplaintsData([]);
-      }
-    } catch (error) {
-      console.error("All Complaints API Error:", error);
-      setAllComplaintsData([]);
-      setError("Error fetching all complaints");
-    } finally {
-      setIsLoadingAll(false);
-    }
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["all-approved-complaints"],
+    queryFn: getAllComplaints,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  // District API Call
+  const getDistrict = async () => {
+    const res = await api.get("/operator/all-district");
+    return res.data.data;
   };
 
-  // Fetch pending complaints data
-  const fetchPendingComplaints = async () => {
-    setIsLoadingPending(true);
-    try {
-      const response = await api.get("/operator/all-pending-complaints");
-      
-      if (response.data.status === true) {
-        setPendingData(response.data.data);
-        setError("");
-      } else {
-        setPendingData([]);
-      }
-    } catch (error) {
-      console.error("Pending API Error:", error);
-      setPendingData([]);
-      setError("Error fetching pending complaints");
-    } finally {
-      setIsLoadingPending(false);
-    }
+  const { data: districtData, isLoading: districtLoading } = useQuery({
+    queryKey: ["district-api"],
+    queryFn: getDistrict,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  // Complaint Types API Call
+  const getComplaintTypes = async () => {
+    const res = await api.get("/operator/complainstype");
+    return res.data.data;
   };
 
-  // ✅ Fetch approved complaints data
-  const fetchApprovedComplaints = async () => {
-    setIsLoadingApproved(true);
-    try {
-      const response = await api.get("/operator/all-approved-complaints");
-      
-      if (response.data.status === true) {
-        setComplaintsData(response.data.data);
-        setError("");
-      } else {
-        setError("Failed to fetch complaints data");
-      }
-    } catch (error) {
-      console.error("API Error:", error);
-      setError("Error fetching data");
-    } finally {
-      setIsLoadingApproved(false);
-    }
-  };
+  const { data: complaintTypesData, isLoading: typesLoading } = useQuery({
+    queryKey: ["complaint-types"],
+    queryFn: getComplaintTypes,
+    staleTime: 10 * 60 * 1000,
+  });
 
-  // Fetch data on component mount
   useEffect(() => {
-    fetchApprovedComplaints(); // Load approved by default
-    fetchAllComplaints(); // Load all complaints data
-    fetchPendingComplaints(); // Load pending data
-  }, []);
-
-  // Get current data based on active tab
-  const getCurrentData = () => {
-    switch(activeTab) {
-      case 'all':
-        return allComplaintsData;
-      case 'pending':
-        return pendingData;
-      case 'approved':
-        return complaintsData;
-      default:
-        return complaintsData;
+    if (data) {
+      setAllComplaints(data);
+      const sorted = sortComplaintsByDate(data, sortOrder);
+      setFilteredComplaints(sorted);
     }
-  };
+  }, [data, sortOrder]);
 
-  // Get current loading state
-  const getCurrentLoadingState = () => {
-    switch(activeTab) {
-      case 'all':
-        return isLoadingAll;
-      case 'pending':
-        return isLoadingPending;
-      case 'approved':
-        return isLoadingApproved;
-      default:
-        return isLoadingApproved;
-    }
-  };
-
-  // Get tab title based on active tab
-  const getTabTitle = () => {
-    switch(activeTab) {
-      case 'all':
-        return 'All Complaints';
-      case 'pending':
-        return 'Pending Complaints';
-      case 'approved':
-        return 'Approved Complaints';
-      default:
-        return 'Approved Complaints';
-    }
-  };
-
-  // Get current data count
-  const getCurrentDataCount = () => {
-    return getCurrentData().length;
-  };
-
-  // ✅ Handle view details with navigation - Only button click
-  const handleViewDetails = (e, complaintId) => {
-    e.stopPropagation(); // Prevent any parent event
-    navigate(`/operator/approved-complaints/view/${complaintId}`);
-      window.scrollTo({ top: 2, behavior: 'smooth' }); // Scroll to top smoothly
-
-  };
-
-  // ✅ Handle modal view - Only for modal
-  const handleModalView = (complaint) => {
-    setSelectedComplaint(complaint);
-    setIsModalOpen(true);
-  };
-
-  // ✅ Handle forward button click - Show confirmation
-  const handleForwardClick = (e, complaint) => {
-    e.stopPropagation();
-    setComplaintToForward(complaint);
-    setIsConfirmModalOpen(true);
-  };
-
-  // ✅ Handle forward confirmation with react-toastify
-  const handleConfirmForward = async () => {
-    if (!complaintToForward) return;
-    
-    setIsForwarding(true);
-    
-    try {
-      // Replace with your actual forward API endpoint
-      const response = await api.post(`/operator/forward-complaint/${complaintToForward.id}`);
-      
-      if (response.data.success || response.status === 200) {
-        // Show success toast
-        toast.success("Complaint Forwarded Successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-        
-        // Update complaint forward status in local state
-        setComplaintsData(prevData => 
-          prevData.map(complaint => 
-            complaint.id === complaintToForward.id 
-              ? { ...complaint, forward_by: 1, status: 'Forwarded' }
-              : complaint
-          )
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      const sorted = sortComplaintsByDate(allComplaints, sortOrder);
+      setFilteredComplaints(sorted);
+    } else {
+      const filtered = allComplaints.filter((complaint) => {
+        const query = searchQuery.toLowerCase();
+        return (
+          complaint.complain_no?.toLowerCase().includes(query) ||
+          complaint.name?.toLowerCase().includes(query) ||
+          complaint.district_name?.toLowerCase().includes(query) ||
+          complaint.remark?.toLowerCase().includes(query) ||
+          complaint.description?.toLowerCase().includes(query) ||
+          complaint.email?.toLowerCase().includes(query) ||
+          complaint.mobile?.includes(query)
         );
-      } else {
-        toast.error("Failed to forward complaint", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-      }
-    } catch (error) {
-      console.error("Forward Error:", error);
-      toast.error("Failed to forward complaint", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
       });
-    } finally {
-      setIsForwarding(false);
-      setIsConfirmModalOpen(false);
-      setComplaintToForward(null);
+      const sorted = sortComplaintsByDate(filtered, sortOrder);
+      setFilteredComplaints(sorted);
     }
-  };
+  }, [searchQuery, allComplaints, sortOrder]);
 
-  // ✅ Cancel forward
-  const handleCancelForward = () => {
-    setIsConfirmModalOpen(false);
-    setComplaintToForward(null);
-  };
+  // Sort function for received date
+  const sortComplaintsByDate = (complaints, order) => {
+    return [...complaints].sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
 
-  // ✅ Format date
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+      if (order === "desc") {
+        return dateB - dateA; // Newest first
+      } else {
+        return dateA - dateB; // Oldest first
+      }
     });
   };
 
-  // ✅ Get status color
-  const getStatusTextColor = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'in progress':
-        return 'text-yellow-600 border-yellow-300 bg-yellow-50';
-      case 'rejected':
-        return 'text-red-600 border-red-300 bg-red-50';
-      case 'approved':
-        return 'text-green-600 border-green-300 bg-green-50';
-      case 'forwarded':
-        return 'text-blue-600 border-blue-300 bg-blue-50';
-      default:
-        return 'text-gray-600 border-gray-300 bg-gray-50';
-    }
+  const handleViewDetails = (e, complaintId) => {
+    e.stopPropagation();
+    navigate(`view/${complaintId}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // ✅ Check if complaint is forwarded
-  const isForwarded = (complaint) => {
-    return complaint.forward_by && complaint.forward_by !== null;
+  const handleSortChange = (e) => {
+    setSortOrder(e.target.value);
   };
 
-  // ✅ Check if complaint is approved by RO
-  const isApprovedByRO = (complaint) => {
+  // Check if verified by RO
+  const isVerifiedByRO = (complaint) => {
     return complaint.approved_rejected_by_ro === 1;
   };
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center">
-          <p className="text-red-600 text-lg">{error}</p>
-        </div>
-      </div>
-    );
-  }
+  const getStatistics = () => {
+    const overdueCount = allComplaints.filter((c) => c.status === "overdue")
+      .length;
+    const receivedToday = allComplaints.filter((c) => {
+      const today = new Date().toDateString();
+      const complaintDate = new Date(c.created_at).toDateString();
+      return today === complaintDate;
+    }).length;
 
-  const currentData = getCurrentData();
-  const isLoading = getCurrentLoadingState();
+    return {
+      total: allComplaints.length,
+      overdue: overdueCount,
+      receivedToday: receivedToday,
+    };
+  };
+
+  const stats = getStatistics();
 
   return (
-    <>
-      {/* ✅ React-Toastify Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }}
-      />
-
-      <div className="min-h-screen p-2 sm:p-4">
-        {/* ✅ Header - Responsive */}
-        <div className="mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-            {getTabTitle()} / स्वीकृत शिकायतें
-          </h1>
-        </div>
-
-        {/* TABS COMPONENT - ALWAYS VISIBLE */}
-        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden mb-4 sm:mb-6">
-          <div className="">
-            {/* JUSTIFY-BETWEEN Tab Navigation */}
-            <div className="flex items-center justify-between rounded-md bg-gray-100 p-1 text-gray-500">
-              <button
-                onClick={() => handleTabChange('all')}
-                className={`flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === "all"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                All Complaints
-              </button>
-              <button
-                onClick={() => handleTabChange('pending')}
-                className={`flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === "pending"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                Pending Complaints
-              </button>
-              <button
-                onClick={() => handleTabChange('approved')}
-                className={`flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-all ${
-                  activeTab === "approved"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "hover:bg-gray-200"
-                }`}
-              >
-                Approved Complaints
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Loading State */}
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="flex flex-col items-center space-y-4">
-              {/* <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div> */}
-                <p className="text-gray-700 text-md font-semibold">Loading...</p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* ✅ Mobile-First Responsive Card Layout */}
-<div className="space-y-4">
-  {currentData.map((complaint) => (
-    <div
-      key={complaint.id}
-      className="w-full bg-white shadow-sm hover:shadow-lg rounded-xl border border-gray-200 transition duration-300 overflow-hidden"
-    >
-      {/* Header Section */}
-      <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <span className="text-gray-700 font-semibold text-sm">Complaint Details</span>
-        <div className="mt-2 sm:mt-0">
-          <span
-            className={`px-3 py-1 rounded-full text-xs font-semibold ${
-              isApprovedByRO(complaint)
-                ? "bg-green-100 text-green-700 border border-green-200"
-                : "bg-yellow-100 text-yellow-700 border border-yellow-200"
-            }`}
-          >
-            {isApprovedByRO(complaint) ? "Verified (Completed)" : "Pending Verification"}
-          </span>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-          {/* Column 1 */}
-          <div className="space-y-2">
-            <div className="flex gap-x-2">
-              <span className="text-gray-600 font-medium">Complaint No:</span>
-              <span className="bg-blue-100 px-2 py-0.5 rounded text-blue-800 font-semibold text-xs">
-                {complaint.complain_no}
+    <div className="w-full h-screen flex bg-gray-50 rounded-md overflow-hidden">
+      <div className="w-full bg-white flex flex-col overflow-hidden">
+        {/* Header Section */}
+        <div className="px-4 py-3 border-b flex-shrink-0 bg-white">
+          {/* Title and Stats */}
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-bold text-gray-900">Inbox</h2>
+            <div className="flex gap-2 text-xs">
+              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium">
+                Inbox: {filteredComplaints.length}
+              </span>
+              <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded-full font-medium">
+                Over 7 days: {stats.overdue}
+              </span>
+              <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium">
+                Received today: {stats.receivedToday}
               </span>
             </div>
-            <div className="flex gap-x-2">
-              <span className="text-gray-600 font-medium">Complainant:</span>
-              <span className="text-gray-900 font-medium">{complaint.name}</span>
-            </div>
-            <div className="flex gap-x-2">
-              <span className="text-gray-600 font-medium">Mobile No:</span>
-              <span className="text-gray-900">{complaint.mobile}</span>
-            </div>
           </div>
 
-          {/* Column 2 */}
-          <div className="space-y-2">
-            <div className="flex gap-x-2">
-              <span className="text-gray-600 font-medium">Email:</span>
-              <span className="text-gray-900 text-md break-all">{complaint.email}</span>
-            </div>
-            <div className="flex gap-x-2">
-              <span className="text-gray-600 font-medium">District:</span>
-              <span className="text-gray-900">{complaint.district_name}</span>
-            </div>
+          {/* Action Buttons */}
+          <div className="flex gap-2 mb-3">
+            <button className="px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
+              ⚠ Overdue &gt; 7 days ({stats.overdue})
+            </button>
+            <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
+              ₹ Fee Pending (0)
+            </button>
           </div>
 
-          {/* Column 3 */}
-          <div className="flex flex-col sm:items-end">
-            <span className="text-xs text-gray-600">Created:</span>
-            <span className="text-sm font-medium text-gray-900">
-              {formatDate(complaint.created_at)}
-            </span>
+          {/* Search Bar */}
+          <div className="relative mb-3">
+            <IoSearchOutline className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Search by file no., complainant, subject..."
+            />
+          </div>
+
+          {/* Filters and Sort */}
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex gap-2">
+              <select className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <option value="">Status: All</option>
+                <option value="in_progress">In Progress</option>
+                <option value="disposed">Disposed Accepted</option>
+                <option value="resolved">Resolved</option>
+                <option value="rejected">Rejected</option>
+                <option value="investigating">Under Investigation</option>
+                <option value="pending">Pending</option>
+              </select>
+
+              {/* District Dropdown */}
+              <select
+                className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={districtLoading}
+              >
+                <option value="">District: All</option>
+                {districtData?.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.district_name}
+                  </option>
+                ))}
+              </select>
+
+              <select className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                <option value="">Fee Status: All</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="exempted">Exempted</option>
+              </select>
+
+              {/* Case Type Dropdown */}
+              <select
+                className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                disabled={typesLoading}
+              >
+                <option value="">Case Type: All</option>
+                {complaintTypesData?.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name} ({type.name_h})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2">
+              <span className="text-gray-600">Sort by:</span>
+              <select
+                className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                value={sortOrder}
+                onChange={handleSortChange}
+              >
+                <option value="desc">Received Date (Newest First)</option>
+                <option value="asc">Received Date (Oldest First)</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="mt-5 pt-4 border-t border-gray-200 flex flex-col sm:flex-row gap-2 sm:justify-end">
-          <button
-            onClick={(e) => handleViewDetails(e, complaint.id)}
-            className="w-full sm:w-auto border border-gray-300 text-gray-700 hover:text-gray-900 hover:bg-gray-50 px-4 py-2 rounded-lg transition duration-200 text-sm font-medium"
-          >
-            View Details
-          </button>
+        {/* Complaints List */}
+        <div className="flex-1 overflow-y-auto">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <h1 className="text-gray-600">Loading...</h1>
+            </div>
+          ) : isError ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-red-500 text-sm">Error: {error.message}</p>
+            </div>
+          ) : filteredComplaints.length > 0 ? (
+            <div className="divide-y divide-gray-200">
+              {filteredComplaints.map((complaint) => (
+                <div
+                  key={complaint.id}
+                  className="px-4 py-3 hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    {/* Left Content */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 mb-1">
+                        File No. {complaint.complain_no}
+                      </p>
+                      <p className="text-xs text-gray-700 mb-1">
+                        {complaint.description ||
+                          complaint.remark ||
+                          "No description available"}
+                      </p>
+                      <div className="text-[11px] text-gray-600 mb-1">
+                        <span className="text-gray-500">Complainant:</span>
+                        <span className="ml-1">{complaint.name}</span>
+                        <span className="mx-1 text-gray-400">•</span>
+                        <span className="text-gray-500">District:</span>
+                        <span className="ml-1">{complaint.district_name}</span>
+                      </div>
+                      <div className="text-[10px] text-gray-400">
+                        Received:{" "}
+                        {new Date(complaint.created_at).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )}{" "}
+                        • Last action:{" "}
+                        {new Date(complaint.updated_at).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )}
+                      </div>
+                    </div>
 
-          {isApprovedByRO(complaint) ? (
-            <span className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium bg-green-500 text-white cursor-default">
-              ✓ Verified
-            </span>
+                    {/* Right Content - Status & Button */}
+                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                      {/* Top Row - Status Badges */}
+                      <div className="flex gap-1.5">
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
+                          New Case
+                        </span>
+                        {complaint.fee_exempted === 1 && (
+                          <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
+                            With Lokayukta
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Middle Row - Time & Status */}
+                      <div className="flex gap-1.5">
+                        <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+                          &gt;9d
+                        </span>
+                        <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
+                          Partial
+                        </span>
+                      </div>
+
+                      {/* Bottom Row - Button and Verified Badge */}
+                      <div className="flex gap-2 items-center">
+                        <button
+                          onClick={(e) => handleViewDetails(e, complaint.id)}
+                          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap"
+                        >
+                          View Details
+                        </button>
+
+                        {/* Verified Badge */}
+                        {isVerifiedByRO(complaint) && (
+                          <span className="px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center gap-1">
+                            <svg
+                              className="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            Verified
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
-            <button
-              onClick={(e) => handleApproveClick(e, complaint)}
-              className="w-full sm:w-auto text-blue-700 border border-blue-700 hover:bg-blue-700 hover:text-white px-4 py-2 rounded-lg transition duration-200 text-sm font-medium"
-            >
-              Verify
-            </button>
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-500 text-sm">
+                {searchQuery ? "No results found" : "No complaints available"}
+              </p>
+            </div>
           )}
         </div>
       </div>
     </div>
-  ))}
-</div>
-
-
-
-
-
-            {/* ✅ Empty State */}
-            {currentData.length === 0 && (
-              <div className="text-center py-8 sm:py-12">
-                <p className="text-gray-500 text-sm sm:text-base">
-                  No {activeTab === 'all' ? '' : activeTab} complaints found
-                </p>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* ✅ Forward Confirmation Modal */}
-      {isConfirmModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="p-6">
-              <div className="flex items-center mb-4">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-lg font-medium text-gray-900">Confirm Forward</h3>
-                  <p className="text-sm text-gray-500">
-                    Are you sure you want to forward this complaint?
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={handleCancelForward}
-                  disabled={isForwarding}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleConfirmForward}
-                  disabled={isForwarding}
-                  className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isForwarding ? "Forwarding..." : "Yes, Forward"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ✅ Mobile Responsive Modal */}
-      {isModalOpen && selectedComplaint && (
-        <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-start sm:items-center p-2 sm:p-4">
-          <div className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto rounded-lg sm:rounded-2xl bg-white mt-2 sm:mt-0">
-            {/* Modal Header - Mobile Responsive */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-start sm:items-center">
-              <div className="pr-4">
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Complaint Details</h2>
-                <p className="text-xs sm:text-sm text-gray-600 mt-1">{selectedComplaint.complain_no}</p>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors p-1 sm:p-2 flex-shrink-0"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 sm:h-6 sm:w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
   );
 };
 
-export default ApprovedComplaints;
+export default AllComplaints;
