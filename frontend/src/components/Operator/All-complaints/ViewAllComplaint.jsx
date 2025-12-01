@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import CoverMeta from "./SubModule/CoverMeta";
+import MovementHistory from "./SubModule/MovementHistory";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -320,7 +321,7 @@ const ViewComplaintDetails = () => {
                       : "text-gray-600 hover:text-gray-800"
                   }`}
                 >
-                  Cover & Meta
+                  File Details
                   {activeTab === "cover" && (
                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
                   )}
@@ -387,26 +388,7 @@ const ViewComplaintDetails = () => {
               )}
 
               {activeTab === "movement" && (
-                <div className="space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-3 h-3 bg-blue-600 rounded-full mt-1"></div>
-                    <div>
-                      <p className="font-medium text-gray-800">Created</p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(complaintData.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-3 h-3 bg-gray-300 rounded-full mt-1"></div>
-                    <div>
-                      <p className="font-medium text-gray-800">Last Updated</p>
-                      <p className="text-sm text-gray-600">
-                        {new Date(complaintData.updated_at).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <MovementHistory/>
               )}
             </div>
 
@@ -419,7 +401,7 @@ const ViewComplaintDetails = () => {
                 Mark as Received (Physical)
               </button>
               <button className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 ml-auto">
-                Forward Physical
+                Forward Physically Completed File
               </button>
             </div>
           </>
