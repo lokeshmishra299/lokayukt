@@ -10,14 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
+
     "@tanstack/react-query": "^5.90.11",
-=======
+
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
-    "@fortawesome/react-fontawesome": "^3.1.1",
-
->>>>>>> ef8470f48f91c415839b4e9a2c4b274a2580984a
+ 
     "axios": "^1.11.0",
     "file-saver": "^2.0.5",
     "firebase": "^10.8.0",
@@ -27,11 +25,8 @@
     "react-datepicker": "^8.7.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
-<<<<<<< HEAD
+
     "react-router-dom": "^6.22.1",
-=======
-    "react-router-dom": "^6.30.2",
->>>>>>> ef8470f48f91c415839b4e9a2c4b274a2580984a
     "react-scroll": "^1.9.0",
     "react-toastify": "^11.0.5",
     "react-typed": "^2.0.12",
@@ -50,10 +45,6 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "gh-pages": "^6.1.1",
     "postcss": "^8.4.35",
-<<<<<<< HEAD
-=======
-    "shadcn-ui": "^0.9.5",
->>>>>>> ef8470f48f91c415839b4e9a2c4b274a2580984a
     "tailwindcss": "^3.4.1",
     "vite": "^5.1.4"
   }
