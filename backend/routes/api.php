@@ -79,8 +79,6 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/add-department',[CommonController::class,'addDepartment']);
         Route::post('/edit-department/{id}',[CommonController::class,'editDepartment']);
         Route::post('/delete-department/{id}',[CommonController::class,'removeDepartment']);
-
-
         /**
          * Designation
          */
@@ -113,16 +111,11 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/edit-rejection/{id}',[CommonController::class,'editRejection']);
         Route::post('/delete-rejection/{id}',[CommonController::class,'removeRejection']);
 
-
-
         Route::get('/complain-report',[AdminReportController::class,'complainReports']);
         Route::get('/all-complains',[AdminReportController::class,'allComplains']);
          Route::get('/view-complaint/{id}',[AdminReportController::class,'viewComplaint']);
          Route::get('/getFilePreview/{id}',[AdminReportController::class,'getFilePreview']);
         Route::get('/detail-by-complaintype',[AdminReportController::class,'complainComplaintypeWise']);
-
-
-
 
         Route::get('/district-wise-complaint',[AdminReportController::class,'complainDistrictWise']);
         Route::get('/department-wise-complaint',[AdminReportController::class,'complainDepartmentWise']);
@@ -154,7 +147,7 @@ Route::middleware('auth:sanctum')->group(function(){
    Route::middleware('role:operator:record-keeper|review-operator')->prefix('operator')->group(function () {
         
         // Route::prefix('admin')->group(function () {
-        
+          
         Route::get('/all-district',[OperatorCommonController::class,'fetch_district']);
         Route::get('/department',[OperatorCommonController::class,'fetch_department']);
         Route::get('/designation',[OperatorCommonController::class,'fetch_designation']);

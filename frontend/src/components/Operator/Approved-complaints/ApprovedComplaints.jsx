@@ -374,7 +374,7 @@ const AllComplaints = () => {
                                 clipRule="evenodd"
                               />
                             </svg>
-                          Send To Lokayukt
+                          Send 
                           </span>
                         )}
                       </div>

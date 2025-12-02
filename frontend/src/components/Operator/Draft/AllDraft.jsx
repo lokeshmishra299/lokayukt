@@ -19,13 +19,12 @@ const api = axios.create({
 
 const AllDraft = () => {
   const navigate = useNavigate();
-
   const [allComplaints, setAllComplaints] = useState([]);
   const [filteredComplaints, setFilteredComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
-
+  
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
