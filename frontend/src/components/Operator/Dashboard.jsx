@@ -33,6 +33,7 @@ import {
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 // import { useNavigate } from 'react-router-dom';
 
 
@@ -258,7 +259,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 // Main Dashboard Component
 const Dashboard = ({ userRole = "operator" }) => {
 
-  // // const navigate = useNavigate()
+  const navigate = useNavigate()
   //  API State Management + Date Picker State
   const [dashboardData, setDashboardData] = useState(null);
   const [monthlyData, setMonthlyData] = useState([]);
@@ -615,7 +616,7 @@ const Dashboard = ({ userRole = "operator" }) => {
         {/* Total Complaints */}
         <div
         onClick={()=>{
-          // navigate("/operator/all-complaints ")
+          navigate("/operator/all-complaints ")
         }}
          className="p-5 rounded-2xl shadow-md border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -634,9 +635,9 @@ const Dashboard = ({ userRole = "operator" }) => {
 
         {/* Today's Entry */}
         <div
-         onClick={()=>{
-          // navigate("/operator/pending-complaints")
-        }}
+        //  onClick={()=>{
+        //   navigate("/operator/pending-complaints")
+        // }}
          className="p-5 rounded-2xl shadow-md border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
@@ -655,7 +656,7 @@ const Dashboard = ({ userRole = "operator" }) => {
         {/* Approved */}
         <div 
           onClick={()=>{
-          // navigate("/operator/approved-complaints")
+          navigate("/operator/approved-complaints")
         }}
         className="p-5 rounded-2xl shadow-md border border-green-200 bg-green-50 hover:bg-green-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -690,9 +691,9 @@ const Dashboard = ({ userRole = "operator" }) => {
 
         {/* Pending */}
         <div
-          onClick={()=>{
-          // navigate("/operator/pending-complaints")
-        }}
+        //   onClick={()=>{
+        //   navigate("/operator/pending-complaints")
+        // }}
          className="p-5 rounded-2xl shadow-md border border-yellow-200 bg-yellow-50 hover:bg-yellow-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
@@ -709,9 +710,9 @@ const Dashboard = ({ userRole = "operator" }) => {
 
         {/* Avg. Processing */}
         <div
-          onClick={()=>{
-          // navigate("/operator/pending-complaints")
-        }}
+        //   onClick={()=>{
+        //   navigate("/operator/pending-complaints")
+        // }}
          className="p-5 rounded-2xl shadow-md border border-teal-200 bg-teal-50 hover:bg-teal-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">

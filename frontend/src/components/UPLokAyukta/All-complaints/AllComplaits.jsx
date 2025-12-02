@@ -52,6 +52,7 @@ const AllComplaints = () => {
     });
   };
 
+
   const getAllComplaints = async () => {
     const res = await api.get("/uplokayukt/all-complaints");
     console.log("Data he", res.data.data)
@@ -175,7 +176,7 @@ const AllComplaints = () => {
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Complaint Approved Successfully!", {
+        toast.success("Send To uplokayukt Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -234,6 +235,15 @@ const AllComplaints = () => {
   };
 
   const stats = getStatistics();
+
+const getDaysDifference = (dateString) => {
+  const today = new Date();
+  const createdDate = new Date(dateString);
+
+  const diffTime = today - createdDate;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+};
+
 
   return (
     <>
@@ -386,7 +396,6 @@ const AllComplaints = () => {
                         </p>
                         <p className="text-xs text-gray-700 mb-1">
                           {complaint.description ||
-                            complaint.remark ||
                             "No description available"}
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
@@ -427,17 +436,21 @@ const AllComplaints = () => {
                           </span>
                           {complaint.fee_exempted === 1 && (
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                              With uplokayukta
+                              With uplokayukt
                             </span>
                           )}
                         </div>
 
                         <div className="flex gap-1.5">
-                          <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-                            &gt;9d
-                          </span>
+                       <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+  {getDaysDifference(complaint.created_at)}d
+</span>
+
                           <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
-                            Partial
+                             {complaint.fee_exempted == 1 ? "Fee Exempted":
+                             complaint.fee_exempted == 0 ? "Fee Not Exempted" :
+                             "Partial"
+                             }
                           </span>
                         </div>
 
@@ -448,16 +461,33 @@ const AllComplaints = () => {
                           >
                             View Details
                           </button>
-
+{/* 
                           {isApprovedByRO(complaint) ? (
-                            <>
-                              
-                            </>
+                            <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
+                            <svg
+                              className="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            Send 
+                          </span>
                           ) : (
-                         <>
-                          
-                         </>
-                          )}
+                            <button
+                              onClick={(e) =>
+                                handleApproveClick(e, complaint)
+                              }
+                              className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
+                            >
+                              
+                              Send To uplokayukt
+                            </button>
+                          )} */}
                         </div>
                       </div>
                     </div>

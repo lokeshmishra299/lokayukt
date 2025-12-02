@@ -631,9 +631,9 @@ const Dashboard = ({ userRole = "uplokayukt" }) => {
 
         {/* Today's Entry */}
         <div
-         onClick={()=>{
-          navigate("/uplokayukt/pending-complaints")
-        }}
+        //  onClick={()=>{
+        //   navigate("/uplokayukt/pending-complaints")
+        // }}
          className="p-5 rounded-2xl shadow-md border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
@@ -687,9 +687,9 @@ const Dashboard = ({ userRole = "uplokayukt" }) => {
 
         {/* Pending */}
         <div
-          onClick={()=>{
-          navigate("/uplokayukt/pending-complaints")
-        }}
+        //   onClick={()=>{
+        //   navigate("/uplokayukt/pending-complaints")
+        // }}
          className="p-5 rounded-2xl shadow-md border border-yellow-200 bg-yellow-50 hover:bg-yellow-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
@@ -706,9 +706,9 @@ const Dashboard = ({ userRole = "uplokayukt" }) => {
 
         {/* Avg. Processing */}
         <div
-          onClick={()=>{
-          navigate("/uplokayukt/pending-complaints")
-        }}
+        //   onClick={()=>{
+        //   navigate("/uplokayukt/pending-complaints")
+        // }}
          className="p-5 rounded-2xl shadow-md border border-teal-200 bg-teal-50 hover:bg-teal-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">

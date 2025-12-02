@@ -276,7 +276,7 @@ const ViewApprovedComplaints = () => {
             {error?.response?.data?.message || error?.message || "Error loading complaint data"}
           </p>
           <button
-            onClick={() => navigate("/operator/all-complaints")}
+            onClick={() => navigate(-1)}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Back to Complaints
@@ -298,7 +298,7 @@ const ViewApprovedComplaints = () => {
               <div className="md:hidden mb-4">
                 <div className="flex justify-between items-center mb-3">
                   <button
-                    onClick={() => navigate("/operator/all-complaints")}
+                    onClick={() => navigate(-1)}
                     className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
                   >
                     <IoMdArrowBack className="w-4 h-4" /> Back
@@ -331,7 +331,7 @@ const ViewApprovedComplaints = () => {
                       In Motion – With Lokayukta
                     </span>
                     <button
-                      onClick={() => navigate("/operator/all-complaints")}
+                      onClick={() => navigate(-1)}
                       className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
                     >
                       <IoMdArrowBack className="w-4 h-4" /> Back
