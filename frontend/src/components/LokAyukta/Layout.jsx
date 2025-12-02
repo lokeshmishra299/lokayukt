@@ -10,15 +10,14 @@ const Layout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-
+  // Check screen size
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
       
-      
       if (mobile) {
-        setIsCollapsed(false); 
+        setIsCollapsed(false);
       }
     };
 
@@ -41,34 +40,36 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
+      {/* Fixed Header - stays at top */}
       <Header 
         toggleMobileMenu={toggleMobileMenu} 
         toggleSidebar={toggleSidebar}
         isCollapsed={isCollapsed}
       />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          isMobileMenuOpen={isMobileMenuOpen} 
-          toggleMobileMenu={toggleMobileMenu} 
-          isCollapsed={isCollapsed}
-          toggleSidebar={toggleSidebar}
-        />
-        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${
-          isMobile ? 'p-4' : 'p-6'
-        }`} style={{
-          marginLeft: !isMobile ? (isCollapsed ? '4rem' : '18rem') : '0'
-        }}>
-          <Outlet />
-        </main>
-      </div>
-      
+
+      {/* Sidebar - below header on desktop */}
+      <Sidebar
+        isMobileMenuOpen={isMobileMenuOpen} 
+        toggleMobileMenu={toggleMobileMenu} 
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+      />
+
+      {/* Main Content Area with proper margin and padding */}
       <div 
-        className="transition-all duration-300"
+        className="min-h-screen transition-all duration-300"
         style={{
-          marginLeft: !isMobile ? (isCollapsed ? '4rem' : '18rem') : '0'
+          marginLeft: !isMobile ? (isCollapsed ? '4rem' : '16rem') : '0',
+          paddingTop: '4rem', // ✅ Add padding for fixed header (64px = 4rem)
         }}
       >
+        {/* Main Content */}
+        <main className={`${isMobile ? 'p-4' : 'p-6'}`}>
+          <Outlet />
+        </main>
+
+        {/* Footer */}
         <Footer />
       </div>
     </div>

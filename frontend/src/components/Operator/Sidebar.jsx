@@ -289,13 +289,13 @@ const Sidebar = ({
           </ul>
 
           {/* Case & Administration Section */}
-          {(isMobile || !isCollapsed) && (
+          {/* {(isMobile || !isCollapsed) && (
             <p className="text-[13px]  text-gray-800 mb-3 mt-6">Case & Administration</p>
-          )}
+          )} */}
 
           <ul className="space-y-2">
             {/* Progress Register */}
-            <li>
+            {/* <li>
               <Link
                 to="/operator/progress-register"
                 onClick={handleLinkClick}
@@ -316,10 +316,10 @@ const Sidebar = ({
                   </div>
                 )}
               </Link>
-            </li>
+            </li> */}
 
             {/* Search & Reports */}
-            <li>
+            {/* <li>
               <Link
                 to="/operator/search-reports"
                 onClick={handleLinkClick}
@@ -340,7 +340,7 @@ const Sidebar = ({
                   </div>
                 )}
               </Link>
-            </li>
+            </li> */}
           </ul>
         </nav>
       </div>
