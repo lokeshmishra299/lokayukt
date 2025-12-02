@@ -1,7 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { FiDownload, FiFileText } from "react-icons/fi";
 
-const Notes = () => {
+const Notes = ({ documents = [], approvalDocs = [] }) => {
+  const [open, setOpen] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState("");
+  const [selectedApprovalDoc, setSelectedApprovalDoc] = useState("");
+  const [note, setNote] = useState("");
   return (
     <div className="bg-white   rounded-lg space-y-6 w-full">
 
@@ -14,10 +18,210 @@ const Notes = () => {
             <FiDownload className="text-sm" />
             Download all notes (PDF)
           </button>
+          
+ {/* Button */}
+      <button
+        className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition w-full sm:w-auto"
+        onClick={() => setOpen(true)}
+      >
+        Add Note / Noting
+      </button>
 
-          <button className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">
-            Add Note / Noting
-          </button>
+      {/* Modal */}
+      {open && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white w-[90%] max-w-3xl rounded-lg shadow-lg p-6 relative max-h-[90vh] overflow-y-auto">
+
+            {/* Close */}
+            <button
+              className="absolute top-4 right-4 text-gray-500 hover:text-black"
+              onClick={() => setOpen(false)}
+            >
+              ✖
+            </button>
+
+            {/* Heading */}
+            <h2 className="text-xl font-semibold mb-4">Add Note / Noting</h2>
+
+            {/* Note Content */}
+            <label className="font-medium">Note Content *</label>
+            <textarea
+              className="w-full border border-gray-300 rounded mt-2 p-3 h-32 resize-none"
+              placeholder="Enter your note here..."
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+
+            <hr className="my-5" />
+
+            {/* References */}
+            <h3 className="font-medium mb-3">References</h3>
+
+            {/* Reference by Document */}
+            <label className="text-sm">Reference by Document</label>
+            <select
+              value={selectedDoc}
+              onChange={(e) => setSelectedDoc(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded mt-2"
+            >
+              <option value="">Select a document...</option>
+              {documents.map((doc) => (
+                <option key={doc.id} value={doc.id}>
+                  {doc.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Page Range */}
+            <div className="mt-6">
+              <label className="text-sm font-medium">
+                Reference by Combined Page Range (Total: 30 pages)
+              </label>
+
+              <div className="flex gap-3 mt-2">
+                <input
+                  type="number"
+                  placeholder="From"
+                  className="border rounded px-3 py-2 w-20"
+                />
+                <span className="mt-2">to</span>
+                <input
+                  type="number"
+                  placeholder="To"
+                  className="border rounded px-3 py-2 w-24"
+                />
+                <button className="border text-xs px-1 py-1 rounded hover:bg-gray-100">
+                  + Add Page Range
+                </button>
+                 <label className="text-sm font-medium">
+                Document for Approval (optional)
+              </label>
+
+              <select
+                value={selectedApprovalDoc}
+                onChange={(e) => setSelectedApprovalDoc(e.target.value)}
+                className="w-full mt-2 px-3 py-2 border rounded"
+              >
+                <option value="">None</option>
+                {approvalDocs.map((doc) => (
+                  <option key={doc.id} value={doc.id}>
+                    {doc.name}
+                  </option>
+                ))}
+              </select>
+              </div>
+            </div>
+
+            {/* ------------------------------- */}
+            {/* SECOND IMAGE UI ADDED BELOW    */}
+            {/* ------------------------------- */}
+
+            
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-3 mt-10">
+              <button
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </button>
+
+              <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Add Note
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      {open && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white w-[90%] max-w-3xl rounded-lg shadow-lg p-6 relative max-h-[90vh] overflow-y-auto">
+
+            {/* Close Icon */}
+            <button
+              className="absolute top-4 right-4 text-gray-500 hover:text-black"
+              onClick={() => setOpen(false)}
+            >
+              ✖
+            </button>
+
+            {/* Heading */}
+            <h2 className="text-xl font-semibold mb-4">Add Note / Noting</h2>
+
+            {/* Note Content */}
+            <label className="font-medium">Note Content *</label>
+            <textarea
+              className="w-full border border-gray-300 rounded mt-2 p-3 h-32 resize-none"
+              placeholder="Enter your note here..."
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+
+            <hr className="my-5" />
+
+            {/* References */}
+            <h3 className="font-medium mb-2">References</h3>
+
+            {/* Reference by Document */}
+            <label className="text-sm">Reference by Document</label>
+            <select
+              value={selectedDoc}
+              onChange={(e) => setSelectedDoc(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded mt-2"
+            >
+              <option value="">Select a document...</option>
+
+              {documents.map((doc) => (
+                <option key={doc.id} value={doc.id}>
+                  {doc.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Page Range Section */}
+            <div className="mt-6">
+              <label className="text-sm font-medium">
+                Reference by Combined Page Range (Total: 30 pages)
+              </label>
+
+              <div className="flex gap-3 mt-2">
+                <input
+                  type="number"
+                  placeholder="From"
+                  className="border rounded px-3 py-2 w-24"
+                />
+                <span className="mt-2">to</span>
+                <input
+                  type="number"
+                  placeholder="To"
+                  className="border rounded px-3 py-2 w-24"
+                />
+                <button className="border px-3 py-2 rounded hover:bg-gray-100">
+                  + Add Page Range
+                </button>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-3 mt-8">
+              <button
+                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </button>
+
+              <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                Add Note
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
         </div>
       </div>
 
