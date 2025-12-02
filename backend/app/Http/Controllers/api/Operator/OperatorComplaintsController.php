@@ -217,14 +217,8 @@ class OperatorComplaintsController extends Controller
                 $compDoc = new ComplainDocuments();
                 $compDoc->complain_id = $request->complain_id;
                 $compDoc->added_by = $added_by;
-<<<<<<< HEAD
-                $compDoc->type = $request->description;
-                // $compDoc->title = $request->title;
-=======
                 $compDoc->type = $request->type;
-                $compDoc->title = $request->title;
->>>>>>> 00fd9bf7725d2fc62d82d63f3df70c6efaabd6f3
-                
+                $compDoc->title = $request->title;     
                 $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
                 $filePath = $request->file('file')->storeAs('Document', $file, 'public');
                 $compDoc->file = $file;
