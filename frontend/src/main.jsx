@@ -9,15 +9,15 @@ import "./index.css";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      gcTime: 10 * 60 * 1000, 
-      retry:2,
-      staleTime: 6 * 1000,
+      staleTime: 10 * 60 * 1000,    
+      gcTime: 20 * 60 * 1000,        
+      retry: 2,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
-      refetchOnReconnect: false
+      refetchOnReconnect: false,
     },
   },
-})
+});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>

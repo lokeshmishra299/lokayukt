@@ -148,7 +148,7 @@ class OperatorComplaintsController extends Controller
    
         $complaintNo = 'UP'.$year.$str.str_pad($complaint->id,8, '0',STR_PAD_LEFT);
         $complaint->where('id',$complaint->id)->update(['complain_no' => $complaintNo]);
-            
+
         $cmpDetails = new ComplainDetails();
         $cmpDetails->complain_id = $complaint->id;
         $cmpDetails->department_id = $request->department;
@@ -184,9 +184,7 @@ class OperatorComplaintsController extends Controller
             'data' => $complaint,
             // 'added_by' =>$added_by
         ], 201);
-        }
-     
-      
+        }   
     }
 
     public function uploadDocument(Request $request)
@@ -199,12 +197,12 @@ class OperatorComplaintsController extends Controller
             
             'complain_id' => 'required|numeric',
             'type' => 'required|string',
-            'title' => 'required|string',
+            // 'title' => 'required|string',
             'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ], [
             'complain_id.required' => 'Complaint Id is required.',
             'type.required' => 'Complaint description is required.',
-            'title.required' => 'Letter Subject is Required',
+            // 'title.required' => 'Letter Subject is Required',
             'file.required' => 'File is Required',
         ]);
 
@@ -220,7 +218,7 @@ class OperatorComplaintsController extends Controller
                 $compDoc->complain_id = $request->complaint_id;
                 $compDoc->added_by = $added_by;
                 $compDoc->type = $request->description;
-                $compDoc->title = $request->title;
+                // $compDoc->title = $request->title;
                 
                 $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
                 $filePath = $request->file('file')->storeAs('Document', $file, 'public');
@@ -236,8 +234,6 @@ class OperatorComplaintsController extends Controller
         }
 
     }
-
-
     public function checkduplicateStoreComplain(Request $request)
     {
         // DB::beginTransaction();

@@ -3,16 +3,16 @@ import React from "react";
 const MovementHistory = () => {
   const items = [
     {
-      title: "PS to Lokayukta (Shri ABC) → Lokayukta",
+      title: "Record Section → Lokayukta",
       desc: "File marked for review and orders",
-      time: "15 Jan 2025, 3:00 PM",
-      status: "Marked",
+      time: "Current",
+      status: "12 Jan 2025, 2:45 PM",
     },
     {
       title: "UpLokayukta → PS to Lokayukta (Shri ABC)",
       desc: "Please prepare draft order for investigation",
-      time: "13 Jan 2025, 11:30 AM",
-      status: "Marked",
+      time: "Current",
+      status: "12 Jan 2025, 2:45 PM",
     },
   ];
 
@@ -44,23 +44,30 @@ const MovementHistory = () => {
 
 
          
-           <div className="bg-white rounded-xl shadow border p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+          <div className="bg-white rounded-xl shadow border p-4 pr-6 
+     flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
 
+  {/* LEFT SIDE */}
   <div className="flex-1">
-    <p className="text-[14px] sm:text-[15px] text-gray-900 font-medium">
-      {item.title}
-    </p>
+    <div className="flex flex-wrap items-center gap-2">
+      <p className="text-[15px] text-gray-900">
+        {item.title}
+      </p>
 
-    <p className="text-[12px] text-gray-500 mt-1">
-      {item.time}
-    </p>
+      <span className="px-1.5 py-[1px] text-[10px] border border-blue-300 
+            text-blue-600 bg-blue-50 rounded">
+        Current
+      </span>
+    </div>
 
-    <p className="text-[13px] text-gray-600 mt-1 leading-snug">
+    <p className="text-[13px] text-gray-600 mt-1">
       {item.desc}
     </p>
   </div>
 
-  <span className="text-[11px] sm:text-[12px] bg-blue-100 text-blue-600 px-2 py-1 rounded-md self-start sm:self-center whitespace-nowrap">
+  {/* RIGHT SIDE — STATUS */}
+  <span className="text-[12px] px-2 py-1 rounded-md
+        self-start sm:self-auto">
     {item.status}
   </span>
 

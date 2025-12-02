@@ -5,16 +5,16 @@ import {
   FaFileAlt,
   FaExclamationTriangle,
   FaTimes,
-
+  FaBars,
 } from "react-icons/fa";
-import { FaRegEdit } from "react-icons/fa";
+// import { FaRegEdit } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useQuery } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
-import CoverMeta from "./SubModule/CoverMeta";
+import FileDetails from "./SubModule/FileDetails";
 import MovementHistory from "./SubModule/MovementHistory";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -38,9 +38,10 @@ const ViewComplaintDetails = () => {
   const [activeTab, setActiveTab] = useState("cover");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
+  const [showMobileTabs, setShowMobileTabs] = useState(false);
 
   const getComplaintIDData = async () => {
-    const res = await api.get(`/operator/view-draft/${id}`);
+    const res = await api.get(`/operator/view-complaint/${id}`);
     console.log("ID Data", res.data.data);
     return res.data.data;
   };
@@ -179,9 +180,7 @@ const ViewComplaintDetails = () => {
   if (isLoading) {
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="text-center text-lg font-medium text-gray-700">
-          Loading...
-        </div>
+        <h1 className="text-gray-600">Loading...</h1>
       </div>
     );
   }
@@ -194,7 +193,7 @@ const ViewComplaintDetails = () => {
           <FaExclamationTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <p className="text-red-600 font-medium">{error?.message || "Error loading data"}</p>
           <button
-            onClick={() => navigate("/operator/all-complaints")}
+            onClick={() => navigate("/operator/draft")}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Back to Complaints
@@ -205,73 +204,108 @@ const ViewComplaintDetails = () => {
   }
 
   return (
-    <div className="w-full h-screen flex bg-gray-50 overflow-hidden">
+    <div className="w-full min-h-screen bg-gray-50">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <div className="w-full bg-white flex flex-col overflow-hidden">
+      <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
             {/* Header Section */}
-            <div className="p-6 border-b flex-shrink-0">
-              <div className="flex justify-between items-start mb-3">
-                <h2 className="text-xl font-semibold text-gray-800">
+            <div className="p-4 md:p-6 border-b">
+              {/* Mobile Header - Compact */}
+              <div className="md:hidden mb-4">
+                <div className="flex justify-between items-center mb-3">
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="p-2 text-gray-600 hover:bg-gray-100 rounded"
+                  >
+                 
+                  </button>
+                  <div className="flex items-center gap-2">
+               
+                  
+                    <button
+                      onClick={() => navigate(-1)}
+                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+                    >
+                      <IoMdArrowBack className="w-4 h-4" /> Back
+                    </button>
+                  </div>
+                </div>
+                
+                <h2 className="text-lg font-semibold text-gray-800 mb-2">
                   File No. {complaintData.complain_no}
                 </h2>
-                <div className="flex gap-2">
-                  <p
-                    className={`px-3 py-1 rounded ${getStatusColor(
+                
+                <div className="mb-3">
+                  <span
+                    className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
                       complaintData.status
                     )}`}
                   >
                     In Motion – With Lokayukta
-                  </p>
-                  {/* {subRole === "review-operator" && (
-                    <button
-                      onClick={handleEditNavigation}
-                      className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition"
-                    >
-                      <FaRegEdit className="inline mr-1" /> Edit
-                    </button>
-                  )} */}
-                  <button
-                    onClick={() => navigate("/operator/all-complaints")}
-                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                  >
-                    <IoMdArrowBack className="inline mr-1" /> Back
-                  </button>
+                  </span>
                 </div>
               </div>
 
-              <p className="text-gray-700 mb-4">
-                {complaintData.remark ||
+              {/* Desktop Header */}
+              <div className="hidden md:block">
+                <div className="flex justify-between items-start mb-3">
+                  <h2 className="text-xl font-semibold text-gray-800">
+                    File No. {complaintData.complain_no}
+                  </h2>
+                  <div className="flex gap-2">
+                    <span
+                      className={`px-3 py-1 rounded ${getStatusColor(
+                        complaintData.status
+                      )}`}
+                    >
+                      In Motion – With Lokayukta
+                    </span>
+                 
+                    <button
+                      onClick={() => navigate(-1)}
+                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+                    >
+                      <IoMdArrowBack className="w-4 h-4" /> Back
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description - Common for both mobile and desktop */}
+              <p className="text-gray-700 mb-4 text-sm md:text-base">
+                {complaintData.details?.[0]?.description ||
                   "No detailed description available for this complaint."}
               </p>
 
-              <div className="grid grid-cols-2 gap-6 mb-4">
-                <div>
+              {/* Complainant Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
+                <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
                   <p className="text-xs text-gray-500 uppercase mb-1">
                     COMPLAINANT
                   </p>
-                  <p className="font-semibold text-gray-800">
+                  <p className="font-semibold text-gray-800 text-sm md:text-base">
                     {complaintData.name}
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">
                     {complaintData.address}
                   </p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">
                     Mobile: {complaintData.mobile}
                   </p>
                   {complaintData.email && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs md:text-sm text-gray-600">
                       Email: {complaintData.email}
                     </p>
                   )}
                 </div>
-                <div>
+                
+                <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
                   <p className="text-xs text-gray-500 uppercase mb-1">
                     DISTRICT
                   </p>
-                  <p className="font-semibold text-gray-800">
+                  <p className="font-semibold text-gray-800 text-sm md:text-base">
                     {complaintData.district_name}
                   </p>
                   {complaintData.dob && (
@@ -279,7 +313,7 @@ const ViewComplaintDetails = () => {
                       <p className="text-xs text-gray-500 uppercase mb-1 mt-3">
                         DATE OF BIRTH
                       </p>
-                      <p className="font-semibold text-gray-800">
+                      <p className="font-semibold text-gray-800 text-sm md:text-base">
                         {new Date(complaintData.dob).toLocaleDateString()}
                       </p>
                     </>
@@ -287,35 +321,95 @@ const ViewComplaintDetails = () => {
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              {/* Fee and Challan Info */}
+              <div className="flex flex-wrap gap-2">
                 {complaintData.fee_exempted === 1 ? (
-                  <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded text-sm border border-green-200">
+                  <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded text-xs border border-green-200">
                     Fee: Exempted
                   </span>
                 ) : complaintData.amount ? (
-                  <span className="px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded text-sm border border-yellow-200">
+                  <span className="px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded text-xs border border-yellow-200">
                     Fee: ₹{complaintData.amount}
                   </span>
                 ) : (
-                  <span className="px-3 py-1.5 bg-gray-50 text-gray-700 rounded text-sm border border-gray-200">
+                  <span className="px-3 py-1.5 bg-gray-50 text-gray-700 rounded text-xs border border-gray-200">
                     Fee: Not specified
                   </span>
                 )}
                 {complaintData.challan_no && (
-                  <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded text-sm border border-blue-200">
+                  <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200">
                     Challan: {complaintData.challan_no}
                   </span>
                 )}
               </div>
             </div>
 
-    
-    {/* Tabs */}
-            <div className="border-b px-6 flex-shrink-0">
-              <div className="flex gap-6">
+            {/* Mobile Tabs Dropdown */}
+           
+              <div className="md:hidden border-b bg-white">
+                <div className="flex flex-col">
+                  <button
+                    onClick={() => {
+                      setActiveTab("cover");
+                      setShowMobileTabs(false);
+                    }}
+                    className={`py-3 px-4 text-left text-sm font-medium ${
+                      activeTab === "cover"
+                        ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    File Details
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab("documents");
+                      setShowMobileTabs(false);
+                    }}
+                    className={`py-3 px-4 text-left text-sm font-medium ${
+                      activeTab === "documents"
+                        ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    Documents
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab("notings");
+                      setShowMobileTabs(false);
+                    }}
+                    className={`py-3 px-4 text-left text-sm font-medium ${
+                      activeTab === "notings"
+                        ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    Notes / Notings
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab("movement");
+                      setShowMobileTabs(false);
+                    }}
+                    className={`py-3 px-4 text-left text-sm font-medium ${
+                      activeTab === "movement"
+                        ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    Movement History
+                  </button>
+                </div>
+              </div>
+       
+
+            {/* Desktop Tabs */}
+            <div className="hidden md:flex border-b px-6">
+              <div className="flex gap-6 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab("cover")}
-                  className={`pb-3 pt-3 text-sm font-medium transition-colors relative ${
+                  className={`pb-3 pt-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
                     activeTab === "cover"
                       ? "text-blue-600"
                       : "text-gray-600 hover:text-gray-800"
@@ -328,7 +422,7 @@ const ViewComplaintDetails = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("documents")}
-                  className={`pb-3 pt-3 text-sm font-medium transition-colors relative ${
+                  className={`pb-3 pt-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
                     activeTab === "documents"
                       ? "text-blue-600"
                       : "text-gray-600 hover:text-gray-800"
@@ -341,7 +435,7 @@ const ViewComplaintDetails = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("notings")}
-                  className={`pb-3 pt-3 text-sm font-medium transition-colors relative ${
+                  className={`pb-3 pt-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
                     activeTab === "notings"
                       ? "text-blue-600"
                       : "text-gray-600 hover:text-gray-800"
@@ -354,7 +448,7 @@ const ViewComplaintDetails = () => {
                 </button>
                 <button
                   onClick={() => setActiveTab("movement")}
-                  className={`pb-3 pt-3 text-sm font-medium transition-colors relative ${
+                  className={`pb-3 pt-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
                     activeTab === "movement"
                       ? "text-blue-600"
                       : "text-gray-600 hover:text-gray-800"
@@ -368,10 +462,29 @@ const ViewComplaintDetails = () => {
               </div>
             </div>
 
-            <div className="flex-1 p-6 overflow-y-auto">
+            {/* Mobile Active Tab Indicator */}
+            <div className="md:hidden border-b">
+              <button
+                onClick={() => setShowMobileTabs(true)}
+                className="w-full py-3 px-4 flex justify-between items-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <span>
+                  {activeTab === "cover" && "File Details"}
+                  {activeTab === "documents" && "Documents"}
+                  {activeTab === "notings" && "Notes / Notings"}
+                  {activeTab === "movement" && "Movement History"}
+                </span>
+                {/* <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg> */}
+              </button>
+            </div>
+
+            {/* Content Area pass the propes */}
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto">
               {activeTab === "cover" && (
                 <div className="space-y-4">
-                  <CoverMeta complaint={complaintData} />
+                  <FileDetails complaint={complaintData} />
                 </div>
               )}
 
@@ -388,21 +501,23 @@ const ViewComplaintDetails = () => {
               )}
 
               {activeTab === "movement" && (
-                <MovementHistory/>
+                <MovementHistory complaint={complaintData} />
               )}
             </div>
 
-           
-            <div className="border-t p-4 flex gap-3 flex-shrink-0">
-              <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
-                Pull Back
-              </button>
-              <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
-                Mark as Received (Physical)
-              </button>
-              <button className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 ml-auto">
-                Forward Physically Completed File
-              </button>
+            {/* Action Buttons - Responsive */}
+            <div className="border-t p-4">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button className="px-4 py-2 border cursor-not-allowed border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
+                  Pull Back
+                </button>
+                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
+                  Mark as Received (Physical)
+                </button>
+                <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0">
+                  Forward Physically Completed File
+                </button>
+              </div>
             </div>
           </>
         ) : (
@@ -414,7 +529,6 @@ const ViewComplaintDetails = () => {
           </div>
         )}
       </div>
-
 
       {showPreview && <PDFPreviewModal />}
     </div>

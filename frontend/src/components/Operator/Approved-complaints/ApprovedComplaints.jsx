@@ -3,6 +3,22 @@ import { IoSearchOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import { IoMdTime } from "react-icons/io";
+
+
+
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
+
+const token = localStorage.getItem("access_token");
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  },
+});
+
 
 const AllComplaints = () => {
   const navigate = useNavigate();
@@ -13,17 +29,24 @@ const AllComplaints = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
 
-  const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
-  const token = localStorage.getItem("access_token");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
+  const [selectedCaseType, setSelectedCaseType] = useState("");
 
-  const api = axios.create({
-    baseURL: BASE_URL,
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
+  const sortComplaintsByDate = (complaints, order) => {
+    return [...complaints].sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
 
-  // AllComplaints API Call
+      if (order === "desc") {
+        return dateB - dateA;
+      } else {
+        return dateA - dateB;
+      }
+    });
+  };
+
   const getAllComplaints = async () => {
     const res = await api.get("/operator/all-approved-complaints");
     return res.data.data;
@@ -32,11 +55,9 @@ const AllComplaints = () => {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["all-approved-complaints"],
     queryFn: getAllComplaints,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
+
   });
 
-  // District API Call
   const getDistrict = async () => {
     const res = await api.get("/operator/all-district");
     return res.data.data;
@@ -45,10 +66,9 @@ const AllComplaints = () => {
   const { data: districtData, isLoading: districtLoading } = useQuery({
     queryKey: ["district-api"],
     queryFn: getDistrict,
-    staleTime: 10 * 60 * 1000,
+
   });
 
-  // Complaint Types API Call
   const getComplaintTypes = async () => {
     const res = await api.get("/operator/complainstype");
     return res.data.data;
@@ -57,7 +77,6 @@ const AllComplaints = () => {
   const { data: complaintTypesData, isLoading: typesLoading } = useQuery({
     queryKey: ["complaint-types"],
     queryFn: getComplaintTypes,
-    staleTime: 10 * 60 * 1000,
   });
 
   useEffect(() => {
@@ -69,12 +88,13 @@ const AllComplaints = () => {
   }, [data, sortOrder]);
 
   useEffect(() => {
-    if (searchQuery.trim() === "") {
-      const sorted = sortComplaintsByDate(allComplaints, sortOrder);
-      setFilteredComplaints(sorted);
-    } else {
-      const filtered = allComplaints.filter((complaint) => {
-        const query = searchQuery.toLowerCase();
+    if (allComplaints.length === 0) return;
+
+    let filtered = [...allComplaints];
+
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((complaint) => {
         return (
           complaint.complain_no?.toLowerCase().includes(query) ||
           complaint.name?.toLowerCase().includes(query) ||
@@ -85,24 +105,42 @@ const AllComplaints = () => {
           complaint.mobile?.includes(query)
         );
       });
-      const sorted = sortComplaintsByDate(filtered, sortOrder);
-      setFilteredComplaints(sorted);
     }
-  }, [searchQuery, allComplaints, sortOrder]);
 
-  // Sort function for received date
-  const sortComplaintsByDate = (complaints, order) => {
-    return [...complaints].sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
+    if (selectedDistrict !== "") {
+      filtered = filtered.filter((complaint) => {
+        return complaint.district_name?.toLowerCase() === selectedDistrict.toLowerCase();
+      });
+    }
 
-      if (order === "desc") {
-        return dateB - dateA; // Newest first
-      } else {
-        return dateA - dateB; // Oldest first
-      }
-    });
-  };
+    if (selectedStatus !== "") {
+      filtered = filtered.filter((complaint) => {
+        return complaint.status === selectedStatus;
+      });
+    }
+
+    if (selectedFeeStatus !== "") {
+      filtered = filtered.filter((complaint) => {
+        return complaint.fee_status === selectedFeeStatus;
+      });
+    }
+
+    if (selectedCaseType !== "") {
+      filtered = filtered.filter((complaint) => {
+        return complaint.complaint_type_id === parseInt(selectedCaseType);
+      });
+    }
+
+    const sorted = sortComplaintsByDate(filtered, sortOrder);
+    setFilteredComplaints(sorted);
+  }, [
+    searchQuery,
+    allComplaints,
+    selectedDistrict,
+    selectedStatus,
+    selectedFeeStatus,
+    selectedCaseType,
+  ]);
 
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
@@ -114,7 +152,6 @@ const AllComplaints = () => {
     setSortOrder(e.target.value);
   };
 
-  // Check if verified by RO
   const isVerifiedByRO = (complaint) => {
     return complaint.approved_rejected_by_ro === 1;
   };
@@ -140,35 +177,22 @@ const AllComplaints = () => {
   return (
     <div className="w-full h-screen flex bg-gray-50 rounded-md overflow-hidden">
       <div className="w-full bg-white flex flex-col overflow-hidden">
-        {/* Header Section */}
         <div className="px-4 py-3 border-b flex-shrink-0 bg-white">
-          {/* Title and Stats */}
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-gray-900">Inbox</h2>
-            <div className="flex gap-2 text-xs">
-              <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium">
-                Inbox: {filteredComplaints.length}
-              </span>
-              <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded-full font-medium">
-                Over 7 days: {stats.overdue}
-              </span>
-              <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium">
-                Received today: {stats.receivedToday}
-              </span>
-            </div>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2">
+            <h2 className="text-lg font-bold text-gray-900">Send</h2>
+          
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 mb-3">
-            <button className="px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
-              ⚠ Overdue &gt; 7 days ({stats.overdue})
-            </button>
-            <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
-              ₹ Fee Pending (0)
-            </button>
-          </div>
+            <div className="flex gap-2 mb-3">
+                       <div className="flex flex-col ">
+                       <button className=" flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
+                         <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
+                       </button></div>
+                       <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
+                         ₹ Fee Pending (0)
+                       </button>
+                     </div>
 
-          {/* Search Bar */}
           <div className="relative mb-3">
             <IoSearchOutline className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
@@ -180,10 +204,13 @@ const AllComplaints = () => {
             />
           </div>
 
-          {/* Filters and Sort */}
-          <div className="flex items-center justify-between text-xs">
-            <div className="flex gap-2">
-              <select className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between text-xs gap-2">
+            <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+              <select
+                className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+              >
                 <option value="">Status: All</option>
                 <option value="in_progress">In Progress</option>
                 <option value="disposed">Disposed Accepted</option>
@@ -193,58 +220,65 @@ const AllComplaints = () => {
                 <option value="pending">Pending</option>
               </select>
 
-              {/* District Dropdown */}
               <select
                 className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                 disabled={districtLoading}
+                value={selectedDistrict}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
               >
                 <option value="">District: All</option>
                 {districtData?.map((item) => (
-                  <option key={item.id} value={item.id}>
+                  <option key={item.id} value={item.district_name}>
                     {item.district_name}
                   </option>
                 ))}
               </select>
 
-              <select className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <select
+                className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                value={selectedFeeStatus}
+                onChange={(e) => setSelectedFeeStatus(e.target.value)}
+              >
                 <option value="">Fee Status: All</option>
                 <option value="paid">Paid</option>
                 <option value="pending">Pending</option>
                 <option value="exempted">Exempted</option>
               </select>
 
-              {/* Case Type Dropdown */}
               <select
                 className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                 disabled={typesLoading}
+                value={selectedCaseType}
+                onChange={(e) => setSelectedCaseType(e.target.value)}
               >
                 <option value="">Case Type: All</option>
                 {complaintTypesData?.map((type) => (
                   <option key={type.id} value={type.id}>
-                    {type.name} ({type.name_h})
+                    {type.name}
                   </option>
                 ))}
               </select>
             </div>
 
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <span className="text-gray-600">Sort by:</span>
               <select
-                className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 flex-1 sm:flex-none"
                 value={sortOrder}
                 onChange={handleSortChange}
               >
-                <option value="desc">Received Date (Newest First)</option>
-                <option value="asc">Received Date (Oldest First)</option>
+                   <option value="desc">Received Date </option> 
+                <option value="asc">Ascending Order</option> 
+                <option value="desc">Decending Order</option>
+                {/* <option value="desc">Newest First</option>
+                <option value="asc">Oldest First</option> */}
               </select>
             </div>
           </div>
         </div>
 
-        {/* Complaints List */}
         <div className="flex-1 overflow-y-auto">
-          {isLoading ? (
+          {isLoading && !data ? (
             <div className="flex items-center justify-center h-full">
               <h1 className="text-gray-600">Loading...</h1>
             </div>
@@ -259,9 +293,8 @@ const AllComplaints = () => {
                   key={complaint.id}
                   className="px-4 py-3 hover:bg-gray-50 transition-colors"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    {/* Left Content */}
-                    <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
+                    <div className="flex-1 min-w-0 w-full sm:w-auto">
                       <p className="text-sm font-semibold text-gray-900 mb-1">
                         File No. {complaint.complain_no}
                       </p>
@@ -299,9 +332,7 @@ const AllComplaints = () => {
                       </div>
                     </div>
 
-                    {/* Right Content - Status & Button */}
-                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                      {/* Top Row - Status Badges */}
+                    <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
                       <div className="flex gap-1.5">
                         <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
                           New Case
@@ -313,7 +344,6 @@ const AllComplaints = () => {
                         )}
                       </div>
 
-                      {/* Middle Row - Time & Status */}
                       <div className="flex gap-1.5">
                         <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
                           &gt;9d
@@ -323,18 +353,16 @@ const AllComplaints = () => {
                         </span>
                       </div>
 
-                      {/* Bottom Row - Button and Verified Badge */}
-                      <div className="flex gap-2 items-center">
+                      <div className="flex gap-2 items-center w-full sm:w-auto">
                         <button
                           onClick={(e) => handleViewDetails(e, complaint.id)}
-                          className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap"
+                          className="flex-1 sm:flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap"
                         >
                           View Details
                         </button>
 
-                        {/* Verified Badge */}
                         {isVerifiedByRO(complaint) && (
-                          <span className="px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center gap-1">
+                          <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
                             <svg
                               className="w-3 h-3"
                               fill="currentColor"
@@ -346,7 +374,7 @@ const AllComplaints = () => {
                                 clipRule="evenodd"
                               />
                             </svg>
-                            Verified
+                          Send To Lokayukt
                           </span>
                         )}
                       </div>
@@ -358,7 +386,9 @@ const AllComplaints = () => {
           ) : (
             <div className="flex items-center justify-center h-full">
               <p className="text-gray-500 text-sm">
-                {searchQuery ? "No results found" : "No complaints available"}
+                {searchQuery || selectedDistrict || selectedStatus || selectedFeeStatus || selectedCaseType
+                  ? "No results found"
+                  : ""}
               </p>
             </div>
           )}

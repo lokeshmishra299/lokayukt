@@ -615,7 +615,7 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
         {/* Today's Entry */}
         <div
          onClick={()=>{
-          navigate("/lokayukt/pending-complaints")
+          // navigate("/lokayukt/pending-complaints")
         }}
          className="p-5 rounded-2xl shadow-md border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -671,7 +671,7 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
         {/* Pending */}
         <div
           onClick={()=>{
-          navigate("/lokayukt/pending-complaints")
+          // navigate("/lokayukt/pending-complaints")
         }}
          className="p-5 rounded-2xl shadow-md border border-yellow-200 bg-yellow-50 hover:bg-yellow-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -690,7 +690,7 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
         {/* Avg. Processing */}
         <div
           onClick={()=>{
-          navigate("/lokayukt/pending-complaints")
+          // navigate("/lokayukt/pending-complaints")
         }}
          className="p-5 rounded-2xl shadow-md border border-teal-200 bg-teal-50 hover:bg-teal-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">

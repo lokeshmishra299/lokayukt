@@ -1,6 +1,7 @@
 // components/Header.jsx
-import React, { useState, useEffect } from 'react';
-import { FaSync, FaBars, FaUser, FaEnvelope, FaPhone, FaSignOutAlt } from 'react-icons/fa';
+import React, { useState, useEffect, useRef } from 'react';
+import { FiBell, FiHelpCircle, FiChevronDown, FiLayers } from "react-icons/fi";
+import { FaBars, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -8,12 +9,14 @@ import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
-const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
+const Header = ({ toggleMobileMenu }) => {
   const navigate = useNavigate();
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   const getApiInstance = () => {
     const token = localStorage.getItem("access_token");
@@ -25,7 +28,6 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
       },
     });
   };
-
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -40,7 +42,7 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
     };
   }, []);
 
-
+  // Update time every minute
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentDateTime(new Date());
@@ -48,6 +50,23 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    if (showProfileDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileDropdown]);
 
   const formatDateTime = () => {
     const now = currentDateTime;
@@ -65,7 +84,6 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
     return `${day} ${month} ${year}, ${hours}:${minutesStr} ${ampm}`;
   };
 
-
   const handleLogout = async () => {
     if (isLoggingOut) return;
     
@@ -78,7 +96,7 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
       if (response.data.status === 'success') {
         toast.success('Logout Successfully');
         
-        setTimeout(() => {
+        timeoutRef.current = setTimeout(() => {
           localStorage.removeItem('access_token');
           localStorage.removeItem('user');
           localStorage.removeItem('role'); 
@@ -96,15 +114,20 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
         toast.error('Network error during logout. Please try again.');
       }
     } finally {
-      setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         setIsLoggingOut(false);
       }, 1500);
     }
   };
 
-  const handleRefresh = () => {
-    window.location.reload();
-  };
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const getUserData = () => {
     try {
@@ -115,7 +138,6 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
       return null;
     }
   };
-
 
   const getUserRole = () => {
     try {
@@ -128,6 +150,17 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
 
   const user = getUserData();
   const userRole = getUserRole();
+
+  const getUserInitials = () => {
+    if (user?.name) {
+      const nameParts = user.name.split(' ');
+      if (nameParts.length >= 2) {
+        return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+      }
+      return user.name.substring(0, 2).toUpperCase();
+    }
+    return 'LK';
+  };
 
   return (
     <>
@@ -145,105 +178,106 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
         style={{ zIndex: 9999 }}
       />
 
-  
-      <header 
-        className="bg-white border-b border-gray-200 relative z-20"
-        style={{
-          marginLeft: !isMobile ? (isCollapsed ? '4rem' : '18rem') : '0',
-          width: !isMobile ? (isCollapsed ? 'calc(100% - 4rem)' : 'calc(100% - 18rem)') : '100%'
-        }}
-      >
-        <div className={`flex justify-between items-center ${isMobile ? 'px-3 py-3' : 'px-6 py-4'}`}>
+      {/* ✅ FIXED Header - stays at top */}
+      <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50 h-16">
+        <div className="w-full h-full flex items-center justify-between px-4 md:px-6">
           
-        
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* ✅ MOBILE: Hamburger Menu Button */}
+          {/* LEFT SECTION - Logo + Title */}
+          <div className="flex items-center gap-3">
             {isMobile && (
               <button
                 onClick={toggleMobileMenu}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors md:hidden"
                 aria-label="Toggle mobile menu"
               >
                 <FaBars className="w-5 h-5" />
               </button>
             )}
 
-            {/* ✅ Clock Icon - Responsive */}
-            <div className={`flex items-center justify-center ${isMobile ? 'w-5 h-5' : 'w-6 h-6'}`}>
-              <div className={`border-2 border-gray-400 rounded-full relative ${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`}>
-                <div className="absolute top-0 left-1/2 w-0.5 h-1.5 bg-gray-400 transform -translate-x-1/2"></div>
-                <div className="absolute top-1/2 left-1/2 w-1 h-0.5 bg-gray-400 transform -translate-x-1/2 -translate-y-1/2"></div>
-              </div>
+            <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+              <FiLayers size={26} className="text-white" />
             </div>
-            
-            {/* ✅ Date Time Text - Responsive */}
-            <span className={`text-gray-600 font-medium ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              {isMobile ? 
-                // Mobile: Show shorter format
-                `${new Date().getDate()} ${new Date().toLocaleDateString('en-US', { month: 'short' })}` :
-                // Desktop: Show full format
-                formatDateTime()
-              }
-            </span>
+
+            {!isMobile && (
+              <div>
+                <h1 className="text-lg font-semibold text-gray-800">
+                  Lokayukta Case Management
+                </h1>
+                <p className="text-xs text-gray-500">
+                  {formatDateTime()}
+                </p>
+              </div>
+            )}
           </div>
 
-          <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
-  
+          {/* RIGHT SECTION - Notifications + Profile */}
+          <div className="flex items-center gap-5">
+            
+            <div className="relative cursor-pointer" aria-label="Notifications">
+              <FiBell size={20} className="text-gray-700" />
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500"></span>
+            </div>
+
             {!isMobile && (
-              <div className="flex flex-col">
-         
-                <div className="flex items-center">
-                  <FaUser className="w-4 h-4 mr-2 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-900">
-                    {user?.name}
-                  </span>
-                  <span className="ml-2 px-2 py-0.5 border text-black text-xs rounded-full font-medium">
-                    {userRole == "lok-ayukt" ? "LokAyukta" : "LokAyukta"}
+              <FiHelpCircle 
+                size={20} 
+                className="text-gray-700 cursor-pointer" 
+                aria-label="Help"
+              />
+            )}
+
+            <div className="relative" ref={dropdownRef}>
+              <div 
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              >
+                <div className="w-9 h-9 rounded-full bg-yellow-500 flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {getUserInitials()}
                   </span>
                 </div>
 
-                {/* User Email */}
-                <div>
-                  <span className="text-xs text-gray-500">
-                    {user?.email || "sahil@gmail.com"}
-                  </span>
+                {!isMobile && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-700">
+                        {user?.name || 'User Name'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {userRole === "lok-ayukt" ? "LokAyukta" : "LokAyukta"}
+                      </span>
+                    </div>
+                    <FiChevronDown className="text-gray-600" />
+                  </div>
+                )}
+
+                {isMobile && (
+                  <FiChevronDown className="text-gray-600" />
+                )}
+              </div>
+
+              {showProfileDropdown && (
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[60]">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-800">{user?.name || 'User Name'}</p>
+                    <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
+                    <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
+                      {userRole === "lok-ayukt" ? "LokAyukta" : "LokAyukta"}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className={`w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors ${
+                      isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <FaSignOutAlt className={`w-4 h-4 ${isLoggingOut ? 'animate-pulse' : ''}`} />
+                    <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+                  </button>
                 </div>
-              </div>
-            )}
-
-            {isMobile && (
-              <div className="flex items-center gap-1">
-                <FaUser className="w-4 h-4 text-gray-600" />
-                <span className="text-xs text-gray-600 font-medium">
-                  {user?.name?.split(' ')[0] || 'User'}
-                </span>
-              </div>
-            )}
-
-            <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
-      
-              <button
-                onClick={handleRefresh}
-                className={`text-blue-500 rounded-lg hover:bg-gray-100 transition-colors ${
-                  isMobile ? 'p-1.5' : 'p-2'
-                }`}
-                title="Refresh"
-              >
-                <FaSync className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
-              </button>
-
-              <button 
-                className={`text-red-600 transition-colors rounded-lg hover:bg-gray-100 ${
-                  isMobile ? 'p-1.5' : 'p-2'
-                } ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                title="Logout"
-              >
-                <FaSignOutAlt className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} ${
-                  isLoggingOut ? 'animate-pulse' : ''
-                }`} />
-              </button>
+              )}
             </div>
           </div>
         </div>

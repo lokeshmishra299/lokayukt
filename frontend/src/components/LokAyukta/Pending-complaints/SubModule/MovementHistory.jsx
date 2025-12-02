@@ -44,28 +44,19 @@ const MovementHistory = () => {
 
 
          
-           <div className="bg-white rounded-xl shadow border p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+            <div className="bg-white rounded-xl shadow border p-4 pr-6 flex justify-between items-start">
+              <div>
+                <p className="text-[15px] text-gray-900 font-medium">
+                  {item.title}
+                </p>
+                <p className="text-[12px] text-gray-500 mt-1">{item.time}</p>
+                <p className="text-[13px] text-gray-600 mt-1">{item.desc}</p>
+              </div>
 
-  <div className="flex-1">
-    <p className="text-[14px] sm:text-[15px] text-gray-900 font-medium">
-      {item.title}
-    </p>
-
-    <p className="text-[12px] text-gray-500 mt-1">
-      {item.time}
-    </p>
-
-    <p className="text-[13px] text-gray-600 mt-1 leading-snug">
-      {item.desc}
-    </p>
-  </div>
-
-  <span className="text-[11px] sm:text-[12px] bg-blue-100 text-blue-600 px-2 py-1 rounded-md self-start sm:self-center whitespace-nowrap">
-    {item.status}
-  </span>
-
-</div>
-
+              <span className="text-[12px] bg-blue-100 text-blue-600 px-2 py-1 rounded-md">
+                {item.status}
+              </span>
+            </div>
 
           </div>
         ))}
