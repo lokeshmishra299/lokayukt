@@ -189,7 +189,7 @@ class OperatorComplaintsController extends Controller
 
     public function uploadDocument(Request $request)
     {
-        
+        // dd($request->complain_id);
         // $user = $request->user()->id;
         $added_by = Auth::user()->id;
     
@@ -218,7 +218,7 @@ class OperatorComplaintsController extends Controller
                 $compDoc->complain_id = $request->complain_id;
                 $compDoc->added_by = $added_by;
                 $compDoc->type = $request->type;
-                $compDoc->title = $request->title;     
+                // $compDoc->title = $request->title;     
                 $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
                 $filePath = $request->file('file')->storeAs('Document', $file, 'public');
                 $compDoc->file = $file;
