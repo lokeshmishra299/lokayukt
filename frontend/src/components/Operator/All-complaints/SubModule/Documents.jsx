@@ -77,7 +77,7 @@ const Documents = ({ complaint }) => {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      });
+      }); 
 
       toast.success(`Uploaded document successfully!`);
 
