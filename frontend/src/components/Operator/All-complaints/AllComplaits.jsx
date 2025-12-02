@@ -52,6 +52,7 @@ const AllComplaints = () => {
     });
   };
 
+
   const getAllComplaints = async () => {
     const res = await api.get("/operator/all-complaints");
     console.log("Data he", res.data.data)
@@ -235,6 +236,15 @@ const AllComplaints = () => {
 
   const stats = getStatistics();
 
+const getDaysDifference = (dateString) => {
+  const today = new Date();
+  const createdDate = new Date(dateString);
+
+  const diffTime = today - createdDate;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+};
+
+
   return (
     <>
       <ToastContainer
@@ -386,7 +396,6 @@ const AllComplaints = () => {
                         </p>
                         <p className="text-xs text-gray-700 mb-1">
                           {complaint.description ||
-                            complaint.remark ||
                             "No description available"}
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
@@ -433,11 +442,15 @@ const AllComplaints = () => {
                         </div>
 
                         <div className="flex gap-1.5">
-                          <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-                            &gt;9d
-                          </span>
+                       <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+  {getDaysDifference(complaint.created_at)}d
+</span>
+
                           <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
-                            Partial
+                             {complaint.fee_exempted == 1 ? "Fee Exempted":
+                             complaint.fee_exempted == 0 ? "Fee Not Exempted" :
+                             "Partial"
+                             }
                           </span>
                         </div>
 

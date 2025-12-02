@@ -14,7 +14,6 @@ import MovementHistory from "./SubModule/MovementHistory";
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
 const token = localStorage.getItem("access_token");
-const subRole = localStorage.getItem("subrole");
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -36,56 +35,100 @@ const ViewComplaintDetails = () => {
   const [confirmConfig, setConfirmConfig] = useState({ open: false, type: null });
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
-  const [forwardOptions, setForwardOptions] = useState([]);
 
-  const getComplaintIDData = async () => {
-    const res = await api.get(`/operator/view-complaint/${id}`);
-    return res.data.data;
-  };
-
-  const { data: complaintData, isLoading, isError, error } = useQuery({
+  // Fetch complaint details
+  const {
+    data: complaintData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["complaint-details", id],
-    queryFn: getComplaintIDData,
+    queryFn: async () => {
+      const res = await api.get(`/operator/view-complaint/${id}`);
+      return res.data.data;
+    },
     enabled: !!id,
+    staleTime: 1000 * 60 * 5,
+    retry: 2,
   });
 
-  useEffect(() => {
-    if (confirmConfig.open && confirmConfig.type === "forward") {
-      const fetchForwardOptions = async () => {
-        try {
-          const res = await api.get("/operator/get-lokayukt");
-          setForwardOptions(res.data.data || []);
-        } catch (err) {
-          console.error("Failed to fetch forward options:", err);
-          toast.error("Failed to load forward options");
-        }
-      };
-      fetchForwardOptions();
-    }
-  }, [confirmConfig.open, confirmConfig.type]);
+  // Fetch forward options - FIXED: Check API response structure
+  const {
+    data: forwardOptionsData,
+    isLoading: isLoadingOptions,
+    isFetching: isFetchingOptions,
+    error: forwardOptionsError,
+  } = useQuery({
+    queryKey: ["lokayukt-options"],
+    queryFn: async () => {
+      try {
+        const res = await api.get("/operator/get-lokayukt");
+ 
+        
 
+        if (Array.isArray(res.data)) {
+          // console.log("Response is direct array");
+          return res.data;
+        } else if (res.data && Array.isArray(res.data.data)) {
+          // console.log("Response has data array");
+          return res.data.data;
+        } else if (res.data && res.data.data) {
+          // console.log("Response data.data exists but not array:", res.data.data);
+          // Try to convert object to array if needed
+          if (typeof res.data.data === 'object' && res.data.data !== null) {
+            return Object.values(res.data.data);
+          }
+          return [];
+        } else {
+          // console.log("Unexpected response structure");
+          return [];
+        }
+      } catch (error) {
+        // console.error("Error fetching lokayukt options:", error);
+        throw error;
+      }
+    },
+    enabled: confirmConfig.open && confirmConfig.type === "forward",
+    staleTime: 0,
+    gcTime: 1000 * 60 * 5,
+    retry: 2,
+  });
+
+  // Mark as received mutation
   const markAsReceivedMutation = useMutation({
-    mutationFn: () => api.post(`/operator/received-physical/${id}`, { remark }),
+    mutationFn: async (remarkData) => {
+      const res = await api.post(`/operator/received-physical/${id}`, {
+        remark: remarkData,
+      });
+      return res.data;
+    },
     onSuccess: (data) => {
       toast.success(data.message || "Marked as received successfully");
-      queryClient.invalidateQueries(["complaint-details", id]);
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setRemark("");
+      setConfirmConfig({ open: false, type: null });
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Failed to mark as received");
     },
   });
 
-  const forwardPhysically = useMutation({
-    mutationFn: () => api.post(`/operator/forward-physical/${id}`, {
-      forward_to: selectedForwardTo,
-      remark,
-    }),
-    onSuccess: () => {
-      toast.success("Forwarded successfully");
-      queryClient.invalidateQueries(["complaint-details", id]);
+  // Forward physically mutation
+  const forwardPhysicallyMutation = useMutation({
+    mutationFn: async ({ forwardTo, remarkData }) => {
+      const res = await api.post(`/operator/forward-physical/${id}`, {
+        forward_to: forwardTo,
+        remark: remarkData,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Forwarded successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setRemark("");
       setSelectedForwardTo("");
+      setConfirmConfig({ open: false, type: null });
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Failed to forward");
@@ -101,15 +144,17 @@ const ViewComplaintDetails = () => {
         toast.error("Please enter a remark");
         return;
       }
-      markAsReceivedMutation.mutate();
+      markAsReceivedMutation.mutate(remark);
     } else if (confirmConfig.type === "forward") {
       if (!selectedForwardTo || !remark.trim()) {
         toast.error("Please select forward to and enter a remark");
         return;
       }
-      forwardPhysically.mutate();
+      forwardPhysicallyMutation.mutate({
+        forwardTo: selectedForwardTo,
+        remarkData: remark,
+      });
     }
-    setConfirmConfig({ open: false, type: null });
   };
 
   const handleConfirmNo = () => {
@@ -135,19 +180,6 @@ const ViewComplaintDetails = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleString("en-IN", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
   const handleFileDownload = (filePath) => {
     if (!filePath) {
       toast.error("No file available for download");
@@ -166,77 +198,71 @@ const ViewComplaintDetails = () => {
     }
   };
 
-  const handleEditNavigation = () => {
-    if (id && complaintData) {
-      navigate(`/operator/all-complaints/edit/${id}`);
-    } else {
-      toast.error("Unable to edit: Missing complaint data");
-    }
-  };
+  // const isPDF = (filePath) => filePath && filePath.toLowerCase().endsWith(".pdf");
+  // const isImage = (filePath) => filePath && /\.(jpg|jpeg|png|gif|webp)$/i.test(filePath);
 
-  const isPDF = (filePath) => filePath && filePath.toLowerCase().endsWith(".pdf");
-  const isImage = (filePath) => filePath && /\.(jpg|jpeg|png|gif|webp)$/i.test(filePath);
-
-  const PDFPreviewModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2">
-      <div className="bg-white rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b">
-          <h3 className="text-lg font-semibold">File Preview</h3>
-          <button
-            onClick={() => {
-              setShowPreview(false);
-              setCurrentPreviewFile(null);
-            }}
-            className="p-2 hover:bg-gray-100 rounded"
-          >
-            <FaTimes className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="flex-1 p-4">
-          {currentPreviewFile ? (
-            <>
-              {isPDF(currentPreviewFile) ? (
-                <iframe
-                  src={`${APP_URL}${currentPreviewFile}`}
-                  className="w-full h-full border rounded"
-                  title="PDF Preview"
-                />
-              ) : isImage(currentPreviewFile) ? (
-                <img
-                  src={`${APP_URL}${currentPreviewFile}`}
-                  alt="File Preview"
-                  className="max-w-full max-h-full mx-auto object-contain"
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <FaFileAlt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-600">Preview not supported</p>
-                    <button
-                      onClick={() => handleFileDownload(currentPreviewFile)}
-                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      Download File
-                    </button>
-                  </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <FaFileAlt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No File Available</p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  // const PDFPreviewModal = () => (
+  //   <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2">
+  //     <div className="bg-white rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
+  //       <div className="flex items-center justify-between p-4 border-b">
+  //         <h3 className="text-lg font-semibold">File Preview</h3>
+  //         <button
+  //           onClick={() => {
+  //             setShowPreview(false);
+  //             setCurrentPreviewFile(null);
+  //           }}
+  //           className="p-2 hover:bg-gray-100 rounded"
+  //         >
+  //           <FaTimes className="w-5 h-5" />
+  //         </button>
+  //       </div>
+  //       <div className="flex-1 p-4">
+  //         {currentPreviewFile ? (
+  //           <>
+  //             {isPDF(currentPreviewFile) ? (
+  //               <iframe
+  //                 src={`${APP_URL}${currentPreviewFile}`}
+  //                 className="w-full h-full border rounded"
+  //                 title="PDF Preview"
+  //               />
+  //             ) : isImage(currentPreviewFile) ? (
+  //               <img
+  //                 src={`${APP_URL}${currentPreviewFile}`}
+  //                 alt="File Preview"
+  //                 className="max-w-full max-h-full mx-auto object-contain"
+  //               />
+  //             ) : (
+  //               <div className="flex items-center justify-center h-full">
+  //                 <div className="text-center">
+  //                   <FaFileAlt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+  //                   <p className="text-gray-600">Preview not supported</p>
+  //                   <button
+  //                     onClick={() => handleFileDownload(currentPreviewFile)}
+  //                     className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+  //                   >
+  //                     Download File
+  //                   </button>
+  //                 </div>
+  //               </div>
+  //             )}
+  //           </>
+  //         ) : (
+  //           <div className="flex items-center justify-center h-full">
+  //             <FaFileAlt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+  //             <p className="text-gray-600">No File Available</p>
+  //           </div>
+  //         )}
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 
   if (isLoading) {
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
-        <h1 className="text-gray-600">Loading...</h1>
+        <div className="text-center">
+          <h1 className="text-gray-600">Loading...</h1>
+        </div>
       </div>
     );
   }
@@ -246,7 +272,9 @@ const ViewComplaintDetails = () => {
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
         <div className="text-center">
           <FaExclamationTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600 font-medium">{error?.message || "Error loading data"}</p>
+          <p className="text-red-600 font-medium">
+            {error?.response?.data?.message || error?.message || "Error loading complaint data"}
+          </p>
           <button
             onClick={() => navigate("/operator/all-complaints")}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -264,7 +292,7 @@ const ViewComplaintDetails = () => {
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
-            {/* Header Section */}
+            {/* Header and content sections remain the same */}
             <div className="p-4 md:p-6 border-b">
               {/* Mobile Header */}
               <div className="md:hidden mb-4">
@@ -289,6 +317,7 @@ const ViewComplaintDetails = () => {
                   </span>
                 </div>
               </div>
+
               {/* Desktop Header */}
               <div className="hidden md:block">
                 <div className="flex justify-between items-start mb-3">
@@ -297,9 +326,7 @@ const ViewComplaintDetails = () => {
                   </h2>
                   <div className="flex gap-2">
                     <span
-                      className={`px-3 py-1 rounded ${getStatusColor(
-                        complaintData.status
-                      )}`}
+                      className={`px-3 py-1 rounded ${getStatusColor(complaintData.status)}`}
                     >
                       In Motion – With Lokayukta
                     </span>
@@ -312,11 +339,13 @@ const ViewComplaintDetails = () => {
                   </div>
                 </div>
               </div>
+
               {/* Description */}
               <p className="text-gray-700 mb-4 text-sm md:text-base">
                 {complaintData.details?.[0]?.description ||
                   "No detailed description available for this complaint."}
               </p>
+
               {/* Complainant Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
                 <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
@@ -347,6 +376,7 @@ const ViewComplaintDetails = () => {
                   )}
                 </div>
               </div>
+
               {/* Fee and Challan Info */}
               <div className="flex flex-wrap gap-2">
                 {complaintData.fee_exempted === 1 ? (
@@ -394,6 +424,7 @@ const ViewComplaintDetails = () => {
                 ))}
               </div>
             </div>
+
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
                 {["cover", "documents", "notings", "movement"].map((tab) => (
@@ -443,23 +474,27 @@ const ViewComplaintDetails = () => {
                     disabled={markAsReceivedMutation.isPending}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {markAsReceivedMutation.isPending ? "Processing..." : "Mark as Received (Physical)"}
+                    {markAsReceivedMutation.isPending
+                      ? "Processing..."
+                      : "Mark as Received (Physical)"}
                   </button>
                 )}
                 {complaintData.forward_physical === 1 ? (
                   <button
                     disabled
-                    className="px-4 py-2 border border-green-300 bg-green-50 text-green-700 rounded cursor-not-allowed text-sm"
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0  disabled:cursor-not-allowed"
                   >
                     Forwarded
                   </button>
                 ) : (
                   <button
                     onClick={handleforwardphysical}
-                    disabled={forwardPhysically.isPending}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0"
+                    disabled={forwardPhysicallyMutation.isPending}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {forwardPhysically.isPending ? "Processing..." : "Forward Physically Completed File"}
+                    {forwardPhysicallyMutation.isPending
+                      ? "Processing..."
+                      : "Forward Physically Completed File"}
                   </button>
                 )}
               </div>
@@ -489,18 +524,44 @@ const ViewComplaintDetails = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Forward To <span className="text-red-500">*</span>
                 </label>
-                <select
-                  value={selectedForwardTo}
-                  onChange={(e) => setSelectedForwardTo(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select...</option>
-                  {forwardOptions.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.name}
-                    </option>
-                  ))}
-                </select>
+                {isLoadingOptions || isFetchingOptions ? (
+                  <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500">
+                    Loading...
+                  </div>
+                ) : forwardOptionsError ? (
+                  <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50">
+                    Error loading options: {forwardOptionsError.message}
+                  </div>
+                ) : (
+                  <>
+                    {process.env.NODE_ENV === "development" && (
+                      <div className="text-xs text-gray-500 mb-1">
+                        Found {Array.isArray(forwardOptionsData) ? forwardOptionsData.length : 0} options
+                      </div>
+                    )}
+                    <select
+                      value={selectedForwardTo}
+                      onChange={(e) => setSelectedForwardTo(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select...</option>
+                      {Array.isArray(forwardOptionsData) && forwardOptionsData.length > 0 ? (
+                        forwardOptionsData.map((option) => {
+                          // Debug each option
+                          {/* console.log("Dropdown option:", option); */}
+                          return (
+                            <option key={option.id} value={option.id}>
+                              {option.name || option.user_name || `User ${option.id}`}
+                              {option.district_name ? ` (${option.district_name})` : ""}
+                            </option>
+                          );
+                        })
+                      ) : (
+                        <option disabled>No options available</option>
+                      )}
+                    </select>
+                  </>
+                )}
               </div>
             )}
             <div className="mb-5">
@@ -518,7 +579,8 @@ const ViewComplaintDetails = () => {
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleConfirmNo}
-                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+                disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
+                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
@@ -526,13 +588,14 @@ const ViewComplaintDetails = () => {
                 onClick={handleConfirmYes}
                 disabled={
                   markAsReceivedMutation.isPending ||
-                  forwardPhysically.isPending ||
+                  forwardPhysicallyMutation.isPending ||
+                  (confirmConfig.type === "forward" && (isLoadingOptions || isFetchingOptions)) ||
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" && (!selectedForwardTo || !remark.trim()))
                 }
                 className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {markAsReceivedMutation.isPending || forwardPhysically.isPending
+                {markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending
                   ? "Sending..."
                   : "Send"}
               </button>
