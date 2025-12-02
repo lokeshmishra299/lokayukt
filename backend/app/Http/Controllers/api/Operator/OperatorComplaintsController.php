@@ -1186,4 +1186,33 @@ class OperatorComplaintsController extends Controller
     //         ], 200);
 
     // }
+
+    public function makedreceivedbyRk(Request $request,$id){
+        if($request->isMethod('post')){
+           
+           $cmp = Complaint::findOrFail($id);
+           $cmp->received_phsical = 1;
+           $cmp->save();
+           
+            return response()->json([
+                'status' => true,
+                'message' => 'Forwarded Successfully',
+                'data' => $cmp
+            ], 200); 
+        }
+    }
+    public function makedforwardbyRk(Request $request,$id){
+        if($request->isMethod('post')){
+           
+           $cmp = Complaint::findOrFail($id);
+           $cmp->forward_physical = 1;
+           $cmp->save();
+           
+            return response()->json([
+                'status' => true,
+                'message' => 'Forwarded Successfully',
+                'data' => $cmp
+            ], 200); 
+        }
+    }
 }
