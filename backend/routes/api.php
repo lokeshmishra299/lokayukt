@@ -155,7 +155,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/rejections',[OperatorCommonController::class,'fetch_rejection']);
         Route::get('/complainstype',[OperatorCommonController::class,'fetch_complainstype']);
         Route::post('/add-complaint',[OperatorComplaintsController::class,'addComplaint']);
-        Route::post('/upload-document',[OperatorComplaintsController::class,'uploadDocument']);
+         Route::post('/upload-document',[OperatorComplaintsController::class,'uploadDocument']);
         Route::get('/all-complaints',[OperatorComplaintsController::class,'allComplainsDashboard']);
         Route::get('/all-draft',[OperatorComplaintsController::class,'allDraft']);
         Route::get('/all-pending-complaints',[OperatorComplaintsController::class,'allComplainspending']);
