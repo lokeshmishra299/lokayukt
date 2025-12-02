@@ -1187,12 +1187,115 @@ class OperatorComplaintsController extends Controller
 
     // }
 
+      public function forwardComplaintbySO(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+        // dd($usersubrole);
+   
+
+        $validation = Validator::make($request->all(), [
+            // 'forward_by_so_us' => 'required|exists:users,id',
+            'forward_to_d_a' => 'required|exists:users,id',
+            // 'remark' => 'required',
+         
+          
+        ], [
+            // 'forward_by_so_us.required' => 'Forward by Supervisor is required.',
+            // 'forward_by_so_us.exists' => 'Forward by user does not exist.',
+            'forward_to_d_a.required' => 'Forward to user is required.',
+            'forward_to_d_a.exists' => 'Forward to user does not exist.',
+            // 'remark.required' => 'Remark is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->approved_rejected_by_so_us = 1;
+                // $cmp->forward_to_d_a = $request->forward_to_d_a;
+                // $remark ='Remark By Section Officer / Under Secretary';
+                // $remark.='\n';
+                // $remark.= $request->remarks;
+                // $remark.='\n';
+                // $cmp->remark = $remark;
+                // $cmp->save();
+
+               
+                if($cmp->save()){
+                    $apcAction = new ComplaintAction();
+                    $apcAction->complaint_id = $complainId;
+                    $apcAction->forward_by_so_us = $user;
+                    $apcAction->forward_to_d_a = $request->forward_to_d_a;
+                    $apcAction->status = 'Forwarded';
+                    $apcAction->remarks = $request->remarks;
+                    $apcAction->save();
+                }
+                // $cmpAction =new ComplaintAction();
+                // $cmpAction->complaint_id = $complainId;
+                // $cmpAction->forward_by_so_us = $user;
+                // $cmpAction->forward_to_d_a = $request->forward_to_d_a; //add supervisor user_id 
+                // $cmpAction->status_so_us = 1;
+                // $cmpAction->action_type = "Forwarded";
+                // $cmpAction->remarks = $request->remarks;
+                // $cmpAction->save();
+            }
+            // $cmp->forward_by = $request->forward_by;
+            // $cmp->forward_to_d_a = $request->forward_to_d_a;
+            // $cmp->sup_status = 1;
+            // $cmp->save();
+    
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Forwarded Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+
     public function makedreceivedbyRk(Request $request,$id){
+         $user = Auth::user()->id;
         if($request->isMethod('post')){
+
+               $validation = Validator::make($request->all(), [
+                'remark' => 'required',
+                ], [
+                    'remark.required' => 'Remark is required.',
+                ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
            
            $cmp = Complaint::findOrFail($id);
-           $cmp->received_phsical = 1;
-           $cmp->save();
+          // $cmp->received_phsical = 1;
+          
+           if($cmp){
+              $apcAction = new ComplaintAction();
+                    $apcAction->complaint_id = $complainId;
+                    $apcAction->forward_to_rk = $user;
+                    $apcAction->remarks = $request->remark;
+                    $apcAction->status = 'Received';
+                    $apcAction->save();
+           }
+       
            
             return response()->json([
                 'status' => true,
@@ -1204,10 +1307,31 @@ class OperatorComplaintsController extends Controller
     public function makedforwardbyRk(Request $request,$id){
         if($request->isMethod('post')){
            
-           $cmp = Complaint::findOrFail($id);
-           $cmp->forward_physical = 1;
-           $cmp->save();
+             $validation = Validator::make($request->all(), [
+                'remark' => 'required',
+                ], [
+                    'remark.required' => 'Remark is required.',
+                ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
            
+           $cmp = Complaint::findOrFail($id);
+          // $cmp->received_phsical = 1;
+          
+           if($cmp){
+              $apcAction = new ComplaintAction();
+                    $apcAction->complaint_id = $complainId;
+                    $apcAction->forward_by_rk = $user;
+                    $apcAction->forward_to_lokayukt = $request->forward_to;
+                    $apcAction->remarks = $request->remark;
+                    $apcAction->status = 'Forwarded';
+                    $apcAction->save();
+           }
             return response()->json([
                 'status' => true,
                 'message' => 'Forwarded Successfully',
@@ -1215,4 +1339,22 @@ class OperatorComplaintsController extends Controller
             ], 200); 
         }
     }
+
+       public function getLokayuktUsers(){
+     
+        $usersByRole = User::with('role')
+         ->whereNotNull('role_id')
+        ->get()
+        ->groupBy(fn ($user) => $user->role->name);
+        
+
+         if(!empty($usersByRole['lok-ayukt'])){
+
+           return response()->json($usersByRole['lok-ayukt']);
+        }else{
+
+            return response()->json(["message"=>"Data Not Found"]);
+        }
+        // dd($usersByRole['lok-ayukt']);
+   }
 }
