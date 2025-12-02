@@ -189,7 +189,7 @@ class OperatorComplaintsController extends Controller
 
     public function uploadDocument(Request $request)
     {
-        // dd($request->all());
+        
         // $user = $request->user()->id;
         $added_by = Auth::user()->id;
     
@@ -213,12 +213,17 @@ class OperatorComplaintsController extends Controller
             ], 422);
         }
 
-        if(isset($request->complaint_id)){    
+        if(isset($request->complain_id)){    
                 $compDoc = new ComplainDocuments();
-                $compDoc->complain_id = $request->complaint_id;
+                $compDoc->complain_id = $request->complain_id;
                 $compDoc->added_by = $added_by;
+<<<<<<< HEAD
                 $compDoc->type = $request->description;
                 // $compDoc->title = $request->title;
+=======
+                $compDoc->type = $request->type;
+                $compDoc->title = $request->title;
+>>>>>>> 00fd9bf7725d2fc62d82d63f3df70c6efaabd6f3
                 
                 $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
                 $filePath = $request->file('file')->storeAs('Document', $file, 'public');
@@ -997,7 +1002,7 @@ class OperatorComplaintsController extends Controller
     public function allComplainsDashboard(){
        
            $complainDetails = DB::table('complaints as cm')
-                // ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
+                ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
@@ -1019,7 +1024,7 @@ class OperatorComplaintsController extends Controller
                     // 'cd.file',
                     // 'cd.subject_id',
                     // 'cd.complaintype_id',
-                    // 'cd.description',
+                    'cd.description',
                   
                 )
                  ->where('in_draft','0')
@@ -1035,7 +1040,7 @@ class OperatorComplaintsController extends Controller
       public function allDraft(){
        
            $complainDetails = DB::table('complaints as cm')
-                // ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
+                ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
@@ -1057,7 +1062,7 @@ class OperatorComplaintsController extends Controller
                     // 'cd.file',
                     // 'cd.subject_id',
                     // 'cd.complaintype_id',
-                    // 'cd.description',
+                    'cd.description',
                   
                 )
                 ->where('in_draft','1')
