@@ -37,8 +37,6 @@ const AllComplaints = () => {
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
 
-
-
   const sortComplaintsByDate = (complaints, order) => {
     return [...complaints].sort((a, b) => {
       const dateA = new Date(a.created_at);
