@@ -67,7 +67,7 @@ const Documents = ({ complaint }) => {
       const formData = new FormData();
 
       uploadedFiles.forEach((fileData) => {
-        formData.append("file[]", fileData.file);
+        formData.append("file", fileData.file);
       });
 
       formData.append("type", correspondenceType);
@@ -79,7 +79,7 @@ const Documents = ({ complaint }) => {
         },
       });
 
-      toast.success(`Uploaded ${uploadedFiles.length} document(s)`);
+      toast.success(`Uploaded document successfully!`);
 
       setUploadedFiles([]);
     } catch (error) {
