@@ -1022,6 +1022,7 @@ class OperatorComplaintsController extends Controller
                   
                 )
                  ->where('in_draft','0')
+                 ->distinct('cm.id')
                 ->get();
         // dd($deadpersondetails);
 
@@ -1308,8 +1309,10 @@ class OperatorComplaintsController extends Controller
         if($request->isMethod('post')){
            
              $validation = Validator::make($request->all(), [
+                'forward_to' => 'required',
                 'remark' => 'required',
                 ], [
+                    'forward_to.required' => 'Forward To is required.',
                     'remark.required' => 'Remark is required.',
                 ]);
 
