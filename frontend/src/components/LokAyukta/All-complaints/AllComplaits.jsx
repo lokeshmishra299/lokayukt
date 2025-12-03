@@ -37,6 +37,8 @@ const AllComplaints = () => {
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
 
+
+
   const sortComplaintsByDate = (complaints, order) => {
     return [...complaints].sort((a, b) => {
       const dateA = new Date(a.created_at);
@@ -49,6 +51,7 @@ const AllComplaints = () => {
       }
     });
   };
+
 
   const getAllComplaints = async () => {
     const res = await api.get("/lokayukt/all-complaints");
@@ -173,7 +176,7 @@ const AllComplaints = () => {
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Complaint Approved Successfully!", {
+        toast.success("Send To Lokayukt Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -245,6 +248,15 @@ const AllComplaints = () => {
 
 
   const stats = getStatistics();
+
+const getDaysDifference = (dateString) => {
+  const today = new Date();
+  const createdDate = new Date(dateString);
+
+  const diffTime = today - createdDate;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+};
+
 
   return (
     <>
@@ -397,7 +409,6 @@ const AllComplaints = () => {
                         </p>
                         <p className="text-xs text-gray-700 mb-1">
                           {complaint.description ||
-                            complaint.remark ||
                             "No description available"}
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
@@ -468,16 +479,33 @@ const AllComplaints = () => {
                           >
                             View Details
                           </button>
-
+{/* 
                           {isApprovedByRO(complaint) ? (
-                            <>
-                              
-                            </>
+                            <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
+                            <svg
+                              className="w-3 h-3"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            Send 
+                          </span>
                           ) : (
-                         <>
-                          
-                         </>
-                          )}
+                            <button
+                              onClick={(e) =>
+                                handleApproveClick(e, complaint)
+                              }
+                              className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
+                            >
+                              
+                              Send To Lokayukt
+                            </button>
+                          )} */}
                         </div>
                       </div>
                     </div>

@@ -20,7 +20,7 @@ const api = axios.create({
 });
 
 
-const AllComplaints = () => {
+const ApprovedComplaints = () => {
   const navigate = useNavigate();
 
   const [allComplaints, setAllComplaints] = useState([]);
@@ -141,6 +141,14 @@ const AllComplaints = () => {
     selectedFeeStatus,
     selectedCaseType,
   ]);
+
+  const getDaysDifference = (dateString) => {
+  const today = new Date();
+  const createdDate = new Date(dateString);
+
+  const diffTime = today - createdDate;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+};
 
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
@@ -309,7 +317,6 @@ const AllComplaints = () => {
                       </p>
                       <p className="text-xs text-gray-700 mb-1">
                         {complaint.description ||
-                          complaint.remark ||
                           "No description available"}
                       </p>
                       <div className="text-[11px] text-gray-600 mb-1">
@@ -414,4 +421,4 @@ const AllComplaints = () => {
   );
 };
 
-export default AllComplaints;
+export default ApprovedComplaints;
