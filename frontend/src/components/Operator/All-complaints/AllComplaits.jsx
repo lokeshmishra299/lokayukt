@@ -248,13 +248,13 @@ const AllComplaints = () => {
 
   const stats = getStatistics();
 
-const getDaysDifference = (dateString) => {
-  const today = new Date();
-  const createdDate = new Date(dateString);
+// const getDaysDifference = (dateString) => {
+//   const today = new Date();
+//   const createdDate = new Date(dateString);
 
-  const diffTime = today - createdDate;
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-};
+//   const diffTime = today - createdDate;
+//   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+// };
 
 
   return (
