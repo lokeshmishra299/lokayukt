@@ -231,6 +231,19 @@ const AllComplaints = () => {
     };
   };
 
+    // **************************count days*******************************************************
+  const getDaysDifference = (date) => {
+  const created = new Date(date);
+  const today = new Date();
+
+  const diffTime = today - created; // milliseconds difference
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays;
+};
+
+
+
   const stats = getStatistics();
 
   return (
@@ -430,14 +443,23 @@ const AllComplaints = () => {
                           )}
                         </div>
 
-                        <div className="flex gap-1.5">
-                          <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-                            &gt;9d
-                          </span>
-                          <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
-                            Partial
-                          </span>
+                         <div className="flex gap-1.5">
+                         <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+                      {getDaysDifference(complaint.created_at)}d</span>
+
+                    <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
+                    {complaint.fee_exempted === 0
+                      ? " Exempted"
+                      : complaint.fee_exempted === 1
+                       ? "Paid"
+                       : complaint.fee_exempted === 2
+                       ? "Partial"
+                       : ""}
+                      </span>
+
                         </div>
+
+
 
                         <div className="flex gap-2 w-full sm:w-auto">
                           <button
