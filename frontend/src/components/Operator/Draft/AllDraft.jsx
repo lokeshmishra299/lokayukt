@@ -170,6 +170,14 @@ const AllDraft = () => {
 
   const stats = getStatistics();
 
+  const getDaysDifference = (dateString) => {
+  const today = new Date();
+  const createdDate = new Date(dateString);
+
+  const diffTime = today - createdDate;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+};
+
   return (
     <div className="w-full h-screen flex bg-gray-50 rounded-md overflow-hidden">
       <div className="w-full bg-white flex flex-col overflow-hidden">
@@ -341,12 +349,16 @@ const AllDraft = () => {
                       </div>
 
                       <div className="flex gap-1.5">
-                        <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-                          &gt;9d
-                        </span>
-                        <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
-                          Partial
-                        </span>
+                                     <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+  {getDaysDifference(complaint.created_at)}d
+</span>
+                       
+                          <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
+                             {complaint.fee_exempted == 1 ? "Fee Exempted":
+                             complaint.fee_exempted == 0 ? "Fee Not Exempted" :
+                             "Partial"
+                             }
+                          </span>
                       </div>
 
                       <button
