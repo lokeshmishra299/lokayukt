@@ -1,14 +1,46 @@
 import React, { useState } from "react";
 import { FiDownload, FiFileText } from "react-icons/fi";
+import { FaTimes } from "react-icons/fa";
 
 const Notes = ({ documents = [], approvalDocs = [] }) => {
   const [open, setOpen] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState("");
   const [selectedApprovalDoc, setSelectedApprovalDoc] = useState("");
   const [note, setNote] = useState("");
-  return (
-    <div className="bg-white   rounded-lg space-y-6 w-full">
+  const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
 
+  // Sample documents data - Replace with actual props
+  const sampleDocuments = [
+    { id: 1, name: "Main Complaint", pages: 3, pageRange: "pp.1–3" },
+    { id: 2, name: "Annexure 1 - Tender Documents", pages: 8, pageRange: "pp.4–11" },
+    { id: 3, name: "Annexure 2 - Financial Records", pages: 12, pageRange: "pp.12–23" },
+    { id: 4, name: "Annexure 3 - Email Communications", pages: 5, pageRange: "pp.24–28" },
+    { id: 5, name: "Letter from Department (15 Jan)", pages: 2, pageRange: "pp.29–30" },
+  ];
+
+  const docsToUse = documents.length > 0 ? documents : sampleDocuments;
+
+  const handleAddPageRange = () => {
+    setPageRanges([...pageRanges, { from: "", to: "" }]);
+  };
+
+  const handlePageRangeChange = (index, field, value) => {
+    const updated = [...pageRanges];
+    updated[index][field] = value;
+    setPageRanges(updated);
+  };
+
+  const handleSubmit = () => {
+    // Add your submit logic here
+    console.log("Note:", note);
+    console.log("Selected Doc:", selectedDoc);
+    console.log("Page Ranges:", pageRanges);
+    console.log("Approval Doc:", selectedApprovalDoc);
+    setOpen(false);
+  };
+
+  return (
+    <div className="bg-white rounded-lg space-y-6 w-full">
       {/* Header Row */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
         <p className="text-[16px] font-medium text-gray-800">Notes & Notings</p>
@@ -18,212 +50,147 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
             <FiDownload className="text-sm" />
             Download all notes (PDF)
           </button>
-          
- {/* Button */}
-      <button
-        className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition w-full sm:w-auto"
-        onClick={() => setOpen(true)}
-      >
-        Add Note / Noting
-      </button>
 
-      {/* Modal */}
-      {open && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white w-[90%] max-w-3xl rounded-lg shadow-lg p-6 relative max-h-[90vh] overflow-y-auto">
-
-            {/* Close */}
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-black"
-              onClick={() => setOpen(false)}
-            >
-              ✖
-            </button>
-
-            {/* Heading */}
-            <h2 className="text-xl font-semibold mb-4">Add Note / Noting</h2>
-
-            {/* Note Content */}
-            <label className="font-medium">Note Content *</label>
-            <textarea
-              className="w-full border border-gray-300 rounded mt-2 p-3 h-32 resize-none"
-              placeholder="Enter your note here..."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-
-            <hr className="my-5" />
-
-            {/* References */}
-            <h3 className="font-medium mb-3">References</h3>
-
-            {/* Reference by Document */}
-            <label className="text-sm">Reference by Document</label>
-            <select
-              value={selectedDoc}
-              onChange={(e) => setSelectedDoc(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded mt-2"
-            >
-              <option value="">Select a document...</option>
-              {documents.map((doc) => (
-                <option key={doc.id} value={doc.id}>
-                  {doc.name}
-                </option>
-              ))}
-            </select>
-
-            {/* Page Range */}
-            <div className="mt-6">
-              <label className="text-sm font-medium">
-                Reference by Combined Page Range (Total: 30 pages)
-              </label>
-
-              <div className="flex gap-3 mt-2">
-                <input
-                  type="number"
-                  placeholder="From"
-                  className="border rounded px-3 py-2 w-20"
-                />
-                <span className="mt-2">to</span>
-                <input
-                  type="number"
-                  placeholder="To"
-                  className="border rounded px-3 py-2 w-24"
-                />
-                <button className="border text-xs px-1 py-1 rounded hover:bg-gray-100">
-                  + Add Page Range
-                </button>
-                 <label className="text-sm font-medium">
-                Document for Approval (optional)
-              </label>
-
-              <select
-                value={selectedApprovalDoc}
-                onChange={(e) => setSelectedApprovalDoc(e.target.value)}
-                className="w-full mt-2 px-3 py-2 border rounded"
-              >
-                <option value="">None</option>
-                {approvalDocs.map((doc) => (
-                  <option key={doc.id} value={doc.id}>
-                    {doc.name}
-                  </option>
-                ))}
-              </select>
-              </div>
-            </div>
-
-            {/* ------------------------------- */}
-            {/* SECOND IMAGE UI ADDED BELOW    */}
-            {/* ------------------------------- */}
-
-            
-
-            {/* Buttons */}
-            <div className="flex justify-end gap-3 mt-10">
-              <button
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-                onClick={() => setOpen(false)}
-              >
-                Cancel
-              </button>
-
-              <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                Add Note
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal */}
-      {open && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white w-[90%] max-w-3xl rounded-lg shadow-lg p-6 relative max-h-[90vh] overflow-y-auto">
-
-            {/* Close Icon */}
-            <button
-              className="absolute top-4 right-4 text-gray-500 hover:text-black"
-              onClick={() => setOpen(false)}
-            >
-              ✖
-            </button>
-
-            {/* Heading */}
-            <h2 className="text-xl font-semibold mb-4">Add Note / Noting</h2>
-
-            {/* Note Content */}
-            <label className="font-medium">Note Content *</label>
-            <textarea
-              className="w-full border border-gray-300 rounded mt-2 p-3 h-32 resize-none"
-              placeholder="Enter your note here..."
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-
-            <hr className="my-5" />
-
-            {/* References */}
-            <h3 className="font-medium mb-2">References</h3>
-
-            {/* Reference by Document */}
-            <label className="text-sm">Reference by Document</label>
-            <select
-              value={selectedDoc}
-              onChange={(e) => setSelectedDoc(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded mt-2"
-            >
-              <option value="">Select a document...</option>
-
-              {documents.map((doc) => (
-                <option key={doc.id} value={doc.id}>
-                  {doc.name}
-                </option>
-              ))}
-            </select>
-
-            {/* Page Range Section */}
-            <div className="mt-6">
-              <label className="text-sm font-medium">
-                Reference by Combined Page Range (Total: 30 pages)
-              </label>
-
-              <div className="flex gap-3 mt-2">
-                <input
-                  type="number"
-                  placeholder="From"
-                  className="border rounded px-3 py-2 w-24"
-                />
-                <span className="mt-2">to</span>
-                <input
-                  type="number"
-                  placeholder="To"
-                  className="border rounded px-3 py-2 w-24"
-                />
-                <button className="border px-3 py-2 rounded hover:bg-gray-100">
-                  + Add Page Range
-                </button>
-              </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex justify-end gap-3 mt-8">
-              <button
-                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50"
-                onClick={() => setOpen(false)}
-              >
-                Cancel
-              </button>
-
-              <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                Add Note
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+          {/* Add Note Button */}
+          <button
+            className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition w-full sm:w-auto"
+            onClick={() => setOpen(true)}
+          >
+            Add Note / Noting
+          </button>
         </div>
       </div>
+
+      {/* Modal */}
+     {/* Modal */}
+{open && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
+    <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl relative max-h-[90vh] overflow-y-auto">
+      {/* Close Button - Top Right */}
+      <button
+        className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors z-10"
+        onClick={() => setOpen(false)}
+        aria-label="Close"
+      >
+        <FaTimes className="w-5 h-5 text-gray-600" />
+      </button>
+
+      <div className="p-6">
+        {/* Heading */}
+        <h2 className="text-lg font-semibold mb-6 pr-8">Add Note / Noting</h2>
+
+        {/* Note Content */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Note Content <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            className="w-full border border-gray-300 rounded-md p-3 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter your note here..."
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+        </div>
+
+        {/* References Section */}
+        <div className="mb-6">
+          <h3 className="text-sm font-semibold text-gray-800 mb-4">References</h3>
+
+          {/* Reference by Document */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Reference by Document
+            </label>
+            <select
+              value={selectedDoc}
+              onChange={(e) => setSelectedDoc(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select a document...</option>
+              {docsToUse.map((doc) => (
+                <option key={doc.id} value={doc.id}>
+                  {doc.name} ({doc.pages} pages, combined {doc.pageRange})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Page Range Section */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Reference by Combined Page Range (Total: 30 pages)
+            </label>
+
+            {pageRanges.map((range, index) => (
+              <div key={index} className="flex items-center gap-2 mb-2">
+                <input
+                  type="number"
+                  placeholder="From"
+                  value={range.from}
+                  onChange={(e) => handlePageRangeChange(index, "from", e.target.value)}
+                  className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <span className="text-sm text-gray-600">to</span>
+                <input
+                  type="number"
+                  placeholder="To"
+                  value={range.to}
+                  onChange={(e) => handlePageRangeChange(index, "to", e.target.value)}
+                  className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {index === pageRanges.length - 1 && (
+                  <button
+                    onClick={handleAddPageRange}
+                    className="text-sm px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors whitespace-nowrap"
+                  >
+                    + Add Page Range
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Document for Approval */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Document for Approval (optional)
+            </label>
+            <select
+              value={selectedApprovalDoc}
+              onChange={(e) => setSelectedApprovalDoc(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">None</option>
+              {docsToUse.map((doc) => (
+                <option key={doc.id} value={doc.id}>
+                  {doc.name} ({doc.pageRange})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <button
+            className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            onClick={() => setOpen(false)}
+          >
+            Cancel
+          </button>
+          <button
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+            onClick={handleSubmit}
+            disabled={!note.trim()}
+          >
+            Add Note
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {/* NOTE CARD 1 */}
       <NoteCard
@@ -269,7 +236,6 @@ fee as the complainant has demonstrated financial hardship.`}
 const NoteCard = ({ name, role, time, text, references, extraTag }) => {
   return (
     <div className="border border-gray-200 shadow-sm rounded-xl p-4 sm:p-5 space-y-3">
-
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-1 sm:gap-2">
         <div>
