@@ -374,6 +374,10 @@ const ViewComplaintDetails = () => {
                   >
                     Documents
                   </button>
+
+
+
+
                   <button
                     onClick={() => {
                       setActiveTab("notings");
@@ -402,9 +406,7 @@ const ViewComplaintDetails = () => {
                   </button>
                 </div>
               </div>
-       
-
-            {/* Desktop Tabs */}
+           {/* Desktop Tabs */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
                 <button
@@ -461,7 +463,6 @@ const ViewComplaintDetails = () => {
                 </button>
               </div>
             </div>
-
             {/* Mobile Active Tab Indicator */}
             <div className="md:hidden border-b">
               <button
@@ -479,7 +480,6 @@ const ViewComplaintDetails = () => {
                 </svg> */}
               </button>
             </div>
-
             {/* Content Area pass the propes */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
               {activeTab === "cover" && (
@@ -504,12 +504,10 @@ const ViewComplaintDetails = () => {
                 <MovementHistory complaint={complaintData} />
               )}
             </div>
-
             {/* Action Buttons - Responsive */}
             <div className="border-t p-4">
-  <div className="flex flex-col sm:flex-row justify-between gap-3">
-
-    {/* LEFT SIDE BUTTON */}
+        <div className="flex flex-col sm:flex-row justify-between gap-3">
+         {/* LEFT SIDE BUTTON */}
     <div className="w-full sm:w-auto">
       <button className="w-full sm:w-auto px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
         Pull Back
@@ -531,8 +529,7 @@ const ViewComplaintDetails = () => {
 
   </div>
 </div>
-
-          </>
+         </>
         ) : (
           <div className="flex items-center justify-center h-full text-center text-gray-500">
             <div>
@@ -542,7 +539,6 @@ const ViewComplaintDetails = () => {
           </div>
         )}
       </div>
-
       {showPreview && <PDFPreviewModal />}
     </div>
   );

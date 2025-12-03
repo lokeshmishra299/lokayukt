@@ -248,13 +248,6 @@ const AllComplaints = () => {
 
   const stats = getStatistics();
 
-// const getDaysDifference = (dateString) => {
-//   const today = new Date();
-//   const createdDate = new Date(dateString);
-
-//   const diffTime = today - createdDate;
-//   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-// };
 
 
   return (
@@ -317,8 +310,7 @@ const AllComplaints = () => {
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                >
+                  onChange={(e) => setSelectedStatus(e.target.value)}>
                   <option value="">Status: All</option>
                   <option value="in_progress">In Progress</option>
                   <option value="disposed">Disposed Accepted</option>
@@ -453,14 +445,22 @@ const AllComplaints = () => {
                           )}
                         </div>
 
-                        <div className="flex gap-1.5">
-                          <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-                            &gt;9d
-                          </span>
-                          <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
-                            Partial
-                          </span>
+                           <div className="flex gap-1.5">
+                         <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+                      {getDaysDifference(complaint.created_at)}d</span>
+
+                    <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
+                    {complaint.fee_exempted === 0
+                      ? " Exempted"
+                      : complaint.fee_exempted === 1
+                       ? "Paid"
+                       : complaint.fee_exempted === 2
+                       ? "Partial"
+                       : ""}
+                      </span>
+
                         </div>
+
 
                         <div className="flex gap-2 w-full sm:w-auto">
                           <button
