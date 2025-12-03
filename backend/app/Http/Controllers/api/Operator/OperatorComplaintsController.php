@@ -375,7 +375,7 @@ class OperatorComplaintsController extends Controller
             ], 200);
     }
 
-
+    
 
     // public function updateComplain(Request $request,$id){
     //     $added_by = Auth::user()->id;
@@ -964,7 +964,7 @@ class OperatorComplaintsController extends Controller
 
                 $apc = Complaint::findOrFail($id);
                 $apc->form_status = 1;
-                $apc->approved_rejected_by_ro = 1;
+                $apc->approved_rejected_by_lokayukt = 1;
                 $apc->approved_by_ro_id =  $userId;
                 
                 if($apc->save()){
@@ -972,7 +972,7 @@ class OperatorComplaintsController extends Controller
                     $apcAction->complaint_id = $id;
                     $apcAction->status = 'Verified';
                     $apcAction->remarks = "Initial verification completed. Forwarded to Supervisor for further action.";
-                    $apcAction->forward_by_ro = $userId;
+                    $apcAction->forward_by_rk = $userId;
                     $apcAction->save();
                 }
            
@@ -1268,13 +1268,15 @@ class OperatorComplaintsController extends Controller
 
     }
 
-    public function makedreceivedbyRk(Request $request,$id){
+    public function makedreceivedbyRk(Request $request){
          $user = Auth::user()->id;
         if($request->isMethod('post')){
 
                $validation = Validator::make($request->all(), [
+                'complaint_id' => 'required',
                 'remark' => 'required',
                 ], [
+                    'complaint_id.required' => 'Complaint Id is required.',
                     'remark.required' => 'Remark is required.',
                 ]);
 
@@ -1290,7 +1292,7 @@ class OperatorComplaintsController extends Controller
           
            if($cmp){
               $apcAction = new ComplaintAction();
-                    $apcAction->complaint_id = $complainId;
+                    $apcAction->complaint_id = $request->complaint_id;
                     $apcAction->forward_to_rk = $user;
                     $apcAction->remarks = $request->remark;
                     $apcAction->status = 'Received';
@@ -1305,10 +1307,11 @@ class OperatorComplaintsController extends Controller
             ], 200); 
         }
     }
-    public function makedforwardbyRk(Request $request,$id){
+    public function makedforwardbyRk(Request $request){
         if($request->isMethod('post')){
            
              $validation = Validator::make($request->all(), [
+                'complaint_id' => 'required',
                 'forward_to' => 'required',
                 'remark' => 'required',
                 ], [
@@ -1328,7 +1331,7 @@ class OperatorComplaintsController extends Controller
           
            if($cmp){
               $apcAction = new ComplaintAction();
-                    $apcAction->complaint_id = $complainId;
+                    $apcAction->complaint_id = $request->complaint_id;
                     $apcAction->forward_by_rk = $user;
                     $apcAction->forward_to_lokayukt = $request->forward_to;
                     $apcAction->remarks = $request->remark;
