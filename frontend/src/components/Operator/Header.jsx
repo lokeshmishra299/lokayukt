@@ -177,7 +177,7 @@ const Header = ({ toggleMobileMenu }) => {
                         {user?.name || 'User Name'}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {subrole === "review-operator" ? "Review Operator" : "Entry Operator"}
+                        {subrole === "review-operator" ? "Record Keeper" : "Record Keeper"}
                       </span>
                     </div>
                     <FiChevronDown className="text-gray-600" />
@@ -195,7 +195,7 @@ const Header = ({ toggleMobileMenu }) => {
                     <p className="text-sm font-semibold text-gray-800">{user?.name || 'User Name'}</p>
                     <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
                     <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
-                      {subrole === "review-operator" ? "RO" : "EO"}
+                      {subrole === "review-operator" ? "RK" : "RK"}
                     </span>
                   </div>
 

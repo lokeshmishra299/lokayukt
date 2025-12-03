@@ -11,9 +11,11 @@ import Documents from "./SubModule/Documents";
 import FileDetails from "./SubModule/FileDetails";
 import MovementHistory from "./SubModule/MovementHistory";
 
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
 const token = localStorage.getItem("access_token");
+
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -23,10 +25,12 @@ const api = axios.create({
   },
 });
 
+
 const ViewComplaintDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
+
 
   const [activeTab, setActiveTab] = useState("cover");
   const [showPreview, setShowPreview] = useState(false);
@@ -36,7 +40,7 @@ const ViewComplaintDetails = () => {
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
 
-  // Fetch complaint details
+
   const {
     data: complaintData,
     isLoading,
@@ -53,7 +57,7 @@ const ViewComplaintDetails = () => {
     retry: 2,
   });
 
-  // Fetch forward options - FIXED: Check API response structure
+
   const {
     data: forwardOptionsData,
     isLoading: isLoadingOptions,
@@ -64,28 +68,20 @@ const ViewComplaintDetails = () => {
     queryFn: async () => {
       try {
         const res = await api.get("/operator/get-lokayukt");
- 
-        
 
         if (Array.isArray(res.data)) {
-          // console.log("Response is direct array");
           return res.data;
         } else if (res.data && Array.isArray(res.data.data)) {
-          // console.log("Response has data array");
           return res.data.data;
         } else if (res.data && res.data.data) {
-          // console.log("Response data.data exists but not array:", res.data.data);
-          // Try to convert object to array if needed
           if (typeof res.data.data === 'object' && res.data.data !== null) {
             return Object.values(res.data.data);
           }
           return [];
         } else {
-          // console.log("Unexpected response structure");
           return [];
         }
       } catch (error) {
-        // console.error("Error fetching lokayukt options:", error);
         throw error;
       }
     },
@@ -95,10 +91,12 @@ const ViewComplaintDetails = () => {
     retry: 2,
   });
 
-  // Mark as received mutation
+
+ 
   const markAsReceivedMutation = useMutation({
-    mutationFn: async (remarkData) => {
-      const res = await api.post(`/operator/received-physical/${id}`, {
+    mutationFn: async ({ complaintId, remarkData }) => {
+      const res = await api.post('/operator/received-physical', {
+        complaint_id: complaintId,
         remark: remarkData,
       });
       return res.data;
@@ -114,10 +112,12 @@ const ViewComplaintDetails = () => {
     },
   });
 
-  // Forward physically mutation
+
+
   const forwardPhysicallyMutation = useMutation({
-    mutationFn: async ({ forwardTo, remarkData }) => {
-      const res = await api.post(`/operator/forward-physical/${id}`, {
+    mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+      const res = await api.post('/operator/forward-physical', {
+        complaint_id: complaintId,
         forward_to: forwardTo,
         remark: remarkData,
       });
@@ -135,8 +135,10 @@ const ViewComplaintDetails = () => {
     },
   });
 
+
   const handleMarkAsReceived = () => setConfirmConfig({ open: true, type: "receive" });
   const handleforwardphysical = () => setConfirmConfig({ open: true, type: "forward" });
+
 
   const handleConfirmYes = () => {
     if (confirmConfig.type === "receive") {
@@ -144,24 +146,30 @@ const ViewComplaintDetails = () => {
         toast.error("Please enter a remark");
         return;
       }
-      markAsReceivedMutation.mutate(remark);
+      markAsReceivedMutation.mutate({
+        complaintId: id,
+        remarkData: remark,
+      });
     } else if (confirmConfig.type === "forward") {
       if (!selectedForwardTo || !remark.trim()) {
         toast.error("Please select forward to and enter a remark");
         return;
       }
       forwardPhysicallyMutation.mutate({
+        complaintId: id,
         forwardTo: selectedForwardTo,
         remarkData: remark,
       });
     }
   };
 
+
   const handleConfirmNo = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
   };
+
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -180,6 +188,7 @@ const ViewComplaintDetails = () => {
     }
   };
 
+
   const handleFileDownload = (filePath) => {
     if (!filePath) {
       toast.error("No file available for download");
@@ -188,6 +197,7 @@ const ViewComplaintDetails = () => {
     const fileUrl = `${APP_URL}${filePath}`;
     window.open(fileUrl, "_blank");
   };
+
 
   const handleFilePreview = (filePath) => {
     if (filePath) {
@@ -198,64 +208,6 @@ const ViewComplaintDetails = () => {
     }
   };
 
-  // const isPDF = (filePath) => filePath && filePath.toLowerCase().endsWith(".pdf");
-  // const isImage = (filePath) => filePath && /\.(jpg|jpeg|png|gif|webp)$/i.test(filePath);
-
-  // const PDFPreviewModal = () => (
-  //   <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2">
-  //     <div className="bg-white rounded-lg w-full max-w-4xl h-[90vh] flex flex-col">
-  //       <div className="flex items-center justify-between p-4 border-b">
-  //         <h3 className="text-lg font-semibold">File Preview</h3>
-  //         <button
-  //           onClick={() => {
-  //             setShowPreview(false);
-  //             setCurrentPreviewFile(null);
-  //           }}
-  //           className="p-2 hover:bg-gray-100 rounded"
-  //         >
-  //           <FaTimes className="w-5 h-5" />
-  //         </button>
-  //       </div>
-  //       <div className="flex-1 p-4">
-  //         {currentPreviewFile ? (
-  //           <>
-  //             {isPDF(currentPreviewFile) ? (
-  //               <iframe
-  //                 src={`${APP_URL}${currentPreviewFile}`}
-  //                 className="w-full h-full border rounded"
-  //                 title="PDF Preview"
-  //               />
-  //             ) : isImage(currentPreviewFile) ? (
-  //               <img
-  //                 src={`${APP_URL}${currentPreviewFile}`}
-  //                 alt="File Preview"
-  //                 className="max-w-full max-h-full mx-auto object-contain"
-  //               />
-  //             ) : (
-  //               <div className="flex items-center justify-center h-full">
-  //                 <div className="text-center">
-  //                   <FaFileAlt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-  //                   <p className="text-gray-600">Preview not supported</p>
-  //                   <button
-  //                     onClick={() => handleFileDownload(currentPreviewFile)}
-  //                     className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-  //                   >
-  //                     Download File
-  //                   </button>
-  //                 </div>
-  //               </div>
-  //             )}
-  //           </>
-  //         ) : (
-  //           <div className="flex items-center justify-center h-full">
-  //             <FaFileAlt className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-  //             <p className="text-gray-600">No File Available</p>
-  //           </div>
-  //         )}
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
 
   if (isLoading) {
     return (
@@ -266,6 +218,7 @@ const ViewComplaintDetails = () => {
       </div>
     );
   }
+
 
   if (isError) {
     return (
@@ -286,15 +239,16 @@ const ViewComplaintDetails = () => {
     );
   }
 
+
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
-            {/* Header and content sections remain the same */}
+        
             <div className="p-4 md:p-6 border-b">
-              {/* Mobile Header */}
+          
               <div className="md:hidden mb-4">
                 <div className="flex justify-between items-center mb-3">
                   <button
@@ -313,12 +267,13 @@ const ViewComplaintDetails = () => {
                       complaintData.status
                     )}`}
                   >
-                    In Motion – With Lokayukta
+                    {/* In Motion – With Lokayukta */}
+                    {complaintData.received_phsical == 0 ? "Not Received" : "Received"}
                   </span>
                 </div>
               </div>
 
-              {/* Desktop Header */}
+
               <div className="hidden md:block">
                 <div className="flex justify-between items-start mb-3">
                   <h2 className="text-xl font-semibold text-gray-800">
@@ -328,7 +283,7 @@ const ViewComplaintDetails = () => {
                     <span
                       className={`px-3 py-1 rounded ${getStatusColor(complaintData.status)}`}
                     >
-                      In Motion – With Lokayukta
+                      {complaintData.received_phsical == 0 ? "Not Received" : "Received"}
                     </span>
                     <button
                       onClick={() => navigate("/operator/all-complaints")}
@@ -340,13 +295,15 @@ const ViewComplaintDetails = () => {
                 </div>
               </div>
 
-              {/* Description */}
+
+      
               <p className="text-gray-700 mb-4 text-sm md:text-base">
                 {complaintData.details?.[0]?.description ||
                   "No detailed description available for this complaint."}
               </p>
 
-              {/* Complainant Info */}
+
+     
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
                 <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
                   <p className="text-xs text-gray-500 uppercase mb-1">COMPLAINANT</p>
@@ -377,7 +334,8 @@ const ViewComplaintDetails = () => {
                 </div>
               </div>
 
-              {/* Fee and Challan Info */}
+
+     
               <div className="flex flex-wrap gap-2">
                 {complaintData.fee_exempted === 1 ? (
                   <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded text-xs border border-green-200">
@@ -400,7 +358,7 @@ const ViewComplaintDetails = () => {
               </div>
             </div>
 
-            {/* Tabs */}
+
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
                 {["cover", "documents", "notings", "movement"].map((tab) => (
@@ -425,6 +383,7 @@ const ViewComplaintDetails = () => {
               </div>
             </div>
 
+
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
                 {["cover", "documents", "notings", "movement"].map((tab) => (
@@ -447,7 +406,8 @@ const ViewComplaintDetails = () => {
               </div>
             </div>
 
-            {/* Content Area */}
+
+  
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
               {activeTab === "cover" && <FileDetails complaint={complaintData} />}
               {activeTab === "documents" && <Documents complaint={complaintData} />}
@@ -455,7 +415,7 @@ const ViewComplaintDetails = () => {
               {activeTab === "movement" && <MovementHistory complaint={complaintData} />}
             </div>
 
-            {/* Action Buttons */}
+
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3">
                 <button className="px-4 py-2 border cursor-not-allowed border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
@@ -510,11 +470,22 @@ const ViewComplaintDetails = () => {
         )}
       </div>
 
-      {/* Confirmation Modal */}
+
+
       {confirmConfig.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5">
-            <h3 className="text-lg font-semibold mb-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+            {/* Close button in top-right corner */}
+            <button
+              onClick={handleConfirmNo}
+              disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
+              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="Close"
+            >
+              <FaTimes className="w-5 h-5 text-gray-600" />
+            </button>
+
+            <h3 className="text-lg font-semibold mb-4 pr-8">
               {confirmConfig.type === "receive"
                 ? "Mark as Received?"
                 : "Forward Physically Completed File?"}
@@ -533,34 +504,23 @@ const ViewComplaintDetails = () => {
                     Error loading options: {forwardOptionsError.message}
                   </div>
                 ) : (
-                  <>
-                    {process.env.NODE_ENV === "development" && (
-                      <div className="text-xs text-gray-500 mb-1">
-                        Found {Array.isArray(forwardOptionsData) ? forwardOptionsData.length : 0} options
-                      </div>
+                  <select
+                    value={selectedForwardTo}
+                    onChange={(e) => setSelectedForwardTo(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select...</option>
+                    {Array.isArray(forwardOptionsData) && forwardOptionsData.length > 0 ? (
+                      forwardOptionsData.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.name || option.user_name || `User ${option.id}`}
+                          {option.district_name ? ` (${option.district_name})` : ""}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No options available</option>
                     )}
-                    <select
-                      value={selectedForwardTo}
-                      onChange={(e) => setSelectedForwardTo(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">Select...</option>
-                      {Array.isArray(forwardOptionsData) && forwardOptionsData.length > 0 ? (
-                        forwardOptionsData.map((option) => {
-                          // Debug each option
-                          {/* console.log("Dropdown option:", option); */}
-                          return (
-                            <option key={option.id} value={option.id}>
-                              {option.name || option.user_name || `User ${option.id}`}
-                              {option.district_name ? ` (${option.district_name})` : ""}
-                            </option>
-                          );
-                        })
-                      ) : (
-                        <option disabled>No options available</option>
-                      )}
-                    </select>
-                  </>
+                  </select>
                 )}
               </div>
             )}
@@ -603,10 +563,9 @@ const ViewComplaintDetails = () => {
           </div>
         </div>
       )}
-
-      {showPreview && <PDFPreviewModal />}
     </div>
   );
 };
+
 
 export default ViewComplaintDetails;
