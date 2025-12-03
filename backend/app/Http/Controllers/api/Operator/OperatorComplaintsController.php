@@ -375,7 +375,7 @@ class OperatorComplaintsController extends Controller
             ], 200);
     }
 
-    
+
 
     // public function updateComplain(Request $request,$id){
     //     $added_by = Auth::user()->id;
@@ -1024,13 +1024,29 @@ class OperatorComplaintsController extends Controller
                  ->where('in_draft','0')
                  ->distinct('cm.id')
                 ->get();
+
+                 $todayCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->whereDate('created_at', today())
+                    ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('created_at', '<', now()->subDays(7))
+                    ->count();
+
+
         // dd($deadpersondetails);
 
           return response()->json([
                'status' => true,
                'message' => 'Records Fetch successfully',
                'data' => $complainDetails,
+                'todayCount' => $todayCount,
+                'older7DaysCount' => $older7DaysCount
            ]);
+   
     }
       public function allDraft(){
        
@@ -1061,6 +1077,7 @@ class OperatorComplaintsController extends Controller
                   
                 )
                 ->where('in_draft','1')
+                 ->distinct('cm.id')
                 ->get();
         // dd($deadpersondetails);
 
@@ -1105,7 +1122,7 @@ class OperatorComplaintsController extends Controller
      public function allComplainsapproved(){
        
            $complainDetails = DB::table('complaints as cm')
-            // ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
+            ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
@@ -1114,6 +1131,8 @@ class OperatorComplaintsController extends Controller
                 ->select(
                     'cm.*',
                     'dd.district_name',
+                    'cd.description',
+
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',
@@ -1123,6 +1142,7 @@ class OperatorComplaintsController extends Controller
                 ->where('form_status',1)
                 ->where('approved_rejected_by_ro',1)
                  ->where('in_draft','0')
+                  ->distinct('cm.id')
                 ->get();
         // dd($deadpersondetails);
 
