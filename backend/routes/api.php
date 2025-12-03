@@ -156,6 +156,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/complainstype',[OperatorCommonController::class,'fetch_complainstype']);
         Route::post('/add-complaint',[OperatorComplaintsController::class,'addComplaint']);
          Route::post('/upload-document',[OperatorComplaintsController::class,'uploadDocument']);
+         Route::post('/get-document/{id}',[OperatorComplaintsController::class,'getUploadDoc']);
          Route::post('/forward-physical',[OperatorComplaintsController::class,'makedforwardbyRk']);
          Route::post('/received-physical',[OperatorComplaintsController::class,'makedreceivedbyRk']);
         Route::get('/get-lokayukt',[OperatorComplaintsController::class,'getLokayuktUsers']);
