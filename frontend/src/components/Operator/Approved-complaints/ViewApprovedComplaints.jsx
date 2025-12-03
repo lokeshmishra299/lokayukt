@@ -313,7 +313,7 @@ const ViewApprovedComplaints = () => {
                       complaintData.status
                     )}`}
                   >
-                    In Motion – With Lokayukta
+                    {complaintData.received_phsical == 0 ? "Not Received" : "Received"}
                   </span>
                 </div>
               </div>
@@ -328,7 +328,7 @@ const ViewApprovedComplaints = () => {
                     <span
                       className={`px-3 py-1 rounded ${getStatusColor(complaintData.status)}`}
                     >
-                      In Motion – With Lokayukta
+                     {complaintData.received_phsical == 0 ? "Not Received" : "Received"}
                     </span>
                     <button
                       onClick={() => navigate(-1)}
