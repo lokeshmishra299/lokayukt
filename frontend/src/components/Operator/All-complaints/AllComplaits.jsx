@@ -55,14 +55,23 @@ const AllComplaints = () => {
 
   const getAllComplaints = async () => {
     const res = await api.get("/operator/all-complaints");
-    console.log("Data he", res.data.data)
+    console.log("Data he", res)
     return res.data.data;
   };
+
+
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["complaints", location.pathname],
     queryFn: getAllComplaints,
   });
+
+
+    const stats = {
+  overdue: data?.older7DaysCount || 0,
+  receivedToday: data?.todayCount || 0,
+};
+
 
   const getDistrict = async () => {
     const res = await api.get("/operator/all-district");
@@ -246,7 +255,7 @@ const AllComplaints = () => {
 };
 
 
-  const stats = getStatistics();
+
 
 
 

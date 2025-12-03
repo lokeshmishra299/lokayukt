@@ -64,6 +64,12 @@ const AllComplaints = () => {
     queryFn: getAllComplaints,
   });
 
+  
+  const stats = {
+  overdue: data?.older7DaysCount || 0,
+  receivedToday: data?.todayCount || 0,
+};
+
   const getDistrict = async () => {
     const res = await api.get("/lokayukt/all-district");
     return res.data.data;
@@ -247,7 +253,7 @@ const AllComplaints = () => {
 
 
 
-  const stats = getStatistics();
+
 
 // const getDaysDifference = (dateString) => {
 //   const today = new Date();

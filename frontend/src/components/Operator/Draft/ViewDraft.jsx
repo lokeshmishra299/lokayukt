@@ -313,7 +313,7 @@ const ViewDraft = () => {
                       complaintData.status
                     )}`}
                   >
-                     {complaintData.received_phsical == 0 ? "Not Received" : "Received"}
+                   {complaintData.approved_rejected_by_lokayukt == 0 ? "Received - Record Section" : "In Motion – With Lokayukta"}
                   </span>
                 </div>
               </div>
@@ -328,7 +328,7 @@ const ViewDraft = () => {
                     <span
                       className={`px-3 py-1 rounded ${getStatusColor(complaintData.status)}`}
                     >
-                       {complaintData.received_phsical == 0 ? "Not Received" : "Received"}
+                                     {complaintData.approved_rejected_by_lokayukt == 0 ? "Received - Record Section" : "In Motion – With Lokayukta"}
                     </span>
                     <button
                       onClick={() => navigate(-1)}
