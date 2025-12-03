@@ -446,12 +446,29 @@ const getDaysDifference = (dateString) => {
   {getDaysDifference(complaint.created_at)}d
 </span>
 
-                          <span className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded text-[11px] font-medium">
-                             {complaint.fee_exempted == 1 ? "Fee Exempted":
-                             complaint.fee_exempted == 0 ? "Fee Not Exempted" :
-                             "Partial"
-                             }
-                          </span>
+                                                                  <span
+  className={`
+    px-2 py-0.5 rounded text-[11px] font-medium
+    ${
+      complaint.fee_exempted === 0
+        ? "bg-green-50 text-blue-600"    
+        : complaint.fee_exempted === 1
+        ?
+        "bg-orange-50 text-orange-600"     
+        : complaint.fee_exempted === 2
+        ? "bg-blue-50 text-orange-400" 
+        : ""
+    }
+  `}
+>
+  {complaint.fee_exempted === 0
+    ? "Exempted"
+    : complaint.fee_exempted === 1
+    ? "Paid"
+    : complaint.fee_exempted === 2
+    ? "Partial"
+    : ""}
+</span>
                         </div>
 
                         <div className="flex gap-2 w-full sm:w-auto">
