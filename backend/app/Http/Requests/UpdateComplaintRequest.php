@@ -41,7 +41,7 @@ class UpdateComplaintRequest extends FormRequest
             'previously_submitted'        => 'nullable|in:yes,no',
             'previously_submitted_details'=> 'nullable|string',
 
-            'category'                    => 'nullable|in:allegation,complaint',
+            'category'                    => 'nullable|in:assertion,complaint',
 
             'challan_number'              => 'nullable|string|max:255',
             'challan_date'                => 'nullable|date',

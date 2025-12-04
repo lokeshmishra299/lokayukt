@@ -47,7 +47,7 @@ class StoreComplaintRequest extends FormRequest
             /*----------------------------------------------------
             | SECTION 7
             ----------------------------------------------------*/
-            'category'                    => 'required|in:allegation,complaint',
+            'category'                    => 'required|in:assertion,complaint',
 
 
             /*----------------------------------------------------
@@ -135,7 +135,7 @@ class StoreComplaintRequest extends FormRequest
             | Section 7
             ----------------------------------------- */
             'category.required' => 'Category is required.',
-            'category.in' => 'Category must be allegation or complaint.',
+            'category.in' => 'Category must be assertion or complaint.',
 
 
             /* -----------------------------------------
