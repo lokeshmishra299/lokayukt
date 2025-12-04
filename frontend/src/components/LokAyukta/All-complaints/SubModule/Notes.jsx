@@ -9,7 +9,7 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
   const [note, setNote] = useState("");
   const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
 
-  // Sample documents data - Replace with actual props
+
   const sampleDocuments = [
     { id: 1, name: "Main Complaint", pages: 3, pageRange: "pp.1–3" },
     { id: 2, name: "Annexure 1 - Tender Documents", pages: 8, pageRange: "pp.4–11" },
@@ -31,7 +31,6 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
   };
 
   const handleSubmit = () => {
-    // Add your submit logic here
     console.log("Note:", note);
     console.log("Selected Doc:", selectedDoc);
     console.log("Page Ranges:", pageRanges);
@@ -40,8 +39,8 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg space-y-6 w-full">
-      {/* Header Row */}
+    <div className="bg-white rounded-lg w-full">
+    
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
         <p className="text-[16px] font-medium text-gray-800">Notes & Notings</p>
 
@@ -51,7 +50,7 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
             Download all notes (PDF)
           </button>
 
-          {/* Add Note Button */}
+       
           <button
             className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition w-full sm:w-auto"
             onClick={() => setOpen(true)}
@@ -61,12 +60,11 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
         </div>
       </div>
 
-      {/* Modal */}
-     {/* Modal */}
+   
 {open && (
   <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
-    <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl relative max-h-[90vh] overflow-y-auto">
-      {/* Close Button - Top Right */}
+    <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl relative max-h-[100vh] overflow-y-auto">
+      
       <button
         className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors z-10"
         onClick={() => setOpen(false)}
@@ -76,10 +74,10 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
       </button>
 
       <div className="p-6">
-        {/* Heading */}
+
         <h2 className="text-lg font-semibold mb-6 pr-8">Add Note / Noting</h2>
 
-        {/* Note Content */}
+    
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Note Content <span className="text-red-500">*</span>
@@ -92,11 +90,10 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
           />
         </div>
 
-        {/* References Section */}
+      
         <div className="mb-6">
           <h3 className="text-sm font-semibold text-gray-800 mb-4">References</h3>
 
-          {/* Reference by Document */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Reference by Document
@@ -115,7 +112,6 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
             </select>
           </div>
 
-          {/* Page Range Section */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Reference by Combined Page Range (Total: 30 pages)
@@ -150,7 +146,6 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
             ))}
           </div>
 
-          {/* Document for Approval */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Document for Approval (optional)
@@ -170,7 +165,6 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex justify-end gap-3 pt-4 border-t">
           <button
             className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
@@ -192,7 +186,7 @@ const Notes = ({ documents = [], approvalDocs = [] }) => {
 )}
 
 
-      {/* NOTE CARD 1 */}
+
       <NoteCard
         name="Shri Vijay Sharma"
         role="PS to Lokayukta"
@@ -209,7 +203,7 @@ and Annexure 3 for timeline verification.`}
         ]}
       />
 
-      {/* NOTE CARD 2 */}
+
       <NoteCard
         name="Shri Ram Sharma"
         role="PS to Lokayukta"
