@@ -253,7 +253,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-by-so/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbySO']);
         Route::post('/dispose-complain/{complainId}',[LokAyuktComplaintsController::class,'disposeComplaints']);
         Route::get('/get-users',[LokAyuktComplaintsController::class,'getSubROleUsers']);
-        Route::post('/get-document/{id}',[LokAyuktComplaintsController::class,'getUploadDoc']);
+        Route::get('/get-document/{id}',[LokAyuktComplaintsController::class,'getUploadDoc']);
+        Route::post('/add-notes',[LokAyuktComplaintsController::class,'addNotes']);
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-lokayukt/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbylokayukt']);
