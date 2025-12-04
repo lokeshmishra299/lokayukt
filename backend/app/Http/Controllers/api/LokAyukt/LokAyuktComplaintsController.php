@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Complaint;
 use App\Models\ComplaintAction;
 use App\Models\ComplainDocuments;
+use App\Models\ComplaintNotes;
 use App\Models\SubRole;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -733,6 +734,19 @@ $complainDetails->details = DB::table('complaints_details as cd')
        
     }
 
+    public function getNotes(Request $request,$id){
+        if($request->isMethod('get')){
+            $Notes = ComplaintNotes::where('complaint_id',$id)->get();
+
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Notes Fetch successfully.',
+                    'data' => $Notes
+                ], 200);
+        }
+       
+    }
+
      public function addNotes(Request $request)
     {
         // $user = $request->user()->id;
@@ -740,7 +754,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
     
         $validation = Validator::make($request->all(), [
             
-            'complain_id' => 'required|numeric',
+            'complaint_id' => 'required|numeric',
             // 'type' => 'required|string',
             // 'title' => 'required|string',
             'description' => 'required|string',
@@ -751,7 +765,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
             'range_two' => 'required',
             
         ], [
-            'complain_id.required' => 'Complaint Id is required.',
+            'complaint_id.required' => 'Complaint Id is required.',
             // 'type.required' => 'Complaint description is required.',
             // 'title.required' => 'Letter Subject is Required',
             'description.required' => 'Description is Required',
