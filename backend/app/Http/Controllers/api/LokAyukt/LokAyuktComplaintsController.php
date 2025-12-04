@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Complaint;
 use App\Models\ComplaintAction;
+use App\Models\ComplainDocuments;
 use App\Models\SubRole;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -121,6 +122,25 @@ $complainDetails->details = DB::table('complaints_details as cd')
         }
         // dd($usersByRole['lok-ayukt']);
    }
+
+    public function getUsers(){
+     
+        $usersByRole = User::with('role')
+         ->whereNotNull('role_id')
+        ->get()
+        ->groupBy(fn ($user) => $user->role->name);
+        
+
+         if(!empty($usersByRole['lok-ayukt'])){
+
+           return response()->json($usersByRole['lok-ayukt']);
+        }else{
+
+            return response()->json(["message"=>"Data Not Found"]);
+        }
+        // dd($usersByRole['lok-ayukt']);
+   }
+
    public function getUpLokayuktUsers(){
     $usersByRole = User::with('role')
      ->whereNotNull('role_id')
@@ -700,9 +720,10 @@ $complainDetails->details = DB::table('complaints_details as cd')
 
     }
 
-    public function getUploadDoc($id){
+    public function getUploadDoc(Request $request,$id){
         if($request->isMethod('get')){
-            $complain = ComplainDocuments::where('complain_id',$id);
+            $complain = ComplainDocuments::where('complain_id',$id)->get();
+
            return response()->json([
                     'status' => true,
                     'message' => 'Document Fetch successfully.',
@@ -720,15 +741,23 @@ $complainDetails->details = DB::table('complaints_details as cd')
         $validation = Validator::make($request->all(), [
             
             'complain_id' => 'required|numeric',
-            'type' => 'required|string',
-            'title' => 'required|string',
+            // 'type' => 'required|string',
+            // 'title' => 'required|string',
             'description' => 'required|string',
+            'd_id' => 'required',
+            // 'forward_by' => 'required',
+            // 'forward_to' => 'required',
+            'range_from' => 'required',
+            'range_two' => 'required',
             
         ], [
             'complain_id.required' => 'Complaint Id is required.',
-            'type.required' => 'Complaint description is required.',
-            'title.required' => 'Letter Subject is Required',
+            // 'type.required' => 'Complaint description is required.',
+            // 'title.required' => 'Letter Subject is Required',
             'description.required' => 'Description is Required',
+            'd_id.required' => 'Document is Required',
+            'range_from.required' => 'Range From is Required',
+            'range_two.required' => 'Range too is Required',
         ]);
 
         if ($validation->fails()) {
@@ -742,11 +771,14 @@ $complainDetails->details = DB::table('complaints_details as cd')
                 $compDoc = new ComplainDocuments();
                 $compDoc->complaint_id = $request->complaint_id;
                 $compDoc->added_by = $added_by;
-                $compDoc->type = $request->type;
-                $compDoc->title = $request->title;
+                // $compDoc->type = $request->type;
+                // $compDoc->title = $request->title;
                 $compDoc->description = $request->description;
-                
-                
+                $compDoc->forward_by = $added_by;
+                $compDoc->forward_to = $request->forward_to;
+                $compDoc->d_id = $request->d_id;
+                $compDoc->range_from = $request->range_from;
+                $compDoc->range_two = $request->range_two;
                 $compDoc->save();
               
                 return response()->json([
