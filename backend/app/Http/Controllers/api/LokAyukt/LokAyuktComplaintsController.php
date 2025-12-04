@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 
 class LokAyuktComplaintsController extends Controller
@@ -802,6 +803,21 @@ $complainDetails->details = DB::table('complaints_details as cd')
                     'data' => $compDoc
                 ], 201);
         }
+
+    }
+     public function getFilePreview($id){
+        $cmp = Complaint::findOrFail($id);
+        $cmpDetail = ComplainDocuments::where('complain_id',$cmp->id)->get();
+        foreach($cmpDetail as $c){
+
+            $path[] = Storage::url('Document/' . $c->file); 
+            $cmp->filepath = $path;
+        }
+           return response()->json([
+               'status' => true,
+               'message' => 'File Fetch successfully',
+               'data' => $cmp->filepath,
+           ]);
 
     }
 }
