@@ -51,6 +51,7 @@ class OperatorComplaintsController extends Controller
             | 2. Create Main Complaint Entry
             |--------------------------------------------*/
 
+
             $complaint = Complaint::create([
                 'relation_with_person'        => $request->relation_with_person,
                 'authorization_document'      => $authorizationDocument,
@@ -88,7 +89,14 @@ class OperatorComplaintsController extends Controller
                 'complaint_description'        => $request->complaint_description,
             ]);
 
+               $year = date('Y');
+              
+              
+                $str = strtoupper(substr('AllGRV', 0, 3));
 
+                
+             $complaintNo = 'UP'.$year.$str.str_pad($complaint->id,6, '0',STR_PAD_LEFT);
+        $complaint->where('id',$complaint->id)->update(['complain_no' => $complaintNo]);
 
             /*--------------------------------------------
             | 3. Add Multiple Complainants (Parivadi)
@@ -142,6 +150,8 @@ class OperatorComplaintsController extends Controller
                 'complain_id' => $complaint->id,
                 'file'         => $attached_documents
             ]);
+               // $complaintNo = 'UP'.$year.$str.str_pad($cmpDetailsUpdate->id,8, '0',STR_PAD_LEFT);
+    //             // $cmpDetailsUpdate->where('id',$cmpDetailsUpdate->id)->update(['complain_no' => $complaintNo]);
             DB::commit();
 
             return response()->json([
