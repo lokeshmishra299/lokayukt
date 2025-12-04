@@ -63,7 +63,7 @@ class StoreComplaintRequest extends FormRequest
             ----------------------------------------------------*/
             'supporting_affidavit_list'   => 'required|string',
             'other_witnesses'             => 'required|string',
-            'attached_documents'          => 'required|string',
+            'attached_documents'          => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'complaint_description'       => 'required|string',
 
 
