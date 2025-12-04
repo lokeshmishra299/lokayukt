@@ -254,6 +254,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/dispose-complain/{complainId}',[LokAyuktComplaintsController::class,'disposeComplaints']);
         Route::get('/get-users',[LokAyuktComplaintsController::class,'getSubROleUsers']);
         Route::get('/get-document/{id}',[LokAyuktComplaintsController::class,'getUploadDoc']);
+        Route::get('/get-notes/{id}',[LokAyuktComplaintsController::class,'getNotes']);
         Route::post('/add-notes',[LokAyuktComplaintsController::class,'addNotes']);
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyda']);
