@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Complaint extends Model
 {
-     protected $table = 'complaints_new'; 
+     protected $table = 'complaints'; 
     public $timestamps = false; 
  
 //     public function district()

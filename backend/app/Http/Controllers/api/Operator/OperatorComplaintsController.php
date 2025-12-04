@@ -33,13 +33,18 @@ class OperatorComplaintsController extends Controller
             $authorizationDocument = null;
             if ($request->hasFile('authorization_document')) {
                 $authorizationDocument = $request->file('authorization_document')
-                    ->store('authorization_documents', 'public');
+                    ->store('Document', 'public');
             }
 
             $challanFile = null;
             if ($request->hasFile('challan_file')) {
                 $challanFile = $request->file('challan_file')
-                    ->store('challan_files', 'public');
+                    ->store('Document', 'public');
+            }
+            $attached_documents = null;
+            if ($request->hasFile('attached_documents')) {
+                $attached_documents = $request->file('attached_documents')
+                    ->store('Document', 'public');
             }
 
             /*--------------------------------------------
@@ -83,6 +88,8 @@ class OperatorComplaintsController extends Controller
                 'complaint_description'        => $request->complaint_description,
             ]);
 
+
+
             /*--------------------------------------------
             | 3. Add Multiple Complainants (Parivadi)
             |--------------------------------------------*/
@@ -122,6 +129,19 @@ class OperatorComplaintsController extends Controller
                 }
             }
 
+          ComplainDocuments::create([
+                'complain_id' => $complaint->id,
+                'file'         => $authorizationDocument
+            ]);
+
+            ComplainDocuments::create([
+                'complain_id' => $complaint->id,
+                'file'         => $challanFile
+            ]);
+            ComplainDocuments::create([
+                'complain_id' => $complaint->id,
+                'file'         => $attached_documents
+            ]);
             DB::commit();
 
             return response()->json([
