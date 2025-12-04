@@ -749,6 +749,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
 
      public function addNotes(Request $request)
     {
+       
         // $user = $request->user()->id;
         $added_by = Auth::user()->id;
     
@@ -781,8 +782,8 @@ $complainDetails->details = DB::table('complaints_details as cd')
             ], 422);
         }
 
-        if(isset($request->complain_id)){    
-                $compDoc = new ComplainDocuments();
+        if(isset($request->complaint_id)){    
+                $compDoc = new ComplaintNotes();
                 $compDoc->complaint_id = $request->complaint_id;
                 $compDoc->added_by = $added_by;
                 // $compDoc->type = $request->type;
