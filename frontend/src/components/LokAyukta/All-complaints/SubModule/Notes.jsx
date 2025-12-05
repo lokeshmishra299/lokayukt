@@ -373,58 +373,68 @@ const Notes = ({ complaint }) => {
       )}
 
       {/* SUCCESS POPUP */}
-      {showSuccess && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-4">
-          <div className="bg-white w-full max-w-2xl rounded-xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-              <div>
-                <p className="text-sm font-semibold text-gray-800 mt-1">
-                  File No: {complaint?.file_number || complaint?.complain_no}
-                </p>
-              </div>
-              <button
-                className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500"
-                onClick={() => setShowSuccess(false)}
-              >
-                <FaTimes className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="px-6 py-5 space-y-6">
-              <div>
-                <p className="text-xs font-semibold tracking-[0.16em] text-gray-500 uppercase">
-                  Description
-                </p>
-                <div className="mt-2 border rounded-lg bg-gray-50 px-4 py-3 min-h-[160px] text-sm leading-relaxed text-gray-800 whitespace-pre-wrap">
-                  {note}
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="text-right text-xs text-gray-400">
-                  <p>{new Date().toLocaleDateString()}</p>
-                </div>
-                <div className="text-xs text-gray-500">
-                  {/* <p className="uppercase tracking-[0.16em]">Submitted by</p> */}
-                  <p className="mt-1 text-sm text-gray-800">{user?.name}</p>
-                </div>
-              </div>
-            </div>
-            <div className="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3">
-              <button
-                className="px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100"
-                onClick={() => setShowSuccess(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="px-6 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                onClick={handleFinalSubmit}
-              >
-                Submit
-              </button>
-            </div>
+    {showSuccess && (
+  <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center px-4">
+    <div className="bg-white w-full max-w-xl rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+
+      {/* HEADER */}
+      <div className="px-5 py-3 border-b flex justify-between items-center bg-gray-50">
+        <p className="text-sm font-semibold text-gray-800">
+          
+        </p>
+
+        <button
+          onClick={() => setShowSuccess(false)}
+          className="p-1.5 rounded hover:bg-gray-200 text-gray-600"
+        >
+          <FaTimes className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* BODY */}
+      <div className="px-6 py-5 text-sm leading-relaxed text-gray-800 space-y-5">
+        <p className="text-sm text-center font-semibold text-gray-800">
+          File No: {complaint?.file_number || complaint?.complain_no}
+        </p>
+
+        {/* SUBJECT / DESCRIPTION */}
+        <div className="border border-gray-300 rounded-md bg-white px-4 py-3 min-h-[140px] whitespace-pre-wrap">
+          {note}
+        </div>
+
+        {/* DATE + AUTHORITY */}
+        <div className="flex justify-between pt-2">
+          <p className="text-xs text-gray-500">
+            Data: {new Date().toLocaleDateString()}
+          </p>
+
+          <div className="text-right text-xs text-gray-600">
+            <p className="uppercase tracking-wide">Authority By</p>
+            {/* <p className="font-semibold mt-1 text-gray-800">{user?.name}</p> */}
+            <p className="font-semibold mt-1 text-gray-800">Shri Sanjay Mishra</p>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* FOOTER BUTTONS */}
+      <div className="px-6 py-3 border-t bg-gray-50 flex justify-end gap-2">
+        <button
+          className="px-3 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-100 text-gray-700"
+          onClick={() => setShowSuccess(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-5 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+          onClick={handleFinalSubmit}
+        >
+          Submit
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
 
       {/* TOAST */}
       <ToastContainer />
