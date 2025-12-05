@@ -27,7 +27,12 @@ const Notes = ({ complaint }) => {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
+  
+  // Data States
   const [documents, setDocuments] = useState([]);
+  const [notesList, setNotesList] = useState([]); // State for API notes
+  
+  // Form States
   const [selectedDoc, setSelectedDoc] = useState("");
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -35,7 +40,7 @@ const Notes = ({ complaint }) => {
   const [errors, setErrors] = useState({});
 
   // ========================
-  // GET DOCUMENT LIST
+  // 1. GET DOCUMENT LIST
   // ========================
   useEffect(() => {
     const fetchDocs = async () => {
@@ -48,6 +53,25 @@ const Notes = ({ complaint }) => {
     };
 
     if (complaint?.id) fetchDocs();
+  }, [complaint?.id]);
+
+  // ========================
+  // 2. GET NOTES LIST (New Added)
+  // ========================
+  const fetchNotes = async () => {
+    if (!complaint?.id) return;
+    try {
+      const res = await api.get(`/lokayukt/get-notes/${complaint.id}`);
+      if (res.data.status) {
+        setNotesList(res.data.data);
+      }
+    } catch (err) {
+      console.log("Notes fetch error:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotes();
   }, [complaint?.id]);
 
   // ========================
@@ -119,10 +143,15 @@ const Notes = ({ complaint }) => {
       if (res.data.status) {
         toast.success("Note Added Successfully!");
         setShowSuccess(false);
+        
+        // Reset Form
         setNote("");
         setSelectedDoc("");
         setPageRanges([{ from: "", to: "" }]);
         setPdfViewUrl(null);
+        
+        // Refresh the List
+        fetchNotes();
       }
       // BACKEND ERRORS
       else if (res.data.errors) {
@@ -153,23 +182,17 @@ const Notes = ({ complaint }) => {
   };
 
   // ========================
-  // SAMPLE NOTES (for display)
+  // HELPER: Get Doc Name by ID
   // ========================
-  const notesList = [
-    {
-      user: "Shri Vijay Sharma, PS to Lokayukta",
-      date: "14 Jan 2025, 3:45 PM",
-      content:
-        "Initial review of the complaint shows prima facie evidence of procedural irregularities in the tender process. The complainant has provided substantial documentation including tender documents and email communications. Recommend detailed scrutiny of Annexure 1 and Annexure 3 for timeline verification.\n\nReferences:\nMain Complaint (pp.1–3)\nAnnexure 1 - Tender Documents (pp.4–11)\nAnnexure 3 - Email Communications (pp.24–28)",
-    },
-    {
-      user: "Hon'ble Justice Sanjay Misra, Lokayukta",
-      date: "15 Jan 2025, 10:20 AM",
-      content:
-        "After examining the documents and the preliminary note by PS, it appears that there are serious questions regarding the tender evaluation process. The timeline presented in the email communications contradicts the official tender records. Issue notice to the concerned department to file their response within 15 days. Also approve partial fee as the complainant has demonstrated financial hardship.\n\nDocument for Approval:\nLetter from Department (15 Jan) (pp.29–30)\nReferences:\nAnnexure 3 - Email Communications (pp.26–27)\npp.7–8",
-    },
-  ];
+  const getDocName = (dId) => {
+    if (!documents.length || !dId) return null;
+    const doc = documents.find(d => d.id === dId);
+    return doc ? doc.file : null;
+  };
 
+  // ========================
+  // RENDER
+  // ========================
   return (
     <div className="bg-white rounded-lg w-full p-4">
       {/* HEADER */}
@@ -183,15 +206,49 @@ const Notes = ({ complaint }) => {
         </button>
       </div>
 
-      {/* DISPLAY NOTES */}
-      <div className="space-y-4">
-        {notesList.map((item, index) => (
-          <div key={index} className="border rounded-lg p-4 bg-gray-50">
-            <p className="font-medium text-gray-800">{item.user}</p>
-            <p className="text-sm text-gray-500">{item.date}</p>
-            <div className="mt-2 whitespace-pre-wrap text-sm text-gray-700">{item.content}</div>
-          </div>
-        ))}
+      {/* DISPLAY NOTES (Dynamic from API) */}
+      <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+        {notesList.length === 0 ? (
+           <p className="text-sm text-gray-500 text-center py-4">No notes available.</p>
+        ) : (
+          notesList.map((item, index) => {
+             // Find doc name for display
+             const referencedFile = getDocName(item.d_id);
+             
+             return (
+              <div key={item.id || index} className="border rounded-lg p-4 bg-gray-50">
+                <div className="flex justify-between items-start">
+                  <p className="font-medium text-gray-800">
+                    User ID: {item.added_by} 
+                    {/* Note: If API sends user name later, replace item.added_by with item.user_name */}
+                  </p>
+                  <p className="text-xs text-gray-400 whitespace-nowrap">
+                    {new Date(item.created_at).toLocaleString('en-IN', { 
+                      day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' 
+                    })}
+                  </p>
+                </div>
+                
+                <div className="mt-2 whitespace-pre-wrap text-sm text-gray-700">
+                  {item.description}
+                </div>
+
+                {/* Show Reference if document exists */}
+                {(referencedFile || (item.range_from && item.range_two)) && (
+                  <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500">
+                    <span className="font-semibold">References:</span>
+                    <div className="mt-1 pl-2 border-l-2 border-blue-200">
+                       {referencedFile && <p>Doc: {referencedFile}</p>}
+                       {item.range_from && item.range_two && (
+                         <p>Pages: {item.range_from} – {item.range_two}</p>
+                       )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* MODAL */}
@@ -346,8 +403,8 @@ const Notes = ({ complaint }) => {
                   <p>{new Date().toLocaleDateString()}</p>
                 </div>
                 <div className="text-xs text-gray-500">
-                  <p className="uppercase tracking-[0.16em]">Submitted by</p>
-                  <p className="mt-1 text-sm text-gray-800">{user.name}</p>
+                  {/* <p className="uppercase tracking-[0.16em]">Submitted by</p> */}
+                  <p className="mt-1 text-sm text-gray-800">{user?.name}</p>
                 </div>
               </div>
             </div>
