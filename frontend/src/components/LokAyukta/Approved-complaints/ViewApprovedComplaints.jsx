@@ -251,31 +251,29 @@ const ViewComplaintDetails = () => {
               {/* Desktop Header */}
               <div className="hidden md:block">
                 <div className="flex justify-between items-start mb-3">
-                  <h2 className="text-xl font-semibold text-gray-800">
+                   <h2 className="text-xl font-semibold text-gray-800">
                     File No. {complaintData.complain_no}
                   </h2>
-                  <div className="flex gap-2">
-                    <span
-                      className={`px-3 py-1 rounded ${getStatusColor(
-                        complaintData.status
-                      )}`}
-                    >
-                      In Motion – With Lokayukta
-                    </span>
-                 
-                    <button
-                      onClick={() => navigate(-1)}
-                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
-                    >
-                      <IoMdArrowBack className="w-4 h-4" /> Back
-                    </button>
-                  </div>
+                    <div className="flex gap-2">
+                                                      <span
+                                                        className={`px-3 py-1 rounded ${getStatusColor(complaintData.status)}`}
+                                                      >
+                                                {complaintData.approved_rejected_by_lokayukt == 0 ? "Received - Record Section" : "In Motion – With Lokayukta"}
+                                  
+                                                      </span>
+                                                      <button
+                                                        onClick={() => navigate(-1)}
+                                                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+                                                      >
+                                                        <IoMdArrowBack className="w-4 h-4" /> Back
+                                                      </button>
+                                                    </div>
                 </div>
               </div>
 
               {/* Description - Common for both mobile and desktop */}
-              <p className="text-gray-700 mb-4 text-sm md:text-base">
-                {complaintData.details?.[0]?.description ||
+                <p className="text-gray-700 mb-4 text-sm md:text-base">
+                Description: {complaintData.complaint_description ||
                   "No detailed description available for this complaint."}
               </p>
 
@@ -283,36 +281,31 @@ const ViewComplaintDetails = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
                 <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
                   <p className="text-xs text-gray-500 uppercase mb-1">
-                    COMPLAINANT
-                  </p>
+CORRESPONDENCE NAME</p>
                   <p className="font-semibold text-gray-800 text-sm md:text-base">
-                    {complaintData.name}
+                    {complaintData.
+correspondence_name}
                   </p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">
-                    {complaintData.address}
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">{complaintData.address}</p>
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">Permanent Name: {complaintData.permanent_name}
                   </p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">
-                    Mobile: {complaintData.mobile}
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">Permanent Place: {complaintData.
+permanent_place
+}
                   </p>
                   {complaintData.email && (
-                    <p className="text-xs md:text-sm text-gray-600">
-                      Email: {complaintData.email}
-                    </p>
+                    <p className="text-xs md:text-sm text-gray-600">Email: {complaintData.email}</p>
                   )}
                 </div>
-                
                 <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
-                  <p className="text-xs text-gray-500 uppercase mb-1">
-                    DISTRICT
-                  </p>
+                  <p className="text-xs text-gray-500 uppercase mb-1">DISTRICT</p>
                   <p className="font-semibold text-gray-800 text-sm md:text-base">
-                    {complaintData.district_name}
+                    {complaintData.
+permanent_district}
                   </p>
                   {complaintData.dob && (
                     <>
-                      <p className="text-xs text-gray-500 uppercase mb-1 mt-3">
-                        DATE OF BIRTH
-                      </p>
+                      <p className="text-xs text-gray-500 uppercase mb-1 mt-3">DATE OF BIRTH</p>
                       <p className="font-semibold text-gray-800 text-sm md:text-base">
                         {new Date(complaintData.dob).toLocaleDateString()}
                       </p>
@@ -322,7 +315,7 @@ const ViewComplaintDetails = () => {
               </div>
 
               {/* Fee and Challan Info */}
-              <div className="flex flex-wrap gap-2">
+               <div className="flex flex-wrap gap-2">
                 {complaintData.fee_exempted === 1 ? (
                   <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded text-xs border border-green-200">
                     Fee: Exempted
