@@ -649,13 +649,13 @@ $complainDetails->details = DB::table('complaints_details as cd')
 
                 
      $complainDetails->where('form_status', 1)
-            ->where('approved_rejected_by_ro', 1)
-                        ->where('approved_rejected_by_d_a',1)
-                        ->where('approved_rejected_by_lokayukt',1)
-                         ->where(function($q){
-                            $q->where('approved_rejected_by_so_us',1)
-                            ->Orwhere('approved_rejected_by_ds_js', 1);               
-                         });
+            // ->where('approved_rejected_by_ro', 1)
+            //             ->where('approved_rejected_by_d_a',1)
+                        ->where('approved_rejected_by_lokayukt',1);
+            //              ->where(function($q){
+            //                 $q->where('approved_rejected_by_so_us',1)
+            //                 ->Orwhere('approved_rejected_by_ds_js', 1);               
+                        //  });
     $complainDetails = $complainDetails
                       
                         // ->toSql();
