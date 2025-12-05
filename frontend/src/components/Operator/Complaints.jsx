@@ -1634,7 +1634,7 @@ const handleDownloadPDF = async () => {
             transform: scale(1) !important;
             box-shadow: none !important;
             border: none !important;
-            width: 210mm; /* Reset width for printing on A4 paper */
+            width: 210mm; 
           }
         }
       `}</style>

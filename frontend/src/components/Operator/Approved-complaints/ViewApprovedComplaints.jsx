@@ -275,7 +275,7 @@ const ViewComplaintDetails = () => {
 
 
        
-{/*        
+                      
                      <div className="hidden md:block">
                        <div className="flex justify-between items-start mb-3">
                          <h2 className="text-xl font-semibold text-gray-800">
@@ -289,18 +289,18 @@ const ViewComplaintDetails = () => {
        
                            </span>
                            <button
-                             onClick={() => navigate("/operator/all-complaints")}
+                             onClick={() => navigate(-1)}
                              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
                            >
                              <IoMdArrowBack className="w-4 h-4" /> Back
                            </button>
                          </div>
                        </div>
-                     </div> */}
+                     </div> 
        
        
              
-                     {/* <p className="text-gray-700 mb-4 text-sm md:text-base">
+                      <p className="text-gray-700 mb-4 text-sm md:text-base">
                        Description: {complaintData.complaint_description ||
                          "No detailed description available for this complaint."}
                      </p>
@@ -341,10 +341,10 @@ const ViewComplaintDetails = () => {
                            </>
                          )}
                        </div>
-                     </div> */}
+                     </div> 
        
        
-{/*             
+           
                      <div className="flex flex-wrap gap-2">
                        {complaintData.fee_exempted === 1 ? (
                          <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded text-xs border border-green-200">
@@ -364,10 +364,10 @@ const ViewComplaintDetails = () => {
                            Challan: {complaintData.challan_no}
                          </span>
                        )}
-                     </div>        */}
+                     </div>       
 
 {/* Cross */}
-              <div className="hidden md:block">
+              {/* <div className="hidden md:block">
                 <div className="flex justify-between items-start mb-3">
                   <h2 className="text-xl font-semibold text-gray-800">
                     File No. {complaintData.complain_no}
@@ -449,7 +449,7 @@ const ViewComplaintDetails = () => {
                     Challan: {complaintData.challan_no}
                   </span>
                 )}
-              </div>
+              </div> */}
             </div>
 
 
