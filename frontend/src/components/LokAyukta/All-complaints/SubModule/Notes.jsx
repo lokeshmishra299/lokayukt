@@ -398,7 +398,7 @@ const Notes = ({ complaint }) => {
         </p>
 
         {/* SUBJECT / DESCRIPTION */}
-        <div className="border border-gray-300 rounded-md bg-white px-4 py-3 min-h-[140px] whitespace-pre-wrap">
+        <div className=" border-gray-300 rounded-md bg-white px-4 py-3 min-h-[140px] whitespace-pre-wrap">
           {note}
         </div>
 
