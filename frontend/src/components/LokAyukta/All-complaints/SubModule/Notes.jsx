@@ -218,8 +218,10 @@ const Notes = ({ complaint }) => {
              return (
               <div key={item.id || index} className="border rounded-lg p-4 bg-gray-50">
                 <div className="flex justify-between items-start">
-                  <p className="font-medium text-gray-800">
-                    User ID: {item.added_by} 
+                  <p className=" text-gray-800">
+                    {/* User ID: {item.added_by}  */}
+                    {user?.name}
+
                     {/* Note: If API sends user name later, replace item.added_by with item.user_name */}
                   </p>
                   <p className="text-xs text-gray-400 whitespace-nowrap">
