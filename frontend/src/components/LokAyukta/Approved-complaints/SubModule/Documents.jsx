@@ -1,136 +1,190 @@
 import React, { useState } from "react";
-import { FaEye, FaCheckSquare } from "react-icons/fa";
+import { FaEye, FaTimes, FaSpinner } from "react-icons/fa";
 import { BsFileEarmarkPdf, BsDownload } from "react-icons/bs";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
+const token = localStorage.getItem("access_token");
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  },
+});
 
 const Documents = ({ complaint }) => {
-  const [selectedDocs, setSelectedDocs] = useState([]);
+  const [pdfViewUrl, setPdfViewUrl] = useState(null);
+  const [loadingDoc, setLoadingDoc] = useState(null); 
 
-  const documents = [
-    {
-      id: 1,
-      title: "Main Complaint",
-      pages: "1-3",
-      combined: "1-3",
-      type: "Complaint",
-    },
-    {
-      id: 2,
-      title: "Annexure 1 - Tender Documents",
-      pages: "1-8",
-      combined: "4-11",
-      type: "Evidence",
-    },
-    {
-      id: 3,
-      title: "Annexure 2 - Financial Records",
-      pages: "1-12",
-      combined: "12-23",
-      type: "Evidence",
-    },
-    {
-      id: 4,
-      title: "Annexure 3 - Email Communications",
-      pages: "1-5",
-      combined: "24-28",
-      type: "Evidence",
-    },
-    {
-      id: 5,
-      title: "Letter from Department (15 Jan)",
-      pages: "1-2",
-      combined: "29-30",
-      type: "External Correspondence",
-    },
-  ];
 
-  const handleSelectDoc = (docId) => {
-    setSelectedDocs((prev) =>
-      prev.includes(docId)
-        ? prev.filter((id) => id !== docId)
-        : [...prev, docId]
-    );
+  const normalizePath = (filePath) => {
+    if (!filePath) return "";
+    let fp = filePath.replace(/^\//, "");
+    fp = fp.replace("storage/", "storage/Document/");
+    return fp;
   };
 
+  const makeFileUrl = (filePath) => {
+    const root = BASE_URL.replace("/api", "");
+    const fixedPath = normalizePath(filePath);
+    return `${root}/${fixedPath}`;
+  };
+
+
+  const {
+    data: documents = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["documents", complaint?.id],
+    queryFn: async () => {
+      const res = await api.get(`/lokayukt/get-document/${complaint.id}`);
+      return res.data.status ? res.data.data : [];
+    },
+    enabled: !!complaint?.id,
+  });
+
+  const handleViewPdf = async (filename) => {
+    try {
+      setLoadingDoc(filename);
+
+      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+
+      if (res.data.status && res.data.data.length > 0) {
+        const match = res.data.data.find((p) => p.includes(filename));
+        if (match) {
+          const url = makeFileUrl(match);
+          setPdfViewUrl(url);
+        }
+      }
+    } catch (err) {
+      alert("PDF नहीं खुल पाया");
+    } finally {
+      setLoadingDoc(null);
+    }
+  };
+
+
+  const handleDownloadPdf = async () => {
+    try {
+      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+      if (res.data.status && res.data.data.length > 0) {
+        const url = makeFileUrl(res.data.data[0]);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `document_${complaint.id}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+    } catch (err) {
+      alert("Download error");
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 bg-red-50 text-red-800 border border-red-200 rounded-lg">
+        <p className="text-sm">Error loading documents</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-5 sm:space-y-6">
-
-      
-      <div className="p-4 bg-blue-50 text-blue-800 border border-blue-200 rounded-lg">
-        <p className="text-sm leading-tight">
-          Documents are treated as a continuous case file. Combined pages
-          update automatically when new documents are added.
-        </p>
-      </div>
-
+    <div className="">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-gray-800">Documents</h2>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Documents ({documents.length})
+        </h2>
 
-        <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 border border-gray-300 rounded-lg transition">
+        {/* <button
+          onClick={handleDownloadPdf}
+          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100"
+        >
           <BsDownload className="w-4 h-4" />
-          Download case as single PDF
-        </button>
+          Download case PDF
+        </button> */}
       </div>
 
- 
+      {/* Docs */}
       <div className="space-y-3">
-        {documents.map((doc) => (
-          <div
-            key={doc.id}
-            className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-          >
-
-      
-            <button
-              onClick={() => handleSelectDoc(doc.id)}
-              className="flex-shrink-0 mt-1 sm:mt-0"
-            >
-              <div
-                className={`w-5 h-5 border-2 rounded flex items-center justify-center ${
-                  selectedDocs.includes(doc.id)
-                    ? "bg-blue-600 border-blue-600"
-                    : "border-gray-300 bg-white"
-                }`}
-              >
-                {selectedDocs.includes(doc.id) && (
-                  <FaCheckSquare className="w-4 h-4 text-white" />
-                )}
-              </div>
-            </button>
-
-           
-            <div className="flex-shrink-0">
-              <BsFileEarmarkPdf className="w-6 h-6 text-blue-600" />
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-medium text-gray-800 leading-tight">
-                {doc.title}
-              </h3>
-
-              <div className="flex flex-wrap items-center gap-2 text-xs text-gray-600 mt-1">
-                <span>Pages: {doc.pages}</span>
-
-                <span className="text-gray-400">•</span>
-
-                <span className="text-purple-700 px-2 py-0.5 rounded bg-purple-100 font-medium">
-                  Combined: {doc.combined}
-                </span>
-
-                <span className="text-gray-400">•</span>
-
-                <span>{doc.type}</span>
-              </div>
-            </div>
+        {documents.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            No documents available
           </div>
-        ))}
+        ) : (
+          documents.map((doc) => (
+            <div
+              key={doc.id}
+              className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg"
+            >
+              {/* Icon + Filename */}
+              <div className="flex items-center gap-3">
+                <BsFileEarmarkPdf className="w-6 h-6 text-blue-600" />
+                <span className="text-sm font-medium">{doc.file}</span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleViewPdf(doc.file)}
+                  disabled={loadingDoc === doc.file}
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 disabled:opacity-50"
+                >
+                  {loadingDoc === doc.file ? (
+                    <FaSpinner className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <FaEye className="w-4 h-4" />
+                  )}
+                  View
+                </button>
+
+                {/* <button
+                  onClick={() => handleDownloadPdf()}
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100"
+                >
+                  <BsDownload className="w-4 h-4" />
+                </button> */}
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
-      <div className="pt-1">
-        <button className="w-full sm:w-auto px-6 py-2.5 text-sm text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg transition shadow-sm">
-          Add selected as Reference in Note
-        </button>
-      </div>
+      {/* PDF Modal */}
+      {pdfViewUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">PDF Viewer</h3>
+              <button
+                onClick={() => setPdfViewUrl(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <FaTimes className="w-5 h-5" />
+              </button>
+            </div>
+
+            <iframe
+              src={`${pdfViewUrl}#zoom=page-width`}
+              className="w-full h-full border-0"
+              title="PDF Viewer"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -12,10 +12,10 @@ const FileDetails = ({ complaint }) => {
   return (
     <div className="w-full space-y-6">
 
-      {/* GRID SECTION */}
+    
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-        {/* File No */}
+   
         <div className="bg-gray-50 p-4 rounded-xl border">
           <p className="text-gray-500 text-sm">File No.</p>
           <p className="text-gray-800 text-[15px] break-all">
@@ -23,7 +23,6 @@ const FileDetails = ({ complaint }) => {
           </p>
         </div>
 
-        {/* Case Type */}
         <div className="bg-gray-50 p-4 rounded-xl border">
           <p className="text-gray-500 text-sm">Case Type</p>
           <p className="text-gray-800 text-[15px]">
@@ -31,13 +30,12 @@ const FileDetails = ({ complaint }) => {
           </p>
         </div>
 
-        {/* Received On */}
         <div className="bg-gray-50 p-4 rounded-xl border">
           <p className="text-gray-500 text-sm">Received On</p>
           <p className="text-gray-800 text-[15px]">12 Jan 2025</p>
         </div>
 
-        {/* Current Level */}
+
         <div className="bg-gray-50 p-4 rounded-xl border">
           <p className="text-gray-500 text-sm">Current Level</p>
           <p className="text-gray-800 text-[15px]">
@@ -45,7 +43,6 @@ const FileDetails = ({ complaint }) => {
           </p>
         </div>
 
-        {/* Current Holder */}
         <div className="bg-gray-50 p-4 rounded-xl border">
           <p className="text-gray-500 text-sm">Current Holder</p>
           <p className="text-gray-800 text-[15px]">
@@ -53,7 +50,6 @@ const FileDetails = ({ complaint }) => {
           </p>
         </div>
 
-        {/* Linked Old Case */}
         <div className="bg-gray-50 p-4 rounded-xl border">
           <p className="text-gray-500 text-sm">Linked Old Case</p>
           <p className="text-blue-600 font-semibold text-[15px] hover:underline cursor-pointer">
@@ -63,11 +59,9 @@ const FileDetails = ({ complaint }) => {
 
       </div>
 
-      {/* FEE VERIFICATION */}
       <div className="bg-blue-100 p-4 sm:p-6 rounded-xl border space-y-4">
         <h3 className="text-gray-800 font-semibold text-base">Fee Verification</h3>
 
-        {/* Radio Options */}
         <div className="space-y-3">
           <label className="flex items-center gap-3 cursor-pointer">
             <input
@@ -106,7 +100,7 @@ const FileDetails = ({ complaint }) => {
           </label>
         </div>
 
-        {/* Comments */}
+    
         <div className="space-y-2">
           <label className="text-gray-700 text-sm font-medium">
             Comments
@@ -121,7 +115,7 @@ const FileDetails = ({ complaint }) => {
           />
         </div>
 
-        {/* Approve Button */}
+        
         <button
           onClick={handleApprove}
           className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition"

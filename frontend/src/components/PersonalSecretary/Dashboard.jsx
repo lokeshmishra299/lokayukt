@@ -276,7 +276,7 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
   const fetchWeeklyData = async () => {
     try {
       console.log('Fetching weekly graph data...');
-      const response = await api.get('/lokayukt/getWeeklyGraph');
+      const response = await api.get('/admin/getWeeklyGraph');
       console.log('Weekly API Response:', response.data);
       
       if (response.data && response.data.labels) {

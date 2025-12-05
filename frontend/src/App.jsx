@@ -155,6 +155,12 @@ import LokayuktViewPendingComplaints from './components/LokAyukta/Pending-compla
 import LokayuktApprovedComplaints from './components/LokAyukta/Approved-complaints/ApprovedComplaints';
 import LokayuktViewApprovedComplaint from './components/LokAyukta/Approved-complaints/ViewApprovedComplaints';
 
+// import LokayuktUserManagement from './components/LokAyukta/UserManagement';
+import LokayuktUserManagement from './components/LokAyukta/UserManagement';
+import LokayuktAddUserManagement from './components/LokAyukta/AddUserManagement';
+import LokayuktEditUserManagement from './components/LokAyukta/EditUserManagment';
+import LokayuktMasterData from './components/LokAyukta/MasterData';
+
 //UpLok-ayukt
 import UpLokayuktLayout from './components/UPLokAyukta/Layout';
 import UpLokayuktDashboard from './components/UPLokAyukta/Dashboard';
@@ -171,6 +177,10 @@ import UpLokayuktViewApprovedComplaint from './components/UPLokAyukta/Approved-c
 
 
 import Login from './components/Login';
+
+
+
+
 
 
 
@@ -378,6 +388,12 @@ function App() {
           <Route path="approved-complaints" element={<LokayuktApprovedComplaints />} />   
           <Route path="approved-complaints/view/:id" element={<LokayuktViewApprovedComplaint/>} />
           {/* <Route path="approved-complaints/edit/:id" element={<LokayuktEditApprovedComplaint />} /> */}
+
+
+                   <Route path="user-management" element={<LokayuktUserManagement />} />
+                    <Route path="user-management/add" element={<LokayuktAddUserManagement />} />
+                    <Route path="user-management/edit/:id" element={<LokayuktEditUserManagement />} />
+                    <Route path="master-data" element={<LokayuktMasterData />} />
          
         </Route>
       )}

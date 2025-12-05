@@ -19,14 +19,23 @@ const api = axios.create({
   },
 });
 
+const uploadApi = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    ...(token && { Authorization: `Bearer ${token}` }),
+  },
+});
+
 const Documents = ({ complaint }) => {
   const [correspondenceType, setCorrespondenceType] = useState("Letter");
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
+    setFieldErrors((prev) => ({ ...prev, file: undefined })); // clear file error
 
+    const files = Array.from(e.target.files);
     const pdfFiles = files.filter((file) => file.type === "application/pdf");
 
     if (pdfFiles.length !== files.length) {
@@ -51,10 +60,7 @@ const Documents = ({ complaint }) => {
   };
 
   const uploadDocument = async () => {
-    if (uploadedFiles.length === 0) {
-      toast.warning("Please select at least one file to upload");
-      return;
-    }
+    setFieldErrors({});
 
     if (!complaint?.id) {
       toast.error("Complaint ID is missing");
@@ -73,20 +79,23 @@ const Documents = ({ complaint }) => {
       formData.append("type", correspondenceType);
       formData.append("complain_id", complaint.id);
 
-      const response = await api.post("/operator/upload-document", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }); 
+      await uploadApi.post("/operator/upload-document", formData);
 
-      toast.success(`Uploaded document successfully!`);
-
+      toast.success("Uploaded document successfully!");
       setUploadedFiles([]);
     } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to upload documents. Please try again."
-      );
+      const res = error.response?.data;
+
+      if (res?.errors) {
+        setFieldErrors(res.errors);
+        // const firstKey = Object.keys(res.errors)[0];
+        // const firstMsg = res.errors[firstKey]?.[0];
+        if (firstMsg) toast.error(firstMsg);
+      } else if (res?.message) {
+        toast.error(res.message);
+      } else {
+        toast.error("Failed to upload documents. Please try again.");
+      }
     } finally {
       setIsUploading(false);
     }
@@ -116,46 +125,70 @@ const Documents = ({ complaint }) => {
             Attach New Incoming Correspondence
           </h2>
 
-          <p className="text-sm text-blue-800 mb-5">
+          <p className="text-sm text-blue-800 mb-3">
             Attach letters, reminders, RTI replies received after file movement.
           </p>
 
           {/* Correspondence Type */}
-          <div className="mb-5">
+          <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Correspondence Type (for all files)
             </label>
-
             <select
               value={correspondenceType}
-              onChange={(e) => setCorrespondenceType(e.target.value)}
-              className="border px-3 py-2 rounded-lg w-full sm:w-60 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              onChange={(e) => {
+                setCorrespondenceType(e.target.value);
+                setFieldErrors((prev) => ({ ...prev, type: undefined }));
+              }}
+              className={`border px-3 py-2 rounded-lg w-full sm:w-60 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                fieldErrors.type ? "border-red-500" : "border-gray-300"
+              }`}
             >
               <option>Letter</option>
               <option>Reminder</option>
               <option>RTI Reply</option>
               <option>Counter Order</option>
             </select>
+            {fieldErrors.type && (
+              <p className="mt-1 text-xs text-red-600">
+                {fieldErrors.type[0]}
+              </p>
+            )}
           </div>
 
           {/* PDF Upload Input */}
-          <label
-            htmlFor="pdfUpload"
-            className="cursor-pointer w-full border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-gray-100 transition"
-          >
-            <FaArrowUpLong className="text-3xl text-gray-500 mb-2" />
-            <p className="font-medium text-gray-700">Click to upload PDF(s)</p>
-            <p className="text-xs text-gray-500">Only .pdf files are allowed</p>
+          <div className="mb-1">
+            <label
+              htmlFor="pdfUpload"
+              className={`cursor-pointer w-full border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-gray-100 transition ${
+                fieldErrors.file
+                  ? "border-red-500 bg-red-50"
+                  : "border-gray-300"
+              }`}
+            >
+              <FaArrowUpLong className="text-3xl text-gray-500 mb-2" />
+              <p className="font-medium text-gray-700">
+                Click to upload PDF(s)
+              </p>
+              <p className="text-xs text-gray-500">
+                Only .pdf files are allowed
+              </p>
 
-            <input
-              id="pdfUpload"
-              type="file"
-              accept="application/pdf"
-              multiple
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-          </label>
+              <input
+                id="pdfUpload"
+                type="file"
+                accept="application/pdf"
+                multiple
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
+            {fieldErrors.file && (
+              <p className="mt-1 text-xs text-red-600">
+                {fieldErrors.file[0]}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Uploaded File List */}
@@ -174,19 +207,16 @@ const Documents = ({ complaint }) => {
                 >
                   <div className="flex items-center gap-4 flex-1">
                     <FaFilePdf className="text-red-600 text-2xl flex-shrink-0" />
-
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-800 truncate">
                         {file.name}
                       </p>
-
                       <div className="flex flex-wrap gap-2 text-xs text-gray-600 mt-1">
                         <span>{file.size} KB</span>
                         <span>{file.uploadDate}</span>
                       </div>
                     </div>
                   </div>
-
                   <button
                     onClick={() => handleRemoveFile(file.id)}
                     className="self-end sm:self-center p-2 text-red-600 hover:bg-red-100 rounded-full transition"
@@ -203,7 +233,7 @@ const Documents = ({ complaint }) => {
         <div className="flex flex-col sm:flex-row justify-end">
           <button
             onClick={uploadDocument}
-            disabled={isUploading || uploadedFiles.length === 0}
+            disabled={isUploading}
             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
           >
             <FiUpload className="text-lg" />

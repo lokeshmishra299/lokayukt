@@ -3,8 +3,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineHome } from "react-icons/ai";
 import {FiInbox,FiSend,FiFileText,FiBarChart2,FiSearch}  from "react-icons/fi";
-import { HiMiniUsers } from "react-icons/hi2";
-import { FaDatabase } from "react-icons/fa";
 import {
   FaHome,
   FaFileAlt,
@@ -190,56 +188,6 @@ const Sidebar = ({
                               {(isMobile || !isCollapsed) && <span>Send</span>}
                             </div>
                             {isActive("/approved-complaints") && (isMobile) && (
-                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                                <div className="w-4 h-4 bg-white rounded-full"></div>
-                              </div>
-                            )}
-                          </Link>
-                        </li>
-
-
-                        {/* userMangment */}
-                        <li>
-                          <Link
-                            to="/lokayukt/user-management"
-                            onClick={handleLinkClick}
-                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                              isActive("/user-management")
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "text-gray-700 hover:bg-gray-200"
-                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
-                          >
-                            <div className="flex items-center gap-3">
-                              <HiMiniUsers size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
-                              {(isMobile || !isCollapsed) && <span>User Management</span>}
-                            </div>
-                            {isActive("/user-management") && (isMobile) && (
-                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                                <div className="w-4 h-4 bg-white rounded-full"></div>
-                              </div>
-                            )}
-                          </Link>
-                        </li>
-
-
-                            {/* masterData */}
-                        <li>
-                          <Link
-                            to="/lokayukt/master-data"
-                            onClick={handleLinkClick}
-                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                              isActive("/master-data")
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "text-gray-700 hover:bg-gray-200"
-                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
-                          >
-                            <div className="flex items-center gap-3">
-                              <FaDatabase size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
-                              {(isMobile || !isCollapsed) && <span>Master Data</span>}
-                            </div>
-                            {isActive("/master-data") && (isMobile) && (
                               <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
                                 <div className="w-4 h-4 bg-white rounded-full"></div>
                               </div>
