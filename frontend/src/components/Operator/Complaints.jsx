@@ -17,7 +17,7 @@ const api = axios.create({
 });
 
 /**
- * A4 PRINT VIEW – same layout as the original orange form
+ * A4 PRINT VIEW – Updated styling to ensure background covers all content including point 12
  */
 const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }, ref) => {
   const formatYesNo = (val) =>
@@ -30,22 +30,20 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
       : '';
 
   return (
-  <div ref={ref} className="a4-sheet  shadow-lg rounded-md text-[12px] leading-relaxed text-gray-900">
-  <div className="w-full px-8 pt-8 pb-10">
+    <div ref={ref} className="a4-sheet shadow-lg rounded-md text-[12px] leading-relaxed text-gray-900">
+      {/* Added h-full to ensure inner padding container stretches */}
+      <div className="w-full h-full px-8 pt-8 pb-10">
 
         {/* HEADER */}
         <div className="text-center mb-2">
           <p className="font-semibold text-[13px]">
-            "शिकायत", "अभिकथन" उत्तर प्रदेश लोक आयुक्त तथा उप लोक आयुक्त अधिनियम, 1975 की धारा 2 (ख) और (घ) में
-            यथापरिभाषित, संबंधी परिवाद का प्रपत्र जो लोक आयुक्त / उप लोक आयुक्त को दिया जायेगा।
+            "शिकायत"
+         
           </p>
         </div>
-        {/* <p className="text-center text-[11px] font-medium mb-4">
-          (तीन प्रतियों में भरा जायेगा)
-        </p> */}
 
         {/* BODY */}
-        <div className="space-y-1.5 text-[12px]">
+        <div className=" text-[12px]">
           {/* 1 */}
           <div className="flex gap-2">
             <span className="min-w-[18px]">1.</span>
@@ -259,11 +257,12 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
             <span className="min-w-[18px]">12.</span>
             <div className="flex-1">
               परिवाद का विवरण - कृपया यहाँ पर परिवाद के सम्पूर्ण तथ्य बतायें। (अधिकतम 2000 अक्षर)
-              <div className="mt-0.5 pl-4 whitespace-pre-wrap">
+              <div className="mt-0.5 pl-4 whitespace-pre-wrap break-words">
                 {formData.complaintDescription || '——'}
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -399,8 +398,6 @@ const handleDownloadPDF = async () => {
     setIsDownloadingPDF(false);
   }
 };
-
-
 
   const addComplainant = () => {
     const newComplainant = {
@@ -843,7 +840,6 @@ const handleDownloadPDF = async () => {
                     </button>
                   </div>
                 </div>
-                
 
                 {showComplainants[complainant.id] && (
                   <div className="p-5 animate-slideDown">
@@ -1461,7 +1457,6 @@ const handleDownloadPDF = async () => {
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               11. परिवाद से सम्बन्धित संलग्न दस्तावेजों की सूची (परिवादी का शपथपत्र सहित) : <span className="text-red-500">*</span>
             </h3>
-
             <textarea
               placeholder="दस्तावेज क्रमवार लिखें (वैकल्पिक). वास्तविक फाइल नीचे अपलोड करें।"
               rows="3"
@@ -1536,122 +1531,113 @@ const handleDownloadPDF = async () => {
       </div>
 
       {/* PREVIEW MODAL WITH A4 SHEET AND PDF DOWNLOAD */}
-    {showPreview && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 print-modal-overlay">
-    <div className="bg-white rounded-lg shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden flex flex-col">
-      {/* Header */}
-      <div className="shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-800">शिकायत पूर्वावलोकन</h2>
-        <div className="flex items-center gap-3">
-          {/* <button
-            type="button"
-            onClick={handleDownloadPDF}
-            disabled={isDownloadingPDF}
-            className="hidden md:inline-flex bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-1.5 rounded-lg text-sm font-medium border border-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isDownloadingPDF ? 'डाउनलोड हो रहा है...' : '📥 PDF डाउनलोड'}
-          </button> */}
-          {/* <button
-            type="button"
-            onClick={() => window.print()}
-            className="hidden md:inline-flex bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-1.5 rounded-lg text-sm font-medium border border-gray-300"
-          >
-            प्रिंट
-          </button> */}
-          <button
-            onClick={() => setShowPreview(false)}
-            className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
-          >
-            ×
-          </button>
+      {showPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 print-modal-overlay">
+          <div className="bg-white rounded-lg shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-800">शिकायत पूर्वावलोकन</h2>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowPreview(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            {/* Content - Main scrollable area */}
+            <div className="flex-1 overflow-auto bg-slate-100 px-2 md:px-4 py-4 flex justify-center min-h-0">
+              <ComplaintPrintView
+                ref={printRef}
+                complainants={complainants}
+                persons={persons}
+                formData={formData}
+              />
+            </div>
+
+            {/* Footer */}
+            <div className="shrink-0 bg-gray-50 px-6 py-3 flex justify-end gap-4 border-t border-gray-200 flex-wrap">
+              <button
+                type="button"
+                onClick={handleDownloadPDF}
+                disabled={isDownloadingPDF}
+                className="md:hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                {isDownloadingPDF ? 'डाउनलोड हो रहा है...' : '📥 PDF डाउनलोड'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPreview(false)}
+                className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200"
+                disabled={isSubmitting}
+              >
+                संपादित करें
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'सबमिट हो रहा है...' : 'अंतिम सबमिट करें'}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Content - Main scrollable area */}
-      <div className="flex-1 overflow-auto bg-slate-100 px-2 md:px-4 py-4 flex justify-center min-h-0">
-        <ComplaintPrintView
-          ref={printRef}
-          complainants={complainants}
-          persons={persons}
-          formData={formData}
-        />
-      </div>
-
-      {/* Footer */}
-      <div className="shrink-0 bg-gray-50 px-6 py-3 flex justify-end gap-4 border-t border-gray-200 flex-wrap">
-        <button
-          type="button"
-          onClick={handleDownloadPDF}
-          disabled={isDownloadingPDF}
-          className="md:hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-        >
-          {isDownloadingPDF ? 'डाउनलोड हो रहा है...' : '📥 PDF डाउनलोड'}
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowPreview(false)}
-          className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200"
-          disabled={isSubmitting}
-        >
-          संपादित करें
-        </button>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? 'सबमिट हो रहा है...' : 'अंतिम सबमिट करें'}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-<style jsx>{`
-  @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .animate-slideDown {
-    animation: slideDown 0.3s ease-out;
-  }
-  .a4-sheet {
-    width: 210mm;
-    min-height: 297mm;
-    height: auto !important;
-    margin: 0 auto;
-    background: linear-gradient(to bottom right, #fff7ed, #ffedd5, #fff7ed) !important;
-  }
-  @media screen {
-    .a4-sheet {
-      max-width: 100%;
-    }
-  }
-  @media print {
-    body {
-      margin: 0;
-    }
-    .print-modal-overlay {
-      position: static !important;
-      background: none !important;
-      padding: 0 !important;
-    }
-    .a4-sheet {
-      transform: scale(1) !important;
-      box-shadow: none !important;
-      border: none !important;
-    }
-  }
-`}</style>
-
-
+      <style jsx>{`
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slideDown {
+          animation: slideDown 0.3s ease-out;
+        }
+        
+        /* UPDATED AND FIXED CSS FOR FULL COVERAGE */
+        .a4-sheet {
+          width: 100%;
+          min-height: 297mm;
+          height: auto !important; /* Ensure height grows with content */
+          margin: 0 auto;
+          background: linear-gradient(to bottom right, #fff7ed, #ffedd5, #fff7ed) !important;
+          display: flow-root; /* Establishes a new block formatting context */
+          overflow: visible; /* Ensure content doesn't get hidden */
+        }
+        
+        @media screen {
+          .a4-sheet {
+            max-width: 100%;
+            min-width: 100%; /* Force full width in preview */
+          }
+        }
+        
+        @media print {
+          body {
+            margin: 0;
+          }
+          .print-modal-overlay {
+            position: static !important;
+            background: none !important;
+            padding: 0 !important;
+          }
+          .a4-sheet {
+            transform: scale(1) !important;
+            box-shadow: none !important;
+            border: none !important;
+            width: 210mm; /* Reset width for printing on A4 paper */
+          }
+        }
+      `}</style>
     </div>
   );
 };
