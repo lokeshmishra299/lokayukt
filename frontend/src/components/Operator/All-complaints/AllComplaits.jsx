@@ -197,7 +197,7 @@ const AllComplaints = () => {
         const updateData = (prevData) =>
           prevData.map((complaint) =>
             complaint.id === complaintToApprove.id
-              ? { ...complaint, approved_rejected_by_ro: 1 }
+              ? { ...complaint, approved_rejected_by_lokayukt: 1 }
               : complaint
           );
 
@@ -224,7 +224,7 @@ const AllComplaints = () => {
   };
 
   const isApprovedByRO = (complaint) => {
-    return complaint.approved_rejected_by_ro === 1;
+    return complaint.approved_rejected_by_lokayukt === 1;
   };
 
   const getStatistics = () => {
