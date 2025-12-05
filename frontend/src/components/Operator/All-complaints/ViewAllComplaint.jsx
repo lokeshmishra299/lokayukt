@@ -299,7 +299,7 @@ const ViewComplaintDetails = () => {
 
       
               <p className="text-gray-700 mb-4 text-sm md:text-base">
-                {complaintData.details?.[0]?.description ||
+                Description: {complaintData.complaint_description ||
                   "No detailed description available for this complaint."}
               </p>
 
@@ -307,13 +307,18 @@ const ViewComplaintDetails = () => {
      
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
                 <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
-                  <p className="text-xs text-gray-500 uppercase mb-1">COMPLAINANT</p>
+                  <p className="text-xs text-gray-500 uppercase mb-1">
+CORRESPONDENCE NAME</p>
                   <p className="font-semibold text-gray-800 text-sm md:text-base">
-                    {complaintData.name}
+                    {complaintData.
+correspondence_name}
                   </p>
                   <p className="text-xs md:text-sm text-gray-600 mt-1">{complaintData.address}</p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">
-                    Mobile: {complaintData.mobile}
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">Permanent Name: {complaintData.permanent_name}
+                  </p>
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">Permanent Place: {complaintData.
+permanent_place
+}
                   </p>
                   {complaintData.email && (
                     <p className="text-xs md:text-sm text-gray-600">Email: {complaintData.email}</p>
@@ -322,7 +327,8 @@ const ViewComplaintDetails = () => {
                 <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
                   <p className="text-xs text-gray-500 uppercase mb-1">DISTRICT</p>
                   <p className="font-semibold text-gray-800 text-sm md:text-base">
-                    {complaintData.district_name}
+                    {complaintData.
+permanent_district}
                   </p>
                   {complaintData.dob && (
                     <>

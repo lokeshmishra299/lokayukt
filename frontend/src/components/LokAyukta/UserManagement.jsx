@@ -12,6 +12,7 @@ import {
   FaExclamationTriangle,
   FaDownload
 } from 'react-icons/fa';
+
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -34,7 +35,7 @@ const api = axios.create({
 
 // API Functions
 const fetchUsers = async () => {
-  const response = await api.get('/admin/users');
+  const response = await api.get('/lokayukt/users');
   if (response.data.status === true) {
     return response.data.data;
   }
@@ -42,7 +43,7 @@ const fetchUsers = async () => {
 };
 
 const toggleUserStatus = async (userId) => {
-  const response = await api.post(`/admin/change-status/${userId}`);
+  const response = await api.post(`/lokayukt/change-status/${userId}`);
   if (response.data.status === true) {
     return response.data;
   }
@@ -50,7 +51,7 @@ const toggleUserStatus = async (userId) => {
 };
 
 const deleteUser = async (userId) => {
-  const response = await api.post(`/admin/delete-users/${userId}`);
+  const response = await api.post(`/lokayukt/delete-users/${userId}`);
   if (response.data.status === true) {
     return response.data;
   }
@@ -262,7 +263,7 @@ const UserManagement = () => {
   const getRoleColor = (role) => {
     const colors = {
       Administrator: 'bg-red-100 text-red-800',
-      admin: 'bg-red-100 text-red-800',
+      lokayukt: 'bg-red-100 text-red-800',
       Operator: 'bg-blue-100 text-blue-800',
       Supervisor: 'bg-green-100 text-green-800',
       Secretary: 'bg-gray-100 text-gray-800',
@@ -379,16 +380,11 @@ const UserManagement = () => {
   if (isError) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="text-center bg-white p-8 rounded-lg shadow-md max-w-md">
-          <FaExclamationTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Users</h2>
+        <div className="text-center ">
+
+        
           <p className="text-gray-600 mb-4">{error?.message || 'Something went wrong'}</p>
-          <button
-            onClick={() => refetch()}
-            className="px-4 py-2 bg-[#13316C] text-white rounded-md hover:bg-[#0f2451] transition"
-          >
-            Try Again
-          </button>
+         
         </div>
       </div>
     );

@@ -296,35 +296,40 @@ const AllDraft = () => {
                         File No. {complaint.complain_no}
                       </p>
                       <p className="text-xs text-gray-700 mb-1">
-                        {complaint.description || "No description available"}
-                      </p>
-                      <div className="text-[11px] text-gray-600 mb-1">
-                        <span className="text-gray-500">Complainant:</span>
-                        <span className="ml-1">{complaint.name}</span>
-                        <span className="mx-1 text-gray-400">•</span>
-                        <span className="text-gray-500">District:</span>
-                        <span className="ml-1">{complaint.district_name}</span>
-                      </div>
-                      <div className="text-[10px] text-gray-400">
-                        Received:{" "}
-                        {new Date(complaint.created_at).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          }
-                        )}{" "}
-                        • Last action:{" "}
-                        {new Date(complaint.updated_at).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          }
-                        )}
-                      </div>
+                          Description: {complaint.complaint_description ||
+                            "No description available"}
+                        </p>
+                     <div className="text-[11px] text-gray-600 mb-1">
+                          <span className="text-gray-500">Post Office:</span>
+                          <span className="ml-1">{complaint.
+correspondence_post_office}</span>
+                          <span className="mx-1 text-gray-400">•</span>
+                          <span className="text-gray-500">District:</span>
+                          <span className="ml-1">
+                            {complaint.correspondence_district
+}
+                          </span>
+                        </div>
+                     <div className="text-[10px] text-gray-400">
+                          Received:{" "}
+                          {new Date(complaint.created_at).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}{" "}
+                          • Last action:{" "}
+                          {new Date(complaint.updated_at).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </div>
                     </div>
 
                     <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
