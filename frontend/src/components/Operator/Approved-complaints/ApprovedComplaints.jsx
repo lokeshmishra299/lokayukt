@@ -161,7 +161,7 @@ const ApprovedComplaints = () => {
   };
 
   const isVerifiedByRO = (complaint) => {
-    return complaint.approved_rejected_by_ro === 1;
+    return complaint.approved_rejected_by_lokayukt === 1;
   };
 
   const getStatistics = () => {

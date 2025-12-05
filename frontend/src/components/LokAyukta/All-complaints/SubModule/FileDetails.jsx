@@ -46,20 +46,10 @@ const FileDetails = ({ complaint }) => {
         </div>
 
         {/* Current Holder */}
-        <div className="bg-gray-50 p-4 rounded-xl border">
-          <p className="text-gray-500 text-sm">Current Holder</p>
-          <p className="text-gray-800 text-[15px]">
-            {complaint?.current_holder || "With Lokayukta"}
-          </p>
-        </div>
+   
 
         {/* Linked Old Case */}
-        <div className="bg-gray-50 p-4 rounded-xl border">
-          <p className="text-gray-500 text-sm">Linked Old Case</p>
-          <p className="text-blue-600 font-semibold text-[15px] hover:underline cursor-pointer">
-            2024/LOK/456 - Open
-          </p>
-        </div>
+  
 
       </div>
 
