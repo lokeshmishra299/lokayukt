@@ -405,20 +405,22 @@ const AllComplaints = () => {
                         <p className="text-sm font-semibold text-gray-900 mb-1">
                           File No. {complaint.complain_no}
                         </p>
-                        <p className="text-xs text-gray-700 mb-1">
-                          {complaint.description ||
+                       <p className="text-xs text-gray-700 mb-1">
+                          Description: {complaint.complaint_description ||
                             "No description available"}
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
-                          <span className="text-gray-500">Complainant:</span>
-                          <span className="ml-1">{complaint.name}</span>
+                          <span className="text-gray-500">Post Office:</span>
+                          <span className="ml-1">{complaint.
+correspondence_post_office}</span>
                           <span className="mx-1 text-gray-400">•</span>
                           <span className="text-gray-500">District:</span>
                           <span className="ml-1">
-                            {complaint.district_name}
+                            {complaint.correspondence_district
+}
                           </span>
                         </div>
-                        <div className="text-[10px] text-gray-400">
+                         <div className="text-[10px] text-gray-400">
                           Received:{" "}
                           {new Date(complaint.created_at).toLocaleDateString(
                             "en-GB",
