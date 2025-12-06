@@ -504,7 +504,7 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
 
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+    <div className=" sm:space-y-1 space-y-6 bg-gray-50 min-h-screen">
       {/* Add styles for chart cursor pointer */}
       <style>{chartStyles}</style>
       {/* Add custom styles for date picker */}
@@ -512,7 +512,7 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
       
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-sm sm:text-base text-gray-600 break-words">
             Welcome Back, {userRole} • Last Updated: {new Date().toLocaleString()}
           </p>

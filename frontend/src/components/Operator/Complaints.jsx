@@ -156,6 +156,10 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                     <div>नाम : {p.name || '——'}</div>
                     <div>पदनाम : {p.designation || '——'}</div>
                     <div>वर्तमान पता : {p.currentAddress || '——'}</div>
+                    {/* Added missing print fields */}
+                    <div>ज़िला : {p.district || '——'}</div>
+                    <div>विभाग : {p.departmentNature || '——'}</div>
+                    <div>श्रेणी : {p.officerCategory || '——'}</div>
                   </div>
                 ))}
               </div>
@@ -236,7 +240,9 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
             <div className="flex-1">
               क्या ऐसे अन्य व्यक्ति भी है जिन्हे परिवाद से सम्बन्धित तथ्यों के बारे में जानकारी हो, जिन्हे लोक आयुक्त/उप लोक आयुक्त द्वारा समन करना चाहें।
               <div className="mt-0.5 pl-4">
-                {formData.otherPersons || '——'}
+                {Array.isArray(formData.otherPersons) 
+                  ? formData.otherPersons.map(p => `${p.name} (${p.address})`).join(', ')
+                  : formData.otherPersons || '——'}
               </div>
             </div>
           </div>
@@ -248,6 +254,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
               परिवाद से सम्बन्धित संलग्न दस्तावेजों की सूची जिसमें परिवादी का शपथपत्र भी सम्मिलित है।
               <div className="mt-0.5 pl-4">
                 {formData.attachedDocumentsFile ? formData.attachedDocumentsFile.name : (formData.attachedDocuments || '——')}
+                {formData.attachedDocuments && <div className="text-[10px] mt-1 text-gray-600">{formData.attachedDocuments}</div>}
               </div>
             </div>
           </div>
@@ -288,20 +295,23 @@ const Complaints = () => {
   const [showComplainants, setShowComplainants] = useState({ 1: true });
   const [showAttachedDocs, setShowAttachedDocs] = useState(false);
 
-
   // State for व्यक्ति (persons against complaint)
   const [persons, setPersons] = useState([
     {
       id: 1,
       name: '',
       designation: '',
-      currentAddress: ''
+      currentAddress: '',
+      district: '',
+      departmentNature: '',
+      officerCategory: ''
     }
   ]);
 
   const [showPersons, setShowPersons] = useState({ 1: true });
 
   // State for other form fields
+  // Initialize otherPersons with one default empty object so the fields are visible
   const [formData, setFormData] = useState({
     relation: '',
     authorizationFile: null,
@@ -316,7 +326,7 @@ const Complaints = () => {
     challanDate: '',
     challanFile: null,
     supportingPersons: '',
-    otherPersons: '',
+    otherPersons: [{ name: '', address: '' }], // Default input visible
     attachedDocuments: '',
     attachedDocumentsFile: null,
     complaintDescription: ''
@@ -327,79 +337,79 @@ const Complaints = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
 
-const handleDownloadPDF = async () => {
-  setIsDownloadingPDF(true);
-  try {
-    if (!printRef.current) {
-      toast.error("PDF generate error");
-      return;
-    }
-
-    const element = printRef.current;
-    
-    // Temporarily remove any transform for accurate capture
-    const originalTransform = element.style.transform;
-    element.style.transform = 'none';
-    
-    // Wait for styles to apply
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    const canvas = await html2canvas(element, {
-      scale: 2,
-      backgroundColor: "#ffffff",
-      useCORS: true,
-      logging: false,
-      allowTaint: true,
-      scrollX: 0,
-      scrollY: 0,
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
-    });
-
-    // Restore original transform
-    element.style.transform = originalTransform;
-
-    // A4 dimensions
-    const A4_WIDTH = 210;
-    const A4_HEIGHT = 297;
-    const imgWidth = A4_WIDTH;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "mm",
-      format: "a4",
-    });
-
-    let position = 0;
-    const imgData = canvas.toDataURL("image/png");
-
-    // Pages add karte hain - full content
-    while (position < imgHeight) {
-      pdf.addImage(imgData, "PNG", 0, -position, imgWidth, imgHeight);
-      position += A4_HEIGHT;
-      if (position < imgHeight) {
-        pdf.addPage();
+  const handleDownloadPDF = async () => {
+    setIsDownloadingPDF(true);
+    try {
+      if (!printRef.current) {
+        toast.error("PDF generate error");
+        return;
       }
+
+      const element = printRef.current;
+      
+      // Temporarily remove any transform for accurate capture
+      const originalTransform = element.style.transform;
+      element.style.transform = 'none';
+      
+      // Wait for styles to apply
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false,
+        allowTaint: true,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: element.scrollWidth,
+        windowHeight: element.scrollHeight,
+      });
+
+      // Restore original transform
+      element.style.transform = originalTransform;
+
+      // A4 dimensions
+      const A4_WIDTH = 210;
+      const A4_HEIGHT = 297;
+      const imgWidth = A4_WIDTH;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      let position = 0;
+      const imgData = canvas.toDataURL("image/png");
+
+      // Pages add karte hain - full content
+      while (position < imgHeight) {
+        pdf.addImage(imgData, "PNG", 0, -position, imgWidth, imgHeight);
+        position += A4_HEIGHT;
+        if (position < imgHeight) {
+          pdf.addPage();
+        }
+      }
+
+      const fileName = `Complaint_${new Date().getTime()}.pdf`;
+      pdf.save(fileName);
+
+      toast.success("PDF successfully downloaded!", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } catch (error) {
+      console.error("PDF download error:", error);
+      toast.error("PDF download error", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } finally {
+      setIsDownloadingPDF(false);
     }
-
-    const fileName = `Complaint_${new Date().getTime()}.pdf`;
-    pdf.save(fileName);
-
-    toast.success("PDF successfully downloaded!", {
-      position: "top-right",
-      autoClose: 3000,
-    });
-  } catch (error) {
-    console.error("PDF download error:", error);
-    toast.error("PDF download error", {
-      position: "top-right",
-      autoClose: 3000,
-    });
-  } finally {
-    setIsDownloadingPDF(false);
-  }
-};
+  };
 
   const addComplainant = () => {
     const newComplainant = {
@@ -446,7 +456,10 @@ const handleDownloadPDF = async () => {
       id: persons.length + 1,
       name: '',
       designation: '',
-      currentAddress: ''
+      currentAddress: '',
+      district: '',
+      departmentNature: '',
+      officerCategory: ''
     };
     setPersons([...persons, newPerson]);
     setShowPersons({ ...showPersons, [newPerson.id]: true });
@@ -526,9 +539,7 @@ const handleDownloadPDF = async () => {
       newErrors.authorization_document = ['प्राधिकरण दस्तावेज़ अपलोड करना आवश्यक है।'];
     }
 
-    if (!formData.permanentAddress.name.trim()) {
-      newErrors.permanent_name = ['स्थायी पते का नाम आवश्यक है।'];
-    }
+    // Removed validation for permanent_name as there is no input field for it
     if (!formData.permanentAddress.place.trim()) {
       newErrors.permanent_place = ['स्थायी पते का स्थान आवश्यक है।'];
     }
@@ -598,10 +609,6 @@ const handleDownloadPDF = async () => {
       newErrors.supporting_affidavit_list = ['शपथपत्र की सूची आवश्यक है।'];
     }
 
-    if (!formData.otherPersons.trim()) {
-      newErrors.other_witnesses = ['अन्य साक्षियों का विवरण आवश्यक है।'];
-    }
-
     if (!formData.attachedDocumentsFile) {
       newErrors.attached_documents = ['संलग्न दस्तावेजों की फाइल आवश्यक है।'];
     }
@@ -639,6 +646,7 @@ const handleDownloadPDF = async () => {
     try {
       const submitData = new FormData();
 
+      // 1. Complainants
       complainants.forEach((complainant, index) => {
         submitData.append(`complainant_name[${index}]`, complainant.name);
         submitData.append(`father_name[${index}]`, complainant.fatherName);
@@ -649,18 +657,27 @@ const handleDownloadPDF = async () => {
         );
       });
 
+      // 2. Respondents (Persons)
       persons.forEach((person, index) => {
         submitData.append(`respondent_name[${index}]`, person.name);
         submitData.append(`designation[${index}]`, person.designation);
         submitData.append(`current_address[${index}]`, person.currentAddress);
+        
+        // --- Added Missing Keys ---
+        submitData.append(`respondent_district[${index}]`, person.district || '');
+        submitData.append(`department_name[${index}]`, person.departmentNature || '');
+        submitData.append(`officer_category[${index}]`, person.officerCategory || '');
       });
 
+      // 3. Relation
       submitData.append('relation_with_person', formData.relation);
       if (formData.authorizationFile) {
         submitData.append('authorization_document', formData.authorizationFile);
       }
 
-      submitData.append('permanent_name', formData.permanentAddress.name);
+      // 4 & 5. Addresses
+      // Send Complainant Name as Permanent Name if the field is empty (since input is hidden)
+      submitData.append('permanent_name', formData.permanentAddress.name || (complainants[0] ? complainants[0].name : ''));
       submitData.append('permanent_place', formData.permanentAddress.place);
       submitData.append('permanent_post_office', formData.permanentAddress.postOffice);
       submitData.append('permanent_district', formData.permanentAddress.district);
@@ -670,9 +687,10 @@ const handleDownloadPDF = async () => {
       submitData.append('correspondence_post_office', formData.correspondenceAddress.postOffice);
       submitData.append('correspondence_district', formData.correspondenceAddress.district);
 
+      // 6. Cause Date
       submitData.append('cause_date', formData.complaintDate);
       submitData.append('delay_reason', formData.delayReason);
-
+      
       const prevVal =
         formData.previousComplaint === 'हाँ'
           ? 'yes'
@@ -684,6 +702,7 @@ const handleDownloadPDF = async () => {
         submitData.append('previously_submitted_details', formData.previousComplaintDetails || '');
       }
 
+      // 7. Category
       const categoryVal =
         formData.complaintType === 'अभिकथन'
           ? 'assertion'
@@ -692,6 +711,7 @@ const handleDownloadPDF = async () => {
           : '';
       submitData.append('category', categoryVal);
 
+      // 8. Challan
       submitData.append('challan_number', formData.challanNumber);
       submitData.append('challan_date', formData.challanDate);
 
@@ -699,13 +719,23 @@ const handleDownloadPDF = async () => {
         submitData.append('challan_file', formData.challanFile);
       }
 
+      // 9. Supporting Persons
       submitData.append('supporting_affidavit_list', formData.supportingPersons);
-      submitData.append('other_witnesses', formData.otherPersons);
 
+      // 10. Other Witnesses
+      let otherWitnessesVal = formData.otherPersons;
+      if (Array.isArray(formData.otherPersons)) {
+          otherWitnessesVal = JSON.stringify(formData.otherPersons); 
+      }
+      submitData.append('other_witnesses', otherWitnessesVal || '');
+
+      // 11. Attached Documents
       if (formData.attachedDocumentsFile) {
         submitData.append('attached_documents', formData.attachedDocumentsFile);
       }
+      submitData.append('attached_documents_description', formData.attachedDocuments || '');
 
+      // 12. Description
       submitData.append('complaint_description', formData.complaintDescription);
 
       await api.post('/operator/add-complaint', submitData, {
@@ -753,7 +783,10 @@ const handleDownloadPDF = async () => {
       id: 1,
       name: '',
       designation: '',
-      currentAddress: ''
+      currentAddress: '',
+      district: '',
+      departmentNature: '',
+      officerCategory: ''
     }]);
     setFormData({
       relation: '',
@@ -769,7 +802,7 @@ const handleDownloadPDF = async () => {
       challanDate: '',
       challanFile: null,
       supportingPersons: '',
-      otherPersons: '',
+      otherPersons: [{ name: '', address: '' }], // Reset with default empty object
       attachedDocuments: '',
       attachedDocumentsFile: null,
       complaintDescription: ''
@@ -792,13 +825,10 @@ const handleDownloadPDF = async () => {
           <p className="text-gray-600 text-center text-base mb-3">
             धारा 2 (ख) और (घ) में यथापरिभाषित, संबंधी परिवाद का प्रपत्र जो लोक आयुक्त / माननीय उप लोक आयुक्त को दिया जायेगा।
           </p>
-          {/* <p className="text-gray-500 text-center text-sm">
-            (तीन प्रतियों में भरा जायेगा)
-          </p> */}
         </div>
 
         <form onSubmit={handlePreview}>
-          {/* 1–3 complainants */}
+          {/* 1. Complainants */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-3 md:mb-0">
@@ -816,8 +846,6 @@ const handleDownloadPDF = async () => {
             <p className="text-gray-600 text-sm mb-4 leading-relaxed">
               प्रत्येक कार्ड एक परिवादी के लिए है। आवश्यकता अनुसार अतिरिक्त परिवादी जोड़े जा सकते हैं।
             </p>
-
-          
 
             {complainants.map((complainant, index) => (
               <div key={complainant.id} className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
@@ -844,143 +872,136 @@ const handleDownloadPDF = async () => {
                 </div>
 
                {showComplainants[complainant.id] && (
-  <div className="p-5 animate-slideDown">
-    {/* Grid 1: Name and Father Name */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <div>
-        <label className="block text-gray-700 text-sm font-medium mb-2">
-          परिवादी का नाम (1) <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-            errors.complainant_name ? 'border-red-500' : 'border-gray-300'
-          }`}
-          value={complainant.name}
-          onChange={(e) => updateComplainant(complainant.id, 'name', e.target.value)}
-        />
-      </div>
-      <div>
-        <label className="block text-gray-700 text-sm font-medium mb-2">
-          पिता का नाम (2) <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-            errors.father_name ? 'border-red-500' : 'border-gray-300'
-          }`}
-          value={complainant.fatherName}
-          onChange={(e) => updateComplainant(complainant.id, 'fatherName', e.target.value)}
-        />
-      </div>
-    </div>
+                <div className="p-5 animate-slideDown">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
+                        परिवादी का नाम  <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                          errors.complainant_name ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        value={complainant.name}
+                        onChange={(e) => updateComplainant(complainant.id, 'name', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
+                        पिता का नाम <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                          errors.father_name ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        value={complainant.fatherName}
+                        onChange={(e) => updateComplainant(complainant.id, 'fatherName', e.target.value)}
+                      />
+                    </div>
+                  </div>
 
-    {/* Grid 2: Occupation and Public Servant */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-      <div>
-        <label className="block text-gray-700 text-sm font-medium mb-2">
-          व्यवसाय (3 (क)) <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-            errors.occupation ? 'border-red-500' : 'border-gray-300'
-          }`}
-          value={complainant.occupation}
-          onChange={(e) => updateComplainant(complainant.id, 'occupation', e.target.value)}
-        />
-      </div>
-      <div>
-        <label className="block text-gray-700 text-sm font-medium mb-2">
-          क्या आप लोक सेवक हैं या नहीं (3 (ख)) <span className="text-red-500">*</span>
-        </label>
-        <select
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-            errors.is_public_servant ? 'border-red-500' : 'border-gray-300'
-          }`}
-          value={complainant.isPublicServant}
-          onChange={(e) => updateComplainant(complainant.id, 'isPublicServant', e.target.value)}
-        >
-          <option value="चुनें">चुनें</option>
-          <option value="हाँ">हाँ</option>
-          <option value="नहीं">नहीं</option>
-        </select>
-      </div>
-    </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
+                        व्यवसाय (क) <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                          errors.occupation ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        value={complainant.occupation}
+                        onChange={(e) => updateComplainant(complainant.id, 'occupation', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
+                        क्या आप लोक सेवक हैं या नहीं (ख) <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                          errors.is_public_servant ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        value={complainant.isPublicServant}
+                        onChange={(e) => updateComplainant(complainant.id, 'isPublicServant', e.target.value)}
+                      >
+                        <option value="चुनें">चुनें</option>
+                        <option value="हाँ">हाँ</option>
+                        <option value="नहीं">नहीं</option>
+                      </select>
+                    </div>
+                  </div>
 
-    {errors.complainant_name && (
-      <p className="text-red-500 text-sm mb-4">{errors.complainant_name[0]}</p>
-    )}
+                  {errors.complainant_name && (
+                    <p className="text-red-500 text-sm mb-4">{errors.complainant_name[0]}</p>
+                  )}
 
-    {/* Full Width Line: Place (स्थान) */}
-    
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
+                        (ग) डाकघर या पुलिस थाना <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                          errors.permanent_post_office ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        value={formData.permanentAddress.postOffice}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            permanentAddress: { ...formData.permanentAddress, postOffice: e.target.value },
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
+                        (घ) जिला <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                          errors.permanent_district ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        value={formData.permanentAddress.district}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            permanentAddress: { ...formData.permanentAddress, district: e.target.value },
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
 
-    {/* Grid 3: Post Office and District */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label className="block text-gray-700 text-sm font-medium mb-2">
-          (ग) डाकघर या पुलिस थाना <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-            errors.permanent_post_office ? 'border-red-500' : 'border-gray-300'
-          }`}
-          value={formData.permanentAddress.postOffice}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              permanentAddress: { ...formData.permanentAddress, postOffice: e.target.value },
-            })
-          }
-        />
-      </div>
-      <div>
-        <label className="block text-gray-700 text-sm font-medium mb-2">
-          (घ) जिला <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-            errors.permanent_district ? 'border-red-500' : 'border-gray-300'
-          }`}
-          value={formData.permanentAddress.district}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              permanentAddress: { ...formData.permanentAddress, district: e.target.value },
-            })
-          }
-        />
-      </div>
-    </div>
-
-    <div className="w-full mb-4">
-      <label className="block text-gray-700 text-sm font-medium mb-2">
-        (ख) स्थान <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-          errors.permanent_place ? 'border-red-500' : 'border-gray-300'
-        }`}
-        value={formData.permanentAddress.place}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            permanentAddress: { ...formData.permanentAddress, place: e.target.value },
-          })
-        }
-      />
-    </div>
-  </div>
-)}
-
+                  <div className="w-full mb-4">
+                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                      (ख) स्थान <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                        errors.permanent_place ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      value={formData.permanentAddress.place}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          permanentAddress: { ...formData.permanentAddress, place: e.target.value },
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+               )}
               </div>
             ))}
           </div>
 
-          {/* 3(ग) relation */}
+          {/* 2. Relation */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               2. यदि परिवाद किसी दूसरे व्यक्ति की ओर से है तो उस व्यक्ति के साथ अपना संबंध बतायें। <span className="text-red-500">*</span>
@@ -1023,9 +1044,7 @@ const handleDownloadPDF = async () => {
             )}
           </div>
 
-      
-
-          {/* 5 correspondence address */}
+          {/* 3. Correspondence Address */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               3. पता जिस पर सूचना भेजी जाये : <span className="text-red-500">*</span>
@@ -1108,7 +1127,7 @@ const handleDownloadPDF = async () => {
             </div>
           </div>
 
-          {/* 6 respondents */}
+          {/* 4. Persons / Respondents */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-3 md:mb-0">
@@ -1131,115 +1150,114 @@ const handleDownloadPDF = async () => {
               <p className="text-red-500 text-sm mb-2">{errors.respondent_name[0]}</p>
             )}
 
-          {persons.map((person, index) => (
-  <div key={person.id} className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
-    <div className="bg-gray-50 px-5 py-3 flex justify-between items-center border-b border-gray-200">
-      <h4 className="text-base font-medium text-gray-700">व्यक्ति {index + 1}</h4>
-      <div className="flex gap-2">
-        {persons.length > 1 && (
-          <button
-            type="button"
-            className="text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded text-sm transition-all duration-200"
-            onClick={() => removePerson(person.id)}
-          >
-            हटाएँ
-          </button>
-        )}
-        <button
-          type="button"
-          className="bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1 rounded text-lg font-bold transition-all duration-200 min-w-[35px]"
-          onClick={() => togglePerson(person.id)}
-        >
-          {showPersons[person.id] ? '−' : '+'}
-        </button>
-      </div>
-    </div>
+            {persons.map((person, index) => (
+              <div key={person.id} className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
+                <div className="bg-gray-50 px-5 py-3 flex justify-between items-center border-b border-gray-200">
+                  <h4 className="text-base font-medium text-gray-700">व्यक्ति {index + 1}</h4>
+                  <div className="flex gap-2">
+                    {persons.length > 1 && (
+                      <button
+                        type="button"
+                        className="text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded text-sm transition-all duration-200"
+                        onClick={() => removePerson(person.id)}
+                      >
+                        हटाएँ
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1 rounded text-lg font-bold transition-all duration-200 min-w-[35px]"
+                      onClick={() => togglePerson(person.id)}
+                    >
+                      {showPersons[person.id] ? '−' : '+'}
+                    </button>
+                  </div>
+                </div>
 
-    {showPersons[person.id] && (
-      <div className="p-5 animate-slideDown">
-        
-        {/* Row 1: District & Nature of Department */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-gray-700 text-sm font-medium mb-2">
-              ज़िला: <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-              value={person.district || ''} 
-              onChange={(e) => updatePerson(person.id, 'district', e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm font-medium mb-2">
-               विभाग का नाम: <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-              value={person.departmentNature || ''}
-              onChange={(e) => updatePerson(person.id, 'departmentNature', e.target.value)}
-            />
-          </div>
-        </div>
+                {showPersons[person.id] && (
+                  <div className="p-5 animate-slideDown">
+                    
+                    {/* Row 1: District & Nature of Department */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-2">
+                          ज़िला: <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                          value={person.district || ''} 
+                          onChange={(e) => updatePerson(person.id, 'district', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-2">
+                          विभाग का नाम: <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                          value={person.departmentNature || ''}
+                          onChange={(e) => updatePerson(person.id, 'departmentNature', e.target.value)}
+                        />
+                      </div>
+                    </div>
 
-        {/* Row 2: Officer Category & Designation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-gray-700 text-sm font-medium mb-2">
-              अधिकारी की श्रेणी: <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-              value={person.officerCategory || ''}
-              onChange={(e) => updatePerson(person.id, 'officerCategory', e.target.value)}
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm font-medium mb-2">
-              पदनाम: <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-              value={person.designation || ''}
-              onChange={(e) => updatePerson(person.id, 'designation', e.target.value)}
-            />
-          </div>
-        </div>
+                    {/* Row 2: Officer Category & Designation */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-2">
+                          अधिकारी की श्रेणी: <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                          value={person.officerCategory || ''}
+                          onChange={(e) => updatePerson(person.id, 'officerCategory', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-2">
+                          पदनाम: <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                          value={person.designation || ''}
+                          onChange={(e) => updatePerson(person.id, 'designation', e.target.value)}
+                        />
+                      </div>
+                    </div>
 
-        {/* Row 3: Name & Address */}
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-medium mb-2">
-            अधिकारी का नाम: <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-            value={person.name || ''}
-            onChange={(e) => updatePerson(person.id, 'name', e.target.value)}
-          />
-        </div>
+                    {/* Row 3: Name & Address */}
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
+                        अधिकारी का नाम: <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                        value={person.name || ''}
+                        onChange={(e) => updatePerson(person.id, 'name', e.target.value)}
+                      />
+                    </div>
 
-        <div>
-          <label className="block text-gray-700 text-sm font-medium mb-2">
-          वर्तमान पता (यदि ज्ञात हो): <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            rows="3"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
-            value={person.currentAddress || ''}
-            onChange={(e) => updatePerson(person.id, 'currentAddress', e.target.value)}
-          />
-        </div>
+                    <div>
+                      <label className="block text-gray-700 text-sm font-medium mb-2">
+                      वर्तमान पता (यदि ज्ञात हो): <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        rows="3"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
+                        value={person.currentAddress || ''}
+                        onChange={(e) => updatePerson(person.id, 'currentAddress', e.target.value)}
+                      />
+                    </div>
 
-      </div>
-    )}
-  </div>
-))}
-
+                  </div>
+                )}
+              </div>
+            ))}
 
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-medium mb-2">
@@ -1321,7 +1339,7 @@ const handleDownloadPDF = async () => {
             </div>
           </div>
 
-          {/* 7 complaint type */}
+          {/* 5. Complaint Type */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">5. क्या यह – <span className="text-red-500">*</span></h3>
             <div className="space-y-3">
@@ -1357,7 +1375,7 @@ const handleDownloadPDF = async () => {
             )}
           </div>
 
-          {/* 8 challan */}
+          {/* 6. Challan */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               6. चालान संख्या और नियम-4 के अधीन खर्च के लिए प्रतिभूति जमा करने का दिनांक : <span className="text-red-500">*</span>
@@ -1437,7 +1455,7 @@ const handleDownloadPDF = async () => {
             </div>
           </div>
 
-          {/* 9 supporting persons */}
+          {/* 7. Supporting Persons */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               7. ऐसे व्यक्तियों की सूची जिन्होने परिवाद के समर्थन में शपथपत्र दिये हों : <span className="text-red-500">*</span>
@@ -1456,18 +1474,18 @@ const handleDownloadPDF = async () => {
             )}
           </div>
 
-          {/* 10 other persons */}
-         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          {/* 8. Other Persons */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
   <h3 className="text-lg font-semibold text-gray-800 mb-4">
-    8. क्या ऐसे अन्य व्यक्ति भी हैं जिन्हे परिवाद से सम्बन्धित तथ्यों के बारे में जानकारी हो, जिन्हे लोक आयुक्त / उप लोक आयुक्त द्वारा समन किया जा सके : <span className="text-red-500">*</span>
+    8. क्या ऐसे अन्य व्यक्ति भी हैं जिन्हे परिवाद से सम्बन्धित तथ्यों के बारे में जानकारी हो, जिन्हे लोक आयुक्त / उप लोक आयुक्त द्वारा समन किया जा सके : 
+    <span className="text-red-500">*</span>
   </h3>
 
-  {/* Add Button */}
   <button
     type="button"
     onClick={() => {
       const updated = [
-        ...((Array.isArray(formData.otherPersons) ? formData.otherPersons : [])),
+        ...(Array.isArray(formData.otherPersons) ? formData.otherPersons : []),
         { name: "", address: "" }
       ];
       handleFormDataChange("otherPersons", updated);
@@ -1477,14 +1495,12 @@ const handleDownloadPDF = async () => {
     + अन्य व्यक्ति जोड़ें
   </button>
 
-  {/* Dynamic Fields */}
   {Array.isArray(formData.otherPersons) &&
     formData.otherPersons.map((item, index) => (
       <div
         key={index}
         className="border border-gray-200 rounded-lg mb-4 p-4 relative"
       >
-        {/* Remove Button */}
         {formData.otherPersons.length > 1 && (
           <button
             type="button"
@@ -1498,108 +1514,98 @@ const handleDownloadPDF = async () => {
           </button>
         )}
 
-        <div className="mb-3">
-          <label className="block text-gray-700 text-sm font-medium mb-1">
-            नाम (व्यक्ति {index + 1}) <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            placeholder="नाम दर्ज करें"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-            value={item.name}
-            onChange={(e) => {
-              const updated = [...formData.otherPersons];
-              updated[index].name = e.target.value;
-              handleFormDataChange("otherPersons", updated);
-            }}
-          />
-        </div>
+        {/* 🔥 2 fields in 1 row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-        <div>
-          <label className="block text-gray-700 text-sm font-medium mb-1">
-            पता <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            rows="3"
-            placeholder="पूरा पता लिखें"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
-            value={item.address}
-            onChange={(e) => {
-              const updated = [...formData.otherPersons];
-              updated[index].address = e.target.value;
-              handleFormDataChange("otherPersons", updated);
-            }}
-          />
+          {/* NAME */}
+          <div className="mb-3">
+            <label className="block text-gray-700 text-sm font-medium mb-1">
+              नाम (व्यक्ति {index + 1}) <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="नाम दर्ज करें"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+              value={item.name}
+              onChange={(e) => {
+                const updated = [...formData.otherPersons];
+                updated[index].name = e.target.value;
+                handleFormDataChange("otherPersons", updated);
+              }}
+            />
+          </div>
+
+          {/* ADDRESS */}
+          <div>
+            <label className="block text-gray-700 text-sm font-medium mb-1">
+              पता <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              rows="1"
+              placeholder="पूरा पता लिखें"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none"
+              value={item.address}
+              onChange={(e) => {
+                const updated = [...formData.otherPersons];
+                updated[index].address = e.target.value;
+                handleFormDataChange("otherPersons", updated);
+              }}
+            />
+          </div>
+
         </div>
       </div>
     ))}
 
-  {/* Validation error */}
   {errors.other_witnesses && (
-    <p className="text-red-500 text-sm mt-1">{errors.other_witnesses[0]}</p>
+    <p className="text-red-500 text-sm mt-1">
+      {errors.other_witnesses[0]}
+    </p>
   )}
 </div>
 
+          {/* 9. Attached Documents */}
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              9. परिवाद से सम्बन्धित संलग्न दस्तावेजों की सूची (परिवादी का शपथपत्र सहित) : <span className="text-red-500">*</span>
+            </h3>
 
-          {/* 11 attached docs */}
-       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-    9. परिवाद से सम्बन्धित संलग्न दस्तावेजों की सूची (परिवादी का शपथपत्र सहित) : <span className="text-red-500">*</span>
-  </h3>
+            <textarea
+              placeholder="दस्तावेज क्रमवार लिखें (वैकल्पिक). वास्तविक फाइल नीचे अपलोड करें।"
+              rows="3"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y mb-3"
+              value={formData.attachedDocuments}
+              onChange={(e) => handleFormDataChange('attachedDocuments', e.target.value)}
+            />
 
-  {/* ADD TOGGLE BUTTON */}
-  <button
-    type="button"
-    onClick={() => setShowAttachedDocs(!showAttachedDocs)}
-    className="mb-4 bg-white text-[12px] text-orange-500 border-2 border-orange-500 
-           hover:bg-orange-500 hover:text-white px-4 py-2 rounded-lg font-semibold 
-           transition-all duration-300"
-  >
-    {showAttachedDocs ? "− दस्तावेज़ बंद करें" : "+ दस्तावेज़ जोड़ें"}
-  </button>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <label
+                className={`bg-orange-50 text-orange-600 font-semibold px-5 py-2.5 rounded-lg cursor-pointer border border-orange-200 hover:bg-orange-100 transition-all duration-200 ${
+                  errors.attached_documents ? 'border-red-500' : ''
+                }`}
+              >
+                संलग्न दस्तावेज़ फाइल अपलोड करें
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={(e) => handleFileChange('attachedDocumentsFile', e.target.files[0])}
+                  accept=".pdf,.jpg,.jpeg,.png"
+                />
+              </label>
 
-  {/* FIELDS SHOW WHEN OPEN */}
-  {showAttachedDocs && (
-    <>
-      <textarea
-        placeholder="दस्तावेज क्रमवार लिखें (वैकल्पिक). वास्तविक फाइल नीचे अपलोड करें।"
-        rows="3"
-        className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y mb-3"
-        value={formData.attachedDocuments}
-        onChange={(e) => handleFormDataChange('attachedDocuments', e.target.value)}
-      />
+              <span className="text-gray-500 text-sm ">
+                {formData.attachedDocumentsFile
+                  ? formData.attachedDocumentsFile.name
+                  : 'कोई फाइल नहीं चुनी गई'}
+              </span>
+            </div>
 
-      <div className="flex items-center gap-4">
-        <label
-          className={`bg-orange-100 text-orange-600 font-semibold px-5 py-2.5 rounded-lg cursor-pointer transition-all duration-200 ${
-            errors.attached_documents ? 'border-2 border-red-500' : ''
-          }`}
-        >
-          संलग्न दस्तावेज़ फाइल अपलोड करें
-          <input
-            type="file"
-            className="hidden"
-            onChange={(e) => handleFileChange('attachedDocumentsFile', e.target.files[0])}
-            accept=".pdf,.jpg,.jpeg,.png"
-          />
-        </label>
+            {errors.attached_documents && (
+              <p className="text-red-500 text-sm mt-2">{errors.attached_documents[0]}</p>
+            )}
+          </div>
 
-        <span className="text-gray-500 text-sm">
-          {formData.attachedDocumentsFile
-            ? formData.attachedDocumentsFile.name
-            : 'No file chosen'}
-        </span>
-      </div>
-
-      {errors.attached_documents && (
-        <p className="text-red-500 text-sm mt-1">{errors.attached_documents[0]}</p>
-      )}
-    </>
-  )}
-</div>
-
-
-          {/* 12 complaint description */}
+          {/* 10. Complaint Description */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               10. परिवाद का विवरण – कृपया यहाँ पर परिवाद के सम्पूर्ण तथ्य बतायें  : <span className="text-red-500">*</span>
@@ -1607,7 +1613,6 @@ const handleDownloadPDF = async () => {
             <textarea
               placeholder="सम्पूर्ण विवरण स्पष्ट एवं संक्षेप में लिखें"
               rows="8"
-              maxLength=""
               className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y ${
                 errors.complaint_description ? 'border-red-500' : 'border-gray-300'
               }`}
@@ -1617,10 +1622,9 @@ const handleDownloadPDF = async () => {
             {errors.complaint_description && (
               <p className="text-red-500 text-sm mt-1">{errors.complaint_description[0]}</p>
             )}
-          
           </div>
 
-          {/* buttons */}
+          {/* Buttons */}
           <div className="flex flex-col sm:flex-row justify-end gap-4">
             <button
               type="button"
@@ -1639,11 +1643,10 @@ const handleDownloadPDF = async () => {
         </form>
       </div>
 
-      {/* PREVIEW MODAL WITH A4 SHEET AND PDF DOWNLOAD */}
+      {/* PREVIEW MODAL */}
       {showPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 print-modal-overlay">
           <div className="bg-white rounded-lg shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden flex flex-col">
-            {/* Header */}
             <div className="shrink-0 bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-800">शिकायत पूर्वावलोकन</h2>
               <div className="flex items-center gap-3">
@@ -1656,7 +1659,6 @@ const handleDownloadPDF = async () => {
               </div>
             </div>
 
-            {/* Content - Main scrollable area */}
             <div className="flex-1 overflow-auto bg-orange-50 px-2 md:px-4 py-4 flex justify-center min-h-0">
               <ComplaintPrintView
                 ref={printRef}
@@ -1666,16 +1668,7 @@ const handleDownloadPDF = async () => {
               />
             </div>
 
-            {/* Footer */}
             <div className="shrink-0 bg-gray-50 px-6 py-3 flex justify-end gap-4 border-t border-gray-200 flex-wrap">
-              {/* <button
-                type="button"
-                onClick={handleDownloadPDF}
-                disabled={isDownloadingPDF}
-                className="md:hidden bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-              >
-                {isDownloadingPDF ? 'डाउनलोड हो रहा है...' : '📥 PDF डाउनलोड'}
-              </button> */}
               <button
                 type="button"
                 onClick={() => setShowPreview(false)}
@@ -1711,40 +1704,25 @@ const handleDownloadPDF = async () => {
         .animate-slideDown {
           animation: slideDown 0.3s ease-out;
         }
-        
-        /* UPDATED AND FIXED CSS FOR FULL COVERAGE */
         .a4-sheet {
           width: 100%;
           min-height: 297mm;
-          height: auto !important; /* Ensure height grows with content */
+          height: auto !important;
           margin: 0 auto;
           background: linear-gradient(to bottom right, #fff7ed, #ffedd5, #fff7ed) !important;
-          display: flow-root; /* Establishes a new block formatting context */
-          overflow: visible; /* Ensure content doesn't get hidden */
+          display: flow-root;
+          overflow: visible;
         }
-        
         @media screen {
           .a4-sheet {
             max-width: 100%;
-            min-width: 100%; /* Force full width in preview */
+            min-width: 100%;
           }
         }
-        
         @media print {
-          body {
-            margin: 0;
-          }
-          .print-modal-overlay {
-            position: static !important;
-            background: none !important;
-            padding: 0 !important;
-          }
-          .a4-sheet {
-            transform: scale(1) !important;
-            box-shadow: none !important;
-            border: none !important;
-            width: 210mm; 
-          }
+          body { margin: 0; }
+          .print-modal-overlay { position: static !important; background: none !important; padding: 0 !important; }
+          .a4-sheet { transform: scale(1) !important; box-shadow: none !important; border: none !important; width: 210mm; }
         }
       `}</style>
     </div>

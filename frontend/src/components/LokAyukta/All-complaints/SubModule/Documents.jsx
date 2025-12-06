@@ -106,7 +106,7 @@ const Documents = ({ complaint }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">
-          Documents ({documents.length})
+          Documents 
         </h2>
 
         {/* <button

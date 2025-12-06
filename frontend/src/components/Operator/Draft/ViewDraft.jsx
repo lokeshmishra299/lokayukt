@@ -299,7 +299,7 @@ const ViewDraft = () => {
     <p className="text-xs text-gray-500 uppercase mb-1">
       CORRESPONDENCE NAME
     </p>
-    <p className="font-semibold text-gray-800 text-sm md:text-base">
+    <p className=" text-gray-800 text-sm md:text-base">
       {complaintData.correspondence_name}
     </p>
 
@@ -307,19 +307,16 @@ const ViewDraft = () => {
       {complaintData.address}
     </p>
 
-    <p className="text-xs md:text-sm text-gray-600 mt-3">
-      Name: {complaintData.permanent_name || "N/A"}
+  <p className="text-xs mt-3 text-gray-500 uppercase mb-1">
+      ADDRESS
     </p>
-
-    <p className="text-xs md:text-sm text-gray-600 mt-1">
-    Address: {complaintData.permanent_place || "N/A"}
+    <p className=" text-gray-800 text-sm md:text-base">
+        {complaintData.permanent_place || "N/A"}
     </p>
+    
 
-    {complaintData.email && (
-      <p className="text-xs md:text-sm text-gray-600 mt-1">
-        Email: {complaintData.email || "N/A"}
-      </p>
-    )}
+
+
   </div>
 
 
@@ -500,7 +497,7 @@ const ViewDraft = () => {
                   >
                     {forwardPhysicallyMutation.isPending
                       ? "Processing..."
-                      : "Forward Physically Completed File"}
+                      : "Forward File Physically Electronically"}
                   </button>
                 )}
               </div>
@@ -532,7 +529,7 @@ const ViewDraft = () => {
             <h3 className="text-lg font-semibold mb-4 pr-8">
               {confirmConfig.type === "receive"
                 ? "Mark as Received?"
-                : "Forward Physically Completed File?"}
+                : "Forward File Physically Electronically?"}
             </h3>
             {confirmConfig.type === "forward" && (
               <div className="mb-4">

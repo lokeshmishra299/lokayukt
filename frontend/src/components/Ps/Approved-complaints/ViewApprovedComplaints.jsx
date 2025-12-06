@@ -23,7 +23,7 @@ const api = axios.create({
   },
 });
 
-const ViewAllComplaint = () => {
+const ViewApprovedComplaints = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -299,7 +299,7 @@ const ViewAllComplaint = () => {
     <p className="text-xs text-gray-500 uppercase mb-1">
       CORRESPONDENCE NAME
     </p>
-    <p className="font-semibold text-gray-800 text-sm md:text-base">
+    <p className=" text-gray-800 text-sm md:text-base">
       {complaintData.correspondence_name}
     </p>
 
@@ -307,19 +307,16 @@ const ViewAllComplaint = () => {
       {complaintData.address}
     </p>
 
-    <p className="text-xs md:text-sm text-gray-600 mt-3">
-      Name: {complaintData.permanent_name || "N/A"}
+  <p className="text-xs mt-3 text-gray-500 uppercase mb-1">
+      ADDRESS
     </p>
-
-    <p className="text-xs md:text-sm text-gray-600 mt-1">
-    Address: {complaintData.permanent_place || "N/A"}
+    <p className=" text-gray-800 text-sm md:text-base">
+        {complaintData.permanent_place || "N/A"}
     </p>
+    
 
-    {complaintData.email && (
-      <p className="text-xs md:text-sm text-gray-600 mt-1">
-        Email: {complaintData.email || "N/A"}
-      </p>
-    )}
+
+
   </div>
 
 
@@ -462,47 +459,46 @@ const ViewAllComplaint = () => {
             </div>
 
             {/* Footer Buttons */}
-            <div className="border-t p-4">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button className="px-4 py-2 border cursor-not-allowed border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
+             <div className="border-t p-4">
+              <div className="flex flex-col sm:flex-row gap-3 justify-between">
+
+              <div>
+
+                <button className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
                   Pull Back
                 </button>
-                {complaintData.received_phsical === 1 ? (
-                  <button
-                    disabled
-                    className="px-4 py-2 border border-green-300 bg-green-50 text-green-700 rounded cursor-not-allowed text-sm"
-                  >
-                    Received
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleMarkAsReceived}
+             
+              </div>
+             
+                  
+                  <div className="flex gap-2">
+
+                      <button
+                    // onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {markAsReceivedMutation.isPending
                       ? "Processing..."
-                      : "Mark as Received (Physical)"}
+                      : "Return with Remarks"}
                   </button>
-                )}
-                {complaintData.forward_physical === 1 ? (
-                  <button
-                    disabled
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0  disabled:cursor-not-allowed"
-                  >
-                    Forwarded
-                  </button>
-                ) : (
-                  <button
-                    onClick={handleforwardphysical}
+
+
+                     <button
+                    // onClick={handleforwardphysical}
                     disabled={forwardPhysicallyMutation.isPending}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {forwardPhysicallyMutation.isPending
                       ? "Processing..."
-                      : "Forward File Physically Electronically"}
+                      : "Send / Mark"}
                   </button>
-                )}
+
+
+                  </div>
+                  
+               
+            
               </div>
             </div>
           </>
@@ -611,4 +607,4 @@ const ViewAllComplaint = () => {
   );
 };
 
-export default ViewAllComplaint;
+export default ViewApprovedComplaints;
