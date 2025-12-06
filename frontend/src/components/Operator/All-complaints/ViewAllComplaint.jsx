@@ -8,14 +8,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
-import FileDetails from "./SubModule/FileDetails";
+// import FileDetails from "./SubModule/FileDetails"; // Removed as requested
 import MovementHistory from "./SubModule/MovementHistory";
-
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
 const token = localStorage.getItem("access_token");
-
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -25,21 +23,19 @@ const api = axios.create({
   },
 });
 
-
-const ViewComplaintDetails = () => {
+const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
 
-
-  const [activeTab, setActiveTab] = useState("cover");
+  // UPDATED: Default active tab set to 'documents'
+  const [activeTab, setActiveTab] = useState("documents");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ open: false, type: null });
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
-
 
   const {
     data: complaintData,
@@ -56,7 +52,6 @@ const ViewComplaintDetails = () => {
     staleTime: 1000 * 60 * 5,
     retry: 2,
   });
-
 
   const {
     data: forwardOptionsData,
@@ -91,8 +86,6 @@ const ViewComplaintDetails = () => {
     retry: 2,
   });
 
-
- 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
       const res = await api.post('/operator/received-physical', {
@@ -111,8 +104,6 @@ const ViewComplaintDetails = () => {
       toast.error(error?.response?.data?.message || "Failed to mark as received");
     },
   });
-
-
 
   const forwardPhysicallyMutation = useMutation({
     mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
@@ -135,10 +126,8 @@ const ViewComplaintDetails = () => {
     },
   });
 
-
   const handleMarkAsReceived = () => setConfirmConfig({ open: true, type: "receive" });
   const handleforwardphysical = () => setConfirmConfig({ open: true, type: "forward" });
-
 
   const handleConfirmYes = () => {
     if (confirmConfig.type === "receive") {
@@ -163,13 +152,11 @@ const ViewComplaintDetails = () => {
     }
   };
 
-
   const handleConfirmNo = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
   };
-
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -188,7 +175,6 @@ const ViewComplaintDetails = () => {
     }
   };
 
-
   const handleFileDownload = (filePath) => {
     if (!filePath) {
       toast.error("No file available for download");
@@ -198,7 +184,6 @@ const ViewComplaintDetails = () => {
     window.open(fileUrl, "_blank");
   };
 
-
   const handleFilePreview = (filePath) => {
     if (filePath) {
       setCurrentPreviewFile(filePath);
@@ -207,7 +192,6 @@ const ViewComplaintDetails = () => {
       toast.error("File preview not available");
     }
   };
-
 
   if (isLoading) {
     return (
@@ -219,7 +203,6 @@ const ViewComplaintDetails = () => {
     );
   }
 
-
   if (isError) {
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
@@ -229,7 +212,7 @@ const ViewComplaintDetails = () => {
             {error?.response?.data?.message || error?.message || "Error loading complaint data"}
           </p>
           <button
-            onClick={() => navigate("/operator/all-complaints")}
+            onClick={() => navigate(-1)}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Back to Complaints
@@ -239,20 +222,18 @@ const ViewComplaintDetails = () => {
     );
   }
 
-
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
-        
             <div className="p-4 md:p-6 border-b">
-          
+              {/* Mobile Header */}
               <div className="md:hidden mb-4">
                 <div className="flex justify-between items-center mb-3">
                   <button
-                    onClick={() => navigate("/operator/all-complaints")}
+                    onClick={() => navigate(-1)}
                     className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
                   >
                     <IoMdArrowBack className="w-4 h-4" /> Back
@@ -267,96 +248,158 @@ const ViewComplaintDetails = () => {
                       complaintData.status
                     )}`}
                   >
-                    {/* In Motion – With Lokayukta */}
                     {complaintData.approved_rejected_by_lokayukt == 0 ? "Received - Record Section" : "In Motion – With Lokayukta"}
                   </span>
                 </div>
               </div>
 
+              {/* Desktop Header */}
+       {/* ===== HEADER UNCHANGED ===== */}
+<div className="hidden md:block">
+  <div className="flex justify-between items-start mb-3">
+    <h2 className="text-xl font-semibold text-gray-800">
+      File No. {complaintData.complain_no}(
+       <span className="text-blue-600">NEW CASE</span>
+      )
+    </h2>
 
-              <div className="hidden md:block">
-                <div className="flex justify-between items-start mb-3">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    File No. {complaintData.complain_no}
-                  </h2>
-                  <div className="flex gap-2">
-                    <span
-                      className={`px-3 py-1 rounded ${getStatusColor(complaintData.status)}`}
-                    >
-              {complaintData.approved_rejected_by_lokayukt == 0 ? "Received - Record Section" : "In Motion – With Lokayukta"}
+    <div className="flex gap-2">
+      <span
+        className={`px-3 py-1 rounded ${getStatusColor(complaintData.status)}`}
+      >
+        {complaintData.approved_rejected_by_lokayukt == 0
+          ? "Received - Record Section"
+          : "In Motion – With Lokayukta"}
+      </span>
 
-                    </span>
-                    <button
-                      onClick={() => navigate("/operator/all-complaints")}
-                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
-                    >
-                      <IoMdArrowBack className="w-4 h-4" /> Back
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-
-      
-              <p className="text-gray-700 mb-4 text-sm md:text-base">
-                Description: {complaintData.complaint_description ||
-                  "No detailed description available for this complaint."}
-              </p>
-
-
-     
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
-                <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
-                  <p className="text-xs text-gray-500 uppercase mb-1">
-CORRESPONDENCE NAME</p>
-                  <p className="font-semibold text-gray-800 text-sm md:text-base">
-                    {complaintData.
-correspondence_name}
-                  </p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">{complaintData.address}</p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">Permanent Name: {complaintData.permanent_name}
-                  </p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">Permanent Place: {complaintData.
-permanent_place
-}
-                  </p>
-                  {complaintData.email && (
-                    <p className="text-xs md:text-sm text-gray-600">Email: {complaintData.email}</p>
-                  )}
-                </div>
-                <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
-                  <p className="text-xs text-gray-500 uppercase mb-1">DISTRICT</p>
-                  <p className="font-semibold text-gray-800 text-sm md:text-base">
-                    {complaintData.
-permanent_district}
-                  </p>
-                  {complaintData.dob && (
-                    <>
-                      <p className="text-xs text-gray-500 uppercase mb-1 mt-3">DATE OF BIRTH</p>
-                      <p className="font-semibold text-gray-800 text-sm md:text-base">
-                        {new Date(complaintData.dob).toLocaleDateString()}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
+      <button
+        onClick={() => navigate(-1)}
+        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+      >
+        <IoMdArrowBack className="w-4 h-4" /> Back
+      </button>
+    </div>
+  </div>
+</div>
 
 
-     
+{/* ===== DESCRIPTION ===== */}
+<p className="text-gray-700 mb-4 text-sm md:text-base">
+  Description:{" "}
+  {complaintData.complaint_description ||
+    "No detailed description available for this complaint."}
+</p>
+
+
+{/* ===== DETAILS GRID (3 Columns Now) ===== */}
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+  {/* ------------ COLUMN 1 ------------ */}
+  <div>
+    <p className="text-xs text-gray-500 uppercase mb-1">
+      CORRESPONDENCE NAME
+    </p>
+    <p className="font-semibold text-gray-800 text-sm md:text-base">
+      {complaintData.correspondence_name}
+    </p>
+
+    <p className="text-xs md:text-sm text-gray-600 mt-1">
+      {complaintData.address}
+    </p>
+
+    <p className="text-xs md:text-sm text-gray-600 mt-3">
+      Name: {complaintData.permanent_name || "N/A"}
+    </p>
+
+    <p className="text-xs md:text-sm text-gray-600 mt-1">
+    Address: {complaintData.permanent_place || "N/A"}
+    </p>
+
+    {complaintData.email && (
+      <p className="text-xs md:text-sm text-gray-600 mt-1">
+        Email: {complaintData.email || "N/A"}
+      </p>
+    )}
+  </div>
+
+
+  {/* ------------ COLUMN 2 ------------ */}
+  <div>
+    <p className="text-xs text-gray-500 uppercase mb-1">DISTRICT</p>
+    <p className=" text-gray-800 text-sm md:text-base">
+      {complaintData.permanent_district || "N/A"}
+    </p>
+
+    {complaintData.dob && (
+      <>
+        <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
+          Relation With Person
+        </p>
+        <p className=" text-gray-800 text-sm md:text-base">
+          {complaintData.relation_with_person || "NA"}
+        </p>
+      </>
+    )}
+  </div>
+
+
+  {/* ------------ COLUMN 3 ------------ */}
+  <div>
+    <p className="text-xs text-gray-500 uppercase mb-1">OTHER WITNESSES</p>
+    <p className=" text-gray-800 text-sm md:text-base">
+      {complaintData.other_witnesses || "N/A"}
+    </p>
+
+    <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
+      PREVIOUSLY SUBMITTED DETAILS
+    </p>
+    <p className=" text-gray-800 text-sm md:text-base">
+      {complaintData.previously_submitted_details || "N/A"}
+    </p>
+
+    {/* <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
+      RELATION WITH PERSON
+    </p>
+    <p className="font-semibold text-gray-800 text-sm md:text-base">
+      {complaintData.relation_with_person}
+    </p> */}
+
+    {/* <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
+      SUPPORTING AFFIDAVIT LIST
+    </p>
+    <p className="font-semibold text-gray-800 text-sm md:text-base">
+      {complaintData.supporting_affidavit_list}
+    </p> */}
+  </div>
+
+</div>
+
+
+              {/* UPDATED: Fee Status and Fee Type Section */}
               <div className="flex flex-wrap gap-2">
-                {complaintData.fee_exempted === 1 ? (
-                  <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded text-xs border border-green-200">
-                    Fee: Exempted
-                  </span>
-                ) : complaintData.amount ? (
-                  <span className="px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded text-xs border border-yellow-200">
-                    Fee: ₹{complaintData.amount}
-                  </span>
-                ) : (
-                  <span className="px-3 py-1.5 bg-gray-50 text-gray-700 rounded text-xs border border-gray-200">
-                    Fee: Not specified
-                  </span>
-                )}
+                {/* 1. Fee Type Logic */}
+                <span className={`px-3 py-1.5 rounded text-xs border ${
+                  complaintData.fee_exempted === 1 
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-gray-50 text-gray-700 border-gray-200"
+                }`}>
+                  Fee Type: {complaintData.fee_exempted === 1 
+                      ? 'Exempted' 
+                      : complaintData.amount 
+                      ? 'Paid' 
+                      : 'Partial'}
+                </span>
+
+                {/* 2. Fee Status Logic */}
+                <span className={`px-3 py-1.5 rounded text-xs border ${
+                  complaintData.payment_status === 'Success' || complaintData.payment_status === 'Verified'
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                }`}>
+                  Status: {complaintData.payment_status || 'Awaiting approval'}
+                </span>
+
+                {/* 3. Challan (if exists) */}
                 {complaintData.challan_no && (
                   <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200">
                     Challan: {complaintData.challan_no}
@@ -365,10 +408,10 @@ permanent_district}
               </div>
             </div>
 
-
+            {/* Mobile Tab Navigation (Removed "cover") */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["cover", "documents", "notings", "movement"].map((tab) => (
+                {["documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -381,7 +424,6 @@ permanent_district}
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
-                    {tab === "cover" && "File Details"}
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
@@ -390,10 +432,10 @@ permanent_district}
               </div>
             </div>
 
-
+            {/* Desktop Tab Navigation (Removed "cover") */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["cover", "documents", "notings", "movement"].map((tab) => (
+                {["documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -401,7 +443,6 @@ permanent_district}
                       activeTab === tab ? "text-blue-600" : "text-gray-600 hover:text-gray-800"
                     }`}
                   >
-                    {tab === "cover" && "File Details"}
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
@@ -413,16 +454,14 @@ permanent_district}
               </div>
             </div>
 
-
-  
+            {/* Tab Content Area (Removed "cover" render) */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
-              {activeTab === "cover" && <FileDetails complaint={complaintData} />}
               {activeTab === "documents" && <Documents complaint={complaintData} />}
               {activeTab === "notings" && <Notes complaint={complaintData} />}
               {activeTab === "movement" && <MovementHistory complaint={complaintData} />}
             </div>
 
-
+            {/* Footer Buttons */}
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3">
                 <button className="px-4 py-2 border cursor-not-allowed border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
@@ -461,7 +500,7 @@ permanent_district}
                   >
                     {forwardPhysicallyMutation.isPending
                       ? "Processing..."
-                      : "Forward Physically Completed File"}
+                      : "Forward File Physically Electronically"}
                   </button>
                 )}
               </div>
@@ -477,12 +516,10 @@ permanent_district}
         )}
       </div>
 
-
-
+      {/* Confirmation Modal */}
       {confirmConfig.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
-            {/* Close button in top-right corner */}
             <button
               onClick={handleConfirmNo}
               disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
@@ -495,7 +532,7 @@ permanent_district}
             <h3 className="text-lg font-semibold mb-4 pr-8">
               {confirmConfig.type === "receive"
                 ? "Mark as Received?"
-                : "Forward Physically Completed File?"}
+                : "Forward File Physically Electronically?"}
             </h3>
             {confirmConfig.type === "forward" && (
               <div className="mb-4">
@@ -574,5 +611,4 @@ permanent_district}
   );
 };
 
-
-export default ViewComplaintDetails;
+export default ViewAllComplaint;

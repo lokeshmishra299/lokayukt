@@ -249,86 +249,152 @@ const ViewComplaintDetails = () => {
               </div>
 
               {/* Desktop Header */}
-              <div className="hidden md:block">
-                <div className="flex justify-between items-start mb-3">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    File No. {complaintData.complain_no}
-                  </h2>
-                  <div className="flex gap-2">
-                                     <span
-                                       className={`px-3 py-1 rounded ${getStatusColor(complaintData.status)}`}
-                                     >
-                               {complaintData.approved_rejected_by_lokayukt == 0 ? "Received - Record Section" : "In Motion – With Lokayukta"}
-                 
-                                     </span>
-                                     <button
-                                       onClick={() => navigate(-1)}
-                                       className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
-                                     >
-                                       <IoMdArrowBack className="w-4 h-4" /> Back
-                                     </button>
-                                   </div>
-                </div>
-              </div>
+       {/* ===== HEADER UNCHANGED ===== */}
+<div className="hidden md:block">
+  <div className="flex justify-between items-start mb-3">
+    <h2 className="text-xl font-semibold text-gray-800">
+      File No. {complaintData.complain_no}(
+       <span className="text-blue-600">NEW CASE</span>
+      )
+    </h2>
 
-              {/* Description - Common for both mobile and desktop */}
-             <p className="text-gray-700 mb-4 text-sm md:text-base">
-                Description: {complaintData.complaint_description ||
-                  "No detailed description available for this complaint."}
-              </p>
+    <div className="flex gap-2">
+      <span
+        className={`px-3 py-1 rounded ${getStatusColor(complaintData.status)}`}
+      >
+        {complaintData.approved_rejected_by_lokayukt == 0
+          ? "Received - Record Section"
+          : "In Motion – With Lokayukta"}
+      </span>
 
-              {/* Complainant Info */}
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-4">
-                <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
-                  <p className="text-xs text-gray-500 uppercase mb-1">
-CORRESPONDENCE NAME</p>
-                  <p className="font-semibold text-gray-800 text-sm md:text-base">
-                    {complaintData.
-correspondence_name}
-                  </p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">{complaintData.address}</p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">Permanent Name: {complaintData.permanent_name}
-                  </p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">Permanent Place: {complaintData.
-permanent_place
-}
-                  </p>
-                  {complaintData.email && (
-                    <p className="text-xs md:text-sm text-gray-600">Email: {complaintData.email}</p>
-                  )}
-                </div>
-                <div className="bg-gray-50 p-3 md:p-0 md:bg-transparent rounded">
-                  <p className="text-xs text-gray-500 uppercase mb-1">DISTRICT</p>
-                  <p className="font-semibold text-gray-800 text-sm md:text-base">
-                    {complaintData.
-permanent_district}
-                  </p>
-                  {complaintData.dob && (
-                    <>
-                      <p className="text-xs text-gray-500 uppercase mb-1 mt-3">DATE OF BIRTH</p>
-                      <p className="font-semibold text-gray-800 text-sm md:text-base">
-                        {new Date(complaintData.dob).toLocaleDateString()}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
+      <button
+        onClick={() => navigate(-1)}
+        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+      >
+        <IoMdArrowBack className="w-4 h-4" /> Back
+      </button>
+    </div>
+  </div>
+</div>
 
-              {/* Fee and Challan Info */}
-             <div className="flex flex-wrap gap-2">
-                {complaintData.fee_exempted === 1 ? (
-                  <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded text-xs border border-green-200">
-                    Fee: Exempted
-                  </span>
-                ) : complaintData.amount ? (
-                  <span className="px-3 py-1.5 bg-yellow-50 text-yellow-700 rounded text-xs border border-yellow-200">
-                    Fee: ₹{complaintData.amount}
-                  </span>
-                ) : (
-                  <span className="px-3 py-1.5 bg-gray-50 text-gray-700 rounded text-xs border border-gray-200">
-                    Fee: Not specified
-                  </span>
-                )}
+
+{/* ===== DESCRIPTION ===== */}
+<p className="text-gray-700 mb-4 text-sm md:text-base">
+  Description:{" "}
+  {complaintData.complaint_description ||
+    "No detailed description available for this complaint."}
+</p>
+
+
+{/* ===== DETAILS GRID (3 Columns Now) ===== */}
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+  {/* ------------ COLUMN 1 ------------ */}
+  <div>
+    <p className="text-xs text-gray-500 uppercase mb-1">
+      CORRESPONDENCE NAME
+    </p>
+    <p className="font-semibold text-gray-800 text-sm md:text-base">
+      {complaintData.correspondence_name}
+    </p>
+
+    <p className="text-xs md:text-sm text-gray-600 mt-1">
+      {complaintData.address}
+    </p>
+
+    <p className="text-xs md:text-sm text-gray-600 mt-3">
+      Name: {complaintData.permanent_name || "N/A"}
+    </p>
+
+    <p className="text-xs md:text-sm text-gray-600 mt-1">
+    Address: {complaintData.permanent_place || "N/A"}
+    </p>
+
+    {complaintData.email && (
+      <p className="text-xs md:text-sm text-gray-600 mt-1">
+        Email: {complaintData.email || "N/A"}
+      </p>
+    )}
+  </div>
+
+
+  {/* ------------ COLUMN 2 ------------ */}
+  <div>
+    <p className="text-xs text-gray-500 uppercase mb-1">DISTRICT</p>
+    <p className=" text-gray-800 text-sm md:text-base">
+      {complaintData.permanent_district || "N/A"}
+    </p>
+
+    {complaintData.dob && (
+      <>
+        <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
+          Relation With Person
+        </p>
+        <p className=" text-gray-800 text-sm md:text-base">
+          {complaintData.relation_with_person || "NA"}
+        </p>
+      </>
+    )}
+  </div>
+
+
+  {/* ------------ COLUMN 3 ------------ */}
+  <div>
+    <p className="text-xs text-gray-500 uppercase mb-1">OTHER WITNESSES</p>
+    <p className=" text-gray-800 text-sm md:text-base">
+      {complaintData.other_witnesses || "N/A"}
+    </p>
+
+    <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
+      PREVIOUSLY SUBMITTED DETAILS
+    </p>
+    <p className=" text-gray-800 text-sm md:text-base">
+      {complaintData.previously_submitted_details || "N/A"}
+    </p>
+
+    {/* <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
+      RELATION WITH PERSON
+    </p>
+    <p className="font-semibold text-gray-800 text-sm md:text-base">
+      {complaintData.relation_with_person}
+    </p> */}
+
+    {/* <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
+      SUPPORTING AFFIDAVIT LIST
+    </p>
+    <p className="font-semibold text-gray-800 text-sm md:text-base">
+      {complaintData.supporting_affidavit_list}
+    </p> */}
+  </div>
+
+</div>
+
+
+              {/* UPDATED: Fee Status and Fee Type Section */}
+              <div className="flex flex-wrap gap-2">
+                {/* 1. Fee Type Logic */}
+                <span className={`px-3 py-1.5 rounded text-xs border ${
+                  complaintData.fee_exempted === 1 
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-gray-50 text-gray-700 border-gray-200"
+                }`}>
+                  Fee Type: {complaintData.fee_exempted === 1 
+                      ? 'Exempted' 
+                      : complaintData.amount 
+                      ? 'Paid' 
+                      : 'Partial'}
+                </span>
+
+                {/* 2. Fee Status Logic */}
+                <span className={`px-3 py-1.5 rounded text-xs border ${
+                  complaintData.payment_status === 'Success' || complaintData.payment_status === 'Verified'
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                }`}>
+                  Status: {complaintData.payment_status || 'Awaiting approval'}
+                </span>
+
+                {/* 3. Challan (if exists) */}
                 {complaintData.challan_no && (
                   <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200">
                     Challan: {complaintData.challan_no}
@@ -352,7 +418,7 @@ permanent_district}
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
-                    File Details
+                    Fee Verification
                   </button>
                   <button
                     onClick={() => {
@@ -410,7 +476,7 @@ permanent_district}
                       : "text-gray-600 hover:text-gray-800"
                   }`}
                 >
-                  File Details
+                  Fee Verification
                   {activeTab === "cover" && (
                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
                   )}
@@ -463,7 +529,7 @@ permanent_district}
                 className="w-full py-3 px-4 flex justify-between items-center text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 <span>
-                  {activeTab === "cover" && "File Details"}
+                  {activeTab === "cover" && "Fee Verification"}
                   {activeTab === "documents" && "Documents"}
                   {activeTab === "notings" && "Notes / Notings"}
                   {activeTab === "movement" && "Movement History"}

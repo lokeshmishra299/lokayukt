@@ -3,77 +3,64 @@ import React from "react";
 const MovementHistory = () => {
   const items = [
     {
-      title: "Record Section → Lokayukta",
+      title: "PS to Lokayukta (Shri ABC) → Lokayukta",
       desc: "File marked for review and orders",
-      time: "Current",
-      status: "12 Jan 2025, 2:45 PM",
+      time: "15 Jan 2025, 3:00 PM",
+      status: "Marked",
+      remark: "Urgent", // Added remark data
     },
     {
       title: "UpLokayukta → PS to Lokayukta (Shri ABC)",
       desc: "Please prepare draft order for investigation",
-      time: "Current",
-      status: "12 Jan 2025, 2:45 PM",
+      time: "13 Jan 2025, 11:30 AM",
+      status: "Marked",
+      remark: "Draft needed", // Added remark data
     },
   ];
 
   return (
     <div className="p-6">
-
       <div className="flex items-center gap-2 mb-4">
         <span className="text-[18px] text-gray-700">Movement</span>
         <span className="text-[18px] text-gray-700">History</span>
       </div>
 
-   
       <div className="relative pl-10">
-
-
         <div className="absolute left-[14px] top-[20px] bottom-[20px] w-[2px] bg-blue-300"></div>
 
-     
         {items.map((item, index) => (
           <div key={index} className="relative mb-4">
+            <div className="absolute left-[-32px] top-2 w-4 h-4 bg-white rounded-full border border-gray-300 flex items-center justify-center">
+              <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+            </div>
 
-       
-<div className="absolute left-[-32px] top-2 w-4 h-4 bg-white rounded-full border border-gray-300 flex items-center justify-center">
-    
-    
-    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+            <div className="bg-white rounded-xl shadow border p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+              <div className="flex-1">
+                <p className="text-[14px] sm:text-[15px] text-gray-900 font-medium">
+                  {item.title}
+                </p>
 
-</div>
+                <p className="text-[12px] text-gray-500 mt-1">{item.time}</p>
 
+                <p className="text-[13px] text-gray-600 mt-1 leading-snug">
+                  {item.desc}
+                </p>
+              </div>
 
-         
-          <div className="bg-white rounded-xl shadow border p-4 pr-6 
-     flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
-
-  {/* LEFT SIDE */}
-  <div className="flex-1">
-    <div className="flex flex-wrap items-center gap-2">
-      <p className="text-[15px] text-gray-900">
-        {item.title}
-      </p>
-
-      <span className="px-1.5 py-[1px] text-[10px] border border-blue-300 
-            text-blue-600 bg-blue-50 rounded">
-        Current
-      </span>
-    </div>
-
-    <p className="text-[13px] text-gray-600 mt-1">
-      {item.desc}
-    </p>
-  </div>
-
-  {/* RIGHT SIDE — STATUS */}
-  <span className="text-[12px] px-2 py-1 rounded-md
-        self-start sm:self-auto">
-    {item.status}
-  </span>
-
-</div>
-
-
+              {/* Right Side: Status + Remark with Label */}
+              <div className="flex flex-col items-start sm:items-end gap-1.5 min-w-fit">
+                <span className="text-[11px] sm:text-[12px] bg-blue-100 text-blue-600 px-2 py-1 rounded-md whitespace-nowrap">
+                  {item.status}
+                </span>
+                
+                {item.remark && (
+                  <div className="text-[11px] text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100">
+                    <span className="font-semibold text-gray-700 mr-1">Remark:</span>
+                    {item.remark}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         ))}
       </div>

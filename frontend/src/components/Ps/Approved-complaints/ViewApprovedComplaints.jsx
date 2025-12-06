@@ -23,7 +23,7 @@ const api = axios.create({
   },
 });
 
-const ViewApprovedComplaints = () => {
+const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -45,7 +45,7 @@ const ViewApprovedComplaints = () => {
   } = useQuery({
     queryKey: ["complaint-details", id],
     queryFn: async () => {
-      const res = await api.get(`/operator/view-complaint/${id}`);
+      const res = await api.get(`/ps/view-complaint/${id}`);
       return res.data.data;
     },
     enabled: !!id,
@@ -62,7 +62,7 @@ const ViewApprovedComplaints = () => {
     queryKey: ["lokayukt-options"],
     queryFn: async () => {
       try {
-        const res = await api.get("/operator/get-lokayukt");
+        const res = await api.get("/ps/get-lokayukt");
 
         if (Array.isArray(res.data)) {
           return res.data;
@@ -88,7 +88,7 @@ const ViewApprovedComplaints = () => {
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post('/operator/received-physical', {
+      const res = await api.post('/ps/received-physical', {
         complaint_id: complaintId,
         remark: remarkData,
       });
@@ -107,7 +107,7 @@ const ViewApprovedComplaints = () => {
 
   const forwardPhysicallyMutation = useMutation({
     mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-      const res = await api.post('/operator/forward-physical', {
+      const res = await api.post('/ps/forward-physical', {
         complaint_id: complaintId,
         forward_to: forwardTo,
         remark: remarkData,
@@ -611,4 +611,4 @@ const ViewApprovedComplaints = () => {
   );
 };
 
-export default ViewApprovedComplaints;
+export default ViewAllComplaint;

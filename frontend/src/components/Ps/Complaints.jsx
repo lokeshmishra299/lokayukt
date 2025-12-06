@@ -708,7 +708,7 @@ const handleDownloadPDF = async () => {
 
       submitData.append('complaint_description', formData.complaintDescription);
 
-      await api.post('/operator/add-complaint', submitData, {
+      await api.post('/ps/add-complaint', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

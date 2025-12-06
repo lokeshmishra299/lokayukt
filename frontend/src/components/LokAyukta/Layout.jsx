@@ -41,14 +41,13 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Fixed Header - stays at top */}
+  
       <Header 
         toggleMobileMenu={toggleMobileMenu} 
         toggleSidebar={toggleSidebar}
         isCollapsed={isCollapsed}
       />
 
-      {/* Sidebar - below header on desktop */}
       <Sidebar
         isMobileMenuOpen={isMobileMenuOpen} 
         toggleMobileMenu={toggleMobileMenu} 
@@ -56,20 +55,20 @@ const Layout = () => {
         toggleSidebar={toggleSidebar}
       />
 
-      {/* Main Content Area with proper margin and padding */}
+ 
       <div 
         className="min-h-screen transition-all duration-300"
         style={{
           marginLeft: !isMobile ? (isCollapsed ? '4rem' : '16rem') : '0',
-          paddingTop: '4rem', // ✅ Add padding for fixed header (64px = 4rem)
+          paddingTop: '4rem', 
         }}
       >
-        {/* Main Content */}
+    
         <main className={`${isMobile ? 'p-4' : 'p-6'}`}>
           <Outlet />
         </main>
 
-        {/* Footer */}
+    
         <Footer />
       </div>
     </div>
