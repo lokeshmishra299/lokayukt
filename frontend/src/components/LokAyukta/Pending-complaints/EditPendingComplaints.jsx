@@ -119,7 +119,7 @@ const AllComplaintsEdit = () => {
           setComplaintTypes(complaintTypesResponse.data.data);
         }
 
-        // ✅ Pre-populate form with complaint data - Fixed mapping
+        
         if (complaintResponse.data.status === true) {
           const data = complaintResponse.data.data;
           setFormData({

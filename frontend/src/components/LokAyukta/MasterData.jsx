@@ -1139,7 +1139,7 @@ const MasterData = () => {
         style={{ zIndex: 9999 }}
       />
       
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="  space-y-4 sm:space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Master Data / मास्टर डेटा</h1>
           {/* <button className="inline-flex items-center gap-2 px-3 py-2 border rounded-md text-sm hover:bg-gray-50">

@@ -74,6 +74,9 @@ const Login = () => {
           else if (userRole === "up-lok-ayukt") {
             window.open("/uplokayukt/dashboard", "_self");
           }
+          else if (userRole === "ps") {
+            window.open("/ps/dashboard", "_self");
+          }
           else {
             toast.error("Unauthorized role.");
             navigate("/login");

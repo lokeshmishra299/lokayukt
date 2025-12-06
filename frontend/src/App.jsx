@@ -161,6 +161,27 @@ import LokayuktAddUserManagement from './components/LokAyukta/AddUserManagement'
 import LokayuktEditUserManagement from './components/LokAyukta/EditUserManagment';
 import LokayuktMasterData from './components/LokAyukta/MasterData';
 
+
+
+// import PsLayout from './components/PersonalSecretary/Layout';
+// import PsDashboard from './components/PersonalSecretary/Dashboard';
+// import PsComplaints from './components/PersonalSecretary/Complaints';
+// import PsProgressRegister from './components/PersonalSecretary/ProgressRegister';
+// import PsSearchReports from './components/PersonalSecretary/SearchReports';
+// import PsViewComplait from './components/PersonalSecretary/ViewComplaints';
+// import PsAllComplaits from './components/PersonalSecretary/All-complaints/AllComplaits';
+// import PsViewAllComplaint from './components/PersonalSecretary/All-complaints/ViewwAllComplaint';
+// import PsPendingComplaints from './components/PersonalSecretary/Pending-complaints/PendingComplaints';
+// import PsViewPendingComplaints from './components/PersonalSecretary/Pending-complaints/ViewPendingComplaints';
+// import PsApprovedComplaints from './components/PersonalSecretary/Approved-complaints/ApprovedComplaints';
+// import PsViewApprovedComplaint from './components/PersonalSecretary/Approved-complaints/ViewApprovedComplaints';
+
+// import LokayuktUserManagement from './components/PersonalSecretary/UserManagement';
+// import PsUserManagement from './components/PersonalSecretary/UserManagement';
+// import PddUserManagement from './components/PersonalSecretary/AddUserManagement';
+// import LokayuktEditUserManagement from './components/PersonalSecretary/EditUserManagment';
+// import LokayuktMasterData from './components/PersonalSecretary/MasterData';
+
 //UpLok-ayukt
 import UpLokayuktLayout from './components/UPLokAyukta/Layout';
 import UpLokayuktDashboard from './components/UPLokAyukta/Dashboard';
@@ -177,6 +198,19 @@ import UpLokayuktViewApprovedComplaint from './components/UPLokAyukta/Approved-c
 
 
 import Login from './components/Login';
+import LokayuktReporting from './components/LokAyukta/Reporting';
+
+
+import Layout from "./components/Ps/Layout";
+import Dashboard from "./components/Ps/Dashboard";
+import Complaints from './components/Ps/Complaints';
+import AllComplaints from './components/Ps/All-complaints/AllComplaits';
+import ViewAllComplaint from './components/Ps/All-complaints/ViewAllComplaint';
+import PendingComplaints from './components/Ps/Pending-complaints/PendingComplaints';
+import ViewPendingComplaint from './components/Ps/Pending-complaints/ViewPendingComplaint';
+import ApprovedComplaints from './components/Ps/Approved-complaints/ApprovedComplaints';
+import ViewApprovedComplaints from './components/Ps/Approved-complaints/ViewApprovedComplaints';
+import ScaneLetter from './components/LokAyukta/ScaneLetter';
 
 
 
@@ -394,6 +428,37 @@ function App() {
                     <Route path="user-management/add" element={<LokayuktAddUserManagement />} />
                     <Route path="user-management/edit/:id" element={<LokayuktEditUserManagement />} />
                     <Route path="master-data" element={<LokayuktMasterData />} />
+                    <Route path="reporting" element={<LokayuktReporting />} />       
+                    <Route path="scane-letter" element={<ScaneLetter />} />       
+
+
+         
+        </Route>
+      )}
+      {role === 'ps' && (
+        <Route path="/ps" element={<Layout />}>
+           <Route path="dashboard" element={<Dashboard/>} />
+          <Route path="complaints" element={<Complaints />} />
+          {/* <Route path="progress-register" element={<pro />} />
+          <Route path="search-reports" element={<PsSearchReports />} />
+          <Route path="search-reports/view/:id" element={<PsViewComplait />} /> */}
+
+          <Route path="all-complaints" element={<AllComplaints />} />
+          <Route path="all-complaints/view/:id" element={<ViewAllComplaint />} />
+        
+
+          <Route path="pending-complaints" element={<PendingComplaints />} />
+          <Route path="pending-complaints/view/:id" element={<ViewPendingComplaint />} />
+          
+
+          <Route path="approved-complaints" element={<ApprovedComplaints />} />   
+          <Route path="approved-complaints/view/:id" element={<ViewApprovedComplaints/>} />
+    
+
+
+              
+                    {/* <Route path="master-data" element={<PsMasterData />} />
+                    <Route path="reporting" element={<PsReporting />} /> */}
          
         </Route>
       )}
