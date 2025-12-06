@@ -525,7 +525,7 @@ const Dashboard = ({ userRole = "operator" }) => {
 
 
   return (
-    <div className=" space-y-6 bg-gray-50 min-h-screen">
+    <div className=" sm:space-y-2 space-y-4 bg-gray-50 min-h-screen">
       {/* Add styles for chart cursor pointer */}
       <style>{chartStyles}</style>
       {/* Add custom styles for date picker */}
@@ -533,7 +533,7 @@ const Dashboard = ({ userRole = "operator" }) => {
       
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
+                <h1 className="text-2xl sm:text-2xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
                 <p className="text-sm sm:text-base text-gray-600 break-words">
                   Welcome Back, {userRole} • Last Updated: {new Date().toLocaleString()}
                 </p>

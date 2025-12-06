@@ -79,7 +79,7 @@ const ScanLetter = () => {
       <div className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            Scan Letters / <span className="text-gray-600 font-semibold">पत्र स्कैन करें</span>
+            Scan Letters
           </h1>
           <p className="text-gray-500 text-sm mt-1">Scan and attach letters to case files</p>
         </div>

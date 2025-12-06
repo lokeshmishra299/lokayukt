@@ -99,11 +99,11 @@ const Reporting = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6 pb-20 md:pb-6">
+    <div className="min-h-screen bg-gray-50  pb-20 md:pb-6">
       {/* Header Section */}
       <div className="mb-6">
         <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
-          Reports / <span className="text-gray-600 font-semibold">रिपोर्टस</span>
+          Reports
         </h1>
         <p className="text-gray-500 text-xs md:text-sm mt-1">Generate and export case reports</p>
       </div>
