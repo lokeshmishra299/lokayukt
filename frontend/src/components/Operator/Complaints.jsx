@@ -37,7 +37,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
   
         <div className="text-center mb-2">
           <p className="font-semibold text-[13px]">
-            "शिकायत"
+          "शिकायत", "अभिकथन" उत्तर प्रदेश लोक आयुक्त तथा माननीय उप लोक आयुक्त अधिनियम, 1975
          
           </p>
         </div>
