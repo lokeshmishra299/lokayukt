@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { FaTimes, FaSpinner } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from "react";
+import { FaTimes, FaSpinner, FaDownload } from "react-icons/fa";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -27,11 +29,12 @@ const Notes = ({ complaint }) => {
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  
+  const popupRef = useRef(null); // Ref for PDF generation
+
   // Data States
   const [documents, setDocuments] = useState([]);
   const [notesList, setNotesList] = useState([]); // State for API notes
-  
+
   // Form States
   const [selectedDoc, setSelectedDoc] = useState("");
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
@@ -117,6 +120,44 @@ const Notes = ({ complaint }) => {
   const handleSubmitNote = () => {
     setOpen(false);
     setShowSuccess(true);
+  };
+
+  // ========================
+  // DOWNLOAD PDF FUNCTION (Updated to Hide Header)
+  // ========================
+  const handleDownloadPdf = async () => {
+    if (!popupRef.current) return;
+    
+    try {
+      // 1. Hide Header & Footer Buttons
+      const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
+      elementsToHide.forEach(el => el.style.display = 'none');
+
+      // 2. Generate Canvas
+      const canvas = await html2canvas(popupRef.current, {
+        scale: 2, // Higher scale for better quality
+        backgroundColor: "#ffffff",
+        useCORS: true // if images are involved
+      });
+      
+      // 3. Restore Header & Footer Buttons
+      elementsToHide.forEach(el => el.style.display = 'flex');
+
+      // 4. Create PDF
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Noting_${complaint?.file_number || "File"}.pdf`);
+      
+      toast.success("PDF Downloaded successfully!");
+    } catch (err) {
+      console.error("PDF Generation Error:", err);
+      toast.error("Failed to generate PDF");
+    }
   };
 
   // ========================
@@ -221,8 +262,6 @@ const Notes = ({ complaint }) => {
                   <p className=" text-gray-800">
                     {/* User ID: {item.added_by}  */}
                     {user?.name}
-
-                    {/* Note: If API sends user name later, replace item.added_by with item.user_name */}
                   </p>
                   <p className="text-xs text-gray-400 whitespace-nowrap">
                     {new Date(item.created_at).toLocaleString('en-IN', { 
@@ -374,73 +413,89 @@ const Notes = ({ complaint }) => {
         </div>
       )}
 
-      {/* SUCCESS POPUP */}
-{showSuccess && (
-  <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center px-4">
-    <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl   overflow-hidden">
+      {/* SUCCESS POPUP WITH PDF DOWNLOAD */}
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center px-4">
+          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden">
 
-      {/* HEADER */}
-      <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-100">
-        <p className="text-sm font-semibold text-gray-800"></p>
+            {/* Printable Area Ref */}
+            <div ref={popupRef} className="bg-white">
+              
+              {/* HEADER (Contains Download button - Will be hidden in PDF) */}
+              <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-100 pdf-hide-section">
+                <p className="text-sm font-semibold text-gray-800">
+                   {/* Blank title or can be "Preview" */}
+                </p>
 
-        <button
-          onClick={() => setShowSuccess(false)}
-          className="p-2 rounded hover:bg-gray-200 text-gray-600"
-        >
-          <FaTimes className="w-4 h-4" />
-        </button>
-      </div>
+                <div className="flex items-center gap-2">
+                  {/* Download Button */}
+                  <button
+                    onClick={handleDownloadPdf}
+                    className="p-2 rounded hover:bg-gray-200 text-blue-600 flex items-center gap-1 text-xs font-medium"
+                    title="Download as PDF"
+                  >
+                    <FaDownload /> Download
+                  </button>
 
-      {/* BODY */}
-      <div className="px-8 py-8 text-sm leading-relaxed text-gray-800 space-y-6">
+                  <button
+                    onClick={() => setShowSuccess(false)}
+                    className="p-2 rounded hover:bg-gray-200 text-gray-600"
+                  >
+                    <FaTimes className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
 
-        <p className="text-sm text-center font-semibold text-gray-800">
-          File No: {complaint?.file_number || complaint?.complain_no}
-        </p>
+              {/* BODY (This is what will be in the PDF) */}
+              <div className="px-8 py-8 text-sm leading-relaxed text-gray-800 space-y-6">
 
-        <p className="text-xs text-gray-500">
-          Data: {new Date().toLocaleDateString()}
-        </p>
+                <p className="text-sm text-center font-semibold text-gray-800">
+                  File No: {complaint?.file_number || complaint?.complain_no}
+                </p>
 
-        {/* SUBJECT / DESCRIPTION */}
-        <div className="  rounded-md bg-white px-5 py-4 min-h-[260px] whitespace-pre-wrap">
-          {note}
-        </div>
+                <p className="text-xs text-gray-500">
+                  Data: {new Date().toLocaleDateString()}
+                </p>
 
-        {/* DATE + AUTHORITY */}
-        <div className="flex justify-between pt-4">
-          <p className="text-xs text-gray-500"></p>
+                {/* SUBJECT / DESCRIPTION */}
+                <div className="rounded-md bg-white px-5 py-4 min-h-[260px] whitespace-pre-wrap">
+                  {note}
+                </div>
 
-          <div className="text-right text-xs text-gray-600">
-            <p className="uppercase tracking-wide">Noting By</p>
-            {/* <p className="font-semibold mt-1 text-gray-800">{user?.name}</p> */}
-            <p className="font-semibold mt-1 text-gray-800">Shri Sanjay Mishra</p>
-            <p>PS Name...</p>
+                {/* DATE + AUTHORITY */}
+                <div className="flex justify-between pt-4">
+                  <p className="text-xs text-gray-500"></p>
+
+                  <div className="text-right text-xs text-gray-600">
+                    <p className="uppercase tracking-wide">Noting By</p>
+                    <p className="font-semibold mt-1 text-gray-800">Shri Sanjay Mishra</p>
+                    <p>PS Name...</p>
+                  </div>
+                </div>
+
+              </div>
+              
+              {/* FOOTER BUTTONS (Hidden in PDF) */}
+              <div className="px-8 py-4 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
+                <button
+                  className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
+                  onClick={() => setShowSuccess(false)}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="px-6 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                  onClick={handleFinalSubmit}
+                >
+                  Submit
+                </button>
+              </div>
+
+            </div>
           </div>
         </div>
-
-      </div>
-
-      {/* FOOTER BUTTONS */}
-      <div className="px-8 py-4 border-t bg-gray-100 flex justify-end gap-3">
-        <button
-          className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
-          onClick={() => setShowSuccess(false)}
-        >
-          Cancel
-        </button>
-
-        <button
-          className="px-6 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
-          onClick={handleFinalSubmit}
-        >
-          Submit
-        </button>
-      </div>
-
-    </div>
-  </div>
-)}
+      )}
 
       {/* TOAST */}
       <ToastContainer />
