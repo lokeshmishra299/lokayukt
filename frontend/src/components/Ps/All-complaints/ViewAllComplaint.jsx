@@ -342,9 +342,9 @@ const ViewAllComplaint = () => {
 
   {/* ------------ COLUMN 3 ------------ */}
   <div>
-    <p className="text-xs text-gray-500 uppercase mb-1">OTHER WITNESSES</p>
+    <p className="text-xs text-gray-500 uppercase mb-1">PERMANENT POST OFFICE</p>
     <p className=" text-gray-800 text-sm md:text-base">
-      {complaintData.other_witnesses || "N/A"}
+      {complaintData.permanent_post_office || "N/A"}
     </p>
 
     <p className="text-xs text-gray-500 uppercase mb-1 mt-4">

@@ -45,7 +45,7 @@ const Notes = ({ complaint }) => {
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-        const res = await api.get(`/lokayukt/get-document/${complaint?.id}`);
+        const res = await api.get(`/ps/get-document/${complaint?.id}`);
         if (res.data.status) setDocuments(res.data.data);
       } catch (err) {
         console.log("Document fetch error:", err);
@@ -61,7 +61,7 @@ const Notes = ({ complaint }) => {
   const fetchNotes = async () => {
     if (!complaint?.id) return;
     try {
-      const res = await api.get(`/lokayukt/get-notes/${complaint.id}`);
+      const res = await api.get(`/ps/get-notes/${complaint.id}`);
       if (res.data.status) {
         setNotesList(res.data.data);
       }
@@ -97,7 +97,7 @@ const Notes = ({ complaint }) => {
 
     try {
       setLoading(true);
-      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+      const res = await api.get(`/ps/get-file-preview/${complaint.id}`);
       if (res.data.status && res.data.data.length > 0) {
         const match = res.data.data.find((p) => p.includes(fileName));
         if (match) {
@@ -137,7 +137,7 @@ const Notes = ({ complaint }) => {
     };
 
     try {
-      const res = await api.post("/lokayukt/add-notes", payload);
+      const res = await api.post("/ps/add-notes", payload);
 
       // SUCCESS
       if (res.data.status) {
