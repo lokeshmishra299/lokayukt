@@ -67,7 +67,7 @@ const AddUserManagement = () => {
           setDistricts(districtsResponse.data.data);
         } else {
           console.warn('Unexpected districts API response:', districtsResponse.data);
-          toast.error('Failed to load districts - Invalid response format');
+          // toast.error('Failed to load districts - Invalid response format');
         }
 
         // Fetch departments
@@ -109,7 +109,7 @@ const AddUserManagement = () => {
         }
       } catch (error) {
         console.log("Roles are not defined:", error);
-        toast.error('Failed to load roles');
+        // toast.error('Failed to load roles');
       }
     }
 
@@ -286,7 +286,7 @@ const AddUserManagement = () => {
   };
 
   return (
-    <div className="p-3 sm:p-4 md:p-6 bg-gray-50 min-h-screen">
+    <div className="p-3 sm:p-0  bg-gray-50 min-h-screen">
       <ToastContainer
         position="top-right"
         autoClose={3000}
