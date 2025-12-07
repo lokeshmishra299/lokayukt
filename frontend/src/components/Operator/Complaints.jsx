@@ -326,7 +326,7 @@ const Complaints = () => {
     challanDate: '',
     challanFile: null,
     supportingPersons: '',
-    otherPersons: [{ name: '', address: '' }], // Default input visible
+    otherPersons: [{ name: '', address: '' }], 
     attachedDocuments: '',
     attachedDocumentsFile: null,
     complaintDescription: ''
