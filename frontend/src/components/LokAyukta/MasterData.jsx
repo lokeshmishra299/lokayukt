@@ -295,7 +295,7 @@ const MasterData = () => {
 
   // Pagination State (One per tab)
   const [paginationState, setPaginationState] = useState({
-    districts: 1, departments: 1, subjects: 1, designations: 1, 'complaint-types': 1, 'rejection-reasons': 1
+    districts: 1, departments: 1, categories: 1, designations: 1, 'complaint-types': 1, 'rejection-reasons': 1
   });
   const ITEMS_PER_PAGE = 10;
 
@@ -329,9 +329,9 @@ const MasterData = () => {
     }))
   });
 
-  const { data: subjects = [] } = useQuery({
-    queryKey: ['subjects'],
-    queryFn: () => api.get('/lokayukt/subjects').then(res => res.data.data),
+  const { data: categories = [] } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => api.get('/lokayukt/categories').then(res => res.data.data),
     select: data => data.map(item => ({
       id: item.id,
       name: item.name,
@@ -396,8 +396,8 @@ const MasterData = () => {
           endpoint = `/lokayukt/add-department`;
           requestData = { name: formData.name, name_hindi: formData.nameHi };
           break;
-        case 'subjects':
-          endpoint = `/lokayukt/add-subject`;
+        case 'categories':
+          endpoint = `/lokayukt/add-category`;
           requestData = { name: formData.name, name_h: formData.nameHi };
           break;
         case 'designations':
@@ -439,8 +439,8 @@ const MasterData = () => {
           endpoint = `/lokayukt/edit-department/${id}`;
           requestData = { name: formData.name, name_hindi: formData.nameHi };
           break;
-        case 'subjects':
-          endpoint = `/lokayukt/edit-subject/${id}`;
+        case 'categories':
+          endpoint = `/lokayukt/edit-category/${id}`;
           requestData = { name: formData.name, name_h: formData.nameHi };
           break;
         case 'designations':
@@ -473,7 +473,7 @@ const MasterData = () => {
       switch (activeTab) {
         case 'districts': endpoint = `/lokayukt/delete-district/${deletingItem.id}`; break;
         case 'departments': endpoint = `/lokayukt/delete-department/${deletingItem.id}`; break;
-        case 'subjects': endpoint = `/lokayukt/delete-subject/${deletingItem.id}`; break;
+        case 'categories': endpoint = `/lokayukt/delete-category/${deletingItem.id}`; break;
         case 'designations': endpoint = `/lokayukt/delete-designation/${deletingItem.id}`; break;
         case 'complaint-types': endpoint = `/lokayukt/delete-complainstype/${deletingItem.id}`; break;
         case 'rejection-reasons': endpoint = `/lokayukt/delete-rejection/${deletingItem.id}`; break;
@@ -509,7 +509,7 @@ const MasterData = () => {
   const masterDataTabs = [
     { id: 'districts', label: 'Districts', labelHi: 'जिले', icon: FaMapMarkerAlt, data: districts, iconColor: 'text-red-600' },
     { id: 'departments', label: 'Departments', labelHi: 'विभाग', icon: FaBuilding, data: departments, iconColor: 'text-blue-600' },
-    { id: 'subjects', label: 'Category', labelHi: 'विषय', icon: FaFileAlt, data: subjects, iconColor: 'text-green-600' },
+    { id: 'categories', label: 'Category', labelHi: 'विषय', icon: FaFileAlt, data: categories, iconColor: 'text-green-600' },
     { id: 'designations', label: 'Designations', labelHi: 'पदनाम', icon: FaUsers, data: designations, iconColor: 'text-purple-600' },
     { id: 'complaint-types', label: 'Complaint Types', labelHi: 'शिकायत प्रकार', icon: FaFileAlt, data: complaintTypes, iconColor: 'text-orange-600' },
     { id: 'rejection-reasons', label: 'Rejection Reasons', labelHi: 'अस्वीकृति कारण', icon: FaFileAlt, data: rejectionReasons, iconColor: 'text-pink-600' },

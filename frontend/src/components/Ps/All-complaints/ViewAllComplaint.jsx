@@ -36,6 +36,7 @@ const ViewAllComplaint = () => {
   const [confirmConfig, setConfirmConfig] = useState({ open: false, type: null });
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
+  const [forwardType, setForwardType] = useState("self");
 
   const {
     data: complaintData,
@@ -485,7 +486,7 @@ const ViewAllComplaint = () => {
 
 
                      <button
-                    // onClick={handleforwardphysical}
+                    onClick={handleforwardphysical}
                     disabled={forwardPhysicallyMutation.isPending}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -512,97 +513,169 @@ const ViewAllComplaint = () => {
         )}
       </div>
 
-      {/* Confirmation Modal */}
+     
       {confirmConfig.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
-            <button
-              onClick={handleConfirmNo}
-              disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
-              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Close"
-            >
-              <FaTimes className="w-5 h-5 text-gray-600" />
-            </button>
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+      
+      {/* Close Button */}
+      <button
+        onClick={handleConfirmNo}
+        disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
+        className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Close"
+      >
+        <FaTimes className="w-5 h-5 text-gray-600" />
+      </button>
 
-            <h3 className="text-lg font-semibold mb-4 pr-8">
-              {confirmConfig.type === "receive"
-                ? "Mark as Received?"
-                : "Forward File Physically Electronically?"}
-            </h3>
-            {confirmConfig.type === "forward" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Forward To <span className="text-red-500">*</span>
-                </label>
-                {isLoadingOptions || isFetchingOptions ? (
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500">
-                    Loading...
-                  </div>
-                ) : forwardOptionsError ? (
-                  <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50">
-                    Error loading options: {forwardOptionsError.message}
-                  </div>
-                ) : (
-                  <select
-                    value={selectedForwardTo}
-                    onChange={(e) => setSelectedForwardTo(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select...</option>
-                    {Array.isArray(forwardOptionsData) && forwardOptionsData.length > 0 ? (
-                      forwardOptionsData.map((option) => (
-                        <option key={option.id} value={option.id}>
-                          {option.name || option.user_name || `User ${option.id}`}
-                          {option.district_name ? ` (${option.district_name})` : ""}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>No options available</option>
-                    )}
-                  </select>
-                )}
-              </div>
-            )}
-            <div className="mb-5">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Remark <span className="text-red-500">*</span>
+      {/* Title */}
+      <h3 className="text-lg font-semibold mb-4 pr-8">
+        {confirmConfig.type === "receive"
+          ? "Mark as Received?"
+          : "Forward File Physically Electronically?"}
+      </h3>
+
+      {/* --- FORWARDING LOGIC START --- */}
+      {confirmConfig.type === "forward" && (
+        <>
+          {/* Radio Buttons Section */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Forward Type <span className="text-red-500">*</span>
+            </label>
+            <div className="flex flex-col gap-2">
+              
+              {/* Option 1: Send to Self */}
+              <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
+                <input
+                  type="radio"
+                  name="forwardType"
+                  value="self"
+                  checked={forwardType === "self"}
+                  onChange={(e) => setForwardType(e.target.value)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-gray-700 font-medium">Send to Self</span>
               </label>
-              <textarea
-                value={remark}
-                onChange={(e) => setRemark(e.target.value)}
-                rows={4}
-                placeholder="Enter your remark here..."
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
-            </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={handleConfirmNo}
-                disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
-                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmYes}
-                disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardPhysicallyMutation.isPending ||
-                  (confirmConfig.type === "forward" && (isLoadingOptions || isFetchingOptions)) ||
-                  (confirmConfig.type === "receive" && !remark.trim()) ||
-                  (confirmConfig.type === "forward" && (!selectedForwardTo || !remark.trim()))
-                }
-                className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending
-                  ? "Sending..."
-                  : "Send"}
-              </button>
+
+              {/* Option 2: Send to Lokayukt */}
+              <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
+                <input
+                  type="radio"
+                  name="forwardType"
+                  value="lokayukt"
+                  checked={forwardType === "lokayukt"}
+                  onChange={(e) => setForwardType(e.target.value)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-gray-700 font-medium">Send to Lokayukt</span>
+              </label>
+
+              {/* Option 3: Send to Up-Lokayukt */}
+              <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
+                <input
+                  type="radio"
+                  name="forwardType"
+                  value="uplokayukt"
+                  checked={forwardType === "uplokayukt"}
+                  onChange={(e) => setForwardType(e.target.value)}
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                />
+                <span className="ml-2 text-sm text-gray-700 font-medium">Send to Up-Lokayukt</span>
+              </label>
             </div>
           </div>
-        </div>
+
+          {/* Conditional Dropdown - Only shows if NOT 'self' */}
+          {forwardType !== "self" && (
+            <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                 Select {forwardType === "uplokayukt" ? "Up-Lokayukt" : "Lokayukt"} Officer <span className="text-red-500">*</span>
+              </label>
+              
+              {isLoadingOptions || isFetchingOptions ? (
+                <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50">
+                  Loading options...
+                </div>
+              ) : forwardOptionsError ? (
+                <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50">
+                  Error: {forwardOptionsError.message}
+                </div>
+              ) : (
+                <select
+                  value={selectedForwardTo}
+                  onChange={(e) => setSelectedForwardTo(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="">Select Officer...</option>
+                  {Array.isArray(forwardOptionsData) && forwardOptionsData.length > 0 ? (
+                    forwardOptionsData.map((option) => (
+                      <option key={option.id} value={option.id}>
+                        {option.name || option.user_name || `User ${option.id}`}
+                        {option.district_name ? ` (${option.district_name})` : ""}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No options available</option>
+                  )}
+                </select>
+              )}
+            </div>
+          )}
+        </>
       )}
+      {/* --- FORWARDING LOGIC END --- */}
+
+      {/* Remark Field */}
+      <div className="mb-5">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Remark <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          rows={4}
+          placeholder="Enter your remark here..."
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={handleConfirmNo}
+          disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
+          className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Cancel
+        </button>
+        
+        <button
+          onClick={handleConfirmYes}
+          disabled={
+            markAsReceivedMutation.isPending ||
+            forwardPhysicallyMutation.isPending ||
+            // Disable if receive mode and no remark
+            (confirmConfig.type === "receive" && !remark.trim()) ||
+            // Disable if forward mode logic fails:
+            (confirmConfig.type === "forward" && (
+               !remark.trim() || // Remark is always mandatory
+               (forwardType !== "self" && !selectedForwardTo) || // If not self, must select officer
+               (forwardType !== "self" && (isLoadingOptions || isFetchingOptions)) // Don't submit while loading
+            ))
+          }
+          className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        >
+          {markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending
+            ? "Sending..."
+            : "Send"}
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
