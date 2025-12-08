@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Helpers\ApiResponse;
 use App\Models\ComplainType;
+use App\Models\Category;
 use App\Models\Department;
 use App\Models\Designation;
 use App\Models\District;
