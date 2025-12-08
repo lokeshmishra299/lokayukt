@@ -182,7 +182,7 @@ const AllComplaints = () => {
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Send To Lokayukt Successfully!", {
+        toast.success("Send To UpLokayukt Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,

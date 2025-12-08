@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaTimes, FaSpinner, FaDownload } from "react-icons/fa";
+import { FaTimes, FaSpinner, FaDownload, FaPrint } from "react-icons/fa"; // Added FaPrint
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -123,41 +123,87 @@ const Notes = ({ complaint }) => {
   };
 
   // ========================
-  // DOWNLOAD PDF FUNCTION (Updated to Hide Header)
+  // DOWNLOAD PDF FUNCTION
   // ========================
   const handleDownloadPdf = async () => {
     if (!popupRef.current) return;
-    
+
     try {
       // 1. Hide Header & Footer Buttons
-      const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
-      elementsToHide.forEach(el => el.style.display = 'none');
+      const elementsToHide =
+        popupRef.current.querySelectorAll(".pdf-hide-section");
+      elementsToHide.forEach((el) => (el.style.display = "none"));
 
       // 2. Generate Canvas
       const canvas = await html2canvas(popupRef.current, {
         scale: 2, // Higher scale for better quality
         backgroundColor: "#ffffff",
-        useCORS: true // if images are involved
+        useCORS: true, // if images are involved
       });
-      
+
       // 3. Restore Header & Footer Buttons
-      elementsToHide.forEach(el => el.style.display = 'flex');
+      elementsToHide.forEach((el) => (el.style.display = "flex"));
 
       // 4. Create PDF
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
-      
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
+
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Noting_${complaint?.file_number || "File"}.pdf`);
-      
+
       toast.success("PDF Downloaded successfully!");
     } catch (err) {
       console.error("PDF Generation Error:", err);
       toast.error("Failed to generate PDF");
     }
+  };
+
+  // ========================
+  // NEW: HANDLE PRINT FUNCTION
+  // ========================
+  const handlePrint = () => {
+    if (!popupRef.current) return;
+
+    // Open a new window for printing
+    const printWindow = window.open("", "_blank");
+
+    // Gather all styles from the current document (Tailwind, etc.)
+    const styles = Array.from(
+      document.querySelectorAll("link[rel='stylesheet'], style")
+    )
+      .map((node) => node.outerHTML)
+      .join("");
+
+    // Write content to the new window
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Note</title>
+          ${styles}
+          <style>
+            body { background-color: white; -webkit-print-color-adjust: exact; }
+            /* Explicitly hide the header/footer buttons in print view */
+            .pdf-hide-section { display: none !important; } 
+            .print-container { padding: 20px; }
+          </style>
+        </head>
+        <body class="print-container">
+          ${popupRef.current.innerHTML}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+
+    // Small delay to ensure styles load before printing
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
   };
 
   // ========================
@@ -184,13 +230,13 @@ const Notes = ({ complaint }) => {
       if (res.data.status) {
         toast.success("Note Added Successfully!");
         setShowSuccess(false);
-        
+
         // Reset Form
         setNote("");
         setSelectedDoc("");
         setPageRanges([{ from: "", to: "" }]);
         setPdfViewUrl(null);
-        
+
         // Refresh the List
         fetchNotes();
       }
@@ -219,7 +265,12 @@ const Notes = ({ complaint }) => {
   // VALIDATION
   // ========================
   const isFormValid = () => {
-    return note.trim() !== "" && selectedDoc !== "" && pageRanges[0].from !== "" && pageRanges[0].to !== "";
+    return (
+      note.trim() !== "" &&
+      selectedDoc !== "" &&
+      pageRanges[0].from !== "" &&
+      pageRanges[0].to !== ""
+    );
   };
 
   // ========================
@@ -227,7 +278,7 @@ const Notes = ({ complaint }) => {
   // ========================
   const getDocName = (dId) => {
     if (!documents.length || !dId) return null;
-    const doc = documents.find(d => d.id === dId);
+    const doc = documents.find((d) => d.id === dId);
     return doc ? doc.file : null;
   };
 
@@ -238,7 +289,9 @@ const Notes = ({ complaint }) => {
     <div className="bg-white rounded-lg w-full p-4">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-3">
-        <p className="text-[16px] font-medium text-gray-800">Notes & Notings</p>
+        <p className="text-[16px] font-medium text-gray-800">
+          Notes & Notings
+        </p>
         <button
           className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700"
           onClick={() => setOpen(true)}
@@ -250,26 +303,35 @@ const Notes = ({ complaint }) => {
       {/* DISPLAY NOTES (Dynamic from API) */}
       <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
         {notesList.length === 0 ? (
-           <p className="text-sm text-gray-500 text-center py-4">No notes available.</p>
+          <p className="text-sm text-gray-500 text-center py-4">
+            No notes available.
+          </p>
         ) : (
           notesList.map((item, index) => {
-             // Find doc name for display
-             const referencedFile = getDocName(item.d_id);
-             
-             return (
-              <div key={item.id || index} className="border rounded-lg p-4 bg-gray-50">
+            // Find doc name for display
+            const referencedFile = getDocName(item.d_id);
+
+            return (
+              <div
+                key={item.id || index}
+                className="border rounded-lg p-4 bg-gray-50"
+              >
                 <div className="flex justify-between items-start">
                   <p className=" text-gray-800">
                     {/* User ID: {item.added_by}  */}
                     {user?.name}
                   </p>
                   <p className="text-xs text-gray-400 whitespace-nowrap">
-                    {new Date(item.created_at).toLocaleString('en-IN', { 
-                      day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' 
+                    {new Date(item.created_at).toLocaleString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </p>
                 </div>
-                
+
                 <div className="mt-2 whitespace-pre-wrap text-sm text-gray-700">
                   {item.description}
                 </div>
@@ -279,10 +341,12 @@ const Notes = ({ complaint }) => {
                   <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500">
                     <span className="font-semibold">References:</span>
                     <div className="mt-1 pl-2 border-l-2 border-blue-200">
-                       {referencedFile && <p>Doc: {referencedFile}</p>}
-                       {item.range_from && item.range_two && (
-                         <p>Pages: {item.range_from} – {item.range_two}</p>
-                       )}
+                      {referencedFile && <p>Doc: {referencedFile}</p>}
+                      {item.range_from && item.range_two && (
+                        <p>
+                          Pages: {item.range_from} – {item.range_two}
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -319,11 +383,15 @@ const Notes = ({ complaint }) => {
                 onChange={(e) => setNote(e.target.value)}
               />
               {errors.description && (
-                <p className="text-red-500 text-xs mt-1">{errors.description[0]}</p>
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.description[0]}
+                </p>
               )}
 
               <div className="mt-6">
-                <label className="block text-sm font-medium mb-2">Reference by Document</label>
+                <label className="block text-sm font-medium mb-2">
+                  Reference by Document
+                </label>
                 <select
                   className={`w-full border rounded-md p-2 ${
                     errors.d_id ? "border-red-500" : "border-gray-300"
@@ -344,7 +412,9 @@ const Notes = ({ complaint }) => {
               </div>
 
               <div className="mt-6">
-                <label className="block text-sm font-medium mb-2">Combined Page Range</label>
+                <label className="block text-sm font-medium mb-2">
+                  Combined Page Range
+                </label>
                 <div className="flex gap-2">
                   <input
                     type="number"
@@ -353,7 +423,9 @@ const Notes = ({ complaint }) => {
                     }`}
                     placeholder="From"
                     value={pageRanges[0].from}
-                    onChange={(e) => handlePageRangeChange(0, "from", e.target.value)}
+                    onChange={(e) =>
+                      handlePageRangeChange(0, "from", e.target.value)
+                    }
                   />
                   <input
                     type="number"
@@ -362,7 +434,9 @@ const Notes = ({ complaint }) => {
                     }`}
                     placeholder="To"
                     value={pageRanges[0].to}
-                    onChange={(e) => handlePageRangeChange(0, "to", e.target.value)}
+                    onChange={(e) =>
+                      handlePageRangeChange(0, "to", e.target.value)
+                    }
                   />
                 </div>
                 {(errors.range_from || errors.range_two) && (
@@ -383,7 +457,9 @@ const Notes = ({ complaint }) => {
                   onClick={handleSubmitNote}
                   disabled={!isFormValid()}
                   className={`px-4 py-2 text-sm rounded-md text-white ${
-                    isFormValid() ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-300 cursor-not-allowed"
+                    isFormValid()
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-gray-300 cursor-not-allowed"
                   }`}
                 >
                   Add Note
@@ -405,7 +481,9 @@ const Notes = ({ complaint }) => {
                     className="w-full h-full border-0"
                   />
                 ) : (
-                  <p className="text-gray-400 text-sm">Select a document to preview PDF</p>
+                  <p className="text-gray-400 text-sm">
+                    Select a document to preview PDF
+                  </p>
                 )}
               </div>
             </div>
@@ -413,21 +491,28 @@ const Notes = ({ complaint }) => {
         </div>
       )}
 
-      {/* SUCCESS POPUP WITH PDF DOWNLOAD */}
+      {/* SUCCESS POPUP WITH PDF DOWNLOAD & PRINT */}
       {showSuccess && (
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center px-4">
           <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden">
-
             {/* Printable Area Ref */}
             <div ref={popupRef} className="bg-white">
-              
-              {/* HEADER (Contains Download button - Will be hidden in PDF) */}
+              {/* HEADER (Contains Actions - Hidden in PDF/Print) */}
               <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-100 pdf-hide-section">
                 <p className="text-sm font-semibold text-gray-800">
-                   {/* Blank title or can be "Preview" */}
+                  {/* Blank title or can be "Preview" */}
                 </p>
 
                 <div className="flex items-center gap-2">
+                  {/* PRINT BUTTON (NEW) */}
+                  <button
+                    onClick={handlePrint}
+                    className="p-2 rounded hover:bg-gray-200 text-gray-700 flex items-center gap-1 text-xs font-medium"
+                    title="Print"
+                  >
+                    <FaPrint /> Print
+                  </button>
+
                   {/* Download Button */}
                   <button
                     onClick={handleDownloadPdf}
@@ -446,9 +531,8 @@ const Notes = ({ complaint }) => {
                 </div>
               </div>
 
-              {/* BODY (This is what will be in the PDF) */}
+              {/* BODY (This is what will be in the PDF/Print) */}
               <div className="px-8 py-8 text-sm leading-relaxed text-gray-800 space-y-6">
-
                 <p className="text-sm text-center font-semibold text-gray-800">
                   File No: {complaint?.file_number || complaint?.complain_no}
                 </p>
@@ -468,14 +552,15 @@ const Notes = ({ complaint }) => {
 
                   <div className="text-right text-xs text-gray-600">
                     <p className="uppercase tracking-wide">Noting By</p>
-                    <p className="font-semibold mt-1 text-gray-800">Shri Sanjay Mishra</p>
+                    <p className="font-semibold mt-1 text-gray-800">
+                      Shri Sanjay Mishra
+                    </p>
                     <p>PS Name...</p>
                   </div>
                 </div>
-
               </div>
-              
-              {/* FOOTER BUTTONS (Hidden in PDF) */}
+
+              {/* FOOTER BUTTONS (Hidden in PDF/Print) */}
               <div className="px-8 py-4 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
                 <button
                   className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
@@ -491,7 +576,6 @@ const Notes = ({ complaint }) => {
                   Submit
                 </button>
               </div>
-
             </div>
           </div>
         </div>

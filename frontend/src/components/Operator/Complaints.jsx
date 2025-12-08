@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -16,9 +16,7 @@ const api = axios.create({
   },
 });
 
-/**
- * A4 PRINT VIEW – Updated styling to ensure background covers all content including point 12
- */
+
 const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }, ref) => {
   const formatYesNo = (val) =>
     val === 'हाँ' || val === 'नहीं'
@@ -281,7 +279,36 @@ ComplaintPrintView.displayName = 'ComplaintPrintView';
 const Complaints = () => {
   const printRef = useRef(null);
 
-  // State for परिवादी (complainants)
+
+  const [districtList, setDistrictList] = useState([]);
+  const [departmentList, setDepartmentList] = useState([]);
+  const [subjectList, setSubjectList] = useState([]); 
+  const [designationList, setDesignationList] = useState([]);
+
+  useEffect(() => {
+    const fetchMasterData = async () => {
+      try {
+        const [distRes, deptRes, subjRes, desigRes] = await Promise.all([
+          api.get('/operator/all-district'),
+          api.get('/operator/department'),
+          api.get('/operator/categories'),
+          api.get('/operator/designation')
+        ]);
+
+        if(distRes.data.status) setDistrictList(distRes.data.data);
+        if(deptRes.data.status) setDepartmentList(deptRes.data.data);
+        if(subjRes.data.status) setSubjectList(subjRes.data.data);
+        if(desigRes.data.status) setDesignationList(desigRes.data.data);
+      } catch (err) {
+        console.error("Error fetching master data:", err);
+       
+      }
+    };
+
+    fetchMasterData();
+  }, []);
+
+
   const [complainants, setComplainants] = useState([
     {
       id: 1,
@@ -295,7 +322,6 @@ const Complaints = () => {
   const [showComplainants, setShowComplainants] = useState({ 1: true });
   const [showAttachedDocs, setShowAttachedDocs] = useState(false);
 
-  // State for व्यक्ति (persons against complaint)
   const [persons, setPersons] = useState([
     {
       id: 1,
@@ -310,8 +336,7 @@ const Complaints = () => {
 
   const [showPersons, setShowPersons] = useState({ 1: true });
 
-  // State for other form fields
-  // Initialize otherPersons with one default empty object so the fields are visible
+
   const [formData, setFormData] = useState({
     relation: '',
     authorizationFile: null,
@@ -871,7 +896,7 @@ const Complaints = () => {
                   </div>
                 </div>
 
-               {showComplainants[complainant.id] && (
+                {showComplainants[complainant.id] && (
                 <div className="p-5 animate-slideDown">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
@@ -1177,55 +1202,79 @@ const Complaints = () => {
                 {showPersons[person.id] && (
                   <div className="p-5 animate-slideDown">
                     
-                    {/* Row 1: District & Nature of Department */}
+                    {/* Row 1: District & Nature of Department - UPDATED TO DROPDOWNS */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
                         <label className="block text-gray-700 text-sm font-medium mb-2">
                           ज़िला: <span className="text-red-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                        <select
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
                           value={person.district || ''} 
                           onChange={(e) => updatePerson(person.id, 'district', e.target.value)}
-                        />
+                        >
+                          <option value="">ज़िला चुनें</option>
+                          {districtList.map((dist, i) => (
+                            <option key={i} value={dist.district_name}>
+                              {dist.district_name} / {dist.dist_name_hi}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label className="block text-gray-700 text-sm font-medium mb-2">
                           विभाग का नाम: <span className="text-red-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                        <select
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
                           value={person.departmentNature || ''}
                           onChange={(e) => updatePerson(person.id, 'departmentNature', e.target.value)}
-                        />
+                        >
+                          <option value="">विभाग चुनें</option>
+                          {departmentList.map((dept, i) => (
+                            <option key={i} value={dept.name}>
+                              {dept.name} / {dept.name_hindi}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
-                    {/* Row 2: Officer Category & Designation */}
+                    {/* Row 2: Officer Category & Designation - UPDATED TO DROPDOWNS */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                       <div>
                         <label className="block text-gray-700 text-sm font-medium mb-2">
                           अधिकारी की श्रेणी: <span className="text-red-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                        <select
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
                           value={person.officerCategory || ''}
                           onChange={(e) => updatePerson(person.id, 'officerCategory', e.target.value)}
-                        />
+                        >
+                          <option value="">श्रेणी चुनें</option>
+                          {subjectList.map((subj, i) => (
+                            <option key={i} value={subj.name}>
+                              {subj.name} / {subj.name_h}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label className="block text-gray-700 text-sm font-medium mb-2">
                           पदनाम: <span className="text-red-500">*</span>
                         </label>
-                        <input
-                          type="text"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                        <select
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
                           value={person.designation || ''}
                           onChange={(e) => updatePerson(person.id, 'designation', e.target.value)}
-                        />
+                        >
+                          <option value="">पदनाम चुनें</option>
+                          {designationList.map((desig, i) => (
+                            <option key={i} value={desig.name}>
+                              {desig.name} / {desig.name_h}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
