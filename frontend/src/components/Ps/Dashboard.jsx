@@ -257,7 +257,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 
 // Main Dashboard Component
-const Dashboard = ({ userRole = "operator" }) => {
+const Dashboard = ({ userRole = "ps" }) => {
 
   const navigate = useNavigate()
   //  API State Management + Date Picker State
@@ -316,14 +316,14 @@ const Dashboard = ({ userRole = "operator" }) => {
   const fetchDashboardData = async (monthParam) => {
     try {
       // 1. Dashboard Stats API
-      const dashResponse = await api.get(`/operator/dashboard/${monthParam}`);
+      const dashResponse = await api.get(`/ps/dashboard/${monthParam}`);
       if (dashResponse.data.status) {
         setDashboardData(dashResponse.data.dataDashboard);
       }
 
 
       // 2. Monthly Complaint API
-      const monthlyResponse = await api.get('/operator/montly-complaint');
+      const monthlyResponse = await api.get('/ps/montly-complaint');
       if (monthlyResponse.data) {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const monthlyTrends = months.map((month, index) => ({
@@ -337,7 +337,7 @@ const Dashboard = ({ userRole = "operator" }) => {
 
 
       // 3. Status Distribution API
-      const statusResponse = await api.get('/operator/status-distribution');
+      const statusResponse = await api.get('/ps/status-distribution');
       if (statusResponse.data && statusResponse.data.data) {
         const statusInfo = statusResponse.data.data;
         const statusDistribution = [
@@ -367,7 +367,7 @@ const Dashboard = ({ userRole = "operator" }) => {
 
 
       // 4. Department-wise API
-      const deptResponse = await api.get('/operator/department-wise-complaint');
+      const deptResponse = await api.get('/ps/department-wise-complaint');
       if (deptResponse.data.status) {
         const deptData = Object.entries(deptResponse.data.data).map(([department, complaints]) => ({
           department,
@@ -379,7 +379,7 @@ const Dashboard = ({ userRole = "operator" }) => {
 
 
       // 5. District-wise API
-      const districtResponse = await api.get('/operator/district-wise-company-type');
+      const districtResponse = await api.get('/ps/district-wise-company-type');
       if (districtResponse.data) {
         const { district, total, allegations, grievances } = districtResponse.data;
         const districtFormatted = district.map((districtName, index) => ({
@@ -616,7 +616,7 @@ const Dashboard = ({ userRole = "operator" }) => {
         {/* Total Complaints */}
         <div
         onClick={()=>{
-          navigate("/operator/all-complaints ")
+          navigate("/ps/all-complaints ")
         }}
          className="p-5 rounded-2xl shadow-md border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -636,7 +636,7 @@ const Dashboard = ({ userRole = "operator" }) => {
         {/* Today's Entry */}
         <div
         //  onClick={()=>{
-        //   navigate("/operator/pending-complaints")
+        //   navigate("/ps/pending-complaints")
         // }}
          className="p-5 rounded-2xl shadow-md border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -656,7 +656,7 @@ const Dashboard = ({ userRole = "operator" }) => {
         {/* Approved */}
         <div 
           onClick={()=>{
-          navigate("/operator/approved-complaints")
+          navigate("/ps/approved-complaints")
         }}
         className="p-5 rounded-2xl shadow-md border border-green-200 bg-green-50 hover:bg-green-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -692,7 +692,7 @@ const Dashboard = ({ userRole = "operator" }) => {
         {/* Pending */}
         <div
         //   onClick={()=>{
-        //   navigate("/operator/pending-complaints")
+        //   navigate("/ps/pending-complaints")
         // }}
          className="p-5 rounded-2xl shadow-md border border-yellow-200 bg-yellow-50 hover:bg-yellow-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -711,7 +711,7 @@ const Dashboard = ({ userRole = "operator" }) => {
         {/* Avg. Processing */}
         <div
         //   onClick={()=>{
-        //   navigate("/operator/pending-complaints")
+        //   navigate("/ps/pending-complaints")
         // }}
          className="p-5 rounded-2xl shadow-md border border-teal-200 bg-teal-50 hover:bg-teal-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
