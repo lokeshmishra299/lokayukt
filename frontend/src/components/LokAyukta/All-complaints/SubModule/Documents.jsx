@@ -133,7 +133,7 @@ const Documents = ({ complaint }) => {
               {/* Icon + Filename */}
               <div className="flex items-center gap-3">
                 <BsFileEarmarkPdf className="w-6 h-6 text-blue-600" />
-                <span className="text-sm font-medium">{doc.file}</span>
+                <span className="text-sm font-medium">{doc.title}</span>
               </div>
 
               {/* Actions */}
