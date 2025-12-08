@@ -197,7 +197,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/district-wise-company-type',[OperatorDashboardController::class,'getdistrictWiseCompanyTypeGraph']);
         Route::get('/status-distribution',[OperatorDashboardController::class,'gestatusDistribution']);
         Route::get('/status-distribution',action: [OperatorDashboardController::class,'gestatusDistribution']);
-
+        Route::get('/categories',[CommonController::class,'fetch_Category']);
     });
 
     Route::middleware('role:supervisor:so-us|ds-js|sec|cio-io|dea-assis')->prefix('supervisor')->group(function () {
