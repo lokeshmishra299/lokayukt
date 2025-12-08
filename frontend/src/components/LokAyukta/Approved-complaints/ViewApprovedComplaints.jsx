@@ -36,6 +36,8 @@ const ViewApprovedComplaints = () => {
   const [confirmConfig, setConfirmConfig] = useState({ open: false, type: null });
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
+  const [pullBack, setPullBack] = useState(false)
+
 
   const {
     data: complaintData,
@@ -52,6 +54,14 @@ const ViewApprovedComplaints = () => {
     staleTime: 1000 * 60 * 5,
     retry: 2,
   });
+
+
+    const handlePullBackConfirm = () => {
+    
+    // toast.info("Pull Back confirmed (Logic pending)"); 
+    setPullBack(false); // Close the popup
+  };
+
 
   const {
     data: forwardOptionsData,
@@ -340,9 +350,9 @@ const ViewApprovedComplaints = () => {
   </div>
 
 
-  {/* ------------ COLUMN 3 ------------ */}
+
   <div>
-      <p className="text-xs text-gray-500 uppercase mb-1">POST OFFICE</p>
+     <p className="text-xs text-gray-500 uppercase mb-1">POST OFFICE</p>
     <p className=" text-gray-800 text-sm md:text-base">
       {complaintData.permanent_post_office || "N/A"}
     </p>
@@ -459,12 +469,16 @@ const ViewApprovedComplaints = () => {
             </div>
 
             {/* Footer Buttons */}
-           <div className="border-t p-4">
+            <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
 
               <div>
 
-                <button className="px-4 py-2 border cursor-not-allowed border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
+                <button
+                onClick={()=>{
+                  setPullBack(true)
+                }}
+                 className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
                   Pull Back
                 </button>
              
@@ -474,7 +488,7 @@ const ViewApprovedComplaints = () => {
                   <div className="flex gap-2">
 
                       <button
-                    // onClick={handleMarkAsReceived}
+                    onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -485,7 +499,7 @@ const ViewApprovedComplaints = () => {
 
 
                      <button
-                    // onClick={handleforwardphysical}
+                    onClick={handleforwardphysical}
                     disabled={forwardPhysicallyMutation.isPending}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -513,96 +527,162 @@ const ViewApprovedComplaints = () => {
       </div>
 
       {/* Confirmation Modal */}
-      {confirmConfig.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
-            <button
-              onClick={handleConfirmNo}
-              disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
-              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Close"
-            >
-              <FaTimes className="w-5 h-5 text-gray-600" />
-            </button>
+    {confirmConfig.open && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+      
+      {/* Close Button */}
+      <button
+        onClick={handleConfirmNo}
+        disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
+        className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        aria-label="Close"
+      >
+        <FaTimes className="w-5 h-5 text-gray-600" />
+      </button>
 
-            <h3 className="text-lg font-semibold mb-4 pr-8">
-              {confirmConfig.type === "receive"
-                ? "Mark as Received?"
-                : "Forward File Physically Electronically?"}
-            </h3>
-            {confirmConfig.type === "forward" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Forward To <span className="text-red-500">*</span>
-                </label>
-                {isLoadingOptions || isFetchingOptions ? (
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500">
-                    Loading...
-                  </div>
-                ) : forwardOptionsError ? (
-                  <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50">
-                    Error loading options: {forwardOptionsError.message}
-                  </div>
-                ) : (
-                  <select
-                    value={selectedForwardTo}
-                    onChange={(e) => setSelectedForwardTo(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select...</option>
-                    {Array.isArray(forwardOptionsData) && forwardOptionsData.length > 0 ? (
-                      forwardOptionsData.map((option) => (
-                        <option key={option.id} value={option.id}>
-                          {option.name || option.user_name || `User ${option.id}`}
-                          {option.district_name ? ` (${option.district_name})` : ""}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>No options available</option>
-                    )}
-                  </select>
-                )}
-              </div>
-            )}
-            <div className="mb-5">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Remark <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                value={remark}
-                onChange={(e) => setRemark(e.target.value)}
-                rows={4}
-                placeholder="Enter your remark here..."
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-              />
+      {/* Title */}
+      <h3 className="text-lg font-semibold mb-4 pr-8">
+        {confirmConfig.type === "receive"
+          ? "Return with Remarks?"
+          : "Forward To?"}
+      </h3>
+
+      {/* Forward To Dropdown - Only visible when forwarding */}
+      {confirmConfig.type === "forward" && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Forward To <span className="text-red-500">*</span>
+          </label>
+          
+          {isLoadingOptions || isFetchingOptions ? (
+            <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50">
+              Loading...
             </div>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={handleConfirmNo}
-                disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
-                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmYes}
-                disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardPhysicallyMutation.isPending ||
-                  (confirmConfig.type === "forward" && (isLoadingOptions || isFetchingOptions)) ||
-                  (confirmConfig.type === "receive" && !remark.trim()) ||
-                  (confirmConfig.type === "forward" && (!selectedForwardTo || !remark.trim()))
-                }
-                className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending
-                  ? "Sending..."
-                  : "Send"}
-              </button>
+          ) : forwardOptionsError ? (
+            <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50">
+              Error loading options: {forwardOptionsError.message}
             </div>
-          </div>
+          ) : (
+            <select
+              value={selectedForwardTo}
+              onChange={(e) => setSelectedForwardTo(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select User...</option>
+              {Array.isArray(forwardOptionsData) && forwardOptionsData.length > 0 ? (
+                forwardOptionsData.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name || option.user_name || `User ${option.id}`}
+                    {option.district_name ? ` (${option.district_name})` : ""}
+                  </option>
+                ))
+              ) : (
+                <option disabled>No options available</option>
+              )}
+            </select>
+          )}
         </div>
       )}
+
+      {/* Remark Field - Always visible */}
+      <div className="mb-5">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Remark <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          rows={4}
+          placeholder="Enter your remark here..."
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={handleConfirmNo}
+          disabled={markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending}
+          className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleConfirmYes}
+          disabled={
+            markAsReceivedMutation.isPending ||
+            forwardPhysicallyMutation.isPending ||
+            // If forwarding, disable if options are loading
+            (confirmConfig.type === "forward" && (isLoadingOptions || isFetchingOptions)) ||
+            // If receiving, only remark is required
+            (confirmConfig.type === "receive" && !remark.trim()) ||
+            // If forwarding, BOTH dropdown selection and remark are required
+            (confirmConfig.type === "forward" && (!selectedForwardTo || !remark.trim()))
+          }
+          className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {markAsReceivedMutation.isPending || forwardPhysicallyMutation.isPending
+            ? "Sending..."
+            : "Send"}
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+{pullBack && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative animate-in fade-in zoom-in duration-200">
+      
+      {/* Close 'X' Button */}
+      <button
+        onClick={() => setPullBack(false)}
+        className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors"
+      >
+        <FaTimes className="w-5 h-5 text-gray-500" />
+      </button>
+
+      {/* Icon (Optional visual cue) */}
+      <div className="flex justify-center mb-4">
+        <div className="bg-blue-100 p-3 rounded-full">
+          <IoMdArrowBack className="w-8 h-8 text-blue-600" />
+        </div>
+      </div>
+
+      {/* Title & Message */}
+      <div className="text-center mb-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          Confirm Pull Back
+        </h3>
+        <p className="text-gray-600 text-sm">
+          Are you sure you want to pull back this complaint file?
+        </p>
+      </div>
+
+      {/* Yes / No Buttons */}
+      <div className="flex gap-3 justify-center">
+        <button
+          onClick={() => setPullBack(false)}
+          className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+        >
+          No
+        </button>
+        
+        <button
+          onClick={handlePullBackConfirm}
+          className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Yes
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
     </div>
   );
 };
