@@ -694,4 +694,109 @@ class LokAyuktCommonController extends Controller
         }
         
     }
+
+      public function addCategory(Request $request)
+    {
+
+        $validation = Validator::make($request->all(), [
+            'name' => 'required|string|max:150',
+            'name_h' => 'required|string|max:150',
+         
+          
+        ], [
+            'name.required' => 'Name is required.',
+            'name_h.required' => 'Name in Hindi is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        $Category = new Category();
+        $Category->name = $request->name;
+        $Category->name_h = $request->name_h;
+        $Category->status = 1;
+    
+        $Category->save(); // ✅ Insert into DB
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Category added successfully.',
+            'data' => $Category
+        ], 201);
+    }
+
+       public function editCategory(Request $request,$id)
+    {
+        // dd($request->all());
+        $validation = Validator::make($request->all(), [
+            'name' => 'required|string|max:150',
+            'name_h' => 'required|string|max:150',
+         
+          
+        ], [
+            'name.required' => 'Name is required.',
+            'name_h.required' => 'Name in Hindi is required.',
+           
+        ]);
+
+       
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        $Category = Category::find($id);
+
+         if(!$Category){
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid designation ID.'
+            ], 400);
+
+        }
+
+        $Category->name = $request->name;
+        $Category->name_h = $request->name_h;
+        $Category->status = 1;
+    
+        $Category->save(); // ✅ Insert into DB
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Subject update successfully.',
+            'data' => $Category
+        ], 200);
+    }
+    public function removeCategory(Request $request,$id)
+        {
+            $id = $request->id;
+            $Category = Category::find($id);
+            if (!$Category) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Category not found.'
+                ], 404);
+            }
+            if($Category->delete()){
+
+            return response()->json([
+                        'status' => true,
+                        'message' => 'Category deleted successfully.'
+                    ], 200);
+                }
+    }
+       public function fetch_Category(){
+
+        $cat = Category::get();
+        // dd($designation->toArray());
+        return ApiResponse::generateResponse('success','Category fetch successfully',$cat);
+    }
 }

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\api\Operator;
+namespace App\Http\Controllers\api\PS;
 
-use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
 use App\Models\ComplainType;
 use App\Models\Department;
 use App\Models\Designation;
@@ -12,12 +13,11 @@ use App\Models\RejectionReasons;
 use App\Models\Role;
 use App\Models\Subjects;
 use App\Models\SubRole;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class OperatorCommonController extends Controller
+class PSCommonController extends Controller
 {
-    public function fetch_district(){
+      public function fetch_district(){
 
         $district=District::orderBy('district_name', 'asc')->get();
         // dd($district->toArray());
@@ -40,12 +40,6 @@ class OperatorCommonController extends Controller
         $designation = Subjects::get();
         // dd($designation->toArray());
         return ApiResponse::generateResponse('success','Subject fetch successfully',$designation);
-    }
-    public function fetch_Category(){
-
-        $cat = Category::get();
-        // dd($designation->toArray());
-        return ApiResponse::generateResponse('success','Subject fetch successfully',$cat);
     }
     
     public function fetch_complainstype(){
@@ -399,40 +393,6 @@ class OperatorCommonController extends Controller
             'data' => $subject
         ], 201);
     }
-     public function addCategory(Request $request)
-    {
-
-        $validation = Validator::make($request->all(), [
-            'name' => 'required|string|max:150',
-            'name_h' => 'required|string|max:150',
-         
-          
-        ], [
-            'name.required' => 'Name is required.',
-            'name_h.required' => 'Name in Hindi is required.',
-           
-        ]);
-
-        if ($validation->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validation->errors()
-            ], 422);
-        }
-
-        $Category = new Category();
-        $Category->name = $request->name;
-        $Category->name_h = $request->name_h;
-        $Category->status = 1;
-    
-        $Category->save(); // ✅ Insert into DB
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Category added successfully.',
-            'data' => $Category
-        ], 201);
-    }
      public function editSubject(Request $request,$id)
     {
         // dd($request->all());
@@ -478,51 +438,6 @@ class OperatorCommonController extends Controller
             'data' => $subject
         ], 200);
     }
-     public function editCategory(Request $request,$id)
-    {
-        // dd($request->all());
-        $validation = Validator::make($request->all(), [
-            'name' => 'required|string|max:150',
-            'name_h' => 'required|string|max:150',
-         
-          
-        ], [
-            'name.required' => 'Name is required.',
-            'name_h.required' => 'Name in Hindi is required.',
-           
-        ]);
-
-       
-
-        if ($validation->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validation->errors()
-            ], 422);
-        }
-
-        $Category = Category::find($id);
-
-         if(!$Category){
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid designation ID.'
-            ], 400);
-
-        }
-
-        $Category->name = $request->name;
-        $Category->name_h = $request->name_h;
-        $Category->status = 1;
-    
-        $Category->save(); // ✅ Insert into DB
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Subject update successfully.',
-            'data' => $Category
-        ], 200);
-    }
 
         public function removeSubject(Request $request,$id)
          {
@@ -541,24 +456,6 @@ class OperatorCommonController extends Controller
                 'message' => 'Subject deleted successfully.'
             ], 200);
         }
-    }
-    public function removeCategory(Request $request,$id)
-        {
-            $id = $request->id;
-            $Category = Category::find($id);
-            if (!$Category) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Category not found.'
-                ], 404);
-            }
-            if($Category->delete()){
-
-            return response()->json([
-                        'status' => true,
-                        'message' => 'Category deleted successfully.'
-                    ], 200);
-                }
     }
 
         public function addComplainType(Request $request)
