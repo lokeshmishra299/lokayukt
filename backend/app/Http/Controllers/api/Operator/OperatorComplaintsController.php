@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ComplainDetails;
 use App\Models\ComplainDocuments;
 use App\Models\Complaint;
+use App\Models\Category;
 use App\Models\Complainant;
 use App\Models\ComplaintAction;
 use App\Models\ComplainType;
