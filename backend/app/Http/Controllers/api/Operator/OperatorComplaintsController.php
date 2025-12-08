@@ -486,12 +486,12 @@ class OperatorComplaintsController extends Controller
             
             'complain_id' => 'required|numeric',
             'type' => 'required|string',
-            // 'title' => 'required|string',
+            'title' => 'required|string',
             'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ], [
             'complain_id.required' => 'Complaint Id is required.',
             'type.required' => 'Complaint description is required.',
-            // 'title.required' => 'Letter Subject is Required',
+            'title.required' => 'Letter Subject is Required',
             'file.required' => 'File is Required',
         ]);
 
@@ -507,7 +507,7 @@ class OperatorComplaintsController extends Controller
                 $compDoc->complain_id = $request->complain_id;
                 $compDoc->added_by = $added_by;
                 $compDoc->type = $request->type;
-                // $compDoc->title = $request->title;     
+                $compDoc->title = $request->title;     
                 $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
                 $filePath = $request->file('file')->storeAs('Document', $file, 'public');
                 $compDoc->file = $file;
