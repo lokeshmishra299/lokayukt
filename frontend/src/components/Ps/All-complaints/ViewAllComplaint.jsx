@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaFileAlt, FaExclamationTriangle, FaTimes, FaChevronDown } from "react-icons/fa";
+// ADDED FaEye here
+import { FaFileAlt, FaExclamationTriangle, FaTimes, FaChevronDown, FaEye } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -122,6 +123,9 @@ const ViewAllComplaint = () => {
     open: false,
     type: null,
   });
+
+  // ADDED: Config for Data View Modal (Correspondence / Respondent)
+  const [viewModalConfig, setViewModalConfig] = useState({ open: false, type: null });
   
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
@@ -451,8 +455,8 @@ const ViewAllComplaint = () => {
                 </div>
               </div>
 
-              {/* UPDATED: Fee Status and Fee Type Section */}
-              <div className="flex flex-wrap gap-2">
+              {/* Fee Status and Fee Type Section */}
+              <div className="flex flex-wrap gap-2 mb-4">
                 <span
                   className={`px-3 py-1.5 rounded text-xs border ${
                     complaintData.fee_exempted === 1
@@ -483,6 +487,27 @@ const ViewAllComplaint = () => {
                   </span>
                 )}
               </div>
+
+              {/* ===== ADDED: Extra Details Tabs/Buttons ===== */}
+              <div className="flex gap-3 mt-4 border-t pt-4">
+                <button
+                  onClick={() =>
+                    setViewModalConfig({ open: true, type: "correspondence" })
+                  }
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
+                >
+                  <FaEye /> Correspondence Details
+                </button>
+                <button
+                  onClick={() =>
+                    setViewModalConfig({ open: true, type: "respondent" })
+                  }
+                  className="flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-md border border-orange-200 hover:bg-orange-100 transition-colors text-sm font-medium"
+                >
+                  <FaEye /> Respondent Details
+                </button>
+              </div>
+
             </div>
 
             {/* Mobile Tab Navigation */}
@@ -702,17 +727,6 @@ const ViewAllComplaint = () => {
             {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
             {(confirmConfig.type !== "assign" && confirmConfig.type !== "pullback") && (
               <>
-                {/* <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Remark <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={remark}
-                  onChange={(e) => setRemark(e.target.value)}
-                  rows={1}
-                  placeholder="Enter your remark here..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                /> */}
-
                 <div className="mb-5">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Remark <span className="text-red-500">*</span>
@@ -721,7 +735,7 @@ const ViewAllComplaint = () => {
                     value={remark}
                     onChange={(e) => setRemark(e.target.value)}
                     rows={4}
-                 placeholder="Enter your remark here..."
+                    placeholder="Enter your remark here..."
                     className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   />
                 </div>
@@ -762,6 +776,146 @@ const ViewAllComplaint = () => {
                   : confirmConfig.type === "assign" || confirmConfig.type === "pullback"
                   ? "Yes"
                   : "Send"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== ADDED: View Data Modal (Correspondence / Respondent) ===== */}
+      {viewModalConfig.open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
+          onClick={(e) => {
+            if (e.target === e.currentTarget)
+              setViewModalConfig({ open: false, type: null });
+          }}
+        >
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative animate-in fade-in zoom-in duration-200 m-4 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setViewModalConfig({ open: false, type: null })}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 p-1"
+            >
+              <FaTimes size={20} />
+            </button>
+
+            <h3 className="text-xl font-semibold mb-6 border-b pb-2 text-gray-800">
+              {viewModalConfig.type === "correspondence"
+                ? "Correspondence Address Details"
+                : "Respondent Details"}
+            </h3>
+
+            {viewModalConfig.type === "correspondence" ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="p-3 bg-gray-50 rounded border border-gray-100">
+                    <p className="text-xs text-gray-500 uppercase font-semibold">
+                      Name
+                    </p>
+                    <p className="text-gray-800 ">
+                      {complaintData.correspondence_name || "N/A"}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border border-gray-100">
+                    <p className="text-xs text-gray-500 uppercase font-semibold">
+                      District
+                    </p>
+                    <p className="text-gray-800 ">
+                      {complaintData.correspondence_district || "N/A"}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border border-gray-100">
+                    <p className="text-xs text-gray-500 uppercase font-semibold">
+                      Post Office
+                    </p>
+                    <p className="text-gray-800 ">
+                      {complaintData.correspondence_post_office || "N/A"}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-gray-50 rounded border border-gray-100">
+                    <p className="text-xs text-gray-500 uppercase font-semibold">
+                      Place/Address
+                    </p>
+                    <p className="text-gray-800 ">
+                      {complaintData.correspondence_place || "N/A"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {complaintData.respondant &&
+                complaintData.respondant.length > 0 ? (
+                  complaintData.respondant.map((resp, idx) => (
+                    <div
+                      key={idx}
+                      className="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-3 shadow-sm"
+                    >
+                      <div className="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
+                        <h4 className="text-sm font-bold text-gray-700">
+                          Respondent #{idx + 1}
+                        </h4>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                        <div>
+                          <p className="text-xs text-gray-500 font-semibold">
+                            NAME
+                          </p>
+                          <p className="text-sm text-gray-800">
+                            {resp?.respondent_name || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 font-semibold">
+                            DESIGNATION
+                          </p>
+                          <p className="text-sm text-gray-800">
+                            {resp?.designation || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 font-semibold">
+                            DEPARTMENT
+                          </p>
+                          <p className="text-sm text-gray-800">
+                            {resp?.department_name || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 font-semibold">
+                            DISTRICT
+                          </p>
+                          <p className="text-sm text-gray-800">
+                            {resp?.respondent_district || "N/A"}
+                          </p>
+                        </div>
+                        <div className="sm:col-span-2">
+                          <p className="text-xs text-gray-500 font-semibold">
+                            ADDRESS
+                          </p>
+                          <p className="text-sm text-gray-800">
+                            {resp?.current_address || "N/A"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 bg-gray-50 rounded border border-dashed border-gray-300">
+                    <p className="text-gray-500">
+                      No respondent data available.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-6 flex justify-end pt-4 border-t">
+              <button
+                onClick={() => setViewModalConfig({ open: false, type: null })}
+                className="px-4 py-2 bg-gray-800 text-white hover:bg-gray-700 rounded text-sm font-medium transition-colors"
+              >
+                Close
               </button>
             </div>
           </div>
