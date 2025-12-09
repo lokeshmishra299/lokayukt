@@ -16,7 +16,6 @@ const api = axios.create({
   },
 });
 
-
 const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }, ref) => {
   const formatYesNo = (val) =>
     val === 'हाँ' || val === 'नहीं'
@@ -154,7 +153,6 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                     <div>नाम : {p.name || '——'}</div>
                     <div>पदनाम : {p.designation || '——'}</div>
                     <div>वर्तमान पता : {p.currentAddress || '——'}</div>
-                    {/* Added missing print fields */}
                     <div>ज़िला : {p.district || '——'}</div>
                     <div>विभाग : {p.departmentNature || '——'}</div>
                     <div>श्रेणी : {p.officerCategory || '——'}</div>
@@ -196,38 +194,42 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
             </div>
           </div>
 
-          {/* 8 चालान */}
-          <div className="flex gap-2 mt-1">
-            <span className="min-w-[18px]">8.</span>
-            <div className="flex-1 space-y-0.5">
-              <div>
-                चालान संख्या और नियम-4 के अधीन खर्च के लिए प्रतिभूति जमा करने का दिनांक -
-                <div className="mt-0.5 pl-4 space-y-0.5">
-                  <div>चालान संख्या : {formData.challanNumber || '——'}</div>
-                  <div>दिनांक : {formData.challanDate || '——'}</div>
-                  {formData.challanFile && (
-                    <div>फ़ाइल : {formData.challanFile.name}</div>
-                  )}
-                </div>
-              </div>
-              <div className="pl-4 text-[11px] text-gray-700 space-y-0.5">
+          {/* 8 चालान (Only if Assertion/Abhikathan) */}
+          {formData.complaintType === 'अभिकथन' && (
+            <div className="flex gap-2 mt-1">
+              <span className="min-w-[18px]">8.</span>
+              <div className="flex-1 space-y-0.5">
                 <div>
-                  टिप्पणी (1) उक्त धनराशि शीर्षक "8443-सिविल निक्षेप-00-103-प्रतिभूति निक्षेप-00-00" के अधीन भारतीय स्टेट बैंक की किसी भी
-                  शाखा में जमा की जा सकती है।
+                  चालान संख्या और नियम-4 के अधीन खर्च के लिए प्रतिभूति जमा करने का दिनांक -
+                  <div className="mt-0.5 pl-4 space-y-0.5">
+                    <div>चालान संख्या : {formData.challanNumber || '——'}</div>
+                    <div>दिनांक : {formData.challanDate || '——'}</div>
+                    {formData.challanFile && (
+                      <div>फ़ाइल : {formData.challanFile.name}</div>
+                    )}
+                  </div>
                 </div>
-                <div>(2) किसी "शिकायत" की स्थिति में कोई धनराशि जमा करना अपेक्षित नहीं है।</div>
-                <div>(3) चालान की एक प्रति परिवाद के साथ संलग्न की जाए। नियम 8 (2) देखिए,</div>
+                <div className="pl-4 text-[11px] text-gray-700 space-y-0.5">
+                  <div>
+                    टिप्पणी (1) उक्त धनराशि शीर्षक "8443-सिविल निक्षेप-00-103-प्रतिभूति निक्षेप-00-00" के अधीन भारतीय स्टेट बैंक की किसी भी
+                    शाखा में जमा की जा सकती है।
+                  </div>
+                  <div>(2) किसी "शिकायत" की स्थिति में कोई धनराशि जमा करना अपेक्षित नहीं है।</div>
+                  <div>(3) चालान की एक प्रति परिवाद के साथ संलग्न की जाए। नियम 8 (2) देखिए,</div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* 9 */}
+          {/* 9 - Updated to map array */}
           <div className="flex gap-2 mt-1">
             <span className="min-w-[18px]">9.</span>
             <div className="flex-1">
               ऐसे व्यक्तियों की सूची जिन्होने परिवाद के समर्थन में शपथपत्र दिये हों।
               <div className="mt-0.5 pl-4">
-                {formData.supportingPersons || '——'}
+                {Array.isArray(formData.supportingPersons) 
+                  ? formData.supportingPersons.map(p => `${p.name} (${p.address})`).join(', ')
+                  : formData.supportingPersons || '——'}
               </div>
             </div>
           </div>
@@ -336,7 +338,6 @@ const Complaints = () => {
 
   const [showPersons, setShowPersons] = useState({ 1: true });
 
-
   const [formData, setFormData] = useState({
     relation: '',
     authorizationFile: null,
@@ -350,7 +351,7 @@ const Complaints = () => {
     challanNumber: '',
     challanDate: '',
     challanFile: null,
-    supportingPersons: '',
+    supportingPersons: [{ name: '', address: '' }], // UPDATED TO ARRAY
     otherPersons: [{ name: '', address: '' }], 
     attachedDocuments: '',
     attachedDocumentsFile: null,
@@ -603,7 +604,6 @@ const Complaints = () => {
     if (!formData.complaintDate) {
       newErrors.cause_date = ['शिकायत की तिथि आवश्यक है।'];
     }
-
     if (!formData.delayReason.trim()) {
       newErrors.delay_reason = ['विलम्ब का कारण आवश्यक है।'];
     }
@@ -620,18 +620,34 @@ const Complaints = () => {
       newErrors.category = ['शिकायत की श्रेणी चुनें (अभिकथन/शिकायत)।'];
     }
 
-    if (!formData.challanNumber.trim()) {
-      newErrors.challan_number = ['चालान संख्या आवश्यक है।'];
-    }
-    if (!formData.challanDate) {
-      newErrors.challan_date = ['चालान की तिथि आवश्यक है।'];
-    }
-    if (!formData.challanFile) {
-      newErrors.challan_file = ['चालान फाइल अपलोड करना आवश्यक है।'];
+    // --- Conditional Validation for Challan (Only if assertion) ---
+    if (formData.complaintType === 'अभिकथन') {
+        if (!formData.challanNumber.trim()) {
+        newErrors.challan_number = ['चालान संख्या आवश्यक है।'];
+        }
+        if (!formData.challanDate) {
+        newErrors.challan_date = ['चालान की तिथि आवश्यक है।'];
+        }
+        if (!formData.challanFile) {
+        newErrors.challan_file = ['चालान फाइल अपलोड करना आवश्यक है।'];
+        }
     }
 
-    if (!formData.supportingPersons.trim()) {
-      newErrors.supporting_affidavit_list = ['शपथपत्र की सूची आवश्यक है।'];
+    // --- Validation for Supporting Persons (Array) ---
+    // At least one person should be filled if required? Or if they add a row, it must be filled.
+    // The previous validation was checking if string is empty.
+    // Assuming at least one person is NOT mandatory if user deleted all rows, but if rows exist they must be valid?
+    // User requirement: "List of persons who gave affidavit". Usually mandatory.
+    if (!formData.supportingPersons || formData.supportingPersons.length === 0) {
+        newErrors.supporting_affidavit_list = ['शपथपत्र की सूची आवश्यक है।'];
+    } else {
+        // Check if the first entry is empty
+        const first = formData.supportingPersons[0];
+        if (!first.name.trim() || !first.address.trim()) {
+             // Just a general error if the first one is empty, or loop through all
+             // For simplicity, checking if list is empty or first item is blank
+             newErrors.supporting_affidavit_list = ['कृपया शपथपत्र देने वाले व्यक्ति का विवरण भरें।'];
+        }
     }
 
     if (!formData.attachedDocumentsFile) {
@@ -656,7 +672,7 @@ const Complaints = () => {
         position: "top-right",
         autoClose: 3000,
       });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -736,16 +752,22 @@ const Complaints = () => {
           : '';
       submitData.append('category', categoryVal);
 
-      // 8. Challan
-      submitData.append('challan_number', formData.challanNumber);
-      submitData.append('challan_date', formData.challanDate);
+      // 8. Challan (Only if assertion)
+      if (formData.complaintType === 'अभिकथन') {
+        submitData.append('challan_number', formData.challanNumber);
+        submitData.append('challan_date', formData.challanDate);
 
-      if (formData.challanFile) {
-        submitData.append('challan_file', formData.challanFile);
+        if (formData.challanFile) {
+            submitData.append('challan_file', formData.challanFile);
+        }
       }
 
-      // 9. Supporting Persons
-      submitData.append('supporting_affidavit_list', formData.supportingPersons);
+      // 9. Supporting Persons - CONVERT ARRAY TO JSON STRING
+      let supportingPersonsVal = formData.supportingPersons;
+      if (Array.isArray(formData.supportingPersons)) {
+        supportingPersonsVal = JSON.stringify(formData.supportingPersons);
+      }
+      submitData.append('supporting_affidavit_list', supportingPersonsVal || '');
 
       // 10. Other Witnesses
       let otherWitnessesVal = formData.otherPersons;
@@ -784,7 +806,7 @@ const Complaints = () => {
           autoClose: 3000,
         });
 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         toast.error('कुछ गलत हो गया। कृपया पुनः प्रयास करें।', {
           position: "top-right",
@@ -826,8 +848,8 @@ const Complaints = () => {
       challanNumber: '',
       challanDate: '',
       challanFile: null,
-      supportingPersons: '',
-      otherPersons: [{ name: '', address: '' }], // Reset with default empty object
+      supportingPersons: [{ name: '', address: '' }], // Reset to array
+      otherPersons: [{ name: '', address: '' }], 
       attachedDocuments: '',
       attachedDocumentsFile: null,
       complaintDescription: ''
@@ -840,7 +862,6 @@ const Complaints = () => {
   return (
     <div className="min-h-screen bg-white rounded-md py-8">
       <ToastContainer />
-
       <div className="max-w-6xl mx-auto">
         {/* Form Header */}
         <div className="bg-white rounded-lg shadow-md p-8 mb-6">
@@ -982,12 +1003,12 @@ const Complaints = () => {
                         }
                       />
                     </div>
+                    {/* UPDATED: District as Dropdown */}
                     <div>
                       <label className="block text-gray-700 text-sm font-medium mb-2">
                         (घ) जिला <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
+                      <select
                         className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
                           errors.permanent_district ? 'border-red-500' : 'border-gray-300'
                         }`}
@@ -998,7 +1019,14 @@ const Complaints = () => {
                             permanentAddress: { ...formData.permanentAddress, district: e.target.value },
                           })
                         }
-                      />
+                      >
+                         <option value="">ज़िला चुनें</option>
+                          {districtList.map((dist, i) => (
+                            <option key={i} value={dist.district_name}>
+                              {dist.district_name} / {dist.dist_name_hi}
+                            </option>
+                          ))}
+                      </select>
                     </div>
                   </div>
 
@@ -1131,12 +1159,12 @@ const Complaints = () => {
                   }
                 />
               </div>
+              {/* UPDATED: District as Dropdown */}
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2">
                   (घ) जिला <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
                     errors.correspondence_district ? 'border-red-500' : 'border-gray-300'
                   }`}
@@ -1147,7 +1175,14 @@ const Complaints = () => {
                       correspondenceAddress: { ...formData.correspondenceAddress, district: e.target.value },
                     })
                   }
-                />
+                >
+                   <option value="">ज़िला चुनें</option>
+                    {districtList.map((dist, i) => (
+                    <option key={i} value={dist.district_name}>
+                        {dist.district_name} / {dist.dist_name_hi}
+                    </option>
+                    ))}
+                </select>
               </div>
             </div>
           </div>
@@ -1424,100 +1459,167 @@ const Complaints = () => {
             )}
           </div>
 
-          {/* 6. Challan */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              6. चालान संख्या और नियम-4 के अधीन खर्च के लिए प्रतिभूति जमा करने का दिनांक : <span className="text-red-500">*</span>
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
+          {/* 6. Challan - CONDITIONALLY RENDERED */}
+          {formData.complaintType === 'अभिकथन' && (
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6 animate-slideDown">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                6. चालान संख्या और नियम-4 के अधीन खर्च के लिए प्रतिभूति जमा करने का दिनांक : <span className="text-red-500">*</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                    चालान संख्या <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                    type="text"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                        errors.challan_number ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    value={formData.challanNumber}
+                    onChange={(e) => handleFormDataChange('challanNumber', e.target.value)}
+                    />
+                    {errors.challan_number && (
+                    <p className="text-red-500 text-sm mt-1">{errors.challan_number[0]}</p>
+                    )}
+                </div>
+                <div>
+                    <label className="block text-gray-700 text-sm font-medium mb-2">
+                    दिनांक <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                    type="date"
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                        errors.challan_date ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    value={formData.challanDate}
+                    onChange={(e) => handleFormDataChange('challanDate', e.target.value)}
+                    />
+                    {errors.challan_date && (
+                    <p className="text-red-500 text-sm mt-1">{errors.challan_date[0]}</p>
+                    )}
+                </div>
+                </div>
+
+                <div className="p-4 mb-4 rounded">
+                <p className="text-gray-700 text-sm mb-2">
+                    <strong>टिप्पणी</strong> (1) उक्त धनराशि शीर्षक "8443-सिविल निक्षेप-00-103-प्रतिभूति निक्षेप-00-00" के अधीन भारतीय स्टेट बैंक की किसी भी शाखा में जमा की जा सकती है।
+                </p>
+                <p className="text-gray-700 text-sm mb-2">
+                    (2) किसी "शिकायत" की स्थिति में कोई धनराशि जमा करना अपेक्षित नहीं है।
+                </p>
+                <p className="text-gray-700 text-sm">
+                    (3) चालान की एक प्रति परिवाद के साथ संलग्न की जाए (नियम 8 (2) देखें)।
+                </p>
+                </div>
+
+                <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2">
-                  चालान संख्या <span className="text-red-500">*</span>
+                    चालान की प्रति (स्कैन / PDF) <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                    errors.challan_number ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  value={formData.challanNumber}
-                  onChange={(e) => handleFormDataChange('challanNumber', e.target.value)}
-                />
-                {errors.challan_number && (
-                  <p className="text-red-500 text-sm mt-1">{errors.challan_number[0]}</p>
+                <div className="mt-4 flex items-center gap-4">
+                    <label
+                    className={`bg-orange-100 text-orange-600 font-semibold px-5 py-2.5 rounded-lg cursor-pointer transition-all duration-200 ${
+                        errors.challan_file ? 'border-2 border-red-500' : ''
+                    }`}
+                    >
+                    Choose File
+                    <input
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => handleFileChange('challanFile', e.target.files[0])}
+                        accept=".pdf,.jpg,.jpeg,.png"
+                    />
+                    </label>
+                    <span className="text-gray-500 text-sm">
+                    {formData.challanFile ? formData.challanFile.name : 'No file chosen'}
+                    </span>
+                </div>
+                {errors.challan_file && (
+                    <p className="text-red-500 text-sm mt-1">{errors.challan_file[0]}</p>
                 )}
-              </div>
-              <div>
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  दिनांक <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                    errors.challan_date ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  value={formData.challanDate}
-                  onChange={(e) => handleFormDataChange('challanDate', e.target.value)}
-                />
-                {errors.challan_date && (
-                  <p className="text-red-500 text-sm mt-1">{errors.challan_date[0]}</p>
-                )}
-              </div>
+                </div>
             </div>
+          )}
 
-            <div className="p-4 mb-4 rounded">
-              <p className="text-gray-700 text-sm mb-2">
-                <strong>टिप्पणी</strong> (1) उक्त धनराशि शीर्षक "8443-सिविल निक्षेप-00-103-प्रतिभूति निक्षेप-00-00" के अधीन भारतीय स्टेट बैंक की किसी भी शाखा में जमा की जा सकती है।
-              </p>
-              <p className="text-gray-700 text-sm mb-2">
-                (2) किसी "शिकायत" की स्थिति में कोई धनराशि जमा करना अपेक्षित नहीं है।
-              </p>
-              <p className="text-gray-700 text-sm">
-                (3) चालान की एक प्रति परिवाद के साथ संलग्न की जाए (नियम 8 (2) देखें)।
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-gray-700 text-sm font-medium mb-2">
-                चालान की प्रति (स्कैन / PDF) <span className="text-red-500">*</span>
-              </label>
-              <div className="mt-4 flex items-center gap-4">
-                <label
-                  className={`bg-orange-100 text-orange-600 font-semibold px-5 py-2.5 rounded-lg cursor-pointer transition-all duration-200 ${
-                    errors.challan_file ? 'border-2 border-red-500' : ''
-                  }`}
-                >
-                  Choose File
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={(e) => handleFileChange('challanFile', e.target.files[0])}
-                    accept=".pdf,.jpg,.jpeg,.png"
-                  />
-                </label>
-                <span className="text-gray-500 text-sm">
-                  {formData.challanFile ? formData.challanFile.name : 'No file chosen'}
-                </span>
-              </div>
-              {errors.challan_file && (
-                <p className="text-red-500 text-sm mt-1">{errors.challan_file[0]}</p>
-              )}
-            </div>
-          </div>
-
-          {/* 7. Supporting Persons */}
+          {/* 7. Supporting Persons - UPDATED TO DYNAMIC LIST */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               7. ऐसे व्यक्तियों की सूची जिन्होने परिवाद के समर्थन में शपथपत्र दिये हों : <span className="text-red-500">*</span>
             </h3>
-            <textarea
-              placeholder="नाम, पता आदि लिखें"
-              rows="4"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y ${
-                errors.supporting_affidavit_list ? 'border-red-500' : 'border-gray-300'
-              }`}
-              value={formData.supportingPersons}
-              onChange={(e) => handleFormDataChange('supportingPersons', e.target.value)}
-            />
+
+            <button
+                type="button"
+                onClick={() => {
+                const updated = [
+                    ...(Array.isArray(formData.supportingPersons) ? formData.supportingPersons : []),
+                    { name: "", address: "" }
+                ];
+                handleFormDataChange("supportingPersons", updated);
+                }}
+                className="mb-4 bg-white text-[12px] text-orange-500 border-2 border-orange-500 hover:bg-orange-500 hover:text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300"
+            >
+                + अन्य व्यक्ति जोड़ें
+            </button>
+
+            {Array.isArray(formData.supportingPersons) &&
+                formData.supportingPersons.map((item, index) => (
+                <div
+                    key={index}
+                    className="border border-gray-200 rounded-lg mb-4 p-4 relative"
+                >
+                    {formData.supportingPersons.length > 1 && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                        const updated = formData.supportingPersons.filter((_, i) => i !== index);
+                        handleFormDataChange("supportingPersons", updated);
+                        }}
+                        className="absolute top-2 right-2 text-red-600 border border-red-600 text-xs px-2 py-1 rounded hover:bg-red-600 hover:text-white"
+                    >
+                        हटाएँ
+                    </button>
+                    )}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* NAME */}
+                        <div className="mb-3">
+                            <label className="block text-gray-700 text-sm font-medium mb-1">
+                            नाम (व्यक्ति {index + 1}) <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                            type="text"
+                            placeholder="नाम दर्ज करें"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                            value={item.name}
+                            onChange={(e) => {
+                                const updated = [...formData.supportingPersons];
+                                updated[index].name = e.target.value;
+                                handleFormDataChange("supportingPersons", updated);
+                            }}
+                            />
+                        </div>
+
+                        {/* ADDRESS */}
+                        <div>
+                            <label className="block text-gray-700 text-sm font-medium mb-1">
+                            पता <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                            rows="1"
+                            placeholder="पूरा पता लिखें"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none"
+                            value={item.address}
+                            onChange={(e) => {
+                                const updated = [...formData.supportingPersons];
+                                updated[index].address = e.target.value;
+                                handleFormDataChange("supportingPersons", updated);
+                            }}
+                            />
+                        </div>
+                    </div>
+                </div>
+                ))}
+            
             {errors.supporting_affidavit_list && (
               <p className="text-red-500 text-sm mt-1">{errors.supporting_affidavit_list[0]}</p>
             )}
@@ -1525,93 +1627,92 @@ const Complaints = () => {
 
           {/* 8. Other Persons */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-    8. क्या ऐसे अन्य व्यक्ति भी हैं जिन्हे परिवाद से सम्बन्धित तथ्यों के बारे में जानकारी हो, जिन्हे लोक आयुक्त / उप लोक आयुक्त द्वारा समन किया जा सके : 
-    <span className="text-red-500">*</span>
-  </h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                8. क्या ऐसे अन्य व्यक्ति भी हैं जिन्हे परिवाद से सम्बन्धित तथ्यों के बारे में जानकारी हो, जिन्हे लोक आयुक्त / उप लोक आयुक्त द्वारा समन किया जा सके : 
+                <span className="text-red-500">*</span>
+            </h3>
 
-  <button
-    type="button"
-    onClick={() => {
-      const updated = [
-        ...(Array.isArray(formData.otherPersons) ? formData.otherPersons : []),
-        { name: "", address: "" }
-      ];
-      handleFormDataChange("otherPersons", updated);
-    }}
-    className="mb-4 bg-white text-[12px] text-orange-500 border-2 border-orange-500 hover:bg-orange-500 hover:text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300"
-  >
-    + अन्य व्यक्ति जोड़ें
-  </button>
-
-  {Array.isArray(formData.otherPersons) &&
-    formData.otherPersons.map((item, index) => (
-      <div
-        key={index}
-        className="border border-gray-200 rounded-lg mb-4 p-4 relative"
-      >
-        {formData.otherPersons.length > 1 && (
-          <button
-            type="button"
-            onClick={() => {
-              const updated = formData.otherPersons.filter((_, i) => i !== index);
-              handleFormDataChange("otherPersons", updated);
-            }}
-            className="absolute top-2 right-2 text-red-600 border border-red-600 text-xs px-2 py-1 rounded hover:bg-red-600 hover:text-white"
-          >
-            हटाएँ
-          </button>
-        )}
-
-        {/* 🔥 2 fields in 1 row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          {/* NAME */}
-          <div className="mb-3">
-            <label className="block text-gray-700 text-sm font-medium mb-1">
-              नाम (व्यक्ति {index + 1}) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="नाम दर्ज करें"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-              value={item.name}
-              onChange={(e) => {
-                const updated = [...formData.otherPersons];
-                updated[index].name = e.target.value;
+            <button
+                type="button"
+                onClick={() => {
+                const updated = [
+                    ...(Array.isArray(formData.otherPersons) ? formData.otherPersons : []),
+                    { name: "", address: "" }
+                ];
                 handleFormDataChange("otherPersons", updated);
-              }}
-            />
-          </div>
+                }}
+                className="mb-4 bg-white text-[12px] text-orange-500 border-2 border-orange-500 hover:bg-orange-500 hover:text-white px-4 py-2 rounded-lg font-semibold transition-all duration-300"
+            >
+                + अन्य व्यक्ति जोड़ें
+            </button>
 
-          {/* ADDRESS */}
-          <div>
-            <label className="block text-gray-700 text-sm font-medium mb-1">
-              पता <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              rows="1"
-              placeholder="पूरा पता लिखें"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none"
-              value={item.address}
-              onChange={(e) => {
-                const updated = [...formData.otherPersons];
-                updated[index].address = e.target.value;
-                handleFormDataChange("otherPersons", updated);
-              }}
-            />
-          </div>
+            {Array.isArray(formData.otherPersons) &&
+                formData.otherPersons.map((item, index) => (
+                <div
+                    key={index}
+                    className="border border-gray-200 rounded-lg mb-4 p-4 relative"
+                >
+                    {formData.otherPersons.length > 1 && (
+                    <button
+                        type="button"
+                        onClick={() => {
+                        const updated = formData.otherPersons.filter((_, i) => i !== index);
+                        handleFormDataChange("otherPersons", updated);
+                        }}
+                        className="absolute top-2 right-2 text-red-600 border border-red-600 text-xs px-2 py-1 rounded hover:bg-red-600 hover:text-white"
+                    >
+                        हटाएँ
+                    </button>
+                    )}
 
-        </div>
-      </div>
-    ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-  {errors.other_witnesses && (
-    <p className="text-red-500 text-sm mt-1">
-      {errors.other_witnesses[0]}
-    </p>
-  )}
-</div>
+                    {/* NAME */}
+                    <div className="mb-3">
+                        <label className="block text-gray-700 text-sm font-medium mb-1">
+                        नाम (व्यक्ति {index + 1}) <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                        type="text"
+                        placeholder="नाम दर्ज करें"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                        value={item.name}
+                        onChange={(e) => {
+                            const updated = [...formData.otherPersons];
+                            updated[index].name = e.target.value;
+                            handleFormDataChange("otherPersons", updated);
+                        }}
+                        />
+                    </div>
+
+                    {/* ADDRESS */}
+                    <div>
+                        <label className="block text-gray-700 text-sm font-medium mb-1">
+                        पता <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                        rows="1"
+                        placeholder="पूरा पता लिखें"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none"
+                        value={item.address}
+                        onChange={(e) => {
+                            const updated = [...formData.otherPersons];
+                            updated[index].address = e.target.value;
+                            handleFormDataChange("otherPersons", updated);
+                        }}
+                        />
+                    </div>
+
+                    </div>
+                </div>
+                ))}
+
+            {errors.other_witnesses && (
+                <p className="text-red-500 text-sm mt-1">
+                {errors.other_witnesses[0]}
+                </p>
+            )}
+            </div>
 
           {/* 9. Attached Documents */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
