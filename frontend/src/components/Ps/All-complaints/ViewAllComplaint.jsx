@@ -124,7 +124,6 @@ const ViewAllComplaint = () => {
     type: null,
   });
 
-  // ADDED: Config for Data View Modal (Correspondence / Respondent)
   const [viewModalConfig, setViewModalConfig] = useState({ open: false, type: null });
   
   const [remark, setRemark] = useState("");
@@ -487,8 +486,8 @@ const ViewAllComplaint = () => {
                   </span>
                 )}
               </div>
-
-              {/* ===== ADDED: Extra Details Tabs/Buttons ===== */}
+              
+              {/* ===== View Details Buttons ===== */}
               <div className="flex gap-3 mt-4 border-t pt-4">
                 <button
                   onClick={() =>
@@ -496,7 +495,7 @@ const ViewAllComplaint = () => {
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
                 >
-                  <FaEye /> Correspondence Details
+                  <FaEye /> Complainants Details
                 </button>
                 <button
                   onClick={() =>
@@ -657,7 +656,6 @@ const ViewAllComplaint = () => {
                     Forward Type <span className="text-red-500">*</span>
                   </label>
                   <div className="flex flex-col gap-2">
-                    {/* Option 1: Send to Self */}
                     <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
                       <input
                         type="radio"
@@ -674,8 +672,6 @@ const ViewAllComplaint = () => {
                         Send To My Pool
                       </span>
                     </label>
-
-                    {/* Option 2: Send to Other Pool */}
                     <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
                       <input
                         type="radio"
@@ -760,12 +756,10 @@ const ViewAllComplaint = () => {
                 disabled={
                   markAsReceivedMutation.isPending ||
                   forwardPhysicallyMutation.isPending ||
-                  // Disable if receive mode and no remark
                   (confirmConfig.type === "receive" && !remark.trim()) ||
-                  // Disable if forward mode logic fails:
                   (confirmConfig.type === "forward" &&
-                    (!remark.trim() || // Remark is always mandatory
-                      !selectedForwardTo || // Now mandatory for BOTH
+                    (!remark.trim() ||
+                      !selectedForwardTo ||
                       (isLoadingOptions || isFetchingOptions)))
                 }
                 className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
@@ -781,8 +775,8 @@ const ViewAllComplaint = () => {
           </div>
         </div>
       )}
-
-      {/* ===== ADDED: View Data Modal (Correspondence / Respondent) ===== */}
+      
+      {/* ===== CORRECTED AND ADDED: View Data Modal ===== */}
       {viewModalConfig.open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
@@ -801,111 +795,66 @@ const ViewAllComplaint = () => {
 
             <h3 className="text-xl font-semibold mb-6 border-b pb-2 text-gray-800">
               {viewModalConfig.type === "correspondence"
-                ? "Correspondence Address Details"
+                ? "Complainant Details"
                 : "Respondent Details"}
             </h3>
 
-            {viewModalConfig.type === "correspondence" ? (
+            {viewModalConfig.type === 'correspondence' ? (
+              // Complainant Details View
               <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
-                      Name
-                    </p>
-                    <p className="text-gray-800 ">
-                      {complaintData.correspondence_name || "N/A"}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
-                      District
-                    </p>
-                    <p className="text-gray-800 ">
-                      {complaintData.correspondence_district || "N/A"}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
-                      Post Office
-                    </p>
-                    <p className="text-gray-800 ">
-                      {complaintData.correspondence_post_office || "N/A"}
-                    </p>
-                  </div>
-                  <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
-                      Place/Address
-                    </p>
-                    <p className="text-gray-800 ">
-                      {complaintData.correspondence_place || "N/A"}
-                    </p>
-                  </div>
-                </div>
+                {complaintData.complainants && complaintData.complainants.length > 0 ? (
+                  complaintData.complainants.map((complainant, idx) => (
+                    <div key={idx} className="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-3 shadow-sm">
+                        <h4 className="text-sm font-bold text-gray-700 mb-3 border-b pb-2">Complainant #{idx + 1}</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                            <div className="p-3 bg-white rounded border">
+                                <p className="text-xs text-gray-500 uppercase font-semibold">Name</p>
+                                <p className="font-medium">{complainant.complainant_name || 'N/A'}</p>
+                            </div>
+                            <div className="p-3 bg-white rounded border">
+                                <p className="text-xs text-gray-500 uppercase font-semibold">Father Name</p>
+                                <p className="font-medium">{complainant.father_name || 'N/A'}</p>
+                            </div>
+                            <div className="p-3 bg-white rounded border">
+                                <p className="text-xs text-gray-500 uppercase font-semibold">Is Public Servant</p>
+                                <p className="font-medium">{complainant.is_public_servant == 1 ? 'Yes' : 'No'}</p>
+                            </div>
+                            <div className="p-3 bg-white rounded border">
+                                <p className="text-xs text-gray-500 uppercase font-semibold">Occupation</p>
+                                <p className="font-medium">{complainant.occupation || 'N/A'}</p>
+                            </div>
+                        </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">No Complainant data available.</div>
+                )}
               </div>
             ) : (
+              // Respondent Details View
               <div className="space-y-4">
-                {complaintData.respondant &&
-                complaintData.respondant.length > 0 ? (
+                {complaintData.respondant && complaintData.respondant.length > 0 ? (
                   complaintData.respondant.map((resp, idx) => (
-                    <div
-                      key={idx}
-                      className="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-3 shadow-sm"
-                    >
-                      <div className="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
-                        <h4 className="text-sm font-bold text-gray-700">
-                          Respondent #{idx + 1}
-                        </h4>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                        <div>
-                          <p className="text-xs text-gray-500 font-semibold">
-                            NAME
-                          </p>
-                          <p className="text-sm text-gray-800">
-                            {resp?.respondent_name || "N/A"}
-                          </p>
+                    <div key={idx} className="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-3 shadow-sm">
+                      <h4 className="text-sm font-bold text-gray-700 mb-3 border-b pb-2">Respondent #{idx + 1}</h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                        <div className="p-3 bg-white rounded border">
+                          <p className="text-xs text-gray-500 uppercase font-semibold">Name</p>
+                          <p className="font-medium">{resp.respondent_name || 'N/A'}</p>
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500 font-semibold">
-                            DESIGNATION
-                          </p>
-                          <p className="text-sm text-gray-800">
-                            {resp?.designation || "N/A"}
-                          </p>
+                        <div className="p-3 bg-white rounded border">
+                          <p className="text-xs text-gray-500 uppercase font-semibold">Designation</p>
+                          <p className="font-medium">{resp.designation || 'N/A'}</p>
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500 font-semibold">
-                            DEPARTMENT
-                          </p>
-                          <p className="text-sm text-gray-800">
-                            {resp?.department_name || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500 font-semibold">
-                            DISTRICT
-                          </p>
-                          <p className="text-sm text-gray-800">
-                            {resp?.respondent_district || "N/A"}
-                          </p>
-                        </div>
-                        <div className="sm:col-span-2">
-                          <p className="text-xs text-gray-500 font-semibold">
-                            ADDRESS
-                          </p>
-                          <p className="text-sm text-gray-800">
-                            {resp?.current_address || "N/A"}
-                          </p>
+                        <div className="sm:col-span-2 p-3 bg-white rounded border">
+                          <p className="text-xs text-gray-500 uppercase font-semibold">Address</p>
+                          <p className="font-medium">{resp.current_address || 'N/A'}</p>
                         </div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-8 bg-gray-50 rounded border border-dashed border-gray-300">
-                    <p className="text-gray-500">
-                      No respondent data available.
-                    </p>
-                  </div>
+                  <div className="text-center py-8 text-gray-500">No respondent data available.</div>
                 )}
               </div>
             )}

@@ -351,7 +351,7 @@ const Complaints = () => {
     challanNumber: '',
     challanDate: '',
     challanFile: null,
-    supportingPersons: [{ name: '', address: '' }], // UPDATED TO ARRAY
+    supportingPersons: [{ name: '', address: '' }], 
     otherPersons: [{ name: '', address: '' }], 
     attachedDocuments: '',
     attachedDocumentsFile: null,
@@ -1022,7 +1022,7 @@ const Complaints = () => {
                       >
                          <option value="">ज़िला चुनें</option>
                           {districtList.map((dist, i) => (
-                            <option key={i} value={dist.district_name}>
+                            <option key={i} value={dist.district_name}> 
                               {dist.district_name} / {dist.dist_name_hi}
                             </option>
                           ))}

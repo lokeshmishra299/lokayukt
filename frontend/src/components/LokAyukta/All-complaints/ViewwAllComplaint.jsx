@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-// ADDED FaEye here
 import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
@@ -34,10 +33,16 @@ const ViewAllComplaint = () => {
   const [showMobileTabs, setShowMobileTabs] = useState(false);
 
   // Single config for Action modals (Receive, Forward, Pullback)
-  const [confirmConfig, setConfirmConfig] = useState({ open: false, type: null });
+  const [confirmConfig, setConfirmConfig] = useState({
+    open: false,
+    type: null,
+  });
 
-  // ADDED: Config for Data View Modal (Correspondence / Respondent)
-  const [viewModalConfig, setViewModalConfig] = useState({ open: false, type: null });
+  // Config for Data View Modal (Correspondence / Respondent)
+  const [viewModalConfig, setViewModalConfig] = useState({
+    open: false,
+    type: null,
+  });
 
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
@@ -160,7 +165,6 @@ const ViewAllComplaint = () => {
       });
     } else if (confirmConfig.type === "pullback") {
       // --- PULL BACK LOGIC ---
-      // Add your API call here if needed
       toast.success("Complaint Pulled Back Successfully");
       setConfirmConfig({ open: false, type: null });
     }
@@ -400,7 +404,7 @@ const ViewAllComplaint = () => {
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
                 >
-                  <FaEye /> Correspondence Details
+                  <FaEye /> Complainants Details
                 </button>
                 <button
                   onClick={() =>
@@ -643,7 +647,7 @@ const ViewAllComplaint = () => {
         </div>
       )}
 
-      {/* ===== ADDED: View Data Modal (Correspondence / Respondent) ===== */}
+      {/* ===== CORRECTED: View Data Modal (Correspondence / Respondent) ===== */}
       {viewModalConfig.open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
@@ -673,32 +677,37 @@ const ViewAllComplaint = () => {
                     <p className="text-xs text-gray-500 uppercase font-semibold">
                       Name
                     </p>
-                    <p className="text-gray-800 ">
-                      {complaintData.correspondence_name || "N/A"}
+                    <p className="text-gray-800 font-medium">
+                      {complaintData.complainants?.[0]?.complainant_name ||
+                        "N/A"}
                     </p>
                   </div>
+
                   <div className="p-3 bg-gray-50 rounded border border-gray-100">
                     <p className="text-xs text-gray-500 uppercase font-semibold">
-                      District
+                      Father Name
                     </p>
-                    <p className="text-gray-800 ">
-                      {complaintData.correspondence_district || "N/A"}
+                    <p className="text-gray-800 font-medium">
+                      {complaintData.complainants?.[0]?.father_name || "N/A"}
                     </p>
                   </div>
+
                   <div className="p-3 bg-gray-50 rounded border border-gray-100">
                     <p className="text-xs text-gray-500 uppercase font-semibold">
-                      Post Office
+                      Is Public Servant
                     </p>
-                    <p className="text-gray-800 ">
-                      {complaintData.correspondence_post_office || "N/A"}
+                    <p className="text-gray-800 font-medium">
+                      {complaintData.complainants?.[0]?.is_public_servant ||
+                        "N/A"}
                     </p>
                   </div>
+
                   <div className="p-3 bg-gray-50 rounded border border-gray-100">
                     <p className="text-xs text-gray-500 uppercase font-semibold">
-                      Place/Address
+                      Occupation
                     </p>
-                    <p className="text-gray-800 ">
-                      {complaintData.correspondence_place || "N/A"}
+                    <p className="text-gray-800 font-medium">
+                      {complaintData.complainants?.[0]?.occupation || "N/A"}
                     </p>
                   </div>
                 </div>
@@ -734,22 +743,8 @@ const ViewAllComplaint = () => {
                             {resp?.designation || "N/A"}
                           </p>
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500 font-semibold">
-                            DEPARTMENT
-                          </p>
-                          <p className="text-sm text-gray-800">
-                            {resp?.department_name || "N/A"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500 font-semibold">
-                            DISTRICT
-                          </p>
-                          <p className="text-sm text-gray-800">
-                            {resp?.respondent_district || "N/A"}
-                          </p>
-                        </div>
+                      
+                      
                         <div className="sm:col-span-2">
                           <p className="text-xs text-gray-500 font-semibold">
                             ADDRESS
@@ -774,7 +769,7 @@ const ViewAllComplaint = () => {
             <div className="mt-6 flex justify-end pt-4 border-t">
               <button
                 onClick={() => setViewModalConfig({ open: false, type: null })}
-                className="px-4 py-2 bg-gray-800 text-white hover:bg-gray-700 rounded text-sm  transition-colors"
+                className="px-4 py-2 bg-gray-800 text-white hover:bg-gray-700 rounded text-sm font-medium transition-colors"
               >
                 Close
               </button>
