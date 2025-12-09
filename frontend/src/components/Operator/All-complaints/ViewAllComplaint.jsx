@@ -455,10 +455,10 @@ const ViewAllComplaint = () => {
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
                 <div className="flex gap-2">
                   <button
-                    onClick={() => {
-                        setConfirmConfig({ open: true, type: "pullback" });
-                    }}
-                    className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+                    // onClick={() => {
+                    //     setConfirmConfig({ open: true, type: "pullback" });
+                    // }}
+                    className="px-4 py-2 border cursor-not-allowed  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                   >
                     Pull Back
                   </button>
