@@ -672,7 +672,7 @@ const Complaints = () => {
         position: "top-right",
         autoClose: 3000,
       });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -806,7 +806,7 @@ const Complaints = () => {
           autoClose: 3000,
         });
 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         toast.error('कुछ गलत हो गया। कृपया पुनः प्रयास करें।', {
           position: "top-right",
