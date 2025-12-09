@@ -94,9 +94,9 @@ class OperatorComplaintsController extends Controller
               
               
                 $str = strtoupper(substr('AllGRV', 0, 3));
-
+                // 'UP'.$year.$str.
                 
-             $complaintNo = 'UP'.$year.$str.str_pad($complaint->id,6, '0',STR_PAD_LEFT);
+             $complaintNo = str_pad($complaint->id,6, '0',STR_PAD_LEFT).'/'.$year;
         $complaint->where('id',$complaint->id)->update(['complain_no' => $complaintNo]);
 
             /*--------------------------------------------
@@ -1260,7 +1260,7 @@ class OperatorComplaintsController extends Controller
                      $apcAction = new ComplaintAction();
                     $apcAction->complaint_id = $id;
                     $apcAction->status = 'Verified';
-                    $apcAction->remarks = "Initial verification completed. Forwarded to Supervisor for further action.";
+                    $apcAction->remarks = "File received";
                     $apcAction->forward_by_rk = $userId;
                     $apcAction->save();
                 }
@@ -1603,6 +1603,7 @@ class OperatorComplaintsController extends Controller
               $apcAction = new ComplaintAction();
                     $apcAction->complaint_id = $request->complaint_id;
                     $apcAction->forward_to_rk = $user;
+                    $apcAction->subject = 'File Received';
                     $apcAction->remarks = $request->remark;
                     $apcAction->status = 'Received';
                     $apcAction->save();
