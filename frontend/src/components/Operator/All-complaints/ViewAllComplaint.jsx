@@ -63,7 +63,7 @@ const ViewAllComplaint = () => {
     queryKey: ["operator-options"],
     queryFn: async () => {
       try {
-        const res = await api.get("/operator/get-operator");
+        const res = await api.get("/operator/get-lokayukt");
         if (Array.isArray(res.data)) {
           return res.data;
         } else if (res.data && Array.isArray(res.data.data)) {
@@ -380,7 +380,7 @@ const ViewAllComplaint = () => {
                     onClick={() => setViewModalConfig({ open: true, type: 'correspondence' })}
                     className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
                   >
-                    <FaEye /> Correspondence Details
+                    <FaEye /> Complainants Details
                   </button>
                   <button 
                     onClick={() => setViewModalConfig({ open: true, type: 'respondent' })}
@@ -649,19 +649,20 @@ const ViewAllComplaint = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="p-3 bg-gray-50 rounded">
                               <p className="text-xs text-gray-500 uppercase">Name</p>
-                              <p className="">{complaintData.correspondence_name || 'N/A'}</p>
+                              <p className="">{complaintData.complainants[0].complainant_name|| 'N/A'}</p>
+                          </div>
+                        
+                          <div className="p-3 bg-gray-50 rounded">
+                              <p className="text-xs text-gray-500 uppercase">Father Name</p>
+                              <p className="">{complaintData.complainants[0].father_name || 'N/A'}</p>
                           </div>
                           <div className="p-3 bg-gray-50 rounded">
-                              <p className="text-xs text-gray-500 uppercase">District</p>
-                              <p className="">{complaintData.correspondence_district || 'N/A'}</p>
+                              <p className="text-xs text-gray-500 uppercase">Is Public Servant</p>
+                              <p className="">{complaintData.complainants[0].is_public_servant || 'N/A'}</p>
                           </div>
                           <div className="p-3 bg-gray-50 rounded">
-                              <p className="text-xs text-gray-500 uppercase">Post Office</p>
-                              <p className="">{complaintData.correspondence_post_office || 'N/A'}</p>
-                          </div>
-                          <div className="p-3 bg-gray-50 rounded">
-                              <p className="text-xs text-gray-500 uppercase">Place/Address</p>
-                              <p className="">{complaintData.correspondence_place || 'N/A'}</p>
+                              <p className="text-xs text-gray-500 uppercase">occupation</p>
+                              <p className="">{complaintData.complainants[0].occupation || 'N/A'}</p>
                           </div>
                       </div>
                   </div>
@@ -680,14 +681,14 @@ const ViewAllComplaint = () => {
                                          <p className="text-xs text-gray-500">DESIGNATION</p>
                                          <p className=" text-sm">{resp.designation || 'N/A'}</p>
                                      </div>
-                                      <div>
+                                      {/* <div>
                                          <p className="text-xs text-gray-500">DEPARTMENT</p>
                                          <p className=" text-sm">{resp.department_name || 'N/A'}</p>
-                                     </div>
-                                      <div>
+                                     </div> */}
+                                      {/* <div>
                                          <p className="text-xs text-gray-500">DISTRICT</p>
                                          <p className=" text-sm">{resp.respondent_district || 'N/A'}</p>
-                                     </div>
+                                     </div> */}
                                      <div className="sm:col-span-2">
                                          <p className="text-xs text-gray-500">ADDRRSS</p>
                                          <p className=" text-sm">{resp.current_address || 'N/A'}</p>
