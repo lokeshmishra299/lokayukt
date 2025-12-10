@@ -11,9 +11,11 @@ import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
 const token = localStorage.getItem("access_token");
+
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -23,11 +25,13 @@ const api = axios.create({
   },
 });
 
+
 // --- CUSTOM SEARCHABLE DROPDOWN COMPONENT ---
 const SearchableDropdown = ({ options, value, onChange, placeholder, disabled }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
+
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -41,6 +45,7 @@ const SearchableDropdown = ({ options, value, onChange, placeholder, disabled })
     };
   }, [wrapperRef]);
 
+
   const selectedOption = options.find((opt) => opt.id == value);
   
   const filteredOptions = options.filter(option => {
@@ -50,11 +55,13 @@ const SearchableDropdown = ({ options, value, onChange, placeholder, disabled })
       return label.toLowerCase().includes(search) || district.toLowerCase().includes(search);
   });
 
+
   const handleSelect = (option) => {
     onChange(option.id);
     setIsOpen(false);
     setSearchTerm("");
   };
+
 
   return (
     <div className="relative" ref={wrapperRef}>
@@ -73,6 +80,7 @@ const SearchableDropdown = ({ options, value, onChange, placeholder, disabled })
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
+
 
       {isOpen && !disabled && (
         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-hidden flex flex-col">
@@ -109,10 +117,12 @@ const SearchableDropdown = ({ options, value, onChange, placeholder, disabled })
   );
 };
 
+
 const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
+
 
   const [activeTab, setActiveTab] = useState("documents");
   const [showPreview, setShowPreview] = useState(false);
@@ -124,12 +134,14 @@ const ViewAllComplaint = () => {
     type: null,
   });
 
+
   const [viewModalConfig, setViewModalConfig] = useState({ open: false, type: null });
   
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
   const [forwardType, setForwardType] = useState("self");
   const [assinedMyself, setassinedMyself] = useState(false);
+
 
   const {
     data: complaintData,
@@ -146,6 +158,7 @@ const ViewAllComplaint = () => {
     staleTime: 1000 * 60 * 5,
     retry: 2,
   });
+
 
   const {
     data: forwardOptionsData,
@@ -179,6 +192,7 @@ const ViewAllComplaint = () => {
     retry: 2,
   });
 
+
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
       const res = await api.post("/ps/received-physical", {
@@ -199,6 +213,7 @@ const ViewAllComplaint = () => {
       );
     },
   });
+
 
   const forwardPhysicallyMutation = useMutation({
     mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
@@ -221,6 +236,7 @@ const ViewAllComplaint = () => {
     },
   });
 
+
   const handleMarkAsReceived = () =>
     setConfirmConfig({ open: true, type: "receive" });
   
@@ -228,12 +244,15 @@ const ViewAllComplaint = () => {
     setConfirmConfig({ open: true, type: "forward" });
   }
 
+
   const handleAssignToSelf = () =>
     setConfirmConfig({ open: true, type: "assign" });
+
 
   const handlePullBack = () => {
     setConfirmConfig({ open: true, type: "pullback" });
   }
+
 
   const handleConfirmYes = () => {
     if (confirmConfig.type === "receive") {
@@ -269,11 +288,13 @@ const ViewAllComplaint = () => {
     }
   };
 
+
   const handleConfirmNo = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
   };
+
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -292,6 +313,7 @@ const ViewAllComplaint = () => {
     }
   };
 
+
   const handleFileDownload = (filePath) => {
     if (!filePath) {
       toast.error("No file available for download");
@@ -300,6 +322,7 @@ const ViewAllComplaint = () => {
     const fileUrl = `${APP_URL}${filePath}`;
     window.open(fileUrl, "_blank");
   };
+
 
   if (isLoading) {
     return (
@@ -310,6 +333,7 @@ const ViewAllComplaint = () => {
       </div>
     );
   }
+
 
   if (isError) {
     return (
@@ -331,6 +355,7 @@ const ViewAllComplaint = () => {
       </div>
     );
   }
+
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
@@ -365,6 +390,7 @@ const ViewAllComplaint = () => {
                 </div>
               </div>
 
+
               {/* Desktop Header */}
               <div className="hidden md:block">
                 <div className="flex justify-between items-start mb-3">
@@ -372,6 +398,7 @@ const ViewAllComplaint = () => {
                     File No. {complaintData.complain_no}(
                     <span className="text-blue-600">NEW CASE</span>)
                   </h2>
+
 
                   <div className="flex gap-2">
                     <span
@@ -384,6 +411,7 @@ const ViewAllComplaint = () => {
                         : "In Motion – With Lokayukta"}
                     </span>
 
+
                     <button
                       onClick={() => navigate(-1)}
                       className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
@@ -394,67 +422,100 @@ const ViewAllComplaint = () => {
                 </div>
               </div>
 
-              {/* ===== DESCRIPTION ===== */}
-              <p className="text-gray-700 mb-4 text-sm md:text-base">
-                Description:{" "}
+
+              {/* ===== DESCRIPTION (Hindi) ===== */}
+              <p className="text-gray-700 mb-2 text-sm md:text-base">
+                विवरण:{" "}
                 {complaintData.complaint_description ||
                   "No detailed description available for this complaint."}
               </p>
 
-              {/* ===== DETAILS GRID ===== */}
+              <p className="text-gray-700 mb-4 text-sm md:text-base">
+                विलंब का कारण: {complaintData.delay_reason || "N/A"}
+              </p>
+
+
+              {/* ===== DETAILS GRID (Hindi) ===== */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                {/* Column 1 */}
                 <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">
-                    CORRESPONDENCE NAME
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                    पत्राचार हेतु नाम
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.correspondence_name}
+                  <p className="text-gray-800 text-sm md:text-base">
+                    {complaintData.correspondence_name || "N/A"}
                   </p>
-                  <p className="text-xs md:text-sm text-gray-600 mt-1">
-                    {complaintData.address}
+
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                    पत्राचार हेतु पता
                   </p>
-                  <p className="text-xs mt-3 text-gray-500 uppercase mb-1">
-                    ADDRESS
+                  <p className="text-gray-800 text-sm md:text-base">
+                    {complaintData.address || "N/A"}
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.permanent_place || "N/A"}
+
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                    पूर्व में प्रस्तुत विवरण
+                  </p>
+                  <p className="text-gray-800 text-sm md:text-base">
+                    {complaintData.previously_submitted_details || "N/A"}
                   </p>
                 </div>
+
+                {/* Column 2 */}
                 <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">
-                    DISTRICT
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                    पत्राचार हेतु डाकघर
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.permanent_district || "N/A"}
+                  <p className="text-gray-800 text-sm md:text-base">
+                    {complaintData.permanent_post_office || "N/A"}
                   </p>
+
                   {complaintData.dob && (
                     <>
-                      <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
-                        Relation With Person
+                      <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                        व्यक्ति से संबंध
                       </p>
-                      <p className=" text-gray-800 text-sm md:text-base">
+                      <p className="text-gray-800 text-sm md:text-base">
                         {complaintData.relation_with_person || "NA"}
+                      </p>
+
+                      <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                        कार्यवाही तिथि
+                      </p>
+                      <p className="text-gray-800 text-sm md:text-base">
+                        {complaintData.cause_date || "NA"}
                       </p>
                     </>
                   )}
                 </div>
+
+                {/* Column 3 */}
                 <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">
-                    POST OFFICE
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                    पत्राचार हेतु जिला
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.permanent_post_office || "N/A"}
+                  <p className="text-gray-800 text-sm md:text-base">
+                    {complaintData.permanent_district || "N/A"}
                   </p>
-                  <p className="text-xs text-gray-500 uppercase mb-1 mt-4">
-                    PREVIOUSLY SUBMITTED DETAILS
+
+                  <p className="text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
+                    पूर्व में प्रस्तुत
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.previously_submitted_details || "N/A"}
+                  <p className="text-gray-800 text-sm md:text-base">
+                    {complaintData.previously_submitted || "N/A"}
+                  </p>
+
+                  <p className="text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
+                    श्रेणी
+                  </p>
+                  <p className="text-gray-800 text-sm md:text-base">
+                    {complaintData.category || "N/A"}
                   </p>
                 </div>
               </div>
 
-              {/* Fee Status and Fee Type Section */}
+
+              {/* Fee Status and Fee Type Section (Hindi) */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
                   className={`px-3 py-1.5 rounded text-xs border ${
@@ -463,7 +524,7 @@ const ViewAllComplaint = () => {
                       : "bg-gray-50 text-gray-700 border-gray-200"
                   }`}
                 >
-                  Fee Type:{" "}
+                  शुल्क का प्रकार:{" "}
                   {complaintData.fee_exempted === 1
                     ? "Exempted"
                     : complaintData.amount
@@ -478,7 +539,7 @@ const ViewAllComplaint = () => {
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  Status: {complaintData.payment_status || "Awaiting approval"}
+                  स्थिति: {complaintData.payment_status || "Awaiting approval"}
                 </span>
                 {complaintData.challan_no && (
                   <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200">
@@ -487,7 +548,7 @@ const ViewAllComplaint = () => {
                 )}
               </div>
               
-              {/* ===== View Details Buttons ===== */}
+              {/* ===== View Details Buttons (Hindi) ===== */}
               <div className="flex gap-3 mt-4 border-t pt-4">
                 <button
                   onClick={() =>
@@ -495,7 +556,7 @@ const ViewAllComplaint = () => {
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
                 >
-                  <FaEye /> Complainants Details
+                  <FaEye /> शिकायतकर्ता
                 </button>
                 <button
                   onClick={() =>
@@ -503,11 +564,30 @@ const ViewAllComplaint = () => {
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-md border border-orange-200 hover:bg-orange-100 transition-colors text-sm font-medium"
                 >
-                  <FaEye /> Respondent Details
+                  <FaEye /> प्रतिवादी
+                </button>
+                {/* NEW BUTTONS ADDED TO MATCH */}
+                <button
+                  onClick={() =>
+                    setViewModalConfig({ open: true, type: "support" })
+                  }
+                  className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
+                >
+                  <FaEye /> समर्थनकर्ता व्यक्ति
+                </button>
+                <button
+                  onClick={() =>
+                    setViewModalConfig({ open: true, type: "witness" })
+                  }
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
+                >
+                  <FaEye /> साक्षियों का विवरण
                 </button>
               </div>
 
+
             </div>
+
 
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
@@ -533,6 +613,7 @@ const ViewAllComplaint = () => {
               </div>
             </div>
 
+
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
@@ -557,6 +638,7 @@ const ViewAllComplaint = () => {
               </div>
             </div>
 
+
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
               {activeTab === "documents" && (
@@ -567,6 +649,7 @@ const ViewAllComplaint = () => {
                 <MovementHistory complaint={complaintData} />
               )}
             </div>
+
 
             {/* Footer Buttons */}
             <div className="border-t p-4">
@@ -586,6 +669,7 @@ const ViewAllComplaint = () => {
                   </button>
                 </div>
 
+
                 <div className="flex gap-2">
                   <button
                     onClick={handleMarkAsReceived}
@@ -596,6 +680,7 @@ const ViewAllComplaint = () => {
                       ? "Processing..."
                       : "Return with Remarks"}
                   </button>
+
 
                   <button
                     onClick={handleforwardphysical}
@@ -620,6 +705,7 @@ const ViewAllComplaint = () => {
         )}
       </div>
 
+
       {confirmConfig.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
@@ -636,6 +722,7 @@ const ViewAllComplaint = () => {
               <FaTimes className="w-5 h-5 text-gray-600" />
             </button>
 
+
             {/* Title */}
             <h3 className="text-lg font-semibold mb-4 pr-8">
               {confirmConfig.type === "receive"
@@ -646,6 +733,7 @@ const ViewAllComplaint = () => {
                 ? "Pull Back Complaint?"
                 : "Assign to Yourself?"}
             </h3>
+
 
             {/* --- FORWARDING LOGIC START --- */}
             {confirmConfig.type === "forward" && (
@@ -691,6 +779,7 @@ const ViewAllComplaint = () => {
                   </div>
                 </div>
 
+
                 {/* SEARCHABLE DROPDOWN */}
                 <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -698,6 +787,7 @@ const ViewAllComplaint = () => {
                     {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
                     Officer <span className="text-red-500">*</span>
                   </label>
+
 
                   {isLoadingOptions || isFetchingOptions ? (
                     <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50 text-sm">
@@ -720,6 +810,7 @@ const ViewAllComplaint = () => {
             )}
             {/* --- FORWARDING LOGIC END --- */}
 
+
             {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
             {(confirmConfig.type !== "assign" && confirmConfig.type !== "pullback") && (
               <>
@@ -738,6 +829,7 @@ const ViewAllComplaint = () => {
               </>
             )}
 
+
             {/* Buttons */}
             <div className="flex justify-end gap-3">
               <button
@@ -750,6 +842,7 @@ const ViewAllComplaint = () => {
               >
                 {confirmConfig.type === "assign" || confirmConfig.type === "pullback" ? "No" : "Cancel"}
               </button>
+
 
               <button
                 onClick={handleConfirmYes}
@@ -793,13 +886,19 @@ const ViewAllComplaint = () => {
               <FaTimes size={20} />
             </button>
 
+
             <h3 className="text-xl font-semibold mb-6 border-b pb-2 text-gray-800">
               {viewModalConfig.type === "correspondence"
                 ? "Complainant Details"
-                : "Respondent Details"}
+                : viewModalConfig.type === "respondent"
+                ? "Respondent Details"
+                : viewModalConfig.type === "support"
+                ? "Supporting Persons Details"
+                : "Witness Details"}
             </h3>
 
-            {viewModalConfig.type === 'correspondence' ? (
+{/* 
+            {viewModalConfig.type === 'correspondence' && (
               // Complainant Details View
               <div className="space-y-4">
                 {complaintData.complainants && complaintData.complainants.length > 0 ? (
@@ -830,7 +929,63 @@ const ViewAllComplaint = () => {
                   <div className="text-center py-8 text-gray-500">No Complainant data available.</div>
                 )}
               </div>
-            ) : (
+            )} */}
+
+                        
+              {viewModalConfig.type === 'correspondence' && (
+  <div className="space-y-4">
+    {complaintData.complainants && complaintData.complainants.length > 0 ? (
+      complaintData.complainants.map((comp, idx) => (
+        <div key={idx} className="mb-4">
+          <h4 className="text-sm font-bold text-gray-700 mb-2">
+            परिवादी #{idx + 1}
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">नाम</p>
+              <p className="text-gray-800">{comp.complainant_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पिता का नाम</p>
+              <p className="text-gray-800">{comp.father_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">जिला</p>
+              <p className="text-gray-800">{comp.district_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">क्या लोक सेवक हैं?</p>
+              <p className="text-gray-800">{comp.is_public_servant || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">व्यवसाय</p>
+              <p className="text-gray-800">{comp.occupation || 'N/A'}</p>
+            </div>
+
+            <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पता</p>
+              <p className="text-gray-800">{comp.permanent_place || 'N/A'}</p>
+            </div>
+
+          </div>
+        </div>
+      ))
+    ) : (
+      <div className="text-center py-4 text-gray-500">
+        परिवादी का कोई डेटा उपलब्ध नहीं है।
+      </div>
+    )}
+  </div>
+)}
+
+
+            {/* {viewModalConfig.type === 'respondent' && (
               // Respondent Details View
               <div className="space-y-4">
                 {complaintData.respondant && complaintData.respondant.length > 0 ? (
@@ -857,7 +1012,156 @@ const ViewAllComplaint = () => {
                   <div className="text-center py-8 text-gray-500">No respondent data available.</div>
                 )}
               </div>
-            )}
+            )} */}
+
+            {/* Support Content (Added) */}
+            {/* {viewModalConfig.type === "support" && (
+              <div className="space-y-4">
+                {complaintData.support && complaintData.support.length > 0 ? (
+                  complaintData.support.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-3 shadow-sm"
+                    >
+                      <h4 className="text-sm font-bold text-gray-700 mb-2">
+                        Person #{idx + 1}
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">
+                            NAME
+                          </p>
+                          <p className="text-gray-800">
+                            {item.support_name || "NA"}
+                          </p>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">
+                            ADDRESS
+                          </p>
+                          <p className="text-gray-800">
+                            {item.support_address || "NA"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    No supporting persons found.
+                  </div>
+                )}
+              </div>
+            )} */}
+
+
+                      {viewModalConfig.type === 'support' && (
+  <div className="space-y-4">
+    {complaintData.support && complaintData.support.length > 0 ? (
+      complaintData.support.map((item, idx) => (
+        <div key={idx} className="mb-4">
+          <h4 className="text-sm font-bold text-gray-700 mb-2">
+            सहायक व्यक्ति #{idx + 1}
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">नाम</p>
+              <p className="text-gray-800">{item.support_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पता</p>
+              <p className="text-gray-800">{item.support_address || 'N/A'}</p>
+            </div>
+
+          </div>
+        </div>
+      ))
+    ) : (
+      <div className="text-center py-4 text-gray-500">
+        कोई सहायक व्यक्ति उपलब्ध नहीं है।
+      </div>
+    )}
+  </div>
+)}
+
+
+            {/* Witness Content (Added) */}
+            {/* {viewModalConfig.type === "witness" && (
+              <div className="space-y-4">
+                {complaintData.witness && complaintData.witness.length > 0 ? (
+                  complaintData.witness.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-3 shadow-sm"
+                    >
+                      <h4 className="text-sm font-bold text-gray-700 mb-2">
+                        Witness #{idx + 1}
+                      </h4>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">
+                            NAME
+                          </p>
+                          <p className="text-gray-800">
+                            {item.witness_name || "NA"}
+                          </p>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">
+                            ADDRESS
+                          </p>
+                          <p className="text-gray-800">
+                            {item.witness_address || "NA"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    No witness data available.
+                  </div>
+                )}
+              </div>
+            )} */}
+
+                                  {viewModalConfig.type === 'witness' && (
+  <div className="space-y-4">
+    {complaintData.witness && complaintData.witness.length > 0 ? (
+      complaintData.witness.map((item, idx) => (
+        <div key={idx} className="mb-4">
+          
+          <h4 className="text-sm font-bold text-gray-700 mb-2">
+            गवाह #{idx + 1}
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">नाम</p>
+              <p className="text-gray-800">{item.witness_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पता</p>
+              <p className="text-gray-800">{item.witness_address || 'N/A'}</p>
+            </div>
+
+          </div>
+        </div>
+      ))
+    ) : (
+      <div className="text-center py-4 text-gray-500">
+        कोई गवाह डेटा उपलब्ध नहीं है।
+      </div>
+    )}
+  </div>
+)}
+
+
 
             <div className="mt-6 flex justify-end pt-4 border-t">
               <button
@@ -871,6 +1175,7 @@ const ViewAllComplaint = () => {
         </div>
       )}
 
+
       {assinedMyself && (
         <div>
           <h1>krishna</h1>
@@ -879,5 +1184,6 @@ const ViewAllComplaint = () => {
     </div>
   );
 };
+
 
 export default ViewAllComplaint;

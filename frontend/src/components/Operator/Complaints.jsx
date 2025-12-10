@@ -864,6 +864,15 @@ const Complaints = () => {
     setErrors({});
   };
 
+  const handleSelect = (value) => {
+  if (formData.complaintType === value) {
+    handleFormDataChange("complaintType", "");   
+  } else {
+    handleFormDataChange("complaintType", value); 
+  }
+};
+
+
   return (
     <div className="min-h-screen bg-white rounded-md py-8">
       <ToastContainer />
@@ -1428,41 +1437,50 @@ const Complaints = () => {
             </div>
           </div>
 
-          {/* 5. Complaint Type */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">5. क्या यह – <span className="text-red-500">*</span></h3>
-            <div className="space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="complaintType"
-                  value="अभिकथन"
-                  className="w-4 h-4 mt-1 text-orange-500 focus:ring-orange-500"
-                  checked={formData.complaintType === 'अभिकथन'}
-                  onChange={(e) => handleFormDataChange('complaintType', e.target.value)}
-                />
-                <span className="text-gray-700">
-                  कोई अभिकथन (अधिनियम की धारा 2 (ख) में यथा परिभाषित)
-                </span>
-              </label>
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="complaintType"
-                  value="शिकायत"
-                  className="w-4 h-4 mt-1 text-orange-500 focus:ring-orange-500"
-                  checked={formData.complaintType === 'शिकायत'}
-                  onChange={(e) => handleFormDataChange('complaintType', e.target.value)}
-                />
-                <span className="text-gray-700">
-                  शिकायत (अधिनियम की धारा 2 (घ) में यथा परिभाषित)
-                </span>
-              </label>
-            </div>
-            {errors.category && (
-              <p className="text-red-500 text-sm mt-2">{errors.category[0]}</p>
-            )}
-          </div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5 px-2">
+  
+  {/* अभिकथन */}
+  <div
+    onClick={() => handleSelect("अभिकथन")}
+    className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer 
+      ${formData.complaintType === "अभिकथन"
+        ? "border-orange-500 bg-orange-50"
+        : "border-gray-300 hover:bg-gray-50"}`}
+  >
+    <div
+      className={`w-4 h-4 mt-1 rounded-full border 
+        ${formData.complaintType === "अभिकथन"
+          ? "bg-orange-500 border-orange-500"
+          : "border-gray-400"}`}
+    ></div>
+
+    <span className="text-gray-700">
+      कोई अभिकथन (अधिनियम की धारा 2 (ख) में यथा परिभाषित)
+    </span>
+  </div>
+
+  {/* शिकायत */}
+  <div
+    onClick={() => handleSelect("शिकायत")}
+    className={`flex items-start gap-3 p-3 rounded-md border cursor-pointer 
+      ${formData.complaintType === "शिकायत"
+        ? "border-orange-500 bg-orange-50"
+        : "border-gray-300 hover:bg-gray-50"}`}
+  >
+    <div
+      className={`w-4 h-4 mt-1 rounded-full border 
+        ${formData.complaintType === "शिकायत"
+          ? "bg-orange-500 border-orange-500"
+          : "border-gray-400"}`}
+    ></div>
+
+    <span className="text-gray-700">
+      शिकायत (अधिनियम की धारा 2 (घ) में यथा परिभाषित)
+    </span>
+  </div>
+
+</div>
 
           {/* 6. Challan - CONDITIONALLY RENDERED */}
           {formData.complaintType === 'अभिकथन' && (
