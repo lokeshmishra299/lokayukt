@@ -260,6 +260,10 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-notes/{id}',[LokAyuktComplaintsController::class,'getNotes']);
         Route::post('/add-notes',[LokAyuktComplaintsController::class,'addNotes']);
         Route::get('/get-file-preview/{id}',[LokAyuktComplaintsController::class,'getFilePreview']);
+        Route::get('/return-complain-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'returnComplainByLokayukt']);
+        Route::get('/pull-back-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'pullBackByLokayukt']);
+       
+       
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-lokayukt/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbylokayukt']);
@@ -369,6 +373,9 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-notes/{id}',[PSComplaintsController::class,'getNotes']);
         Route::post('/add-notes',[PSComplaintsController::class,'addNotes']);
         Route::get('/get-file-preview/{id}',[PSComplaintsController::class,'getFilePreview']);
+         Route::get('/return-complain-by-ps/{id}',[PSComplaintsController::class,'returnComplainByPs']);
+        Route::get('/pull-back-by-ps/{id}',[PSComplaintsController::class,'pullBackByPs']);
+       
         // Route::post('/forward-by-ds-js/{complainId}',[PSComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[PSComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-ps/{complainId}',[PSComplaintsController::class,'forwardComplaintbyPS']);
