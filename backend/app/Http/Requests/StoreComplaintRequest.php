@@ -23,9 +23,9 @@ class StoreComplaintRequest extends FormRequest
 
             // Permanent Address
             // 'permanent_name'              => 'required|string|max:255',
-            'permanent_place'             => 'required|string|max:255',
-            'permanent_post_office'       => 'required|string|max:255',
-            'permanent_district'          => 'required|string|max:255',
+            // 'permanent_place'             => 'required|string|max:255',
+            // 'permanent_post_office'       => 'required|string|max:255',
+            // 'permanent_district'          => 'required|string|max:255',
 
             // Correspondence Address
             'correspondence_name'         => 'required|string|max:255',
@@ -73,8 +73,18 @@ class StoreComplaintRequest extends FormRequest
             | MULTIPLE COMPLAINANTS (Required)
             ----------------------------------------------------*/
 
-             'support_name'   => 'required|string',
+            'permanent_place'             => 'required|string',
+            'permanent_place.*'   => 'required|string|max:255',
+            
+            'permanent_post_office'       => 'required|string',
+            'permanent_post_office.*'   => 'required|string|max:255',
+           
+            'permanent_district'          => 'required|string',
+            'permanent_district.*'   => 'required|string|max:255',
+           
+            'support_name'   => 'required|string',
              'support_name.*'   => 'required|string|max:150',
+          
              'support_address'   => 'required|string',
              'support_address.*'   => 'required|string|max:255',
 
@@ -125,10 +135,8 @@ class StoreComplaintRequest extends FormRequest
             'authorization_document.mimes' => 'Authorization document must be a PDF or image.',
             'authorization_document.max' => 'Authorization document size cannot exceed 2MB.',
 
-            'permanent_name.required' => 'Permanent address name is required.',
-            'permanent_place.required' => 'Permanent address place is required.',
-            'permanent_post_office.required' => 'Permanent post office is required.',
-            'permanent_district.required' => 'Permanent district is required.',
+            // 'permanent_name.required' => 'Permanent address name is required.',
+           
 
             'correspondence_name.required' => 'Correspondence name is required.',
             'correspondence_place.required' => 'Correspondence place is required.',
@@ -180,6 +188,29 @@ class StoreComplaintRequest extends FormRequest
             'father_name.*.required' => 'Father name is required.',
             'occupation.*.required' => 'Occupation is required.',
             'is_public_servant.*.required' => 'Public servant Yes/No is required.',
+
+
+             'permanent_place.required' => 'At least one Place is required.',
+             'permanent_place.*.required' => 'Place is required.',
+            
+             'permanent_post_office.required' => 'At least one Post office is required.',
+             'permanent_post_office.*.required' => 'Post office is required.',
+            
+             'permanent_district.required' => 'At least one District is required.',
+            'permanent_district.*.required' => 'District is required.',
+            
+            'support_name.required' => 'At least one Support person name is required.',
+            'support_name.*.required' => 'Support person name is required.',
+        
+            'support_address.required' => 'At least one Support person address is required.',
+            'support_address.*.required' => 'Support person address is required.',
+        
+            'witness_name.required' => 'At least one Witness is required.',
+            'witness_name.*.required' => 'Witness  is required.',
+        
+            'witness_address.required' => 'At least one Witness address is required.',
+            'witness_address.*.required' => 'Witness address is required.',
+
 
 
             /* -----------------------------------------
