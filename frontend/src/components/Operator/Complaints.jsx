@@ -616,9 +616,9 @@ const Complaints = () => {
       newErrors.previously_submitted_details = ['यदि पहले प्रस्तुत किया है तो विवरण आवश्यक है।'];
     }
 
-    if (!formData.complaintType) {
-      newErrors.category = ['शिकायत की श्रेणी चुनें (अभिकथन/शिकायत)।'];
-    }
+    // if (!formData.complaintType) {
+    //   newErrors.category = ['शिकायत की श्रेणी चुनें (अभिकथन/शिकायत)।'];
+    // }
 
     // --- Conditional Validation for Challan (Only if assertion) ---
     if (formData.complaintType === 'अभिकथन') {
