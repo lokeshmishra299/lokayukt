@@ -47,8 +47,6 @@ const ViewAllComplaint = () => {
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
 
-
-
   const {
     data: complaintData,
     isLoading,
@@ -118,10 +116,10 @@ const ViewAllComplaint = () => {
     },
   });
 
+ 
   const forwardPhysicallyMutation = useMutation({
     mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-      const res = await api.post("/lokayukt/forward-physical", {
-        complaint_id: complaintId,
+      const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
         forward_to: forwardTo,
         remark: remarkData,
       });
@@ -166,8 +164,8 @@ const ViewAllComplaint = () => {
         remarkData: remark,
       });
     } else if (confirmConfig.type === "pullback") {
-      // --- PULL BACK LOGIC ---
-      toast.success("Complaint Pulled Back Successfully");
+   
+      // toast.success("Complaint Pulled Back Successfully");
       setConfirmConfig({ open: false, type: null });
     }
   };
