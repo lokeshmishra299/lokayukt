@@ -47,7 +47,7 @@ class StoreComplaintRequest extends FormRequest
             /*----------------------------------------------------
             | SECTION 7
             ----------------------------------------------------*/
-            'category'                    => 'required|in:assertion,complaint',
+            'category'                    => 'in:assertion,complaint',
 
 
             /*----------------------------------------------------

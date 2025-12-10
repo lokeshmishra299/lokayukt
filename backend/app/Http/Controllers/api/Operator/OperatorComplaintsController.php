@@ -21,188 +21,383 @@ use App\Http\Requests\UpdateComplaintRequest;
 
 class OperatorComplaintsController extends Controller
 {
-    
-     public function store(StoreComplaintRequest $request)
-    {
-        DB::beginTransaction();
 
-        try {
-            /*--------------------------------------------
-            | 1. Upload Files
-            |--------------------------------------------*/
+    public function store(StoreComplaintRequest $request)
+{
+    DB::beginTransaction();
 
-            $authorizationDocument = null;
-            if ($request->hasFile('authorization_document')) {
-                $authorizationDocument = $request->file('authorization_document')
-                    ->store('Document', 'public');
-            }
+    try {
+        /*--------------------------------------------
+        | 1. Upload Files
+        |--------------------------------------------*/
+        $authorizationDocument = $request->hasFile('authorization_document')
+            ? $request->file('authorization_document')->store('Document', 'public')
+            : null;
 
-            $challanFile = null;
-            if ($request->hasFile('challan_file')) {
-                $challanFile = $request->file('challan_file')
-                    ->store('Document', 'public');
-            }
-            $attached_documents = null;
-            if ($request->hasFile('attached_documents')) {
-                $attached_documents = $request->file('attached_documents')
-                    ->store('Document', 'public');
-            }
+        $challanFile = $request->hasFile('challan_file')
+            ? $request->file('challan_file')->store('Document', 'public')
+            : null;
 
-            /*--------------------------------------------
-            | 2. Create Main Complaint Entry
-            |--------------------------------------------*/
+        $attached_documents = $request->hasFile('attached_documents')
+            ? $request->file('attached_documents')->store('Document', 'public')
+            : null;
 
+        /*--------------------------------------------
+        | 2. Create Main Complaint Entry
+        |--------------------------------------------*/
 
-            $complaint = Complaint::create([
-                'relation_with_person'        => $request->relation_with_person,
-                'authorization_document'      => $authorizationDocument,
+        $complaintId = DB::table('complaints')->insertGetId([
+            'relation_with_person'        => $request->relation_with_person,
+            'authorization_document'      => $authorizationDocument,
+            'correspondence_name'         => $request->correspondence_name,
+            'correspondence_place'        => $request->correspondence_place,
+            'correspondence_post_office'  => $request->correspondence_post_office,
+            'correspondence_district'     => $request->correspondence_district,
+            'cause_date'                  => $request->cause_date,
+            'delay_reason'                => $request->delay_reason,
+            'previously_submitted'        => $request->previously_submitted,
+            'previously_submitted_details'=> $request->previously_submitted_details,
+            'category'                    => $request->category,
+            'challan_number'              => $request->challan_number,
+            'challan_date'                => $request->challan_date,
+            'challan_file'                => $challanFile,
+            'attached_documents'          => $attached_documents,
+            'complaint_description'       => $request->complaint_description,
+        ]);
 
-                // Permanent Address
-                // 'permanent_name'              => $request->permanent_name,
+        /*--------------------------------------------
+        | 3. Generate Complaint No
+        |--------------------------------------------*/
+        $year = date('Y');
+        $complaintNo = str_pad($complaintId, 6, '0', STR_PAD_LEFT) . '/' . $year;
 
-                // Correspondence Address
-                'correspondence_name'         => $request->correspondence_name,
-                'correspondence_place'        => $request->correspondence_place,
-                'correspondence_post_office'  => $request->correspondence_post_office,
-                'correspondence_district'     => $request->correspondence_district,
+        DB::table('complaints')->where('id', $complaintId)
+            ->update(['complain_no' => $complaintNo]);
 
-                // Section 6
-                'cause_date'                   => $request->cause_date,
-                'delay_reason'                 => $request->delay_reason,
-                'previously_submitted'         => $request->previously_submitted,
-                'previously_submitted_details' => $request->previously_submitted_details,
+        /*--------------------------------------------
+        | 4. Insert Multiple Complainants
+        |--------------------------------------------*/
+        if ($request->has('complainant_name')) {
 
-                // Section 7
-                'category'                     => $request->category,
+            foreach ($request->complainant_name as $i => $name) {
 
-                // Section 8 Challan
-                'challan_number'               => $request->challan_number,
-                'challan_date'                 => $request->challan_date,
-                'challan_file'                 => $challanFile,
-
-                // Section 9, 10, 11, 12
-                // 'supporting_affidavit_list'    => $request->supporting_affidavit_list,
-                'other_witnesses'              => $request->other_witnesses,
-                'attached_documents'           => $request->attached_documents,
-                'complaint_description'        => $request->complaint_description,
-            ]);
-
-               $year = date('Y');
-              
-              
-                $str = strtoupper(substr('AllGRV', 0, 3));
-                // 'UP'.$year.$str.
-                
-             $complaintNo = str_pad($complaint->id,6, '0',STR_PAD_LEFT).'/'.$year;
-        $complaint->where('id',$complaint->id)->update(['complain_no' => $complaintNo]);
-
-            /*--------------------------------------------
-            | 3. Add Multiple Complainants (Parivadi)
-            |--------------------------------------------*/
-
-            if ($request->has('complainant_name')) {
-                foreach ($request->complainant_name as $i => $name) {
-
-                    // Skip empty rows
-                    if (empty($name)) continue;
-
-                    Complainant::create([
-                        'complaint_id'  => $complaint->id,
-                        'complainant_name' => $name,
-                        'father_name'      => $request->father_name[$i] ?? null,
-                        'occupation'       => $request->occupation[$i] ?? null,
-                        'is_public_servant'=> $request->is_public_servant[$i] ?? null,
-                        'permanent_place' => $request->permanent_place[$i] ?? null,
-                        'permanent_post_office' => $request->permanent_post_office[$i] ?? null,
-                        'permanent_district' => $request->permanent_district[$i] ?? null,
-                    ]);
+                // SKIP EMPTY complainant rows
+                if (!isset($name) || trim($name) === '') {
+                    continue;
                 }
+
+                DB::table('complainants')->insert([
+                    'complaint_id'          => $complaintId,
+                    'complainant_name'      => trim($name),
+                    'father_name'           => $request->father_name[$i] ?? '',
+                    'occupation'            => $request->occupation[$i] ?? '',
+                    'is_public_servant'     => $request->is_public_servant[$i] ?? 'no',
+                    'permanent_place'       => $request->permanent_place[$i] ?? '',
+                    'permanent_post_office' => $request->permanent_post_office[$i] ?? '',
+                    'permanent_district'    => $request->permanent_district[$i] ?? null,
+                ]);
             }
-            if ($request->has('support_name')) {
-                foreach ($request->support_name as $i => $support_name) {
-
-                    // Skip empty rows
-                    if (empty($support_name)) continue;
-
-                    Complainant::create([
-                        'complaint_id'  => $complaint->id,
-                        'support_name' => $request->support_name[$i] ?? null,
-                        'support_address' => $request->support_address[$i] ?? null,
-                        
-                    ]);
-                }
-            }
-            if ($request->has('witness_name')) {
-                foreach ($request->witness_name as $i => $witness_name) {
-
-                    // Skip empty rows
-                    if (empty($witness_name)) continue;
-
-                    Complainant::create([
-                        'complaint_id'  => $complaint->id,
-                        'witness_name' => $request->witness_name[$i] ?? null,
-                        'witness_address' => $request->witness_address[$i] ?? null,
-                        
-                    ]);
-                }
-            }
-
-            /*--------------------------------------------
-            | 4. Add Multiple Respondents (Prativadi)
-            |--------------------------------------------*/
-
-            if ($request->has('respondent_name')) {
-                foreach ($request->respondent_name as $i => $name) {
-
-                    // Skip empty rows
-                    if (empty($name)) continue;
-
-                    Respondent::create([
-                        'complaint_id'   => $complaint->id,
-                        'respondent_name' => $name,
-                        'designation'     => $request->designation[$i] ?? null,
-                        'officer_category'     => $request->officer_category[$i] ?? null,
-                        'department_name'     => $request->department_name[$i] ?? null,
-                        'current_address' => $request->current_address[$i] ?? null,
-                        'respondent_district' => $request->respondent_district[$i] ?? null,
-                    ]);
-                }
-            }
-
-          ComplainDocuments::create([
-                'complain_id' => $complaint->id,
-                'file'         => $authorizationDocument
-            ]);
-
-            ComplainDocuments::create([
-                'complain_id' => $complaint->id,
-                'file'         => $challanFile
-            ]);
-            ComplainDocuments::create([
-                'complain_id' => $complaint->id,
-                'file'         => $attached_documents
-            ]);
-               // $complaintNo = 'UP'.$year.$str.str_pad($cmpDetailsUpdate->id,8, '0',STR_PAD_LEFT);
-    //             // $cmpDetailsUpdate->where('id',$cmpDetailsUpdate->id)->update(['complain_no' => $complaintNo]);
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Complaint submitted successfully!',
-                'complaint_id' => $complaint->id
-            ]);
-
-        } catch (\Exception $e) {
-
-            DB::rollback();
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Error occurred',
-                'error' => $e->getMessage()
-            ], 500);
         }
+
+        /*--------------------------------------------
+        | 5. Insert Supporters (Support_name)
+        |--------------------------------------------*/
+        if ($request->has('support_name')) {
+            foreach ($request->support_name as $i => $support_name) {
+
+                if (trim($support_name) === '') continue;
+
+                DB::table('complaint_supporting')->insert([
+                    'complaint_id'    => $complaintId,
+                    'support_name'    => trim($support_name),
+                    'support_address' => $request->support_address[$i] ?? '',
+                ]);
+            }
+        }
+
+        /*--------------------------------------------
+        | 6. Insert Witnesses
+        |--------------------------------------------*/
+        if ($request->has('witness_name')) {
+            foreach ($request->witness_name as $i => $witness_name) {
+
+                if (trim($witness_name) === '') continue;
+
+                DB::table('complaint_witness')->insert([
+                    'complaint_id'     => $complaintId,
+                    'witness_name'     => trim($witness_name),
+                    'witness_address'  => $request->witness_address[$i] ?? '',
+                ]);
+            }
+        }
+
+        /*--------------------------------------------
+        | 7. Insert Respondents
+        |--------------------------------------------*/
+        if ($request->has('respondent_name')) {
+            foreach ($request->respondent_name as $i => $name) {
+
+                if (trim($name) === '') continue;
+
+                DB::table('respondents')->insert([
+                    'complaint_id'        => $complaintId,
+                    'respondent_name'     => trim($name),
+                    'designation'         => $request->designation[$i] ?? '',
+                    'officer_category'    => $request->officer_category[$i] ?? '',
+                    'department_name'     => $request->department_name[$i] ?? '',
+                    'current_address'     => $request->current_address[$i] ?? '',
+                    'respondent_district' => $request->respondent_district[$i] ?? null,
+                ]);
+            }
+        }
+
+        /*--------------------------------------------
+        | 8. Insert Documents Table
+        |--------------------------------------------*/
+        if ($authorizationDocument) {
+            DB::table('complaints_documents')->insert([
+                'complain_id' => $complaintId,
+                'file'        => $authorizationDocument
+            ]);
+        }
+
+        if ($challanFile) {
+            DB::table('complaints_documents')->insert([
+                'complain_id' => $complaintId,
+                'file'        => $challanFile
+            ]);
+        }
+
+        if ($attached_documents) {
+            DB::table('complaints_documents')->insert([
+                'complain_id' => $complaintId,
+                'file'        => $attached_documents
+            ]);
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Complaint submitted successfully!',
+            'complaint_id' => $complaintId
+        ]);
+
+    } catch (\Exception $e) {
+        DB::rollback();
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Error occurred',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
+
+    //  public function store(StoreComplaintRequest $request)
+    // {
+    //     // dd($request->all());
+    //     DB::beginTransaction();
+
+    //     try {
+    //         /*--------------------------------------------
+    //         | 1. Upload Files
+    //         |--------------------------------------------*/
+
+    //         $authorizationDocument = null;
+    //         if ($request->hasFile('authorization_document')) {
+    //             $authorizationDocument = $request->file('authorization_document')
+    //                 ->store('Document', 'public');
+    //         }
+
+    //         $challanFile = null;
+    //         if ($request->hasFile('challan_file')) {
+    //             $challanFile = $request->file('challan_file')
+    //                 ->store('Document', 'public');
+    //         }
+    //         $attached_documents = null;
+    //         if ($request->hasFile('attached_documents')) {
+    //             $attached_documents = $request->file('attached_documents')
+    //                 ->store('Document', 'public');
+    //         }
+
+    //         /*--------------------------------------------
+    //         | 2. Create Main Complaint Entry
+    //         |--------------------------------------------*/
+
+
+    //         $complaint = Complaint::create([
+    //             'relation_with_person'        => $request->relation_with_person,
+    //             'authorization_document'      => $authorizationDocument,
+
+    //             // Permanent Address
+    //             // 'permanent_name'              => $request->permanent_name,
+
+    //             // Correspondence Address
+    //             'correspondence_name'         => $request->correspondence_name,
+    //             'correspondence_place'        => $request->correspondence_place,
+    //             'correspondence_post_office'  => $request->correspondence_post_office,
+    //             'correspondence_district'     => $request->correspondence_district,
+
+    //             // Section 6
+    //             'cause_date'                   => $request->cause_date,
+    //             'delay_reason'                 => $request->delay_reason,
+    //             'previously_submitted'         => $request->previously_submitted,
+    //             'previously_submitted_details' => $request->previously_submitted_details,
+
+    //             // Section 7
+    //             'category'                     => $request->category,
+
+    //             // Section 8 Challan
+    //             'challan_number'               => $request->challan_number,
+    //             'challan_date'                 => $request->challan_date,
+    //             'challan_file'                 => $challanFile,
+
+    //             // Section 9, 10, 11, 12
+    //             // 'supporting_affidavit_list'    => $request->supporting_affidavit_list,
+    //             // 'other_witnesses'              => $request->other_witnesses,
+    //             'attached_documents'           => $request->attached_documents,
+    //             'complaint_description'        => $request->complaint_description,
+    //         ]);
+
+    //            $year = date('Y');
+              
+              
+    //             $str = strtoupper(substr('AllGRV', 0, 3));
+    //             // 'UP'.$year.$str.
+                
+    //          $complaintNo = str_pad($complaint->id,6, '0',STR_PAD_LEFT).'/'.$year;
+    //     $complaint->where('id',$complaint->id)->update(['complain_no' => $complaintNo]);
+
+    //         /*--------------------------------------------
+    //         | 3. Add Multiple Complainants (Parivadi)
+    //         |--------------------------------------------*/
+
+    //         // if ($request->has('complainant_name')) {
+    //         //     foreach ($request->complainant_name as $i => $name) {
+
+    //         //         // Skip empty rows
+    //         //         if (empty($name)) continue;
+
+    //         //         Complainant::create([
+    //         //             'complaint_id'  => $complaint->id,
+    //         //             'complainant_name' =>$request->complainant_name[$i] ?? null,
+    //         //             'father_name'      => $request->father_name[$i] ?? null,
+    //         //             'occupation'       => $request->occupation[$i] ?? null,
+    //         //             'is_public_servant'=> $request->is_public_servant[$i] ?? null,
+    //         //             'permanent_place' => $request->permanent_place[$i] ?? null,
+    //         //             'permanent_post_office' => $request->permanent_post_office[$i] ?? null,
+    //         //             'permanent_district' => $request->permanent_district[$i] ?? null,
+    //         //         ]);
+    //         //     }
+    //         // }
+    //         if ($request->has('complainant_name')) {
+    //             foreach ($request->complainant_name as $i => $name) {
+
+    //                 // skip empty complainant rows
+    //                if (!isset($name) && empty($name)) {
+    //                     continue;
+    //                 }
+
+    //                 Complainant::create([
+    //                     'complaint_id'          => $complaint->id,
+    //                     'complainant_name'      => $name,
+    //                     'father_name'           => $request->father_name[$i] ?? null,
+    //                     'occupation'            => $request->occupation[$i] ?? null,
+    //                     'is_public_servant'     => $request->is_public_servant[$i] ?? null,
+    //                     'permanent_place'       => $request->permanent_place[$i] ?? null,
+    //                     'permanent_post_office' => $request->permanent_post_office[$i] ?? null,
+    //                     'permanent_district'    => $request->permanent_district[$i] ?? null,
+    //                 ]);
+    //             }
+    //         }
+
+    //         if ($request->has('support_name')) {
+    //             foreach ($request->support_name as $i => $support_name) {
+
+    //                 // Skip empty rows
+    //                 if (empty($support_name)) continue;
+
+    //                 Complainant::create([
+    //                     'complaint_id'  => $complaint->id,
+    //                     'support_name' => $request->support_name[$i] ?? null,
+    //                     'support_address' => $request->support_address[$i] ?? null,
+                        
+    //                 ]);
+    //             }
+    //         }
+    //         if ($request->has('witness_name')) {
+    //             foreach ($request->witness_name as $i => $witness_name) {
+
+    //                 // Skip empty rows
+    //                 if (empty($witness_name)) continue;
+
+    //                 Complainant::create([
+    //                     'complaint_id'  => $complaint->id,
+    //                     'witness_name' => $request->witness_name[$i] ?? null,
+    //                     'witness_address' => $request->witness_address[$i] ?? null,
+                        
+    //                 ]);
+    //             }
+    //         }
+
+    //         /*--------------------------------------------
+    //         | 4. Add Multiple Respondents (Prativadi)
+    //         |--------------------------------------------*/
+
+    //         if ($request->has('respondent_name')) {
+    //             foreach ($request->respondent_name as $i => $name) {
+
+    //                 // Skip empty rows
+    //                 if (empty($name)) continue;
+
+    //                 Respondent::create([
+    //                     'complaint_id'   => $complaint->id,
+    //                     'respondent_name' => $name,
+    //                     'designation'     => $request->designation[$i] ?? null,
+    //                     'officer_category'     => $request->officer_category[$i] ?? null,
+    //                     'department_name'     => $request->department_name[$i] ?? null,
+    //                     'current_address' => $request->current_address[$i] ?? null,
+    //                     'respondent_district' => $request->respondent_district[$i] ?? null,
+    //                 ]);
+    //             }
+    //         }
+
+    //       ComplainDocuments::create([
+    //             'complain_id' => $complaint->id,
+    //             'file'         => $authorizationDocument
+    //         ]);
+
+    //         ComplainDocuments::create([
+    //             'complain_id' => $complaint->id,
+    //             'file'         => $challanFile
+    //         ]);
+    //         ComplainDocuments::create([
+    //             'complain_id' => $complaint->id,
+    //             'file'         => $attached_documents
+    //         ]);
+    //            // $complaintNo = 'UP'.$year.$str.str_pad($cmpDetailsUpdate->id,8, '0',STR_PAD_LEFT);
+    // //             // $cmpDetailsUpdate->where('id',$cmpDetailsUpdate->id)->update(['complain_no' => $complaintNo]);
+    //         DB::commit();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Complaint submitted successfully!',
+    //             'complaint_id' => $complaint->id
+    //         ]);
+
+    //     } catch (\Exception $e) {
+
+    //         DB::rollback();
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Error occurred',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     public function edit($id)
     {
