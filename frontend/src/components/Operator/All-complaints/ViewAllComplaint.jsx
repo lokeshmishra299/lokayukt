@@ -213,10 +213,15 @@ const ViewAllComplaint = () => {
 
   const getModalTitle = () => {
     switch (viewModalConfig.type) {
-      case 'correspondence': return 'Complainant Details';
-      case 'respondent': return 'Respondent Details';
-      case 'support': return 'Supporting Persons Details';
-      case 'witness': return 'Witness Details';
+      // case 'correspondence': return 'Complainant Details';
+      // case 'respondent': return 'Respondent Details';
+      // case 'support': return 'Supporting Persons Details';
+      // case 'witness': return 'Witness Details';
+      case 'correspondence': return 'परिवादी का विवरण';
+case 'respondent': return 'प्रतिवादी का विवरण';
+case 'support': return 'समर्थनकर्ता व्यक्तियों का विवरण';
+case 'witness': return 'गवाहों का विवरण';
+
       default: return '';
     }
   };
@@ -284,13 +289,15 @@ const ViewAllComplaint = () => {
               </div>
 
               {/* ===== DESCRIPTION ===== */}
-              <p className="text-gray-700 mb-2 text-sm md:text-base">
-                Description:{" "}
+              <p className="text-xs text-gray-500 font-semibold uppercase my-2">
+                {/* Description:{" "} */}
+                विवरण:{" "}
                 {complaintData.complaint_description ||
                   "No detailed description available for this complaint."}
               </p>
-              <p className="text-gray-700 mb-2 text-sm md:text-base">
-                Delay Reason:{"  "}
+              <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                {/* Delay Reason:{"  "} */}
+                विलंब का कारण:{"  "}
                 {complaintData.delay_reason ||
                   "NA"}
               </p>
@@ -301,47 +308,47 @@ const ViewAllComplaint = () => {
               {/* ===== DETAILS GRID ===== */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">
-                    CORRESPONDENCE NAME
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+
+                
+                    {/* CORRESPONDENCE NAME */}
+                    पत्राचार हेतु नाम
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
                     {complaintData.correspondence_name || "N/A"}
                   </p>
 
-                  <p className="text-xs mt-3 text-gray-500 uppercase mb-1">
-                    CORRESPONDENCE ADDRESS
+                  <p className=" text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
+
+                   
+                    {/* CORRESPONDENCE ADDRESS */}
+                    पत्राचार हेतु पता
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
                     {complaintData.correspondence_place || "N/A"}
                   </p>
                   
               
-                  <p className="text-xs mt-3 text-gray-500 uppercase mb-1">
-                   
-previously_submitted
+ 
 
+
+                  
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                    {/* PREVIOUSLY SUBMITTED DETAILS */}
+                    पूर्व में प्रस्तुत विवरण
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.
-previously_submitted
- || "N/A"}
+                    {complaintData.previously_submitted_details || "N/A"}
                   </p>
-                    <p className="text-xs text-gray-500 uppercase mb-1 mt-3">
-                        
-previously_submitted_details
-
-                      </p>
-                      <p className=" text-gray-800 text-sm md:text-base">
-                        {complaintData.
-previously_submitted_details || "NA"}
-                      </p>
+   
           
              
                 </div>
 
                 <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">
-                    CORRESPONDENCE POST OFFICE
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                    {/* CORRESPONDENCE POST OFFICE */}
+                    पत्राचार हेतु डाकघर
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
                     {complaintData. correspondence_post_office || "N/A"}
@@ -349,15 +356,17 @@ previously_submitted_details || "NA"}
 
                   {complaintData.dob && (
                     <>
-                      <p className="text-xs text-gray-500 uppercase mb-1 mt-3">
-                        Relation With Person
+                      <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                        {/* Relation With Person */}
+                        व्यक्ति से संबंध
                       </p>
                       <p className=" text-gray-800 text-sm md:text-base">
                         {complaintData.relation_with_person || "NA"}
                       </p>
-                      <p className="text-xs text-gray-500 uppercase mb-1 mt-3">
+                      <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
                         
-Cause Date
+{/* Cause Date */}
+कार्यवाही तिथि
                       </p>
                       <p className=" text-gray-800 text-sm md:text-base">
                         {complaintData.
@@ -369,23 +378,30 @@ cause_date || "NA"}
                 </div>
 
                 <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">
-                    CORRESPONDENCE DISTRICT
+                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                    {/* CORRESPONDENCE DISTRICT */}
+                    पत्राचार हेतु जिला
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
                     {complaintData.correspondence_district || "N/A"}
                   </p>
 
-                  <p className="text-xs text-gray-500 uppercase mb-1 mt-3">
-                    PREVIOUSLY SUBMITTED DETAILS
+                                 <p className=" text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
+                   
+{/* previously_submitted */}
+पूर्व में प्रस्तुत
+
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.previously_submitted_details || "N/A"}
+                    {complaintData.
+previously_submitted
+ || "N/A"}
                   </p>
 
-                    <p className="text-xs mt-3 text-gray-500 uppercase mb-1">
+                    <p className=" text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
                   
-                    category
+                    {/* category */}
+                    श्रेणी
 
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
@@ -404,7 +420,13 @@ cause_date || "NA"}
                       : "bg-gray-50 text-gray-700 border-gray-200"
                   }`}
                 >
-                  Fee Type:{" "}
+                  {/* Fee Type:{" "}
+                  {complaintData.fee_exempted === 1
+                    ? "Exempted"
+                    : complaintData.amount
+                    ? "Paid"
+                    : "Partial"} */}
+                 शुल्क का प्रकार:{" "}
                   {complaintData.fee_exempted === 1
                     ? "Exempted"
                     : complaintData.amount
@@ -420,7 +442,7 @@ cause_date || "NA"}
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  Status: {complaintData.payment_status || "Awaiting approval"}
+                  स्थिति: {complaintData.payment_status || "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -436,25 +458,29 @@ cause_date || "NA"}
                     onClick={() => setViewModalConfig({ open: true, type: 'correspondence' })}
                     className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
                   >
-                    <FaEye /> Complainants
+                    {/* <FaEye /> Complainants */}
+                    <FaEye /> शिकायतकर्ता
                   </button>
                   <button 
                     onClick={() => setViewModalConfig({ open: true, type: 'respondent' })}
                     className="flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-md border border-orange-200 hover:bg-orange-100 transition-colors text-sm font-medium"
                   >
-                    <FaEye /> Respondents
+                    {/* <FaEye /> Respondents */}
+                    <FaEye /> प्रतिवादी
                   </button>
                   <button 
                     onClick={() => setViewModalConfig({ open: true, type: 'support' })}
                     className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
                   >
-                    <FaEye /> Supporting Persons
+                    {/* <FaEye /> Supporting Persons */}
+                    <FaEye /> समर्थनकर्ता व्यक्ति
                   </button>
                   <button 
                     onClick={() => setViewModalConfig({ open: true, type: 'witness' })}
                     className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
                   >
-                    <FaEye /> Witness Details
+                    {/* <FaEye /> Witness Details */}
+                    <FaEye /> साक्षियों का विवरण
                   </button>
               </div>
 
@@ -706,7 +732,7 @@ cause_date || "NA"}
                   {getModalTitle()}
               </h3>
 
-              {viewModalConfig.type === 'correspondence' && (
+              {/* {viewModalConfig.type === 'correspondence' && (
                   <div className="space-y-4">
                      {complaintData.complainants && complaintData.complainants.length > 0 ? (
                         complaintData.complainants.map((comp, idx) => (
@@ -715,28 +741,28 @@ cause_date || "NA"}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="p-3 bg-gray-50 rounded">
                                         <p className="text-xs text-gray-500 uppercase">Name</p>
-                                        <p className="font-medium text-gray-800">{comp.complainant_name || 'N/A'}</p>
+                                        <p className=" text-gray-800">{comp.complainant_name || 'N/A'}</p>
                                     </div>
                                     <div className="p-3 bg-gray-50 rounded">
                                         <p className="text-xs text-gray-500 uppercase">Father Name</p>
-                                        <p className="font-medium text-gray-800">{comp.father_name || 'N/A'}</p>
+                                        <p className=" text-gray-800">{comp.father_name || 'N/A'}</p>
                                     </div>
                                     <div className="p-3 bg-gray-50 rounded">
                                         <p className="text-xs text-gray-500 uppercase">District</p>
-                                        <p className="font-medium text-gray-800">{comp.
+                                        <p className=" text-gray-800">{comp.
 district_name || 'N/A'}</p>
                                     </div>
                                     <div className="p-3 bg-gray-50 rounded">
                                         <p className="text-xs text-gray-500 uppercase">Is Public Servant</p>
-                                        <p className="font-medium text-gray-800">{comp.is_public_servant || 'N/A'}</p>
+                                        <p className=" text-gray-800">{comp.is_public_servant || 'N/A'}</p>
                                     </div>
                                     <div className="p-3 bg-gray-50 rounded">
                                         <p className="text-xs text-gray-500 uppercase">Occupation</p>
-                                        <p className="font-medium text-gray-800">{comp.occupation || 'N/A'}</p>
+                                        <p className=" text-gray-800">{comp.occupation || 'N/A'}</p>
                                     </div>
                                     <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
                                         <p className="text-xs text-gray-500 uppercase">Address</p>
-                                        <p className="font-medium text-gray-800">{comp.permanent_place
+                                        <p className=" text-gray-800">{comp.permanent_place
  || "NA"} </p>
                                     </div>
                                 </div>
@@ -746,8 +772,61 @@ district_name || 'N/A'}</p>
                         <div className="text-center py-4 text-gray-500">No complainant data available.</div>
                      )}
                   </div>
-              )}
+              )} */}
 
+              {viewModalConfig.type === 'correspondence' && (
+  <div className="space-y-4">
+    {complaintData.complainants && complaintData.complainants.length > 0 ? (
+      complaintData.complainants.map((comp, idx) => (
+        <div key={idx} className="mb-4">
+          <h4 className="text-sm font-bold text-gray-700 mb-2">
+            परिवादी #{idx + 1}
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">नाम</p>
+              <p className="text-gray-800">{comp.complainant_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पिता का नाम</p>
+              <p className="text-gray-800">{comp.father_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">जिला</p>
+              <p className="text-gray-800">{comp.district_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">क्या लोक सेवक हैं?</p>
+              <p className="text-gray-800">{comp.is_public_servant || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">व्यवसाय</p>
+              <p className="text-gray-800">{comp.occupation || 'N/A'}</p>
+            </div>
+
+            <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पता</p>
+              <p className="text-gray-800">{comp.permanent_place || 'N/A'}</p>
+            </div>
+
+          </div>
+        </div>
+      ))
+    ) : (
+      <div className="text-center py-4 text-gray-500">
+        परिवादी का कोई डेटा उपलब्ध नहीं है।
+      </div>
+    )}
+  </div>
+)}
+
+{/* 
               {viewModalConfig.type === 'respondent' && (
                   <div className="space-y-4">
                      {complaintData.respondant && complaintData.respondant.length > 0 ? (
@@ -757,27 +836,27 @@ district_name || 'N/A'}</p>
                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">NAME</p>
-                                         <p className="font-medium text-gray-800">{resp.respondent_name || 'N/A'}</p>
+                                         <p className=" text-gray-800">{resp.respondent_name || 'N/A'}</p>
                                      </div>
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">DESIGNATION</p>
-                                         <p className="font-medium text-gray-800">{resp.designation || 'N/A'}</p>
+                                         <p className=" text-gray-800">{resp.designation || 'N/A'}</p>
                                      </div>
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">Department</p>
-                                         <p className="font-medium text-gray-800">{resp.department_name || 'N/A'}</p>
+                                         <p className=" text-gray-800">{resp.department_name || 'N/A'}</p>
                                      </div>
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">Distirct</p>
-                                         <p className="font-medium text-gray-800">{resp.district_name|| 'N/A'}</p>
+                                         <p className=" text-gray-800">{resp.district_name|| 'N/A'}</p>
                                      </div>
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">Category</p>
-                                         <p className="font-medium text-gray-800">{resp.officer_category || 'N/A'}</p>
+                                         <p className=" text-gray-800">{resp.officer_category || 'N/A'}</p>
                                      </div>
                                      <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">ADDRESS</p>
-                                         <p className="font-medium text-gray-800">{resp.current_address || 'N/A'}</p>
+                                         <p className=" text-gray-800">{resp.current_address || 'N/A'}</p>
                                      </div>
                                  </div>
                              </div>
@@ -786,10 +865,63 @@ district_name || 'N/A'}</p>
                          <div className="text-center py-4 text-gray-500">No respondent data available.</div>
                      )}
                   </div>
-              )}
+              )} */}
+
+              {viewModalConfig.type === 'respondent' && (
+  <div className="space-y-4">
+    {complaintData.respondant && complaintData.respondant.length > 0 ? (
+      complaintData.respondant.map((resp, idx) => (
+        <div key={idx} className="mb-4">
+          <h4 className="text-sm font-bold text-gray-700 mb-2">
+            प्रतिवादी #{idx + 1}
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">नाम</p>
+              <p className="text-gray-800">{resp.respondent_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पदनाम</p>
+              <p className="text-gray-800">{resp.designation || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">विभाग</p>
+              <p className="text-gray-800">{resp.department_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">जिला</p>
+              <p className="text-gray-800">{resp.district_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">अधिकारी की श्रेणी</p>
+              <p className="text-gray-800">{resp.officer_category || 'N/A'}</p>
+            </div>
+
+            <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पता</p>
+              <p className="text-gray-800">{resp.current_address || 'N/A'}</p>
+            </div>
+
+          </div>
+        </div>
+      ))
+    ) : (
+      <div className="text-center py-4 text-gray-500">
+        प्रतिवादी का कोई डेटा उपलब्ध नहीं है।
+      </div>
+    )}
+  </div>
+)}
+
 
               {/* --- NEW MODAL CONTENT: Support --- */}
-              {viewModalConfig.type === 'support' && (
+              {/* {viewModalConfig.type === 'support' && (
                   <div className="space-y-4">
                      {complaintData.support && complaintData.support.length > 0 ? (
                          complaintData.support.map((item, idx) => (
@@ -798,11 +930,11 @@ district_name || 'N/A'}</p>
                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">NAME</p>
-                                         <p className="font-medium text-gray-800">{item.support_name || 'N/A'}</p>
+                                         <p className=" text-gray-800">{item.support_name || 'N/A'}</p>
                                      </div>
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">ADDRESS</p>
-                                         <p className="font-medium text-gray-800">{item.support_address || 'N/A'}</p>
+                                         <p className=" text-gray-800">{item.support_address || 'N/A'}</p>
                                      </div>
                                  </div>
                              </div>
@@ -811,10 +943,43 @@ district_name || 'N/A'}</p>
                          <div className="text-center py-4 text-gray-500">No supporting persons found.</div>
                      )}
                   </div>
-              )}
+              )} */}
+
+
+{viewModalConfig.type === 'support' && (
+  <div className="space-y-4">
+    {complaintData.support && complaintData.support.length > 0 ? (
+      complaintData.support.map((item, idx) => (
+        <div key={idx} className="mb-4">
+          <h4 className="text-sm font-bold text-gray-700 mb-2">
+            सहायक व्यक्ति #{idx + 1}
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">नाम</p>
+              <p className="text-gray-800">{item.support_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पता</p>
+              <p className="text-gray-800">{item.support_address || 'N/A'}</p>
+            </div>
+
+          </div>
+        </div>
+      ))
+    ) : (
+      <div className="text-center py-4 text-gray-500">
+        कोई सहायक व्यक्ति उपलब्ध नहीं है।
+      </div>
+    )}
+  </div>
+)}
 
               {/* --- NEW MODAL CONTENT: Witness --- */}
-              {viewModalConfig.type === 'witness' && (
+              {/* {viewModalConfig.type === 'witness' && (
                   <div className="space-y-4">
                      {complaintData.witness && complaintData.witness.length > 0 ? (
                          complaintData.witness.map((item, idx) => (
@@ -823,11 +988,11 @@ district_name || 'N/A'}</p>
                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">NAME</p>
-                                         <p className="font-medium text-gray-800">{item.witness_name || 'N/A'}</p>
+                                         <p className=" text-gray-800">{item.witness_name || 'N/A'}</p>
                                      </div>
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">ADDRESS</p>
-                                         <p className="font-medium text-gray-800">{item.witness_address || 'N/A'}</p>
+                                         <p className=" text-gray-800">{item.witness_address || 'N/A'}</p>
                                      </div>
                                  </div>
                              </div>
@@ -836,12 +1001,46 @@ district_name || 'N/A'}</p>
                          <div className="text-center py-4 text-gray-500">No witness data available.</div>
                      )}
                   </div>
-              )}
+              )} */}
+
+              {viewModalConfig.type === 'witness' && (
+  <div className="space-y-4">
+    {complaintData.witness && complaintData.witness.length > 0 ? (
+      complaintData.witness.map((item, idx) => (
+        <div key={idx} className="mb-4">
+          
+          <h4 className="text-sm font-bold text-gray-700 mb-2">
+            गवाह #{idx + 1}
+          </h4>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">नाम</p>
+              <p className="text-gray-800">{item.witness_name || 'N/A'}</p>
+            </div>
+
+            <div className="p-3 bg-gray-50 rounded">
+              <p className="text-xs text-gray-500 uppercase">पता</p>
+              <p className="text-gray-800">{item.witness_address || 'N/A'}</p>
+            </div>
+
+          </div>
+        </div>
+      ))
+    ) : (
+      <div className="text-center py-4 text-gray-500">
+        कोई गवाह डेटा उपलब्ध नहीं है।
+      </div>
+    )}
+  </div>
+)}
+
 
               <div className="mt-6 flex justify-end">
                   <button
                     onClick={() => setViewModalConfig({ open: false, type: null })}
-                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm font-medium"
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm "
                   >
                     Close
                   </button>

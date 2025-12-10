@@ -76,29 +76,77 @@ class PSComplaintsController extends Controller
     // ->where('cm.id', $id)
     // ->first();
 
-    $complainDetails = DB::table('complaints as cm')
-    ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+//     $complainDetails = DB::table('complaints as cm')
+//     ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+//     ->select(
+//         'cm.*',
+//         'dd.district_name'
+//     )
+//     ->where('cm.id', $id)
+//     ->first();
+
+// $complainDetails->details = DB::table('complaints_details as cd')
+//     ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
+//     ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
+//     ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
+//     ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id')
+//     ->select(
+//         'cd.*',
+//         'dp.name as department_name',
+//         'ds.name as designation_name',
+//         'ct.name as complaintype_name',
+//         'sub.name as subject_name'
+//     )
+//     ->where('cd.complain_id', $id)
+//     ->get();
+             $complainDetails = DB::table('complaints as cm')
+    // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+    ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
+    ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
+    ->leftJoin('complainants as cpt', DB::raw("cm.id"), '=', DB::raw("cpt.	complaint_id "))
+    // ->leftJoin('respondents as r', DB::raw("cm.id"), '=', DB::raw("r.complaint_id"))
     ->select(
         'cm.*',
-        'dd.district_name'
+        // 'dd.district_name',
+        'ca.remarks as ca_remark',
+        'ca.subject as ca_subject',
+        'ca.status as ca_status',
+        'cpt.complainant_name as comp_name',
+        'cpt.father_name as comp_fname',
+        'cpt.occupation as comp_occupation',
+        'cpt.is_public_servant as comp_public_servant',
+         'ddn.district_name as correspondence_district',
+        // 'r.*',
+        // 'r.respondent_name as r_name',
+        // 'r.designation as r_desig',
+        // 'r.current_address as r_address',
     )
     ->where('cm.id', $id)
     ->first();
-
-$complainDetails->details = DB::table('complaints_details as cd')
-    ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
-    ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
-    ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
-    ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id')
-    ->select(
-        'cd.*',
-        'dp.name as department_name',
-        'ds.name as designation_name',
-        'ct.name as complaintype_name',
-        'sub.name as subject_name'
-    )
-    ->where('cd.complain_id', $id)
+     $complainDetails->complainants =  DB::table('complainants')
+     ->leftJoin('district_master as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
+    ->select('complainants.*','ddn.district_name')
+     ->where('complaint_id', $id)
     ->get();
+     $complainDetails->respondant =  DB::table('respondents')
+      ->leftJoin('district_master as r', 'respondents.respondent_district', '=', 'r.district_code')
+    ->select('respondents.*','r.district_name')
+    ->where('complaint_id', $id)
+    ->get();
+     $complainDetails->support =  DB::table('complaint_supporting')
+    ->where('complaint_id', $id)
+    ->get();
+     $complainDetails->witness =  DB::table('complaint_witness')
+    ->where('complaint_id', $id)
+    ->get();
+      $complainDetails->actions =  DB::table('complaint_actions')
+    ->where('complaint_id', $id)
+     ->where(function($q){
+                            $q->where('status','Verified')
+                            ->Orwhere('status', 'Forwarded');               
+                         })
+    ->get();
+
            
 
           return response()->json([
