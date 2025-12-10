@@ -100,13 +100,14 @@ class LokAyuktComplaintsController extends Controller
 //     ->where('cd.complain_id', $id)
 //     ->get();
  $complainDetails = DB::table('complaints as cm')
-    ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+    // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+    ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
     ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
     ->leftJoin('complainants as cpt', DB::raw("cm.id"), '=', DB::raw("cpt.	complaint_id "))
     // ->leftJoin('respondents as r', DB::raw("cm.id"), '=', DB::raw("r.complaint_id"))
     ->select(
         'cm.*',
-        'dd.district_name',
+        // 'dd.district_name',
         'ca.remarks as ca_remark',
         'ca.subject as ca_subject',
         'ca.status as ca_status',
@@ -114,6 +115,7 @@ class LokAyuktComplaintsController extends Controller
         'cpt.father_name as comp_fname',
         'cpt.occupation as comp_occupation',
         'cpt.is_public_servant as comp_public_servant',
+         'ddn.district_name as correspondence_district',
         // 'r.*',
         // 'r.respondent_name as r_name',
         // 'r.designation as r_desig',
@@ -122,9 +124,13 @@ class LokAyuktComplaintsController extends Controller
     ->where('cm.id', $id)
     ->first();
      $complainDetails->complainants =  DB::table('complainants')
-    ->where('complaint_id', $id)
+     ->leftJoin('district_master as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
+    ->select('complainants.*','ddn.district_name')
+     ->where('complaint_id', $id)
     ->get();
      $complainDetails->respondant =  DB::table('respondents')
+      ->leftJoin('district_master as r', 'respondents.respondent_district', '=', 'r.district_code')
+    ->select('respondents.*','r.district_name')
     ->where('complaint_id', $id)
     ->get();
      $complainDetails->support =  DB::table('complaint_supporting')
@@ -864,33 +870,33 @@ class LokAyuktComplaintsController extends Controller
         // dd($usersubrole);
    
 
-        $validation = Validator::make($request->all(), [
-            // 'forward_by_so_us' => 'required|exists:users,id',
-            'forward_to_d_a' => 'required|exists:users,id',
-            // 'remark' => 'required',
+        // $validation = Validator::make($request->all(), [
+        //     // 'forward_by_so_us' => 'required|exists:users,id',
+        //     'forward_to_d_a' => 'required|exists:users,id',
+        //     // 'remark' => 'required',
          
           
-        ], [
-            // 'forward_by_so_us.required' => 'Forward by Supervisor is required.',
-            // 'forward_by_so_us.exists' => 'Forward by user does not exist.',
-            'forward_to_d_a.required' => 'Forward to user is required.',
-            'forward_to_d_a.exists' => 'Forward to user does not exist.',
-            // 'remark.required' => 'Remark is required.',
+        // ], [
+        //     // 'forward_by_so_us.required' => 'Forward by Supervisor is required.',
+        //     // 'forward_by_so_us.exists' => 'Forward by user does not exist.',
+        //     'forward_to_d_a.required' => 'Forward to user is required.',
+        //     'forward_to_d_a.exists' => 'Forward to user does not exist.',
+        //     // 'remark.required' => 'Remark is required.',
            
-        ]);
+        // ]);
 
-        if ($validation->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validation->errors()
-            ], 422);
-        }
+        // if ($validation->fails()) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'errors' => $validation->errors()
+        //     ], 422);
+        // }
         if(isset($complainId) && $request->isMethod('post')){
 
              $cmp =  Complaint::findOrFail($complainId);
              
             if($cmp){
-                $cmp->approved_rejected_by_rk = 1;
+                $cmp->approved_rejected_by_rk = 0;
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Section Officer / Under Secretary';
                 // $remark.='\n';
@@ -903,9 +909,7 @@ class LokAyuktComplaintsController extends Controller
                 if($cmp->save()){
                     $apcAction = new ComplaintAction();
                     $apcAction->complaint_id = $complainId;
-                    $apcAction->forward_by_so_us = $user;
-                    $apcAction->forward_to_d_a = $request->forward_to_d_a;
-                    $apcAction->status = 'Forwarded';
+                    $apcAction->status = 'Return';
                     $apcAction->remarks = $request->remarks;
                     $apcAction->save();
                 }
@@ -925,7 +929,35 @@ class LokAyuktComplaintsController extends Controller
     
              return response()->json([
                     'status' => true,
-                    'message' => 'Forwarded Successfully',
+                    'message' => 'Return Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+
+    public function pullBackByLokayukt(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+       
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->approved_rejected_by_rk = 0;
+                $cmp->save(); 
+            }
+          
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Pull Back Successfully',
                     'data' => $cmp
                 ], 200);
         }else{
