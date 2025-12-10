@@ -718,7 +718,7 @@ const Complaints = () => {
 
       // 4 & 5. Addresses
       // Send Complainant Name as Permanent Name if the field is empty (since input is hidden)
-      submitData.append('permanent_name', formData.permanentAddress.name || (complainants[0] ? complainants[0].name : ''));
+      // submitData.append('permanent_name', formData.permanentAddress.name || (complainants[0] ? complainants[0].name : ''));
       submitData.append('permanent_place', formData.permanentAddress.place);
       submitData.append('permanent_post_office', formData.permanentAddress.postOffice);
       submitData.append('permanent_district', formData.permanentAddress.district);
@@ -1424,40 +1424,48 @@ const Complaints = () => {
           </div>
 
           {/* 5. Complaint Type */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">5. क्या यह – <span className="text-red-500">*</span></h3>
-            <div className="space-y-3">
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="complaintType"
-                  value="अभिकथन"
-                  className="w-4 h-4 mt-1 text-orange-500 focus:ring-orange-500"
-                  checked={formData.complaintType === 'अभिकथन'}
-                  onChange={(e) => handleFormDataChange('complaintType', e.target.value)}
-                />
-                <span className="text-gray-700">
-                  कोई अभिकथन (अधिनियम की धारा 2 (ख) में यथा परिभाषित)
-                </span>
-              </label>
-              <label className="flex items-start gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="complaintType"
-                  value="शिकायत"
-                  className="w-4 h-4 mt-1 text-orange-500 focus:ring-orange-500"
-                  checked={formData.complaintType === 'शिकायत'}
-                  onChange={(e) => handleFormDataChange('complaintType', e.target.value)}
-                />
-                <span className="text-gray-700">
-                  शिकायत (अधिनियम की धारा 2 (घ) में यथा परिभाषित)
-                </span>
-              </label>
-            </div>
-            {errors.category && (
-              <p className="text-red-500 text-sm mt-2">{errors.category[0]}</p>
-            )}
-          </div>
+         {/* 5. Complaint Type */}
+<div className="bg-white rounded-lg shadow-md p-6 mb-6">
+  <h3 className="text-lg font-semibold text-gray-800 mb-4">
+    5. क्या यह – <span className="text-red-500">*</span>
+  </h3>
+  <div className="flex flex-col md:flex-row gap-4 md:gap-8">
+    <label className="flex items-center gap-3 cursor-pointer p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex-1">
+      <input
+        type="radio"
+        name="complaintType"
+        value="अभिकथन"
+        className="w-5 h-5 text-orange-500 focus:ring-orange-500"
+        checked={formData.complaintType === 'अभिकथन'}
+        onChange={(e) => handleFormDataChange('complaintType', e.target.value)}
+      />
+      <span className="text-gray-700 font-medium">
+        (क) कोई अभिकथन <br/>
+        <span className="text-xs text-gray-500">(अधिनियम की धारा 2 (ख) में यथा परिभाषित)</span>
+      </span>
+    </label>
+
+    <label className="flex items-center gap-3 cursor-pointer p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex-1">
+      <input
+        type="radio"
+        name="complaintType"
+        value="शिकायत"
+        className="w-5 h-5 text-orange-500 focus:ring-orange-500"
+        checked={formData.complaintType === 'शिकायत'}
+        onChange={(e) => handleFormDataChange('complaintType', e.target.value)}
+      />
+      <span className="text-gray-700 font-medium">
+        (ख) शिकायत <br/>
+        <span className="text-xs text-gray-500">(अधिनियम की धारा 2 (घ) में यथा परिभाषित)</span>
+      </span>
+    </label>
+  </div>
+  
+  {errors.category && (
+    <p className="text-red-500 text-sm mt-2">{errors.category[0]}</p>
+  )}
+</div>
+
 
           {/* 6. Challan - CONDITIONALLY RENDERED */}
           {formData.complaintType === 'अभिकथन' && (
