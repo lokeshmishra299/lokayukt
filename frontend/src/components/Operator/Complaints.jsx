@@ -704,7 +704,6 @@ const Complaints = () => {
         submitData.append(`designation[${index}]`, person.designation);
         submitData.append(`current_address[${index}]`, person.currentAddress);
         
-        // --- Added Missing Keys ---
         submitData.append(`respondent_district[${index}]`, person.district || '');
         submitData.append(`department_name[${index}]`, person.departmentNature || '');
         submitData.append(`officer_category[${index}]`, person.officerCategory || '');
@@ -716,12 +715,12 @@ const Complaints = () => {
         submitData.append('authorization_document', formData.authorizationFile);
       }
 
-      // 4 & 5. Addresses
-      // Send Complainant Name as Permanent Name if the field is empty (since input is hidden)
-      submitData.append('permanent_name', formData.permanentAddress.name || (complainants[0] ? complainants[0].name : ''));
-      submitData.append('permanent_place', formData.permanentAddress.place);
-      submitData.append('permanent_post_office', formData.permanentAddress.postOffice);
-      submitData.append('permanent_district', formData.permanentAddress.district);
+      // 4 & 5. Addresses 
+      // FIX: Changed to array format [0] to satisfy "must be an array" error
+      submitData.append('permanent_name[0]', formData.permanentAddress.name || (complainants[0] ? complainants[0].name : ''));
+      submitData.append('permanent_place[0]', formData.permanentAddress.place);
+      submitData.append('permanent_post_office[0]', formData.permanentAddress.postOffice);
+      submitData.append('permanent_district[0]', formData.permanentAddress.district);
 
       submitData.append('correspondence_name', formData.correspondenceAddress.name);
       submitData.append('correspondence_place', formData.correspondenceAddress.place);
@@ -762,19 +761,27 @@ const Complaints = () => {
         }
       }
 
-      // 9. Supporting Persons - CONVERT ARRAY TO JSON STRING
-      let supportingPersonsVal = formData.supportingPersons;
+      // 9. Supporting Persons
+      // FIX: Added individual fields loop for support_name/support_address
       if (Array.isArray(formData.supportingPersons)) {
-        supportingPersonsVal = JSON.stringify(formData.supportingPersons);
+        formData.supportingPersons.forEach((p, i) => {
+            submitData.append(`support_name[${i}]`, p.name);
+            submitData.append(`support_address[${i}]`, p.address);
+        });
+        // Keeping JSON as fallback
+        submitData.append('supporting_affidavit_list', JSON.stringify(formData.supportingPersons));
       }
-      submitData.append('supporting_affidavit_list', supportingPersonsVal || '');
 
       // 10. Other Witnesses
-      let otherWitnessesVal = formData.otherPersons;
+      // FIX: Added individual fields loop for witness_name/witness_address
       if (Array.isArray(formData.otherPersons)) {
-          otherWitnessesVal = JSON.stringify(formData.otherPersons); 
+         formData.otherPersons.forEach((p, i) => {
+            submitData.append(`witness_name[${i}]`, p.name);
+            submitData.append(`witness_address[${i}]`, p.address);
+         });
+         // Keeping JSON as fallback
+         submitData.append('other_witnesses', JSON.stringify(formData.otherPersons));
       }
-      submitData.append('other_witnesses', otherWitnessesVal || '');
 
       // 11. Attached Documents
       if (formData.attachedDocumentsFile) {
@@ -805,8 +812,6 @@ const Complaints = () => {
           position: "top-right",
           autoClose: 3000,
         });
-
-        // window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         toast.error('कुछ गलत हो गया। कृपया पुनः प्रयास करें।', {
           position: "top-right",
