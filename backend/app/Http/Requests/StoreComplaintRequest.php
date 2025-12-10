@@ -31,7 +31,7 @@ class StoreComplaintRequest extends FormRequest
             'correspondence_name'         => 'required|string|max:255',
             'correspondence_place'        => 'required|string|max:255',
             'correspondence_post_office'  => 'required|string|max:255',
-            'correspondence_district'     => 'required|string|max:255',
+            'correspondence_district'     => 'required',
 
 
             /*----------------------------------------------------
@@ -73,34 +73,34 @@ class StoreComplaintRequest extends FormRequest
             | MULTIPLE COMPLAINANTS (Required)
             ----------------------------------------------------*/
 
-            'permanent_place'             => 'required|string',
+            'permanent_place'             => 'required|array',
             'permanent_place.*'   => 'required|string|max:255',
             
-            'permanent_post_office'       => 'required|string',
+            'permanent_post_office'       => 'required|array',
             'permanent_post_office.*'   => 'required|string|max:255',
            
-            'permanent_district'          => 'required|string',
-            'permanent_district.*'   => 'required|string|max:255',
+            'permanent_district'          => 'required|array',
+            'permanent_district.*'   => 'required',
            
-            'support_name'   => 'required|string',
+            'support_name'   => 'required|array|min:1',
              'support_name.*'   => 'required|string|max:150',
           
-             'support_address'   => 'required|string',
+             'support_address'   => 'required|array|min:1',
              'support_address.*'   => 'required|string|max:255',
 
-            'witness_name'             => 'required|string',
+            'witness_name'             => 'required|array|min:1',
              'witness_name.*'          => 'required|string|max:150',
             
-            'witness_address'             => 'required|string',
+            'witness_address'             => 'required|array|min:1',
             'witness_address.*'          => 'required|string|max:255',
 
-            'complainant_name'            => 'required|array|min:1',
+            'complainant_name'            => 'required|array',
             'complainant_name.*'          => 'required|string|max:255',
 
-            'father_name'                 => 'required|array|min:1',
+            'father_name'                 => 'required|array',
             'father_name.*'               => 'required|string|max:255',
 
-            'occupation'                  => 'required|array|min:1',
+            'occupation'                  => 'required|array',
             'occupation.*'                => 'required|string|max:255',
 
             'is_public_servant'           => 'required|array|min:1',
@@ -111,7 +111,13 @@ class StoreComplaintRequest extends FormRequest
             | MULTIPLE RESPONDENTS (Required)
             ----------------------------------------------------*/
             'respondent_name'             => 'required|array|min:1',
-            'respondent_name.*'           => 'required|string|max:255',
+            'respondent_name.*'           => 'required|string|max:150',
+           
+            'officer_category'             => 'required|array|min:1',
+            'officer_category.*'           => 'required|string|max:150',
+        
+            'respondent_district'             => 'required|array|min:1',
+            'respondent_district.*'           => 'required',
 
             'designation'                 => 'required|array|min:1',
             'designation.*'               => 'required|string|max:255',
