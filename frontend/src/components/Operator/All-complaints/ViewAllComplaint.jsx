@@ -29,10 +29,7 @@ const ViewAllComplaint = () => {
 
   const [activeTab, setActiveTab] = useState("documents");
   
-  // Single config for all action modals (Receive, Forward, Pullback)
   const [confirmConfig, setConfirmConfig] = useState({ open: false, type: null });
-  
-  // Config for Data View Modal (Correspondence / Respondent)
   const [viewModalConfig, setViewModalConfig] = useState({ open: false, type: null });
 
   const [remark, setRemark] = useState("");
@@ -155,7 +152,6 @@ const ViewAllComplaint = () => {
         remarkData: remark,
       });
     } else if (confirmConfig.type === "pullback") {
-      // --- PULL BACK LOGIC ---
       toast.success("Complaint Pulled Back Successfully");
       setConfirmConfig({ open: false, type: null });
     }
@@ -214,6 +210,16 @@ const ViewAllComplaint = () => {
       </div>
     );
   }
+
+  const getModalTitle = () => {
+    switch (viewModalConfig.type) {
+      case 'correspondence': return 'Complainant Details';
+      case 'respondent': return 'Respondent Details';
+      case 'support': return 'Supporting Persons Details';
+      case 'witness': return 'Witness Details';
+      default: return '';
+    }
+  };
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
@@ -288,26 +294,26 @@ const ViewAllComplaint = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
                   <p className="text-xs text-gray-500 uppercase mb-1">
-                    PERMANENT NAME
+                    CORRESPONDENCE NAME
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.permanent_name || "N/A"}
+                    {complaintData.correspondence_name || "N/A"}
                   </p>
 
                   <p className="text-xs mt-3 text-gray-500 uppercase mb-1">
-                    ADDRESS
+                    CORRESPONDENCE ADDRESS
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.permanent_place || "N/A"}
+                    {complaintData.correspondence_place || "N/A"}
                   </p>
                 </div>
 
                 <div>
                   <p className="text-xs text-gray-500 uppercase mb-1">
-                    DISTRICT
+                    CORRESPONDENCE POST OFFICE
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.permanent_district || "N/A"}
+                    {complaintData. correspondence_post_office || "N/A"}
                   </p>
 
                   {complaintData.dob && (
@@ -324,10 +330,10 @@ const ViewAllComplaint = () => {
 
                 <div>
                   <p className="text-xs text-gray-500 uppercase mb-1">
-                    POST OFFICE
+                    CORRESPONDENCE DISTRICT
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.permanent_post_office || "N/A"}
+                    {complaintData.correspondence_district || "N/A"}
                   </p>
 
                   <p className="text-xs text-gray-500 uppercase mb-1 mt-3">
@@ -375,18 +381,30 @@ const ViewAllComplaint = () => {
               </div>
 
               {/* ===== NEW SECTION: Extra Details Tabs/Buttons ===== */}
-              <div className="flex gap-3 mt-4 border-t pt-4">
+              <div className="flex flex-wrap gap-3 mt-4 border-t pt-4">
                   <button 
                     onClick={() => setViewModalConfig({ open: true, type: 'correspondence' })}
                     className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
                   >
-                    <FaEye /> Complainants Details
+                    <FaEye /> Complainants
                   </button>
                   <button 
                     onClick={() => setViewModalConfig({ open: true, type: 'respondent' })}
                     className="flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-md border border-orange-200 hover:bg-orange-100 transition-colors text-sm font-medium"
                   >
-                    <FaEye /> Respondent Details
+                    <FaEye /> Respondents
+                  </button>
+                  <button 
+                    onClick={() => setViewModalConfig({ open: true, type: 'support' })}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
+                  >
+                    <FaEye /> Supporting Persons
+                  </button>
+                  <button 
+                    onClick={() => setViewModalConfig({ open: true, type: 'witness' })}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
+                  >
+                    <FaEye /> Witness Details
                   </button>
               </div>
 
@@ -455,15 +473,12 @@ const ViewAllComplaint = () => {
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
                 <div className="flex gap-2">
                   <button
-                    // onClick={() => {
-                    //     setConfirmConfig({ open: true, type: "pullback" });
-                    // }}
                     className="px-4 py-2 border cursor-not-allowed  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                   >
                     Pull Back
                   </button>
 
-                    {complaintData.ca_status === "Received" ? (
+                  {complaintData.ca_status === "Received" ? (
                     <button
                         disabled
                         className="px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded text-sm cursor-not-allowed font-medium"
@@ -484,9 +499,6 @@ const ViewAllComplaint = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  {/* LOGIC CHANGE: Check if ca_status is "Received" */}
-                
-
                   <button
                     onClick={handleforwardphysical}
                     disabled={forwardPhysicallyMutation.isPending}
@@ -629,7 +641,7 @@ const ViewAllComplaint = () => {
         </div>
       )}
 
-      {/* View Data Modal (Correspondence / Respondent) */}
+      {/* View Data Modal (Correspondence / Respondent / Support / Witness) */}
       {viewModalConfig.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
            <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative animate-in fade-in zoom-in duration-200 m-4 max-h-[90vh] overflow-y-auto">
@@ -641,63 +653,127 @@ const ViewAllComplaint = () => {
               </button>
               
               <h3 className="text-xl font-semibold mb-6 border-b pb-2">
-                  {viewModalConfig.type === 'correspondence' ? 'Correspondence Address Details' : 'Respondent Details'}
+                  {getModalTitle()}
               </h3>
 
-              {viewModalConfig.type === 'correspondence' ? (
+              {viewModalConfig.type === 'correspondence' && (
                   <div className="space-y-4">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="p-3 bg-gray-50 rounded">
-                              <p className="text-xs text-gray-500 uppercase">Name</p>
-                              <p className="">{complaintData.complainants[0].complainant_name|| 'N/A'}</p>
-                          </div>
-                        
-                          <div className="p-3 bg-gray-50 rounded">
-                              <p className="text-xs text-gray-500 uppercase">Father Name</p>
-                              <p className="">{complaintData.complainants[0].father_name || 'N/A'}</p>
-                          </div>
-                          <div className="p-3 bg-gray-50 rounded">
-                              <p className="text-xs text-gray-500 uppercase">Is Public Servant</p>
-                              <p className="">{complaintData.complainants[0].is_public_servant || 'N/A'}</p>
-                          </div>
-                          <div className="p-3 bg-gray-50 rounded">
-                              <p className="text-xs text-gray-500 uppercase">occupation</p>
-                              <p className="">{complaintData.complainants[0].occupation || 'N/A'}</p>
-                          </div>
-                      </div>
+                     {complaintData.complainants && complaintData.complainants.length > 0 ? (
+                        complaintData.complainants.map((comp, idx) => (
+                            <div key={idx} className="mb-4">
+                                <h4 className="text-sm font-bold text-gray-700 mb-2">Complainant #{idx + 1}</h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="p-3 bg-gray-50 rounded">
+                                        <p className="text-xs text-gray-500 uppercase">Name</p>
+                                        <p className="font-medium text-gray-800">{comp.complainant_name || 'N/A'}</p>
+                                    </div>
+                                    <div className="p-3 bg-gray-50 rounded">
+                                        <p className="text-xs text-gray-500 uppercase">Father Name</p>
+                                        <p className="font-medium text-gray-800">{comp.father_name || 'N/A'}</p>
+                                    </div>
+                                    <div className="p-3 bg-gray-50 rounded">
+                                        <p className="text-xs text-gray-500 uppercase">Is Public Servant</p>
+                                        <p className="font-medium text-gray-800">{comp.is_public_servant || 'N/A'}</p>
+                                    </div>
+                                    <div className="p-3 bg-gray-50 rounded">
+                                        <p className="text-xs text-gray-500 uppercase">Occupation</p>
+                                        <p className="font-medium text-gray-800">{comp.occupation || 'N/A'}</p>
+                                    </div>
+                                    <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
+                                        <p className="text-xs text-gray-500 uppercase">Address</p>
+                                        <p className="font-medium text-gray-800">{comp.permanent_place} {comp.permanent_post_office ? `, ${comp.permanent_post_office}` : ''}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                     ) : (
+                        <div className="text-center py-4 text-gray-500">No complainant data available.</div>
+                     )}
                   </div>
-              ) : (
+              )}
+
+              {viewModalConfig.type === 'respondent' && (
                   <div className="space-y-4">
                      {complaintData.respondant && complaintData.respondant.length > 0 ? (
                          complaintData.respondant.map((resp, idx) => (
-                             <div key={idx} className="border border-gray-200 rounded-lg p-4 bg-gray-50 mb-3">
-                                 <h4 className="text-sm font-bold text-gray-700 mb-3">Respondent #{idx + 1}</h4>
-                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                     <div>
-                                         <p className="text-xs text-gray-500">NAME</p>
-                                         <p className=" text-sm">{resp.respondent_name || 'N/A'}</p>
+                             <div key={idx} className="mb-4">
+                                 <h4 className="text-sm font-bold text-gray-700 mb-2">Respondent #{idx + 1}</h4>
+                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                     <div className="p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">NAME</p>
+                                         <p className="font-medium text-gray-800">{resp.respondent_name || 'N/A'}</p>
                                      </div>
-                                     <div>
-                                         <p className="text-xs text-gray-500">DESIGNATION</p>
-                                         <p className=" text-sm">{resp.designation || 'N/A'}</p>
+                                     <div className="p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">DESIGNATION</p>
+                                         <p className="font-medium text-gray-800">{resp.designation || 'N/A'}</p>
                                      </div>
-                                      {/* <div>
-                                         <p className="text-xs text-gray-500">DEPARTMENT</p>
-                                         <p className=" text-sm">{resp.department_name || 'N/A'}</p>
-                                     </div> */}
-                                      {/* <div>
-                                         <p className="text-xs text-gray-500">DISTRICT</p>
-                                         <p className=" text-sm">{resp.respondent_district || 'N/A'}</p>
-                                     </div> */}
-                                     <div className="sm:col-span-2">
-                                         <p className="text-xs text-gray-500">ADDRRSS</p>
-                                         <p className=" text-sm">{resp.current_address || 'N/A'}</p>
+                                     <div className="p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">Department</p>
+                                         <p className="font-medium text-gray-800">{resp.department_name || 'N/A'}</p>
+                                     </div>
+                                     <div className="p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">Category</p>
+                                         <p className="font-medium text-gray-800">{resp.officer_category || 'N/A'}</p>
+                                     </div>
+                                     <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">ADDRESS</p>
+                                         <p className="font-medium text-gray-800">{resp.current_address || 'N/A'}</p>
                                      </div>
                                  </div>
                              </div>
                          ))
                      ) : (
                          <div className="text-center py-4 text-gray-500">No respondent data available.</div>
+                     )}
+                  </div>
+              )}
+
+              {/* --- NEW MODAL CONTENT: Support --- */}
+              {viewModalConfig.type === 'support' && (
+                  <div className="space-y-4">
+                     {complaintData.support && complaintData.support.length > 0 ? (
+                         complaintData.support.map((item, idx) => (
+                             <div key={idx} className="mb-4">
+                                 <h4 className="text-sm font-bold text-gray-700 mb-2">Person #{idx + 1}</h4>
+                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                     <div className="p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">NAME</p>
+                                         <p className="font-medium text-gray-800">{item.support_name || 'N/A'}</p>
+                                     </div>
+                                     <div className="p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">ADDRESS</p>
+                                         <p className="font-medium text-gray-800">{item.support_address || 'N/A'}</p>
+                                     </div>
+                                 </div>
+                             </div>
+                         ))
+                     ) : (
+                         <div className="text-center py-4 text-gray-500">No supporting persons found.</div>
+                     )}
+                  </div>
+              )}
+
+              {/* --- NEW MODAL CONTENT: Witness --- */}
+              {viewModalConfig.type === 'witness' && (
+                  <div className="space-y-4">
+                     {complaintData.witness && complaintData.witness.length > 0 ? (
+                         complaintData.witness.map((item, idx) => (
+                             <div key={idx} className="mb-4">
+                                 <h4 className="text-sm font-bold text-gray-700 mb-2">Witness #{idx + 1}</h4>
+                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                     <div className="p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">NAME</p>
+                                         <p className="font-medium text-gray-800">{item.witness_name || 'N/A'}</p>
+                                     </div>
+                                     <div className="p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">ADDRESS</p>
+                                         <p className="font-medium text-gray-800">{item.witness_address || 'N/A'}</p>
+                                     </div>
+                                 </div>
+                             </div>
+                         ))
+                     ) : (
+                         <div className="text-center py-4 text-gray-500">No witness data available.</div>
                      )}
                   </div>
               )}
