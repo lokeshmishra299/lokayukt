@@ -10,7 +10,9 @@ class Respondent extends Model
         'complaint_id',
         'respondent_name',
         'designation',
-        'current_address'
+        'current_address',
+        'respondent_district',
+        'officer_category',
     ];
 
     public function complaint()
