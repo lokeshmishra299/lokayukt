@@ -61,10 +61,10 @@ class StoreComplaintRequest extends FormRequest
             /*----------------------------------------------------
             | SECTION 9–12
             ----------------------------------------------------*/
-            'support_name'   => 'required|string',
-            'support_address'   => 'required|string',
-            'witness_name'             => 'required|string',
-            'witness_address'             => 'required|string|250',
+            // 'support_name'   => 'required|string',
+            // 'support_address'   => 'required|string',
+            // 'witness_name'             => 'required|string',
+            // 'witness_address'             => 'required|string|250',
             'attached_documents'          => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'complaint_description'       => 'required|string',
 
@@ -91,7 +91,7 @@ class StoreComplaintRequest extends FormRequest
             'witness_name'             => 'required|string',
              'witness_name.*'          => 'required|string|max:150',
             
-            'witness_address'             => 'required|string|250',
+            'witness_address'             => 'required|string',
             'witness_address.*'          => 'required|string|max:255',
 
             'complainant_name'            => 'required|array|min:1',
