@@ -38,7 +38,7 @@ class LokAyuktComplaintsController extends Controller
 
      $query->where('form_status', 1)
                 //   ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_lokayukt', 1);
+                  ->where('approved_rejected_by_rk', 1);
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)
                     //         ->Orwhere('approved_rejected_by_ds_js', 1);               
@@ -125,6 +125,12 @@ class LokAyuktComplaintsController extends Controller
     ->where('complaint_id', $id)
     ->get();
      $complainDetails->respondant =  DB::table('respondents')
+    ->where('complaint_id', $id)
+    ->get();
+     $complainDetails->support =  DB::table('complaint_supporting')
+    ->where('complaint_id', $id)
+    ->get();
+     $complainDetails->witness =  DB::table('complaint_witness')
     ->where('complaint_id', $id)
     ->get();
 
@@ -849,6 +855,86 @@ class LokAyuktComplaintsController extends Controller
                'message' => 'File Fetch successfully',
                'data' => $cmp->filepath,
            ]);
+
+    }
+
+     public function returnComplainByLokayukt(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+        // dd($usersubrole);
+   
+
+        $validation = Validator::make($request->all(), [
+            // 'forward_by_so_us' => 'required|exists:users,id',
+            'forward_to_d_a' => 'required|exists:users,id',
+            // 'remark' => 'required',
+         
+          
+        ], [
+            // 'forward_by_so_us.required' => 'Forward by Supervisor is required.',
+            // 'forward_by_so_us.exists' => 'Forward by user does not exist.',
+            'forward_to_d_a.required' => 'Forward to user is required.',
+            'forward_to_d_a.exists' => 'Forward to user does not exist.',
+            // 'remark.required' => 'Remark is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->approved_rejected_by_rk = 1;
+                // $cmp->forward_to_d_a = $request->forward_to_d_a;
+                // $remark ='Remark By Section Officer / Under Secretary';
+                // $remark.='\n';
+                // $remark.= $request->remarks;
+                // $remark.='\n';
+                // $cmp->remark = $remark;
+                // $cmp->save();
+
+               
+                if($cmp->save()){
+                    $apcAction = new ComplaintAction();
+                    $apcAction->complaint_id = $complainId;
+                    $apcAction->forward_by_so_us = $user;
+                    $apcAction->forward_to_d_a = $request->forward_to_d_a;
+                    $apcAction->status = 'Forwarded';
+                    $apcAction->remarks = $request->remarks;
+                    $apcAction->save();
+                }
+                // $cmpAction =new ComplaintAction();
+                // $cmpAction->complaint_id = $complainId;
+                // $cmpAction->forward_by_so_us = $user;
+                // $cmpAction->forward_to_d_a = $request->forward_to_d_a; //add supervisor user_id 
+                // $cmpAction->status_so_us = 1;
+                // $cmpAction->action_type = "Forwarded";
+                // $cmpAction->remarks = $request->remarks;
+                // $cmpAction->save();
+            }
+            // $cmp->forward_by = $request->forward_by;
+            // $cmp->forward_to_d_a = $request->forward_to_d_a;
+            // $cmp->sup_status = 1;
+            // $cmp->save();
+    
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Forwarded Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
 
     }
 }
