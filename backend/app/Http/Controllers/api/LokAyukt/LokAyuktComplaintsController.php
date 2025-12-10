@@ -55,51 +55,10 @@ class LokAyuktComplaintsController extends Controller
     ]);
 
 }
-       public function viewComplaint($id)
+    public function viewComplaint($id)
   {
-    //    $complainDetails = DB::table('complaints as cm')
-    //    ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-    // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
-    // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
-    // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
-    // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
-    // ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id') // <-- should be subject_id, not department_id
-    // ->select(
-    //     'cm.*',
-    //     'dd.district_name',
-    //     'dp.name as department_name',
-    //     'ds.name as designation_name',
-    //     'ct.name as complaintype_name',
-    //     'sub.name as subject_name',
-    //     // 'cd.*'
-    // )
-    // ->where('cm.id', $id)
-    // ->first();
-
-//     $complainDetails = DB::table('complaints as cm')
-//     ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
-//     ->select(
-//         'cm.*',
-//         'dd.district_name'
-//     )
-//     ->where('cm.id', $id)
-//     ->first();
-
-// $complainDetails->details = DB::table('complaints_details as cd')
-//     ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
-//     ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
-//     ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
-//     ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id')
-//     ->select(
-//         'cd.*',
-//         'dp.name as department_name',
-//         'ds.name as designation_name',
-//         'ct.name as complaintype_name',
-//         'sub.name as subject_name'
-//     )
-//     ->where('cd.complain_id', $id)
-//     ->get();
- $complainDetails = DB::table('complaints as cm')
+  
+  $complainDetails = DB::table('complaints as cm')
     // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
     ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
     ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
@@ -138,6 +97,13 @@ class LokAyuktComplaintsController extends Controller
     ->get();
      $complainDetails->witness =  DB::table('complaint_witness')
     ->where('complaint_id', $id)
+    ->get();
+      $complainDetails->actions =  DB::table('complaint_actions')
+    ->where('complaint_id', $id)
+     ->where(function($q){
+                            $q->where('status','Verified')
+                            ->Orwhere('status', 'Forwarded');               
+                         })
     ->get();
 
            
