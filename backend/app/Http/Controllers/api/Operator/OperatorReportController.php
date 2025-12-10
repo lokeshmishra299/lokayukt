@@ -238,15 +238,15 @@ class OperatorReportController extends Controller
     // ->first();
 
     $complainDetails = DB::table('complaints as cm')
-    ->leftJoin('district_master as dd', 'cm.permanent_district', '=', 'dd.district_code')
-    ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
+    // ->leftJoin('district_master as dd', 'cm.permanent_district', '=', 'dd.district_code')
+    // ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
     ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
     ->leftJoin('complainants as cpt', DB::raw("cm.id"), '=', DB::raw("cpt.	complaint_id "))
     ->leftJoin('respondents as r', DB::raw("cm.id"), '=', DB::raw("r.complaint_id"))
     ->select(
         'cm.*',
-        'dd.district_name as permanent_district_name',
-        'ddn.district_name as correspondence_district',
+        // 'dd.district_name as permanent_district_name',
+        // 'ddn.district_name as correspondence_district',
         'ca.remarks as ca_remark',
         'ca.subject as ca_subject',
         'ca.status as ca_status',
