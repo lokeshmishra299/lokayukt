@@ -315,8 +315,6 @@ ComplaintPrintView.displayName = 'ComplaintPrintView';
 
 const Complaints = () => {
   const printRef = useRef(null);
-
-
   const [districtList, setDistrictList] = useState([]);
   const [departmentList, setDepartmentList] = useState([]);
   const [subjectList, setSubjectList] = useState([]); 
@@ -517,6 +515,7 @@ const Complaints = () => {
   const validateForm = () => {
     const newErrors = {};
 
+    // 1. Validate Complainants
     complainants.forEach((complainant, index) => {
       if (!complainant.name.trim()) {
         newErrors.complainant_name = [`परिवादी ${index + 1} का नाम आवश्यक है।`];
@@ -530,7 +529,6 @@ const Complaints = () => {
       if (complainant.isPublicServant === 'चुनें') {
         newErrors.is_public_servant = [`परिवादी ${index + 1} के लिए लोक सेवक स्थिति चुनें।`];
       }
-      // New Validations
       if (!complainant.postOffice.trim()) {
         newErrors[`complainant_post_office_${index}`] = [`परिवादी ${index + 1} का डाकघर/पुलिस थाना आवश्यक है।`];
       }
@@ -539,22 +537,23 @@ const Complaints = () => {
       }
     });
 
+    // 2. Validate Relation
     if (!formData.relation.trim()) {
       newErrors.relation_with_person = ['संबंध का विवरण आवश्यक है।'];
     }
-
     if (!formData.authorizationFile) {
       newErrors.authorization_document = ['प्राधिकरण दस्तावेज़ अपलोड करना आवश्यक है।'];
     }
 
+    // 3. Validate Address
     if (!formData.permanentAddress.place.trim()) {
       newErrors.permanent_place = ['स्थायी पते का स्थान आवश्यक है।'];
     }
-
     if (!formData.correspondenceAddress.place.trim()) {
       newErrors.correspondence_place = ['पत्राचार पते का स्थान आवश्यक है।'];
     }
 
+    // 4. Validate Persons (Respondents)
     persons.forEach((person, index) => {
       if (!person.name.trim()) {
         newErrors.respondent_name = [`व्यक्ति ${index + 1} का नाम आवश्यक है।`];
@@ -576,21 +575,24 @@ const Complaints = () => {
       }
     });
 
+    // 5. Validate Complaint Details
     if (!formData.complaintDate) {
       newErrors.cause_date = ['शिकायत की तिथि आवश्यक है।'];
     }
     if (!formData.delayReason.trim()) {
       newErrors.delay_reason = ['विलम्ब का कारण आवश्यक है।'];
     }
-
     if (!formData.previousComplaint) {
       newErrors.previously_submitted = ['कृपया पूर्व शिकायत का चयन करें (हाँ/नहीं)।'];
     }
-
     if (formData.previousComplaint === 'हाँ' && !formData.previousComplaintDetails.trim()) {
       newErrors.previously_submitted_details = ['यदि पहले प्रस्तुत किया है तो विवरण आवश्यक है।'];
     }
 
+    // 6. Validate Category & Challan
+    if (!formData.complaintType) {
+        newErrors.category = ['श्रेणी (अभिकथन/शिकायत) का चयन आवश्यक है।'];
+    }
     if (formData.complaintType === 'अभिकथन') {
         if (!formData.challanNumber.trim()) {
         newErrors.challan_number = ['चालान संख्या आवश्यक है।'];
@@ -598,13 +600,12 @@ const Complaints = () => {
         if (!formData.challanDate) {
         newErrors.challan_date = ['चालान की तिथि आवश्यक है।'];
         }
-        // ONLY validate file if Assertion is selected
         if (!formData.challanFile) {
         newErrors.challan_file = ['चालान फाइल अपलोड करना आवश्यक है।'];
         }
     }
 
-    // Validate Supporting Persons (Keys: support_name, support_address)
+    // 7. Validate Supporting Persons
     if (!formData.supportingPersons || formData.supportingPersons.length === 0) {
         newErrors.supporting_affidavit_list = ['शपथपत्र की सूची आवश्यक है।'];
     } else {
@@ -614,7 +615,7 @@ const Complaints = () => {
         }
     }
     
-    // Validate Witnesses (Keys: witness_name, witness_address)
+    // 8. Validate Witnesses
     if (formData.otherPersons.length > 0) {
         const first = formData.otherPersons[0];
          if (!first.witness_name.trim() || !first.witness_address.trim()) {
@@ -622,10 +623,12 @@ const Complaints = () => {
         }
     }
 
+    // 9. Attached Documents
     if (!formData.attachedDocumentsFile) {
       newErrors.attached_documents = ['संलग्न दस्तावेजों की फाइल आवश्यक है।'];
     }
 
+    // 10. Description
     if (!formData.complaintDescription.trim()) {
       newErrors.complaint_description = ['शिकायत का विवरण आवश्यक है।'];
     }
@@ -637,18 +640,20 @@ const Complaints = () => {
     e.preventDefault();
     const validationErrors = validateForm();
 
-    // DEBUG: Log Validation Errors
+    // Check if there are any errors
     if (Object.keys(validationErrors).length > 0) {
-      console.log("Validation Errors Found:", validationErrors);
-      
+      // Set errors to display red borders/messages
       setErrors(validationErrors);
+      // Show toast message
       toast.error('कृपया सभी आवश्यक फ़ील्ड भरें!', {
         position: "top-right",
         autoClose: 3000,
       });
+      // STOP: Do not open preview
       return;
     }
 
+    // If no errors, clear errors and show preview
     setErrors({});
     setShowPreview(true);
   };
@@ -668,7 +673,6 @@ const Complaints = () => {
         
         const isPublicServantVal = complainant.isPublicServant === 'हाँ' ? 'yes' : 'no';
         submitData.append(`is_public_servant[${index}]`, isPublicServantVal);
-
         submitData.append(`permanent_place[${index}]`, formData.permanentAddress.place || ''); 
         submitData.append(`permanent_post_office[${index}]`, complainant.postOffice || '');
         submitData.append(`permanent_district[${index}]`, complainant.district || '');
