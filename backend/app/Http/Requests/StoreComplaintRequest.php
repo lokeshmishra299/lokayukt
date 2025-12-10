@@ -22,7 +22,7 @@ class StoreComplaintRequest extends FormRequest
             'authorization_document'      => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
 
             // Permanent Address
-            'permanent_name'              => 'required|string|max:255',
+            // 'permanent_name'              => 'required|string|max:255',
             'permanent_place'             => 'required|string|max:255',
             'permanent_post_office'       => 'required|string|max:255',
             'permanent_district'          => 'required|string|max:255',
@@ -53,16 +53,18 @@ class StoreComplaintRequest extends FormRequest
             /*----------------------------------------------------
             | SECTION 8 — Challan (Required)
             ----------------------------------------------------*/
-            'challan_number'              => 'required|string|max:255',
-            'challan_date'                => 'required|date',
-            'challan_file'                => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            'challan_number'              => 'string|max:255',
+            'challan_date'                => 'date',
+            'challan_file'                => 'file|mimes:pdf,jpg,jpeg,png|max:2048',
 
 
             /*----------------------------------------------------
             | SECTION 9–12
             ----------------------------------------------------*/
-            'supporting_affidavit_list'   => 'required|string',
-            'other_witnesses'             => 'required|string',
+            'support_name'   => 'required|string',
+            'support_address'   => 'required|string',
+            'witness_name'             => 'required|string',
+            'witness_address'             => 'required|string|250',
             'attached_documents'          => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'complaint_description'       => 'required|string',
 
@@ -70,6 +72,18 @@ class StoreComplaintRequest extends FormRequest
             /*----------------------------------------------------
             | MULTIPLE COMPLAINANTS (Required)
             ----------------------------------------------------*/
+
+             'support_name'   => 'required|string',
+             'support_name.*'   => 'required|string|max:150',
+             'support_address'   => 'required|string',
+             'support_address.*'   => 'required|string|max:255',
+
+            'witness_name'             => 'required|string',
+             'witness_name.*'          => 'required|string|max:150',
+            
+            'witness_address'             => 'required|string|250',
+            'witness_address.*'          => 'required|string|max:255',
+
             'complainant_name'            => 'required|array|min:1',
             'complainant_name.*'          => 'required|string|max:255',
 

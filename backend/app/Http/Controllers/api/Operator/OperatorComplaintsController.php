@@ -58,10 +58,7 @@ class OperatorComplaintsController extends Controller
                 'authorization_document'      => $authorizationDocument,
 
                 // Permanent Address
-                'permanent_name'              => $request->permanent_name,
-                'permanent_place'             => $request->permanent_place,
-                'permanent_post_office'       => $request->permanent_post_office,
-                'permanent_district'          => $request->permanent_district,
+                // 'permanent_name'              => $request->permanent_name,
 
                 // Correspondence Address
                 'correspondence_name'         => $request->correspondence_name,
@@ -84,7 +81,7 @@ class OperatorComplaintsController extends Controller
                 'challan_file'                 => $challanFile,
 
                 // Section 9, 10, 11, 12
-                'supporting_affidavit_list'    => $request->supporting_affidavit_list,
+                // 'supporting_affidavit_list'    => $request->supporting_affidavit_list,
                 'other_witnesses'              => $request->other_witnesses,
                 'attached_documents'           => $request->attached_documents,
                 'complaint_description'        => $request->complaint_description,
@@ -115,6 +112,37 @@ class OperatorComplaintsController extends Controller
                         'father_name'      => $request->father_name[$i] ?? null,
                         'occupation'       => $request->occupation[$i] ?? null,
                         'is_public_servant'=> $request->is_public_servant[$i] ?? null,
+                        'permanent_place' => $request->permanent_place[$i] ?? null,
+                        'permanent_post_office' => $request->permanent_post_office[$i] ?? null,
+                        'permanent_district' => $request->permanent_district[$i] ?? null,
+                    ]);
+                }
+            }
+            if ($request->has('support_name')) {
+                foreach ($request->support_name as $i => $support_name) {
+
+                    // Skip empty rows
+                    if (empty($support_name)) continue;
+
+                    Complainant::create([
+                        'complaint_id'  => $complaint->id,
+                        'support_name' => $request->support_name[$i] ?? null,
+                        'support_address' => $request->support_address[$i] ?? null,
+                        
+                    ]);
+                }
+            }
+            if ($request->has('witness_name')) {
+                foreach ($request->witness_name as $i => $witness_name) {
+
+                    // Skip empty rows
+                    if (empty($witness_name)) continue;
+
+                    Complainant::create([
+                        'complaint_id'  => $complaint->id,
+                        'witness_name' => $request->witness_name[$i] ?? null,
+                        'witness_address' => $request->witness_address[$i] ?? null,
+                        
                     ]);
                 }
             }
@@ -133,7 +161,10 @@ class OperatorComplaintsController extends Controller
                         'complaint_id'   => $complaint->id,
                         'respondent_name' => $name,
                         'designation'     => $request->designation[$i] ?? null,
+                        'officer_category'     => $request->officer_category[$i] ?? null,
+                        'department_name'     => $request->department_name[$i] ?? null,
                         'current_address' => $request->current_address[$i] ?? null,
+                        'respondent_district' => $request->respondent_district[$i] ?? null,
                     ]);
                 }
             }
