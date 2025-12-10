@@ -340,7 +340,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
     }
 
 
-        public function forwardComplaintbylokayukt(Request $request,$complainId){
+        public function forwardComplaintbyPS(Request $request,$complainId){
         //    dd($request->all());
         $user = Auth::user()->id;
         // dd($usersubrole);
@@ -378,7 +378,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
             // dd($cmp);
 
                if($cmp){
-                $cmp->approved_rejected_by_d_a = 1;
+                $cmp->approved_rejected_by_ps = 1;
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Deputy Secretary / Joint Secretary';
                 // $remark.='\n';
@@ -389,9 +389,9 @@ $complainDetails->details = DB::table('complaints_details as cd')
                     if($cmp->save()){
                         $apcAction = new ComplaintAction();
                         $apcAction->complaint_id = $complainId;
-                        $apcAction->forward_by_lokayukt = $user;
+                        $apcAction->forward_by_ps = $user;
 
-                        $apcAction->forward_to_uplokayukt = $request->forward_to;
+                        $apcAction->forward_to_lokayukt = $request->forward_to;
                        
                         $apcAction->status = 'Forwarded';
                         $apcAction->type = '1';

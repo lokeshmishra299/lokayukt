@@ -371,7 +371,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-file-preview/{id}',[PSComplaintsController::class,'getFilePreview']);
         // Route::post('/forward-by-ds-js/{complainId}',[PSComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[PSComplaintsController::class,'forwardComplaintbyda']);
-        Route::post('/forward-by-lokayukt/{complainId}',[PSComplaintsController::class,'forwardComplaintbyPS']);
+        Route::post('/forward-by-ps/{complainId}',[PSComplaintsController::class,'forwardComplaintbyPS']);
         Route::post('/request-report/{complainId}',[PSReportController::class,'requestReport']);
         Route::get('/request-list/{complainId}',[PSReportController::class,'requestReportList']);
                 Route::get('/request-list-cio/{complainId}',[PSReportController::class,'requestinvestigationReport']);

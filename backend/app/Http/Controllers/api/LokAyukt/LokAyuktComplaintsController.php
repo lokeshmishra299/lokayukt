@@ -369,7 +369,7 @@ class LokAyuktComplaintsController extends Controller
     }
 
 
-        public function forwardComplaintbylokayukt(Request $request,$complainId){
+    public function forwardComplaintbylokayukt(Request $request,$complainId){
         //    dd($request->all());
         $user = Auth::user()->id;
         // dd($usersubrole);
