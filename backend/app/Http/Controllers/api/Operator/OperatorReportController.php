@@ -267,6 +267,12 @@ class OperatorReportController extends Controller
      $complainDetails->respondant =  DB::table('respondents')
     ->where('complaint_id', $id)
     ->get();
+     $complainDetails->support =  DB::table('complaint_supporting')
+    ->where('complaint_id', $id)
+    ->get();
+     $complainDetails->witness =  DB::table('complaint_witness')
+    ->where('complaint_id', $id)
+    ->get();
 
     // dd($complainDetails);
 
