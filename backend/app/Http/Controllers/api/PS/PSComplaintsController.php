@@ -822,4 +822,110 @@ $complainDetails->details = DB::table('complaints_details as cd')
            ]);
 
     }
+
+    public function returnComplainByPs(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+        // dd($usersubrole);
+   
+
+        // $validation = Validator::make($request->all(), [
+        //     // 'forward_by_so_us' => 'required|exists:users,id',
+        //     'forward_to_d_a' => 'required|exists:users,id',
+        //     // 'remark' => 'required',
+         
+          
+        // ], [
+        //     // 'forward_by_so_us.required' => 'Forward by Supervisor is required.',
+        //     // 'forward_by_so_us.exists' => 'Forward by user does not exist.',
+        //     'forward_to_d_a.required' => 'Forward to user is required.',
+        //     'forward_to_d_a.exists' => 'Forward to user does not exist.',
+        //     // 'remark.required' => 'Remark is required.',
+           
+        // ]);
+
+        // if ($validation->fails()) {
+        //     return response()->json([
+        //         'status' => false,
+        //         'errors' => $validation->errors()
+        //     ], 422);
+        // }
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->approved_rejected_by_rk = 0;
+                // $cmp->forward_to_d_a = $request->forward_to_d_a;
+                // $remark ='Remark By Section Officer / Under Secretary';
+                // $remark.='\n';
+                // $remark.= $request->remarks;
+                // $remark.='\n';
+                // $cmp->remark = $remark;
+                // $cmp->save();
+
+               
+                if($cmp->save()){
+                    $apcAction = new ComplaintAction();
+                    $apcAction->complaint_id = $complainId;
+                    $apcAction->status = 'Return';
+                    $apcAction->remarks = $request->remarks;
+                    $apcAction->save();
+                }
+                // $cmpAction =new ComplaintAction();
+                // $cmpAction->complaint_id = $complainId;
+                // $cmpAction->forward_by_so_us = $user;
+                // $cmpAction->forward_to_d_a = $request->forward_to_d_a; //add supervisor user_id 
+                // $cmpAction->status_so_us = 1;
+                // $cmpAction->action_type = "Forwarded";
+                // $cmpAction->remarks = $request->remarks;
+                // $cmpAction->save();
+            }
+            // $cmp->forward_by = $request->forward_by;
+            // $cmp->forward_to_d_a = $request->forward_to_d_a;
+            // $cmp->sup_status = 1;
+            // $cmp->save();
+    
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Return Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+
+    public function pullBackByPs(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+       
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->approved_rejected_by_rk = 0;
+                $cmp->save(); 
+            }
+          
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Pull Back Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
 }
