@@ -284,11 +284,19 @@ const ViewAllComplaint = () => {
               </div>
 
               {/* ===== DESCRIPTION ===== */}
-              <p className="text-gray-700 mb-4 text-sm md:text-base">
+              <p className="text-gray-700 mb-2 text-sm md:text-base">
                 Description:{" "}
                 {complaintData.complaint_description ||
                   "No detailed description available for this complaint."}
               </p>
+              <p className="text-gray-700 mb-2 text-sm md:text-base">
+                Delay Reason:{"  "}
+                {complaintData.delay_reason ||
+                  "NA"}
+              </p>
+
+
+
 
               {/* ===== DETAILS GRID ===== */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -306,6 +314,29 @@ const ViewAllComplaint = () => {
                   <p className=" text-gray-800 text-sm md:text-base">
                     {complaintData.correspondence_place || "N/A"}
                   </p>
+                  
+              
+                  <p className="text-xs mt-3 text-gray-500 uppercase mb-1">
+                   
+previously_submitted
+
+                  </p>
+                  <p className=" text-gray-800 text-sm md:text-base">
+                    {complaintData.
+previously_submitted
+ || "N/A"}
+                  </p>
+                    <p className="text-xs text-gray-500 uppercase mb-1 mt-3">
+                        
+previously_submitted_details
+
+                      </p>
+                      <p className=" text-gray-800 text-sm md:text-base">
+                        {complaintData.
+previously_submitted_details || "NA"}
+                      </p>
+          
+             
                 </div>
 
                 <div>
@@ -324,6 +355,15 @@ const ViewAllComplaint = () => {
                       <p className=" text-gray-800 text-sm md:text-base">
                         {complaintData.relation_with_person || "NA"}
                       </p>
+                      <p className="text-xs text-gray-500 uppercase mb-1 mt-3">
+                        
+Cause Date
+                      </p>
+                      <p className=" text-gray-800 text-sm md:text-base">
+                        {complaintData.
+cause_date || "NA"}
+                      </p>
+  
                     </>
                   )}
                 </div>
@@ -342,6 +382,16 @@ const ViewAllComplaint = () => {
                   <p className=" text-gray-800 text-sm md:text-base">
                     {complaintData.previously_submitted_details || "N/A"}
                   </p>
+
+                    <p className="text-xs mt-3 text-gray-500 uppercase mb-1">
+                  
+                    category
+
+                  </p>
+                  <p className=" text-gray-800 text-sm md:text-base">
+                    {complaintData.category|| "N/A"}
+                  </p>
+    
                 </div>
               </div>
 
