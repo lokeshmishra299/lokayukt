@@ -722,6 +722,11 @@ cause_date || "NA"}
                                         <p className="font-medium text-gray-800">{comp.father_name || 'N/A'}</p>
                                     </div>
                                     <div className="p-3 bg-gray-50 rounded">
+                                        <p className="text-xs text-gray-500 uppercase">District</p>
+                                        <p className="font-medium text-gray-800">{comp.
+district_name || 'N/A'}</p>
+                                    </div>
+                                    <div className="p-3 bg-gray-50 rounded">
                                         <p className="text-xs text-gray-500 uppercase">Is Public Servant</p>
                                         <p className="font-medium text-gray-800">{comp.is_public_servant || 'N/A'}</p>
                                     </div>
@@ -731,7 +736,8 @@ cause_date || "NA"}
                                     </div>
                                     <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
                                         <p className="text-xs text-gray-500 uppercase">Address</p>
-                                        <p className="font-medium text-gray-800">{comp.permanent_place} {comp.permanent_post_office ? `, ${comp.permanent_post_office}` : ''}</p>
+                                        <p className="font-medium text-gray-800">{comp.permanent_place
+ || "NA"} </p>
                                     </div>
                                 </div>
                             </div>
@@ -760,6 +766,10 @@ cause_date || "NA"}
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">Department</p>
                                          <p className="font-medium text-gray-800">{resp.department_name || 'N/A'}</p>
+                                     </div>
+                                     <div className="p-3 bg-gray-50 rounded">
+                                         <p className="text-xs text-gray-500 uppercase">Distirct</p>
+                                         <p className="font-medium text-gray-800">{resp.district_name|| 'N/A'}</p>
                                      </div>
                                      <div className="p-3 bg-gray-50 rounded">
                                          <p className="text-xs text-gray-500 uppercase">Category</p>
