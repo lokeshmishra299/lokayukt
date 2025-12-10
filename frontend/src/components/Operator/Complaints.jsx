@@ -969,7 +969,7 @@ const Complaints = () => {
                       >
                          <option value="">ज़िला चुनें</option>
                           {districtList.map((dist, i) => (
-                            <option key={i} value={dist.district_name}> 
+                            <option key={i} value={dist.district_code}> 
                               {dist.district_name} / {dist.dist_name_hi}
                             </option>
                           ))}
@@ -1139,7 +1139,7 @@ const Complaints = () => {
                         >
                           <option value="">ज़िला चुनें</option>
                           {districtList.map((dist, i) => (
-                            <option key={i} value={dist.district_name}>
+                            <option key={i} value={dist.district_code}>
                               {dist.district_name} / {dist.dist_name_hi}
                             </option>
                           ))}
