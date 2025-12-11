@@ -224,7 +224,7 @@ const AllComplaints = () => {
   };
 
   const isApprovedByRO = (complaint) => {
-    return complaint.approved_rejected_by_lokayukt === 1;
+    return complaint.approved_rejected_by_rk === 1;
   };
 
   const getStatistics = () => {
