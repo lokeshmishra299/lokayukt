@@ -368,6 +368,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/view-complaint/{id}',[PSComplaintsController::class,'viewComplaint']);
         Route::post('/forward-by-so/{complainId}',[PSComplaintsController::class,'forwardComplaintbySO']);
         Route::post('/dispose-complain/{complainId}',[PSComplaintsController::class,'disposeComplaints']);
+        Route::get('/get-lokayult-uplokayukt',[PSComplaintsController::class,'getUsers']);
         Route::get('/get-users',[PSComplaintsController::class,'getSubROleUsers']);
         Route::get('/get-document/{id}',[PSComplaintsController::class,'getUploadDoc']);
         Route::get('/get-notes/{id}',[PSComplaintsController::class,'getNotes']);
