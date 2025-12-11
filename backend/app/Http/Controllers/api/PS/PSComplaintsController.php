@@ -38,7 +38,7 @@ class PSComplaintsController extends Controller
 
      $query->where('form_status', 1)
                 //   ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_lokayukt', 1);
+                  ->where('approved_rejected_by_rk', 1);
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)
                     //         ->Orwhere('approved_rejected_by_ds_js', 1);               
@@ -183,8 +183,10 @@ class PSComplaintsController extends Controller
         
 
          if(!empty($usersByRole['lok-ayukt'])){
+            $data[] =  $usersByRole['lok-ayukt'];
+            $data[] =  $usersByRole['up-lok-ayukt'];
 
-           return response()->json($usersByRole['lok-ayukt']);
+           return response()->json($data);
         }else{
 
             return response()->json(["message"=>"Data Not Found"]);
