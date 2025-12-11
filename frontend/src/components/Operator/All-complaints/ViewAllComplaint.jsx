@@ -28,7 +28,7 @@ const ViewAllComplaint = () => {
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState("documents");
-  
+
   const [confirmConfig, setConfirmConfig] = useState({ open: false, type: null });
   const [viewModalConfig, setViewModalConfig] = useState({ open: false, type: null });
 
@@ -92,7 +92,7 @@ const ViewAllComplaint = () => {
       return res.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message || "Marked as received successfully");
+      toast.success("Marked as received successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setRemark("");
       setConfirmConfig({ open: false, type: null });
@@ -127,7 +127,7 @@ const ViewAllComplaint = () => {
 
   const handleMarkAsReceived = () =>
     setConfirmConfig({ open: true, type: "receive" });
-    
+
   const handleforwardphysical = () =>
     setConfirmConfig({ open: true, type: "forward" });
 
@@ -218,9 +218,9 @@ const ViewAllComplaint = () => {
       // case 'support': return 'Supporting Persons Details';
       // case 'witness': return 'Witness Details';
       case 'correspondence': return 'परिवादी का विवरण';
-case 'respondent': return 'प्रतिवादी का विवरण';
-case 'support': return 'समर्थनकर्ता व्यक्तियों का विवरण';
-case 'witness': return 'गवाहों का विवरण';
+      case 'respondent': return 'प्रतिवादी का विवरण';
+      case 'support': return 'समर्थनकर्ता व्यक्तियों का विवरण';
+      case 'witness': return 'गवाहों का विवरण';
 
       default: return '';
     }
@@ -254,7 +254,7 @@ case 'witness': return 'गवाहों का विवरण';
                   >
                     {complaintData.approved_rejected_by_operator == 0
                       ? "Received - Record Section"
-                      : "In Motion – With operatora"}
+                      : "Received - Record Section"}
                   </span>
                 </div>
               </div>
@@ -275,7 +275,7 @@ case 'witness': return 'गवाहों का विवरण';
                     >
                       {complaintData.approved_rejected_by_operator == 0
                         ? "Received - Record Section"
-                        : "In Motion – With operatora"}
+                        : "Received - Record Section"}
                     </span>
 
                     <button
@@ -289,13 +289,13 @@ case 'witness': return 'गवाहों का विवरण';
               </div>
 
               {/* ===== DESCRIPTION ===== */}
-              <p className="text-xs text-gray-500 font-semibold uppercase my-2">
+              <p className="text-[14px] text-gray-500 font-semibold uppercase my-2">
                 {/* Description:{" "} */}
                 विवरण:{" "}
                 {complaintData.complaint_description ||
                   "No detailed description available for this complaint."}
               </p>
-              <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+              <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
                 {/* Delay Reason:{"  "} */}
                 विलंब का कारण:{"  "}
                 {complaintData.delay_reason ||
@@ -308,9 +308,9 @@ case 'witness': return 'गवाहों का विवरण';
               {/* ===== DETAILS GRID ===== */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
 
-                
+
                     {/* CORRESPONDENCE NAME */}
                     पत्राचार हेतु नाम
                   </p>
@@ -318,67 +318,67 @@ case 'witness': return 'गवाहों का विवरण';
                     {complaintData.correspondence_name || "N/A"}
                   </p>
 
-                  <p className=" text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
+                  <p className=" text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
 
-                   
+
                     {/* CORRESPONDENCE ADDRESS */}
                     पत्राचार हेतु पता
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
                     {complaintData.correspondence_place || "N/A"}
                   </p>
-                  
-              
- 
 
 
-                  
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+
+
+
+
+                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                     {/* PREVIOUSLY SUBMITTED DETAILS */}
                     पूर्व में प्रस्तुत विवरण
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
                     {complaintData.previously_submitted_details || "N/A"}
                   </p>
-   
-          
-             
+
+
+
                 </div>
 
                 <div>
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
                     {/* CORRESPONDENCE POST OFFICE */}
                     पत्राचार हेतु डाकघर
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData. correspondence_post_office || "N/A"}
+                    {complaintData.correspondence_post_office || "N/A"}
                   </p>
 
                   {complaintData.dob && (
                     <>
-                      <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                      <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                         {/* Relation With Person */}
                         व्यक्ति से संबंध
                       </p>
                       <p className=" text-gray-800 text-sm md:text-base">
                         {complaintData.relation_with_person || "NA"}
                       </p>
-                      <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
-                        
-{/* Cause Date */}
-कार्यवाही तिथि
+                      <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
+
+                        {/* Cause Date */}
+                        कार्यवाही तिथि
                       </p>
                       <p className=" text-gray-800 text-sm md:text-base">
                         {complaintData.
-cause_date || "NA"}
+                          cause_date || "NA"}
                       </p>
-  
+
                     </>
                   )}
                 </div>
 
                 <div>
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
                     {/* CORRESPONDENCE DISTRICT */}
                     पत्राचार हेतु जिला
                   </p>
@@ -386,39 +386,38 @@ cause_date || "NA"}
                     {complaintData.correspondence_district || "N/A"}
                   </p>
 
-                                 <p className=" text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
-                   
-{/* previously_submitted */}
-पूर्व में प्रस्तुत
+                  <p className=" text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
+
+                    {/* previously_submitted */}
+                    पूर्व में प्रस्तुत
 
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
                     {complaintData.
-previously_submitted
- || "N/A"}
+                      previously_submitted
+                      || "N/A"}
                   </p>
 
-                    <p className=" text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
-                  
+                  <p className=" text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
+
                     {/* category */}
                     श्रेणी
 
                   </p>
                   <p className=" text-gray-800 text-sm md:text-base">
-                    {complaintData.category|| "N/A"}
+                    {complaintData.category || "N/A"}
                   </p>
-    
+
                 </div>
               </div>
 
               {/* Fee Status and Fee Type Section */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
-                  className={`px-3 py-1.5 rounded text-xs border ${
-                    complaintData.fee_exempted === 1
+                  className={`px-3 py-1.5 rounded text-[14px] border ${complaintData.fee_exempted === 1
                       ? "bg-green-50 text-green-700 border-green-200"
                       : "bg-gray-50 text-gray-700 border-gray-200"
-                  }`}
+                    }`}
                 >
                   {/* Fee Type:{" "}
                   {complaintData.fee_exempted === 1
@@ -426,27 +425,26 @@ previously_submitted
                     : complaintData.amount
                     ? "Paid"
                     : "Partial"} */}
-                 शुल्क का प्रकार:{" "}
+                  शुल्क का प्रकार:{" "}
                   {complaintData.fee_exempted === 1
                     ? "Exempted"
                     : complaintData.amount
-                    ? "Paid"
-                    : "Partial"}
+                      ? "Paid"
+                      : "Partial"}
                 </span>
 
                 <span
-                  className={`px-3 py-1.5 rounded text-xs border ${
-                    complaintData.payment_status === "Success" ||
-                    complaintData.payment_status === "Verified"
+                  className={`px-3 py-1.5 rounded text-[14px] border ${complaintData.payment_status === "Success" ||
+                      complaintData.payment_status === "Verified"
                       ? "bg-green-50 text-green-700 border-green-200"
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
-                  }`}
+                    }`}
                 >
                   स्थिति: {complaintData.payment_status || "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
-                  <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200">
+                  <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded text-[14px] border border-blue-200">
                     Challan: {complaintData.challan_no}
                   </span>
                 )}
@@ -454,34 +452,34 @@ previously_submitted
 
               {/* ===== NEW SECTION: Extra Details Tabs/Buttons ===== */}
               <div className="flex flex-wrap gap-3 mt-4 border-t pt-4">
-                  <button 
-                    onClick={() => setViewModalConfig({ open: true, type: 'correspondence' })}
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
-                  >
-                    {/* <FaEye /> Complainants */}
-                    <FaEye /> शिकायतकर्ता
-                  </button>
-                  <button 
-                    onClick={() => setViewModalConfig({ open: true, type: 'respondent' })}
-                    className="flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-md border border-orange-200 hover:bg-orange-100 transition-colors text-sm font-medium"
-                  >
-                    {/* <FaEye /> Respondents */}
-                    <FaEye /> प्रतिवादी
-                  </button>
-                  <button 
-                    onClick={() => setViewModalConfig({ open: true, type: 'support' })}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
-                  >
-                    {/* <FaEye /> Supporting Persons */}
-                    <FaEye /> समर्थनकर्ता व्यक्ति
-                  </button>
-                  <button 
-                    onClick={() => setViewModalConfig({ open: true, type: 'witness' })}
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
-                  >
-                    {/* <FaEye /> Witness Details */}
-                    <FaEye /> साक्षियों का विवरण
-                  </button>
+                <button
+                  onClick={() => setViewModalConfig({ open: true, type: 'correspondence' })}
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
+                >
+                  {/* <FaEye /> Complainants */}
+                  <FaEye /> शिकायतकर्ता
+                </button>
+                <button
+                  onClick={() => setViewModalConfig({ open: true, type: 'respondent' })}
+                  className="flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-md border border-orange-200 hover:bg-orange-100 transition-colors text-sm font-medium"
+                >
+                  {/* <FaEye /> Respondents */}
+                  <FaEye /> प्रतिवादी
+                </button>
+                <button
+                  onClick={() => setViewModalConfig({ open: true, type: 'support' })}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
+                >
+                  {/* <FaEye /> Supporting Persons */}
+                  <FaEye /> समर्थनकर्ता व्यक्ति
+                </button>
+                <button
+                  onClick={() => setViewModalConfig({ open: true, type: 'witness' })}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
+                >
+                  {/* <FaEye /> Witness Details */}
+                  <FaEye /> साक्षियों का विवरण
+                </button>
               </div>
 
             </div>
@@ -495,11 +493,10 @@ previously_submitted
                     onClick={() => {
                       setActiveTab(tab);
                     }}
-                    className={`py-3 px-4 text-left text-sm font-medium ${
-                      activeTab === tab
+                    className={`py-3 px-4 text-left text-sm font-medium ${activeTab === tab
                         ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
                         : "text-gray-600 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
@@ -516,11 +513,10 @@ previously_submitted
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`pb-3 pt-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
-                      activeTab === tab
+                    className={`pb-3 pt-3 text-sm font-medium transition-colors relative whitespace-nowrap ${activeTab === tab
                         ? "text-blue-600"
                         : "text-gray-600 hover:text-gray-800"
-                    }`}
+                      }`}
                   >
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
@@ -554,24 +550,23 @@ previously_submitted
                     Pull Back
                   </button>
 
-                  {complaintData.ca_status === "Received" ? (
+                  {complaintData.received_phsical === 1 ? (
                     <button
-                        disabled
-                        className="px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded text-sm cursor-not-allowed font-medium"
+                      disabled
+                      className="px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded text-sm cursor-not-allowed font-medium"
                     >
-                        ✓ Received (Physical)
+                      ✓ Received (Physical)
                     </button>
                   ) : (
                     <button
-                        onClick={handleMarkAsReceived}
-                        disabled={markAsReceivedMutation.isPending}
-                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handleMarkAsReceived}
+                      disabled={markAsReceivedMutation.isPending}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {markAsReceivedMutation.isPending
-                        ? "Processing..."
-                        : "Mark As Recived"}
+                      {markAsReceivedMutation.isPending ? "Processing..." : "Mark As Received"}
                     </button>
                   )}
+
                 </div>
 
                 <div className="flex gap-2">
@@ -618,14 +613,14 @@ previously_submitted
               {confirmConfig.type === "receive"
                 ? "Return with Remarks?"
                 : confirmConfig.type === "pullback"
-                ? "Pull Back Complaint?"
-                : "Forward File Physically Electronically?"}
+                  ? "Pull Back Complaint?"
+                  : "Forward File Physically Electronically?"}
             </h3>
 
             {confirmConfig.type === "pullback" && (
-                <p className="text-gray-600 mb-6 text-sm">
-                    Are you sure you want to pull back this complaint file?
-                </p>
+              <p className="text-gray-600 mb-6 text-sm">
+                Are you sure you want to pull back this complaint file?
+              </p>
             )}
 
             {confirmConfig.type === "forward" && (
@@ -650,7 +645,7 @@ previously_submitted
                   >
                     <option value="">Select User...</option>
                     {Array.isArray(forwardOptionsData) &&
-                    forwardOptionsData.length > 0 ? (
+                      forwardOptionsData.length > 0 ? (
                       forwardOptionsData.map((option) => (
                         <option key={option.id} value={option.id}>
                           {option.name || option.user_name || `User ${option.id}`}
@@ -668,18 +663,18 @@ previously_submitted
             )}
 
             {confirmConfig.type !== "pullback" && (
-                <div className="mb-5">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Remark <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                    value={remark}
-                    onChange={(e) => setRemark(e.target.value)}
-                    rows={4}
-                    placeholder="Enter your remark here..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
-                </div>
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Remark <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={remark}
+                  onChange={(e) => setRemark(e.target.value)}
+                  rows={4}
+                  placeholder="Enter your remark here..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+              </div>
             )}
 
             <div className="flex justify-end gap-3">
@@ -693,7 +688,7 @@ previously_submitted
               >
                 {confirmConfig.type === "pullback" ? "No" : "Cancel"}
               </button>
-              
+
               <button
                 onClick={handleConfirmYes}
                 disabled={
@@ -708,7 +703,7 @@ previously_submitted
                 className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {markAsReceivedMutation.isPending ||
-                forwardPhysicallyMutation.isPending
+                  forwardPhysicallyMutation.isPending
                   ? "Processing..."
                   : confirmConfig.type === "pullback" ? "Yes" : "Send"}
               </button>
@@ -720,19 +715,19 @@ previously_submitted
       {/* View Data Modal (Correspondence / Respondent / Support / Witness) */}
       {viewModalConfig.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative animate-in fade-in zoom-in duration-200 m-4 max-h-[90vh] overflow-y-auto">
-              <button
-                onClick={() => setViewModalConfig({ open: false, type: null })}
-                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-              >
-                <FaTimes size={20} />
-              </button>
-              
-              <h3 className="text-xl font-semibold mb-6 border-b pb-2">
-                  {getModalTitle()}
-              </h3>
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 relative animate-in fade-in zoom-in duration-200 m-4 max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setViewModalConfig({ open: false, type: null })}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <FaTimes size={20} />
+            </button>
 
-              {/* {viewModalConfig.type === 'correspondence' && (
+            <h3 className="text-xl font-semibold mb-6 border-b pb-2">
+              {getModalTitle()}
+            </h3>
+
+            {/* {viewModalConfig.type === 'correspondence' && (
                   <div className="space-y-4">
                      {complaintData.complainants && complaintData.complainants.length > 0 ? (
                         complaintData.complainants.map((comp, idx) => (
@@ -740,7 +735,7 @@ previously_submitted
                                 <h4 className="text-sm font-bold text-gray-700 mb-2">Complainant #{idx + 1}</h4>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="p-3 bg-gray-50 rounded">
-                                        <p className="text-xs text-gray-500 uppercase">Name</p>
+                                        <p className="text-[14px] text-gray-500 uppercase">Name</p>
                                         <p className=" text-gray-800">{comp.complainant_name || 'N/A'}</p>
                                     </div>
                                     <div className="p-3 bg-gray-50 rounded">
@@ -774,59 +769,59 @@ district_name || 'N/A'}</p>
                   </div>
               )} */}
 
-              {viewModalConfig.type === 'correspondence' && (
-  <div className="space-y-4">
-    {complaintData.complainants && complaintData.complainants.length > 0 ? (
-      complaintData.complainants.map((comp, idx) => (
-        <div key={idx} className="mb-4">
-          <h4 className="text-sm font-bold text-gray-700 mb-2">
-            परिवादी #{idx + 1}
-          </h4>
+            {viewModalConfig.type === 'correspondence' && (
+              <div className="space-y-4">
+                {complaintData.complainants && complaintData.complainants.length > 0 ? (
+                  complaintData.complainants.map((comp, idx) => (
+                    <div key={idx} className="mb-4">
+                      <h4 className="text-sm font-bold text-gray-700 mb-2">
+                        परिवादी #{idx + 1}
+                      </h4>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">नाम</p>
-              <p className="text-gray-800">{comp.complainant_name || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">नाम</p>
+                          <p className="text-gray-800">{comp.complainant_name || 'N/A'}</p>
+                        </div>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पिता का नाम</p>
-              <p className="text-gray-800">{comp.father_name || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">पिता का नाम</p>
+                          <p className="text-gray-800">{comp.father_name || 'N/A'}</p>
+                        </div>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">जिला</p>
-              <p className="text-gray-800">{comp.district_name || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">जिला</p>
+                          <p className="text-gray-800">{comp.district_name || 'N/A'}</p>
+                        </div>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">क्या लोक सेवक हैं?</p>
-              <p className="text-gray-800">{comp.is_public_servant || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">क्या लोक सेवक हैं?</p>
+                          <p className="text-gray-800">{comp.is_public_servant || 'N/A'}</p>
+                        </div>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">व्यवसाय</p>
-              <p className="text-gray-800">{comp.occupation || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">व्यवसाय</p>
+                          <p className="text-gray-800">{comp.occupation || 'N/A'}</p>
+                        </div>
 
-            <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पता</p>
-              <p className="text-gray-800">{comp.permanent_place || 'N/A'}</p>
-            </div>
+                        <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">पता</p>
+                          <p className="text-gray-800">{comp.permanent_place || 'N/A'}</p>
+                        </div>
 
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className="text-center py-4 text-gray-500">
-        परिवादी का कोई डेटा उपलब्ध नहीं है।
-      </div>
-    )}
-  </div>
-)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    परिवादी का कोई डेटा उपलब्ध नहीं है।
+                  </div>
+                )}
+              </div>
+            )}
 
-{/* 
+            {/* 
               {viewModalConfig.type === 'respondent' && (
                   <div className="space-y-4">
                      {complaintData.respondant && complaintData.respondant.length > 0 ? (
@@ -867,61 +862,61 @@ district_name || 'N/A'}</p>
                   </div>
               )} */}
 
-              {viewModalConfig.type === 'respondent' && (
-  <div className="space-y-4">
-    {complaintData.respondant && complaintData.respondant.length > 0 ? (
-      complaintData.respondant.map((resp, idx) => (
-        <div key={idx} className="mb-4">
-          <h4 className="text-sm font-bold text-gray-700 mb-2">
-            प्रतिवादी #{idx + 1}
-          </h4>
+            {viewModalConfig.type === 'respondent' && (
+              <div className="space-y-4">
+                {complaintData.respondant && complaintData.respondant.length > 0 ? (
+                  complaintData.respondant.map((resp, idx) => (
+                    <div key={idx} className="mb-4">
+                      <h4 className="text-sm font-bold text-gray-700 mb-2">
+                        प्रतिवादी #{idx + 1}
+                      </h4>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">नाम</p>
-              <p className="text-gray-800">{resp.respondent_name || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">नाम</p>
+                          <p className="text-gray-800">{resp.respondent_name || 'N/A'}</p>
+                        </div>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पदनाम</p>
-              <p className="text-gray-800">{resp.designation || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">पदनाम</p>
+                          <p className="text-gray-800">{resp.designation || 'N/A'}</p>
+                        </div>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">विभाग</p>
-              <p className="text-gray-800">{resp.department_name || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">विभाग</p>
+                          <p className="text-gray-800">{resp.department_name || 'N/A'}</p>
+                        </div>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">जिला</p>
-              <p className="text-gray-800">{resp.district_name || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">जिला</p>
+                          <p className="text-gray-800">{resp.district_name || 'N/A'}</p>
+                        </div>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">अधिकारी की श्रेणी</p>
-              <p className="text-gray-800">{resp.officer_category || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">अधिकारी की श्रेणी</p>
+                          <p className="text-gray-800">{resp.officer_category || 'N/A'}</p>
+                        </div>
 
-            <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पता</p>
-              <p className="text-gray-800">{resp.current_address || 'N/A'}</p>
-            </div>
+                        <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">पता</p>
+                          <p className="text-gray-800">{resp.current_address || 'N/A'}</p>
+                        </div>
 
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className="text-center py-4 text-gray-500">
-        प्रतिवादी का कोई डेटा उपलब्ध नहीं है।
-      </div>
-    )}
-  </div>
-)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    प्रतिवादी का कोई डेटा उपलब्ध नहीं है।
+                  </div>
+                )}
+              </div>
+            )}
 
 
-              {/* --- NEW MODAL CONTENT: Support --- */}
-              {/* {viewModalConfig.type === 'support' && (
+            {/* --- NEW MODAL CONTENT: Support --- */}
+            {/* {viewModalConfig.type === 'support' && (
                   <div className="space-y-4">
                      {complaintData.support && complaintData.support.length > 0 ? (
                          complaintData.support.map((item, idx) => (
@@ -946,40 +941,40 @@ district_name || 'N/A'}</p>
               )} */}
 
 
-{viewModalConfig.type === 'support' && (
-  <div className="space-y-4">
-    {complaintData.support && complaintData.support.length > 0 ? (
-      complaintData.support.map((item, idx) => (
-        <div key={idx} className="mb-4">
-          <h4 className="text-sm font-bold text-gray-700 mb-2">
-            सहायक व्यक्ति #{idx + 1}
-          </h4>
+            {viewModalConfig.type === 'support' && (
+              <div className="space-y-4">
+                {complaintData.support && complaintData.support.length > 0 ? (
+                  complaintData.support.map((item, idx) => (
+                    <div key={idx} className="mb-4">
+                      <h4 className="text-sm font-bold text-gray-700 mb-2">
+                        सहायक व्यक्ति #{idx + 1}
+                      </h4>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">नाम</p>
-              <p className="text-gray-800">{item.support_name || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">नाम</p>
+                          <p className="text-gray-800">{item.support_name || 'N/A'}</p>
+                        </div>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पता</p>
-              <p className="text-gray-800">{item.support_address || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">पता</p>
+                          <p className="text-gray-800">{item.support_address || 'N/A'}</p>
+                        </div>
 
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className="text-center py-4 text-gray-500">
-        कोई सहायक व्यक्ति उपलब्ध नहीं है।
-      </div>
-    )}
-  </div>
-)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    कोई सहायक व्यक्ति उपलब्ध नहीं है।
+                  </div>
+                )}
+              </div>
+            )}
 
-              {/* --- NEW MODAL CONTENT: Witness --- */}
-              {/* {viewModalConfig.type === 'witness' && (
+            {/* --- NEW MODAL CONTENT: Witness --- */}
+            {/* {viewModalConfig.type === 'witness' && (
                   <div className="space-y-4">
                      {complaintData.witness && complaintData.witness.length > 0 ? (
                          complaintData.witness.map((item, idx) => (
@@ -1003,49 +998,49 @@ district_name || 'N/A'}</p>
                   </div>
               )} */}
 
-              {viewModalConfig.type === 'witness' && (
-  <div className="space-y-4">
-    {complaintData.witness && complaintData.witness.length > 0 ? (
-      complaintData.witness.map((item, idx) => (
-        <div key={idx} className="mb-4">
-          
-          <h4 className="text-sm font-bold text-gray-700 mb-2">
-            गवाह #{idx + 1}
-          </h4>
+            {viewModalConfig.type === 'witness' && (
+              <div className="space-y-4">
+                {complaintData.witness && complaintData.witness.length > 0 ? (
+                  complaintData.witness.map((item, idx) => (
+                    <div key={idx} className="mb-4">
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <h4 className="text-sm font-bold text-gray-700 mb-2">
+                        गवाह #{idx + 1}
+                      </h4>
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">नाम</p>
-              <p className="text-gray-800">{item.witness_name || 'N/A'}</p>
-            </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पता</p>
-              <p className="text-gray-800">{item.witness_address || 'N/A'}</p>
-            </div>
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">नाम</p>
+                          <p className="text-gray-800">{item.witness_name || 'N/A'}</p>
+                        </div>
 
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className="text-center py-4 text-gray-500">
-        कोई गवाह डेटा उपलब्ध नहीं है।
-      </div>
-    )}
-  </div>
-)}
+                        <div className="p-3 bg-gray-50 rounded">
+                          <p className="text-xs text-gray-500 uppercase">पता</p>
+                          <p className="text-gray-800">{item.witness_address || 'N/A'}</p>
+                        </div>
 
-
-              <div className="mt-6 flex justify-end">
-                  <button
-                    onClick={() => setViewModalConfig({ open: false, type: null })}
-                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm "
-                  >
-                    Close
-                  </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-gray-500">
+                    कोई गवाह डेटा उपलब्ध नहीं है।
+                  </div>
+                )}
               </div>
-           </div>
+            )}
+
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setViewModalConfig({ open: false, type: null })}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded text-sm "
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
