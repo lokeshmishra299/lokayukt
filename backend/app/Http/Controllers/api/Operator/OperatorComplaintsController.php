@@ -1823,9 +1823,9 @@ class OperatorComplaintsController extends Controller
         }
            
            $cmp = Complaint::findOrFail($request->complaint_id);
-          // $cmp->received_phsical = 1;
+          $cmp->received_phsical = 1;
           
-           if($cmp){
+           if($cmp->save()){
               $apcAction = new ComplaintAction();
                     $apcAction->complaint_id = $request->complaint_id;
                     $apcAction->forward_to_rk = $user;
