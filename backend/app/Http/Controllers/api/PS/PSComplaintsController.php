@@ -874,7 +874,7 @@ class PSComplaintsController extends Controller
     }
 
     public function returnComplainByPs(Request $request,$complainId){
-        //    dd($request->all());
+        //    dd($request->all(),$complainId);
         $user = Auth::user()->id;
         // dd($usersubrole);
    
@@ -900,10 +900,10 @@ class PSComplaintsController extends Controller
         //         'errors' => $validation->errors()
         //     ], 422);
         // }
-        if(isset($complainId) && $request->isMethod('post')){
+        if(isset($complainId) && $request->isMethod('get')){
 
              $cmp =  Complaint::findOrFail($complainId);
-             
+            //  dd($cmp);
             if($cmp){
                 $cmp->approved_rejected_by_rk = 0;
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
