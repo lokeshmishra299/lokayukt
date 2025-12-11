@@ -439,21 +439,21 @@ const ViewAllComplaint = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 {/* Column 1 */}
                 <div>
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
                     पत्राचार हेतु नाम
                   </p>
                   <p className="text-gray-800 text-sm md:text-base">
                     {complaintData.correspondence_name || "N/A"}
                   </p>
 
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                     पत्राचार हेतु पता
                   </p>
                   <p className="text-gray-800 text-sm md:text-base">
                     {complaintData.address || "N/A"}
                   </p>
 
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                     पूर्व में प्रस्तुत विवरण
                   </p>
                   <p className="text-gray-800 text-sm md:text-base">
@@ -463,7 +463,7 @@ const ViewAllComplaint = () => {
 
                 {/* Column 2 */}
                 <div>
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
                     पत्राचार हेतु डाकघर
                   </p>
                   <p className="text-gray-800 text-sm md:text-base">
@@ -472,14 +472,14 @@ const ViewAllComplaint = () => {
 
                   {complaintData.dob && (
                     <>
-                      <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                      <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                         व्यक्ति से संबंध
                       </p>
                       <p className="text-gray-800 text-sm md:text-base">
                         {complaintData.relation_with_person || "NA"}
                       </p>
 
-                      <p className="text-xs text-gray-500 font-semibold uppercase mb-1 mt-3">
+                      <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                         कार्यवाही तिथि
                       </p>
                       <p className="text-gray-800 text-sm md:text-base">
@@ -491,21 +491,21 @@ const ViewAllComplaint = () => {
 
                 {/* Column 3 */}
                 <div>
-                  <p className="text-xs text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
                     पत्राचार हेतु जिला
                   </p>
                   <p className="text-gray-800 text-sm md:text-base">
                     {complaintData.permanent_district || "N/A"}
                   </p>
 
-                  <p className="text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
                     पूर्व में प्रस्तुत
                   </p>
                   <p className="text-gray-800 text-sm md:text-base">
                     {complaintData.previously_submitted || "N/A"}
                   </p>
 
-                  <p className="text-xs mt-3 text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
                     श्रेणी
                   </p>
                   <p className="text-gray-800 text-sm md:text-base">
