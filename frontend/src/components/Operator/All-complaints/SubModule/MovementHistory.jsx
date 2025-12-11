@@ -1,9 +1,9 @@
 import axios from "axios";
-import React, { useState, useEffect } from "react";
-const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
-const APP_URL = BASE_URL.replace("/api", "");
-const token = localStorage.getItem("access_token");
+import React from "react";
 
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
+
+const token = localStorage.getItem("access_token");
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -13,29 +13,22 @@ const api = axios.create({
   },
 });
 
-const MovementHistory = ({complaint}) => {
-const [movemetHistory, setMovementHistory] = useState([])
-  useEffect(() => {
-    if (complaint) {
-      setMovementHistory(complaint.movement_history || []);
-    }
-  }, [complaint]);
+const MovementHistory = ({ complaint }) => {
 
-    console.log("Data he ", complaint)
   const items = [
     {
       title: "PS to Lokayukta (Shri ABC) → Lokayukta",
-      desc: "File marked for review and orders",
+      desc: complaint?.subject || "NA",  
       time: "15 Jan 2025, 3:00 PM",
       status: "Marked",
-      remark: "Urgent", 
+      remark: complaint?.remark || "NA",       
     },
     {
       title: "UpLokayukta → PS to Lokayukta (Shri ABC)",
-      desc: "Please prepare draft order for investigation",
+      desc: complaint?.subject || "NA",  
       time: "13 Jan 2025, 11:30 AM",
       status: "Marked",
-      remark: "Draft needed", 
+      remark: complaint?.remark || "NA",         
     },
   ];
 
@@ -68,18 +61,15 @@ const [movemetHistory, setMovementHistory] = useState([])
                 </p>
               </div>
 
-              {/* Right Side: Status + Remark with Label */}
               <div className="flex flex-col items-start sm:items-end gap-1.5 min-w-fit">
                 <span className="text-[11px] sm:text-[12px] bg-blue-100 text-blue-600 px-2 py-1 rounded-md whitespace-nowrap">
                   {item.status}
                 </span>
-                
-                {item.remark && (
-                  <div className="text-[11px] text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100">
-                    <span className="font-semibold text-gray-700 mr-1">Remark:</span>
-                    {item.remark}
-                  </div>
-                )}
+
+                <div className="text-[11px] text-gray-500 bg-gray-50 px-2 py-1 rounded border border-gray-100">
+                  <span className="font-semibold text-gray-700 mr-1">Remark:</span>
+                  {item.remark}
+                </div>
               </div>
             </div>
           </div>

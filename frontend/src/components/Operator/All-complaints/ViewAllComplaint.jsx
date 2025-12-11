@@ -415,8 +415,8 @@ const ViewAllComplaint = () => {
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${complaintData.fee_exempted === 1
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-gray-50 text-gray-700 border-gray-200"
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-gray-50 text-gray-700 border-gray-200"
                     }`}
                 >
                   {/* Fee Type:{" "}
@@ -435,9 +435,9 @@ const ViewAllComplaint = () => {
 
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${complaintData.payment_status === "Success" ||
-                      complaintData.payment_status === "Verified"
-                      ? "bg-green-50 text-green-700 border-green-200"
-                      : "bg-yellow-50 text-yellow-700 border-yellow-200"
+                    complaintData.payment_status === "Verified"
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-yellow-50 text-yellow-700 border-yellow-200"
                     }`}
                 >
                   स्थिति: {complaintData.payment_status || "Awaiting approval"}
@@ -494,8 +494,8 @@ const ViewAllComplaint = () => {
                       setActiveTab(tab);
                     }}
                     className={`py-3 px-4 text-left text-sm font-medium ${activeTab === tab
-                        ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
-                        : "text-gray-600 hover:bg-gray-50"
+                      ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
                       }`}
                   >
                     {tab === "documents" && "Documents"}
@@ -514,8 +514,8 @@ const ViewAllComplaint = () => {
                     key={tab}
                     onClick={() => setActiveTab(tab)}
                     className={`pb-3 pt-3 text-sm font-medium transition-colors relative whitespace-nowrap ${activeTab === tab
-                        ? "text-blue-600"
-                        : "text-gray-600 hover:text-gray-800"
+                      ? "text-blue-600"
+                      : "text-gray-600 hover:text-gray-800"
                       }`}
                   >
                     {tab === "documents" && "Documents"}
@@ -570,24 +570,24 @@ const ViewAllComplaint = () => {
                 </div>
 
                 <div className="flex gap-2">
-                 {complaintData.approved_rejected_by_rk === 1 ? (
-  <button
-    disabled
-    className="px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded text-sm cursor-not-allowed"
-  >
-    ✓ Forwarded
-  </button>
-) : (
-  <button
-    onClick={handleforwardphysical}
-    disabled={forwardPhysicallyMutation.isPending}
-    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
-  >
-    {forwardPhysicallyMutation.isPending
-      ? "Processing..."
-      : "Forward File Physically Electronically"}
-  </button>
-)}
+                  {complaintData.approved_rejected_by_rk === 1 ? (
+                    <button
+                      disabled
+                      className="px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded text-sm cursor-not-allowed"
+                    >
+                      ✓ Forwarded
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleforwardphysical}
+                      disabled={forwardPhysicallyMutation.isPending}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {forwardPhysicallyMutation.isPending
+                        ? "Processing..."
+                        : "Forward File Physically Electronically"}
+                    </button>
+                  )}
 
                 </div>
               </div>
