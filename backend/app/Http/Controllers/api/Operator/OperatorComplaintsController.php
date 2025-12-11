@@ -1655,7 +1655,7 @@ class OperatorComplaintsController extends Controller
                     // 'cd.*'
                 )
                 ->where('form_status',1)
-                ->where('approved_rejected_by_ro',1)
+                ->where('approved_rejected_by_rk',1)
                  ->where('in_draft','0')
                   ->distinct('cm.id')
                 ->get();
