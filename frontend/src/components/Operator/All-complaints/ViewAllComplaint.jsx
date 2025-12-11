@@ -570,15 +570,25 @@ const ViewAllComplaint = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <button
-                    onClick={handleforwardphysical}
-                    disabled={forwardPhysicallyMutation.isPending}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {forwardPhysicallyMutation.isPending
-                      ? "Processing..."
-                      : "Forward File Physically Electronically"}
-                  </button>
+                 {complaintData.approved_rejected_by_rk === 1 ? (
+  <button
+    disabled
+    className="px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded text-sm cursor-not-allowed"
+  >
+    ✓ Forwarded
+  </button>
+) : (
+  <button
+    onClick={handleforwardphysical}
+    disabled={forwardPhysicallyMutation.isPending}
+    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
+  >
+    {forwardPhysicallyMutation.isPending
+      ? "Processing..."
+      : "Forward File Physically Electronically"}
+  </button>
+)}
+
                 </div>
               </div>
             </div>
