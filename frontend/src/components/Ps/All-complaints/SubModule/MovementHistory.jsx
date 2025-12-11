@@ -13,9 +13,9 @@ const MovementHistory = ({ complaint }) => {
     const recordSection = "PS";
 
     // forward_by_rk && forward_to_lokayukt is 0 or null
-    // if (item.forward_by_rk && (item.forward_to_lokayukt === 0 || item.forward_to_lokayukt === null)) {
-    //   return `${record} → Record Section`;
-    // }
+    if (item.forward_by_rk && (item.forward_to_lokayukt === 0 || item.forward_to_lokayukt === null)) {
+      return `${record} → Record Section`;
+    }
 
     // forward_by_rk && forward_by_lokayukt present value 
     if (item.forward_by_ps && item.forward_to_lokayukt) {
