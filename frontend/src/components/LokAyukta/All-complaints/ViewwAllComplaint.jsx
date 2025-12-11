@@ -318,80 +318,107 @@ const ViewAllComplaint = () => {
 
               {/* ===== DETAILS GRID (Hindi) ===== */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {/* Column 1 */}
                 <div>
                   <p className="text-[14px] text-black font-semibold uppercase mb-1">
+
+
+                    {/* CORRESPONDENCE NAME */}
                     पत्राचार हेतु नाम
                   </p>
-                  <p className="text-gray-800 text-sm ">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.correspondence_name || "N/A"}
                   </p>
 
-                  <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
+                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+
+
+                    {/* CORRESPONDENCE ADDRESS */}
                     पत्राचार हेतु पता
                   </p>
-                  <p className="text-gray-800 text-sm ">
-                    {complaintData.address || "N/A"}
+                  <p className=" text-gray-800 text-sm ">
+                    {complaintData.correspondence_place || "N/A"}
                   </p>
+
+
+
+
+
 
                   <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
+                    {/* PREVIOUSLY SUBMITTED DETAILS */}
                     पूर्व में प्रस्तुत विवरण
                   </p>
-                  <p className="text-gray-800 text-sm ">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.previously_submitted_details || "N/A"}
                   </p>
+
+
+
                 </div>
 
-                {/* Column 2 */}
                 <div>
                   <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                    {/* CORRESPONDENCE POST OFFICE */}
                     पत्राचार हेतु डाकघर
                   </p>
-                  <p className="text-gray-800 text-sm ">
-                    {complaintData.permanent_post_office || "N/A"}
+                  <p className=" text-gray-800 text-sm ">
+                    {complaintData.correspondence_post_office || "N/A"}
                   </p>
 
                   {complaintData.dob && (
                     <>
                       <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
+                        {/* Relation With Person */}
                         व्यक्ति से संबंध
                       </p>
-                      <p className="text-gray-800 text-sm ">
+                      <p className=" text-gray-800 text-sm ">
                         {complaintData.relation_with_person || "NA"}
                       </p>
-
                       <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
+
+                        {/* Cause Date */}
                         कार्यवाही तिथि
                       </p>
-                      <p className="text-gray-800 text-sm ">
-                        {complaintData.cause_date || "NA"}
+                      <p className=" text-gray-800 text-sm ">
+                        {complaintData.
+                          cause_date || "NA"}
                       </p>
+
                     </>
                   )}
                 </div>
 
-                {/* Column 3 */}
                 <div>
                   <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                    {/* CORRESPONDENCE DISTRICT */}
                     पत्राचार हेतु जिला
                   </p>
-                  <p className="text-gray-800 text-sm ">
-                    {complaintData.permanent_district || "N/A"}
+                  <p className=" text-gray-800 text-sm ">
+                    {complaintData.correspondence_district || "N/A"}
                   </p>
 
-                  <p className="text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+
+                    {/* previously_submitted */}
                     पूर्व में प्रस्तुत
+
                   </p>
-                  <p className="text-gray-800 text-sm ">
-                    {complaintData.previously_submitted || "N/A"}
+                  <p className=" text-gray-800 text-sm ">
+                    {complaintData.
+                      previously_submitted
+                      || "N/A"}
                   </p>
 
-                  <p className="text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+
+                    {/* category */}
                     श्रेणी
+
                   </p>
-                  <p className="text-gray-800 text-sm ">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.category || "N/A"}
                   </p>
+
                 </div>
               </div>
 
