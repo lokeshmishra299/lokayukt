@@ -204,7 +204,7 @@ const Sidebar = ({
                       
                    
 
-                        <li>
+                        {/* <li>
                           <Link
                             to="/lokayukt/user-management"
                             onClick={handleLinkClick}
@@ -225,11 +225,11 @@ const Sidebar = ({
                               </div>
                             )}
                           </Link>
-                        </li>
+                        </li> */}
 
 
                             {/* masterData */}
-                        <li>
+                        {/* <li>
                           <Link
                             to="/lokayukt/master-data"
                             onClick={handleLinkClick}
@@ -250,7 +250,7 @@ const Sidebar = ({
                               </div>
                             )}
                           </Link>
-                        </li>
+                        </li> */}
 
 
 {/* Reporting */}

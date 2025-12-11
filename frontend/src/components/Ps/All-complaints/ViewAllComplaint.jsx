@@ -169,7 +169,7 @@ const ViewAllComplaint = () => {
     queryKey: ["lokayukt-options"],
     queryFn: async () => {
       try {
-        const res = await api.get("/ps/get-lokayukt");
+        const res = await api.get("/ps/get-users");
         if (Array.isArray(res.data)) {
           return res.data;
         } else if (res.data && Array.isArray(res.data.data)) {
