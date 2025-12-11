@@ -160,37 +160,33 @@ const ViewAllComplaint = () => {
   });
 
 
-  const {
-    data: forwardOptionsData,
-    isLoading: isLoadingOptions,
-    isFetching: isFetchingOptions,
-    error: forwardOptionsError,
-  } = useQuery({
-    queryKey: ["lokayukt-options"],
-    queryFn: async () => {
-      try {
+const {
+  data: forwardOptionsData,
+  isLoading: isLoadingOptions,
+  isFetching: isFetchingOptions,
+  error: forwardOptionsError,
+} = useQuery({
+  queryKey: ["lokayukt-options", forwardType],   // <-- NOTE: forwardType added
+  queryFn: async () => {
+    try {
+      // 1️⃣ Send To My Pool → API: /ps/get-users
+      if (forwardType === "self") {
         const res = await api.get("/ps/get-users");
-        if (Array.isArray(res.data)) {
-          return res.data;
-        } else if (res.data && Array.isArray(res.data.data)) {
-          return res.data.data;
-        } else if (res.data && res.data.data) {
-          if (typeof res.data.data === "object" && res.data.data !== null) {
-            return Object.values(res.data.data);
-          }
-          return [];
-        } else {
-          return [];
-        }
-      } catch (error) {
-        throw error;
+        return res.data?.data || res.data || [];
       }
-    },
-    enabled: confirmConfig.open && confirmConfig.type === "forward",
-    staleTime: 0,
-    gcTime: 1000 * 60 * 5,
-    retry: 2,
-  });
+
+      // 2️⃣ Send To Other Pool → API: /ps/get-lokayukt-uplokayukt
+      const res = await api.get("/ps/get-lokayukt-uplokayukt");
+      return res.data?.data || res.data || [];
+
+    } catch (error) {
+      throw error;
+    }
+  },
+  enabled: confirmConfig.open && confirmConfig.type === "forward",
+  staleTime: 0,
+});
+
 
 
   const markAsReceivedMutation = useMutation({
@@ -868,8 +864,7 @@ const ViewAllComplaint = () => {
           </div>
         </div>
       )}
-      
-      {/* ===== CORRECTED AND ADDED: View Data Modal ===== */}
+ 
       {viewModalConfig.open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
