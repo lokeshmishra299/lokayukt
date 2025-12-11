@@ -400,7 +400,7 @@ correspondence_post_office}</span>
                         >
                           View Details
                         </button>
-
+{/* 
                         {isVerifiedByRO(complaint) && (
                           <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
                             <svg
@@ -416,7 +416,7 @@ correspondence_post_office}</span>
                             </svg>
                           Send 
                           </span>
-                        )}
+                        )} */}
                       </div>
                     </div>
                   </div>
