@@ -409,15 +409,17 @@ const AllComplaints = () => {
                           Description: {complaint.complaint_description ||
                             "No description available"}
                         </p>
-                        <div className="text-[11px] text-gray-600 mb-1">
-                          <span className="text-gray-500">Post Office:</span>
-                          <span className="ml-1">{complaint.
-correspondence_post_office}</span>
+                       <div className="text-[11px] text-gray-600 mb-1">
+                          <span className="text-gray-500">
+                            Cause Date
+                            :</span>
+                          <span className="ml-1">{complaint.cause_date || "NA"}</span>
                           <span className="mx-1 text-gray-400">•</span>
-                          <span className="text-gray-500">District:</span>
+                          <span className="text-gray-500">
+                            Category
+                            :</span>
                           <span className="ml-1">
-                            {complaint.correspondence_district
-}
+                            {complaint.category || "NA"}
                           </span>
                         </div>
                          <div className="text-[10px] text-gray-400">

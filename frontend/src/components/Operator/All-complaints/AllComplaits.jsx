@@ -67,10 +67,10 @@ const AllComplaints = () => {
   });
 
 
-    const stats = {
-  overdue: data?.older7DaysCount || 0,
-  receivedToday: data?.todayCount || 0,
-};
+  const stats = {
+    overdue: data?.older7DaysCount || 0,
+    receivedToday: data?.todayCount || 0,
+  };
 
 
   const getDistrict = async () => {
@@ -245,14 +245,14 @@ const AllComplaints = () => {
 
   // **************************count days*******************************************************
   const getDaysDifference = (date) => {
-  const created = new Date(date);
-  const today = new Date();
+    const created = new Date(date);
+    const today = new Date();
 
-  const diffTime = today - created; // milliseconds difference
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffTime = today - created; // milliseconds difference
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  return diffDays;
-};
+    return diffDays;
+  };
 
 
 
@@ -293,11 +293,11 @@ const AllComplaints = () => {
               </div>
             </div>
 
-          <div className="flex gap-2 mb-3">
+            <div className="flex gap-2 mb-3">
               <div className="flex flex-col ">
-              <button className=" flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
-                <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
-              </button></div>
+                <button className=" flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
+                  <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
+                </button></div>
               <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
                 ₹ Fee Pending (0)
               </button>
@@ -376,10 +376,10 @@ const AllComplaints = () => {
                   value={sortOrder}
                   onChange={handleSortChange}
                 >
-                <option value="desc">Received Date </option> 
-                <option value="asc">Ascending Order</option> 
-                <option value="desc">Decending Order</option>
-                 {/* <option value="desc">Newest First</option>
+                  <option value="desc">Received Date </option>
+                  <option value="asc">Ascending Order</option>
+                  <option value="desc">Decending Order</option>
+                  {/* <option value="desc">Newest First</option>
                   <option value="asc">Oldest First</option> */}
                 </select>
               </div>
@@ -412,14 +412,16 @@ const AllComplaints = () => {
                             "No description available"}
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
-                          <span className="text-gray-500">Post Office:</span>
-                          <span className="ml-1">{complaint.
-correspondence_post_office}</span>
+                          <span className="text-gray-500">
+                            Cause Date
+                            :</span>
+                          <span className="ml-1">{complaint.cause_date || "NA"}</span>
                           <span className="mx-1 text-gray-400">•</span>
-                          <span className="text-gray-500">District:</span>
+                          <span className="text-gray-500">
+                            Category
+                            :</span>
                           <span className="ml-1">
-                            {complaint.correspondence_district
-}
+                            {complaint.category || "NA"}
                           </span>
                         </div>
                         <div className="text-[10px] text-gray-400">
@@ -456,33 +458,32 @@ correspondence_post_office}</span>
                           )}
                         </div>
 
-                           <div className="flex gap-1.5">
-                         <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-                      {getDaysDifference(complaint.created_at)}d</span>
+                        <div className="flex gap-1.5">
+                          <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+                            {getDaysDifference(complaint.created_at)}d</span>
 
-                  <span
-  className={`
+                          <span
+                            className={`
     px-2 py-0.5 rounded text-[11px] font-medium
-    ${
-      complaint.fee_exempted === 0
-        ? "bg-green-50 text-blue-600"    
-        : complaint.fee_exempted === 1
-        ?
-        "bg-orange-50 text-orange-600"     
-        : complaint.fee_exempted === 2
-        ? "bg-blue-50 text-orange-400" 
-        : ""
-    }
+    ${complaint.fee_exempted === 0
+                                ? "bg-green-50 text-blue-600"
+                                : complaint.fee_exempted === 1
+                                  ?
+                                  "bg-orange-50 text-orange-600"
+                                  : complaint.fee_exempted === 2
+                                    ? "bg-blue-50 text-orange-400"
+                                    : ""
+                              }
   `}
->
-  {complaint.fee_exempted === 0
-    ? "Exempted"
-    : complaint.fee_exempted === 1
-    ? "Paid"
-    : complaint.fee_exempted === 2
-    ? "Partial"
-    : ""}
-</span>
+                          >
+                            {complaint.fee_exempted === 0
+                              ? "Exempted"
+                              : complaint.fee_exempted === 1
+                                ? "Paid"
+                                : complaint.fee_exempted === 2
+                                  ? "Partial"
+                                  : ""}
+                          </span>
 
 
                         </div>
@@ -498,19 +499,19 @@ correspondence_post_office}</span>
 
                           {isApprovedByRO(complaint) ? (
                             <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
-                            <svg
-                              className="w-3 h-3"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Send 
-                          </span>
+                              <svg
+                                className="w-3 h-3"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              Send
+                            </span>
                           ) : (
                             <button
                               onClick={(e) =>
@@ -518,7 +519,7 @@ correspondence_post_office}</span>
                               }
                               className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
                             >
-                              
+
                               Send To Lokayukt
                             </button>
                           )}

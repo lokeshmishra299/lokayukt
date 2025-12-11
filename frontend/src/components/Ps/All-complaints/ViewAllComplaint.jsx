@@ -420,14 +420,25 @@ const {
 
 
               {/* ===== DESCRIPTION (Hindi) ===== */}
-              <p className="text-gray-700 mb-2 text-sm ">
+             <p className="text-[14px] text-black font-semibold uppercase my-2">
+                {/* Description:{" "} */}
                 विवरण:{" "}
-                {complaintData.complaint_description ||
-                  "No detailed description available for this complaint."}
+                <span className="text-gray-500">
+                  {complaintData.complaint_description ||
+                    "No detailed description available for this complaint."}
+                </span>
+
               </p>
 
-              <p className="text-gray-700 mb-4 text-sm ">
-                विलंब का कारण: {complaintData.delay_reason || "N/A"}
+              <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                {/* Delay Reason:{"  "} */}
+                विलंब का कारण:{"  "}
+
+                <span className="text-gray-500">
+                  {complaintData.delay_reason ||
+                    "NA"}
+                </span>
+
               </p>
 
 
@@ -435,21 +446,21 @@ const {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 {/* Column 1 */}
                 <div>
-                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
                     पत्राचार हेतु नाम
                   </p>
                   <p className="text-gray-800 text-sm ">
                     {complaintData.correspondence_name || "N/A"}
                   </p>
 
-                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
+                  <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
                     पत्राचार हेतु पता
                   </p>
                   <p className="text-gray-800 text-sm ">
                     {complaintData.address || "N/A"}
                   </p>
 
-                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
+                  <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
                     पूर्व में प्रस्तुत विवरण
                   </p>
                   <p className="text-gray-800 text-sm ">
@@ -459,7 +470,7 @@ const {
 
                 {/* Column 2 */}
                 <div>
-                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
                     पत्राचार हेतु डाकघर
                   </p>
                   <p className="text-gray-800 text-sm ">
@@ -468,14 +479,14 @@ const {
 
                   {complaintData.dob && (
                     <>
-                      <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
                         व्यक्ति से संबंध
                       </p>
                       <p className="text-gray-800 text-sm ">
                         {complaintData.relation_with_person || "NA"}
                       </p>
 
-                      <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
                         कार्यवाही तिथि
                       </p>
                       <p className="text-gray-800 text-sm ">
@@ -487,21 +498,21 @@ const {
 
                 {/* Column 3 */}
                 <div>
-                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
                     पत्राचार हेतु जिला
                   </p>
                   <p className="text-gray-800 text-sm ">
                     {complaintData.permanent_district || "N/A"}
                   </p>
 
-                  <p className="text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] mt-3 text-black font-semibold uppercase mb-1">
                     पूर्व में प्रस्तुत
                   </p>
                   <p className="text-gray-800 text-sm ">
                     {complaintData.previously_submitted || "N/A"}
                   </p>
 
-                  <p className="text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] mt-3 text-black font-semibold uppercase mb-1">
                     श्रेणी
                   </p>
                   <p className="text-gray-800 text-sm ">
