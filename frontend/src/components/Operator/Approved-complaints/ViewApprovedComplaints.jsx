@@ -262,10 +262,17 @@ const ViewAllComplaint = () => {
               {/* Desktop Header */}
               <div className="hidden md:block">
                 <div className="flex justify-between items-start mb-3">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    File No. {complaintData.complain_no}(
-                    <span className="text-blue-600">NEW CASE</span>)
-                  </h2>
+                          <h2 className="text-xl font-semibold text-gray-800">
+  File No. {complaintData.complain_no}
+  
+  <span className="hidden md:inline">
+    (
+    <span className="text-blue-600">
+      {complaintData.status == "In Progress" ? "NEW CASE" : complaintData.status }
+    </span>
+    )
+  </span>
+</h2>
 
                   <div className="flex gap-2">
                     <span
