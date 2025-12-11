@@ -424,13 +424,13 @@ const ViewAllComplaint = () => {
 
 
               {/* ===== DESCRIPTION (Hindi) ===== */}
-              <p className="text-gray-700 mb-2 text-sm md:text-base">
+              <p className="text-gray-700 mb-2 text-sm ">
                 विवरण:{" "}
                 {complaintData.complaint_description ||
                   "No detailed description available for this complaint."}
               </p>
 
-              <p className="text-gray-700 mb-4 text-sm md:text-base">
+              <p className="text-gray-700 mb-4 text-sm ">
                 विलंब का कारण: {complaintData.delay_reason || "N/A"}
               </p>
 
@@ -442,21 +442,21 @@ const ViewAllComplaint = () => {
                   <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
                     पत्राचार हेतु नाम
                   </p>
-                  <p className="text-gray-800 text-sm md:text-base">
+                  <p className="text-gray-800 text-sm ">
                     {complaintData.correspondence_name || "N/A"}
                   </p>
 
                   <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                     पत्राचार हेतु पता
                   </p>
-                  <p className="text-gray-800 text-sm md:text-base">
+                  <p className="text-gray-800 text-sm ">
                     {complaintData.address || "N/A"}
                   </p>
 
                   <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                     पूर्व में प्रस्तुत विवरण
                   </p>
-                  <p className="text-gray-800 text-sm md:text-base">
+                  <p className="text-gray-800 text-sm ">
                     {complaintData.previously_submitted_details || "N/A"}
                   </p>
                 </div>
@@ -466,7 +466,7 @@ const ViewAllComplaint = () => {
                   <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
                     पत्राचार हेतु डाकघर
                   </p>
-                  <p className="text-gray-800 text-sm md:text-base">
+                  <p className="text-gray-800 text-sm ">
                     {complaintData.permanent_post_office || "N/A"}
                   </p>
 
@@ -475,14 +475,14 @@ const ViewAllComplaint = () => {
                       <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                         व्यक्ति से संबंध
                       </p>
-                      <p className="text-gray-800 text-sm md:text-base">
+                      <p className="text-gray-800 text-sm ">
                         {complaintData.relation_with_person || "NA"}
                       </p>
 
                       <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
                         कार्यवाही तिथि
                       </p>
-                      <p className="text-gray-800 text-sm md:text-base">
+                      <p className="text-gray-800 text-sm ">
                         {complaintData.cause_date || "NA"}
                       </p>
                     </>
@@ -494,21 +494,21 @@ const ViewAllComplaint = () => {
                   <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
                     पत्राचार हेतु जिला
                   </p>
-                  <p className="text-gray-800 text-sm md:text-base">
+                  <p className="text-gray-800 text-sm ">
                     {complaintData.permanent_district || "N/A"}
                   </p>
 
                   <p className="text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
                     पूर्व में प्रस्तुत
                   </p>
-                  <p className="text-gray-800 text-sm md:text-base">
+                  <p className="text-gray-800 text-sm ">
                     {complaintData.previously_submitted || "N/A"}
                   </p>
 
                   <p className="text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
                     श्रेणी
                   </p>
-                  <p className="text-gray-800 text-sm md:text-base">
+                  <p className="text-gray-800 text-sm ">
                     {complaintData.category || "N/A"}
                   </p>
                 </div>
