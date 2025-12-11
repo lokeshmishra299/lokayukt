@@ -556,41 +556,53 @@ const {
               </div>
               
               {/* ===== View Details Buttons (Hindi) ===== */}
-              <div className="flex gap-3 mt-4 border-t pt-4">
-                <button
-                  onClick={() =>
-                    setViewModalConfig({ open: true, type: "correspondence" })
-                  }
-                  className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-md border border-indigo-200 hover:bg-indigo-100 transition-colors text-sm font-medium"
-                >
-                  <FaEye /> शिकायतकर्ता
-                </button>
-                <button
-                  onClick={() =>
-                    setViewModalConfig({ open: true, type: "respondent" })
-                  }
-                  className="flex items-center gap-2 px-4 py-2 bg-orange-50 text-orange-700 rounded-md border border-orange-200 hover:bg-orange-100 transition-colors text-sm font-medium"
-                >
-                  <FaEye /> प्रतिवादी
-                </button>
-                {/* NEW BUTTONS ADDED TO MATCH */}
-                <button
-                  onClick={() =>
-                    setViewModalConfig({ open: true, type: "support" })
-                  }
-                  className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
-                >
-                  <FaEye /> समर्थनकर्ता व्यक्ति
-                </button>
-                <button
-                  onClick={() =>
-                    setViewModalConfig({ open: true, type: "witness" })
-                  }
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
-                >
-                  <FaEye /> साक्षियों का विवरण
-                </button>
-              </div>
+           <div className="flex flex-col sm:flex-row flex-wrap gap-3 mt-4 border-t pt-4">
+
+  <button
+    onClick={() =>
+      setViewModalConfig({ open: true, type: "correspondence" })
+    }
+    className="flex items-center gap-2 px-4 py-2 bg-indigo-50 
+               text-indigo-700 rounded-md border border-indigo-200 
+               hover:bg-indigo-100 transition-colors text-sm font-medium 
+               w-full sm:w-auto"
+  >
+    <FaEye /> शिकायतकर्ता
+  </button>
+
+  <button
+    onClick={() =>
+      setViewModalConfig({ open: true, type: "respondent" })
+    }
+    className="flex items-center gap-2 px-4 py-2 bg-orange-50 
+               text-orange-700 rounded-md border border-orange-200 
+               hover:bg-orange-100 transition-colors text-sm font-medium 
+               w-full sm:w-auto"
+  >
+    <FaEye /> प्रतिवादी
+  </button>
+
+  <button
+    onClick={() => setViewModalConfig({ open: true, type: "support" })}
+    className="flex items-center gap-2 px-4 py-2 bg-green-50 
+               text-green-700 rounded-md border border-green-200 
+               hover:bg-green-100 transition-colors text-sm font-medium 
+               w-full sm:w-auto"
+  >
+    <FaEye /> समर्थनकर्ता व्यक्ति
+  </button>
+
+  <button
+    onClick={() => setViewModalConfig({ open: true, type: "witness" })}
+    className="flex items-center gap-2 px-4 py-2 bg-purple-50 
+               text-purple-700 rounded-md border border-purple-200 
+               hover:bg-purple-100 transition-colors text-sm font-medium 
+               w-full sm:w-auto"
+  >
+    <FaEye /> साक्षियों का विवरण
+  </button>
+
+</div>
 
 
             </div>
@@ -735,7 +747,7 @@ const {
               {confirmConfig.type === "receive"
                 ? "Mark as Received?"
                 : confirmConfig.type === "forward"
-                ? "Forward File Physically Electronically?"
+                ? "Send"
                 : confirmConfig.type === "pullback"
                 ? "Pull Back Complaint?"
                 : "Assign to Yourself?"}
