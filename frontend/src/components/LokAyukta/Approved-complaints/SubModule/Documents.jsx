@@ -106,7 +106,7 @@ const Documents = ({ complaint }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">
-          Documents
+          Documents 
         </h2>
 
         {/* <button
@@ -133,7 +133,7 @@ const Documents = ({ complaint }) => {
               {/* Icon + Filename */}
               <div className="flex items-center gap-3">
                 <BsFileEarmarkPdf className="w-6 h-6 text-blue-600" />
-                <span className="text-sm font-medium">{doc.title}</span>
+                <span className="text-sm font-medium">{doc.title || "NA"}</span>
               </div>
 
               {/* Actions */}

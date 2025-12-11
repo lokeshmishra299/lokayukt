@@ -22,7 +22,7 @@ const api = axios.create({
   },
 });
 
-const ViewApprovedComplaints = () => {
+const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -289,7 +289,8 @@ const ViewApprovedComplaints = () => {
               </div>
 
               {/* ===== DESCRIPTION ===== */}
-               <p className="text-[14px] text-black font-semibold uppercase my-2">
+
+              <p className="text-[14px] text-black font-semibold uppercase my-2">
                 {/* Description:{" "} */}
                 विवरण:{" "}
                 <span className="text-gray-500">
@@ -1056,7 +1057,7 @@ district_name || 'N/A'}</p>
               >
                 Close
               </button>
-            </div>  
+            </div>
           </div>
         </div>
       )}
@@ -1064,4 +1065,4 @@ district_name || 'N/A'}</p>
   );
 };
 
-export default ViewApprovedComplaints;
+export default ViewAllComplaint;
