@@ -314,7 +314,7 @@ const ViewAllComplaint = () => {
                     {/* CORRESPONDENCE NAME */}
                     पत्राचार हेतु नाम
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.correspondence_name || "N/A"}
                   </p>
 
@@ -324,7 +324,7 @@ const ViewAllComplaint = () => {
                     {/* CORRESPONDENCE ADDRESS */}
                     पत्राचार हेतु पता
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.correspondence_place || "N/A"}
                   </p>
 
@@ -337,7 +337,7 @@ const ViewAllComplaint = () => {
                     {/* PREVIOUSLY SUBMITTED DETAILS */}
                     पूर्व में प्रस्तुत विवरण
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.previously_submitted_details || "N/A"}
                   </p>
 
@@ -350,7 +350,7 @@ const ViewAllComplaint = () => {
                     {/* CORRESPONDENCE POST OFFICE */}
                     पत्राचार हेतु डाकघर
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.correspondence_post_office || "N/A"}
                   </p>
 
@@ -360,7 +360,7 @@ const ViewAllComplaint = () => {
                         {/* Relation With Person */}
                         व्यक्ति से संबंध
                       </p>
-                      <p className=" text-gray-800 text-sm md:text-base">
+                      <p className=" text-gray-800 text-sm ">
                         {complaintData.relation_with_person || "NA"}
                       </p>
                       <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
@@ -368,7 +368,7 @@ const ViewAllComplaint = () => {
                         {/* Cause Date */}
                         कार्यवाही तिथि
                       </p>
-                      <p className=" text-gray-800 text-sm md:text-base">
+                      <p className=" text-gray-800 text-sm ">
                         {complaintData.
                           cause_date || "NA"}
                       </p>
@@ -382,7 +382,7 @@ const ViewAllComplaint = () => {
                     {/* CORRESPONDENCE DISTRICT */}
                     पत्राचार हेतु जिला
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.correspondence_district || "N/A"}
                   </p>
 
@@ -392,7 +392,7 @@ const ViewAllComplaint = () => {
                     पूर्व में प्रस्तुत
 
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.
                       previously_submitted
                       || "N/A"}
@@ -404,7 +404,7 @@ const ViewAllComplaint = () => {
                     श्रेणी
 
                   </p>
-                  <p className=" text-gray-800 text-sm md:text-base">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.category || "N/A"}
                   </p>
 
