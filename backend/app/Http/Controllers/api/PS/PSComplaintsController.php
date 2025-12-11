@@ -879,28 +879,28 @@ class PSComplaintsController extends Controller
         // dd($usersubrole);
    
 
-        // $validation = Validator::make($request->all(), [
-        //     // 'forward_by_so_us' => 'required|exists:users,id',
-        //     'forward_to_d_a' => 'required|exists:users,id',
-        //     // 'remark' => 'required',
+        $validation = Validator::make($request->all(), [
+            // 'forward_by_so_us' => 'required|exists:users,id',
+            // 'forward_to_d_a' => 'required|exists:users,id',
+            'remarks' => 'required',
          
           
-        // ], [
-        //     // 'forward_by_so_us.required' => 'Forward by Supervisor is required.',
-        //     // 'forward_by_so_us.exists' => 'Forward by user does not exist.',
-        //     'forward_to_d_a.required' => 'Forward to user is required.',
-        //     'forward_to_d_a.exists' => 'Forward to user does not exist.',
-        //     // 'remark.required' => 'Remark is required.',
+        ], [
+            // 'forward_by_so_us.required' => 'Forward by Supervisor is required.',
+            // 'forward_by_so_us.exists' => 'Forward by user does not exist.',
+            // 'forward_to_d_a.required' => 'Forward to user is required.',
+            // 'forward_to_d_a.exists' => 'Forward to user does not exist.',
+            'remarks.required' => 'Remark is required.',
            
-        // ]);
+        ]);
 
-        // if ($validation->fails()) {
-        //     return response()->json([
-        //         'status' => false,
-        //         'errors' => $validation->errors()
-        //     ], 422);
-        // }
-        if(isset($complainId) && $request->isMethod('get')){
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        if(isset($complainId) && $request->isMethod('post')){
 
              $cmp =  Complaint::findOrFail($complainId);
             //  dd($cmp);
