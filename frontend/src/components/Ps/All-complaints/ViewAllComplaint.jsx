@@ -169,15 +169,18 @@ const {
   queryKey: ["lokayukt-options", forwardType],   // <-- NOTE: forwardType added
   queryFn: async () => {
     try {
-      // 1️⃣ Send To My Pool → API: /ps/get-users
+      // 1️ Send To My Pool → API: /ps/get-users
       if (forwardType === "self") {
         const res = await api.get("/ps/get-users");
         return res.data?.data || res.data || [];
       }
 
-      // 2️⃣ Send To Other Pool → API: /ps/get-lokayukt-uplokayukt
+      // 2️ Send To Other Pool → API: /ps/get-lokayukt-uplokayukt
       const res = await api.get("/ps/get-lokayukt-uplokayukt");
-      return res.data?.data || res.data || [];
+     const raw = res.data?.data || res.data || [];
+const flatList = Array.isArray(raw) ? raw.flat() : [];
+
+return flatList;
 
     } catch (error) {
       throw error;
@@ -189,48 +192,95 @@ const {
 
 
 
-  const markAsReceivedMutation = useMutation({
-    mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post("/ps/received-physical", {
-        complaint_id: complaintId,
-        remark: remarkData,
-      });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || "Marked as received successfully");
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setRemark("");
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to mark as received"
-      );
-    },
-  });
+const pullBackMutation = useMutation({
+  mutationFn: async ({ complaintId }) => {
+    const res = await api.post(`/ps/pull-back-by-ps/${complaintId}`);
+    return res.data;
+  },
+  onSuccess: (data) => {
+    toast.success(data.message || "Pulled back successfully");
+    queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+    setConfirmConfig({ open: false, type: null });
+  },
+  onError: (error) => {
+    toast.error(error?.response?.data?.message || "Failed to pull back");
+  },
+});
 
 
-  const forwardPhysicallyMutation = useMutation({
-    mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-      const res = await api.post("/ps/forward-physical", {
-        complaint_id: complaintId,
-        forward_to: forwardTo,
-        remark: remarkData,
-      });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || "Forwarded successfully");
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setRemark("");
-      setSelectedForwardTo("");
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to forward");
-    },
-  });
+
+const returnWithRemarksMutation = useMutation({
+  mutationFn: async ({ complaintId, remarkData }) => {
+    const res = await api.post(`/ps/return-complain-by-ps/${complaintId}`, {
+      remark: remarkData,
+    });
+    return res.data;
+  },
+  onSuccess: (data) => {
+    toast.success(data.message || "Returned successfully");
+    queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+    setRemark("");
+    setConfirmConfig({ open: false, type: null });
+  },
+  onError: (error) => {
+    toast.error(error?.response?.data?.message || "Failed to return complaint");
+  },
+});
+
+
+
+const forwardComplaintMutation = useMutation({
+  mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+    const res = await api.post(`/ps/forward-complain-by-ps/${complaintId}`, {
+      forward_to: forwardTo,
+      remark: remarkData,
+    });
+    return res.data;
+  },
+  onSuccess: (data) => {
+    toast.success(data.message || "Forwarded successfully");
+    queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+    setRemark("");
+    setSelectedForwardTo("");
+    setConfirmConfig({ open: false, type: null });
+  },
+  onError: (error) => {
+    toast.error(error?.response?.data?.message || "Failed to forward");
+  },
+});
+
+
+const handleConfirmYes = () => {
+  if (confirmConfig.type === "receive") {
+    if (!remark.trim()) return toast.error("Remark required");
+    returnWithRemarksMutation.mutate({
+      complaintId: id,
+      remarkData: remark,
+    });
+  }
+
+  if (confirmConfig.type === "forward") {
+    if (!selectedForwardTo || !remark.trim())
+      return toast.error("Officer + remark required");
+
+    forwardComplaintMutation.mutate({
+      complaintId: id,
+      forwardTo: selectedForwardTo,
+      remarkData: remark,
+    });
+  }
+
+  if (confirmConfig.type === "pullback") {
+    pullBackMutation.mutate({ complaintId: id });
+  }
+
+  if (confirmConfig.type === "assign") {
+    setassinedMyself(true);
+    toast.success("Assigned to yourself");
+    setConfirmConfig({ open: false, type: null });
+  }
+};
+
 
 
   const handleMarkAsReceived = () =>
@@ -250,39 +300,39 @@ const {
   }
 
 
-  const handleConfirmYes = () => {
-    if (confirmConfig.type === "receive") {
-      if (!remark.trim()) {
-        toast.error("Please enter a remark");
-        return;
-      }
-      markAsReceivedMutation.mutate({
-        complaintId: id,
-        remarkData: remark,
-      });
-    } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
-        toast.error("Please select an officer and enter a remark");
-        return;
-      }
-      forwardPhysicallyMutation.mutate({
-        complaintId: id,
-        forwardTo: selectedForwardTo,
-        remarkData: remark,
-      });
-    } else if (confirmConfig.type === "assign") {
-      setassinedMyself(true);
-      toast.success("Assigned to yourself successfully");
-      setConfirmConfig({ open: false, type: null });
-      setRemark("");
-      setSelectedForwardTo("");
-    } else if (confirmConfig.type === "pullback") {
-      // Pull Back Logic - No inputs required now
-      toast.success("Complaint pulled back successfully");
-      setConfirmConfig({ open: false, type: null });
-      setRemark("");
-    }
-  };
+  // const handleConfirmYes = () => {
+  //   if (confirmConfig.type === "receive") {
+  //     if (!remark.trim()) {
+  //       toast.error("Please enter a remark");
+  //       return;
+  //     }
+  //     markAsReceivedMutation.mutate({
+  //       complaintId: id,
+  //       remarkData: remark,
+  //     });
+  //   } else if (confirmConfig.type === "forward") {
+  //     if (!selectedForwardTo || !remark.trim()) {
+  //       toast.error("Please select an officer and enter a remark");
+  //       return;
+  //     }
+  //     forwardPhysicallyMutation.mutate({
+  //       complaintId: id,
+  //       forwardTo: selectedForwardTo,
+  //       remarkData: remark,
+  //     });
+  //   } else if (confirmConfig.type === "assign") {
+  //     setassinedMyself(true);
+  //     toast.success("Assigned to yourself successfully");
+  //     setConfirmConfig({ open: false, type: null });
+  //     setRemark("");
+  //     setSelectedForwardTo("");
+  //   } else if (confirmConfig.type === "pullback") {
+  //     // Pull Back Logic - No inputs required now
+  //     toast.success("Complaint pulled back successfully");
+  //     setConfirmConfig({ open: false, type: null });
+  //     setRemark("");
+  //   }
+  // };
 
 
   const handleConfirmNo = () => {
@@ -444,80 +494,107 @@ const {
 
               {/* ===== DETAILS GRID (Hindi) ===== */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {/* Column 1 */}
                 <div>
                   <p className="text-[14px] text-black font-semibold uppercase mb-1">
+
+
+                    {/* CORRESPONDENCE NAME */}
                     पत्राचार हेतु नाम
                   </p>
-                  <p className="text-gray-800 text-sm ">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.correspondence_name || "N/A"}
                   </p>
 
-                  <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
+                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+
+
+                    {/* CORRESPONDENCE ADDRESS */}
                     पत्राचार हेतु पता
                   </p>
-                  <p className="text-gray-800 text-sm ">
-                    {complaintData.address || "N/A"}
+                  <p className=" text-gray-800 text-sm ">
+                    {complaintData.correspondence_place || "N/A"}
                   </p>
+
+
+
+
+
 
                   <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
+                    {/* PREVIOUSLY SUBMITTED DETAILS */}
                     पूर्व में प्रस्तुत विवरण
                   </p>
-                  <p className="text-gray-800 text-sm ">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.previously_submitted_details || "N/A"}
                   </p>
+
+
+
                 </div>
 
-                {/* Column 2 */}
                 <div>
                   <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                    {/* CORRESPONDENCE POST OFFICE */}
                     पत्राचार हेतु डाकघर
                   </p>
-                  <p className="text-gray-800 text-sm ">
-                    {complaintData.permanent_post_office || "N/A"}
+                  <p className=" text-gray-800 text-sm ">
+                    {complaintData.correspondence_post_office || "N/A"}
                   </p>
 
                   {complaintData.dob && (
                     <>
                       <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
+                        {/* Relation With Person */}
                         व्यक्ति से संबंध
                       </p>
-                      <p className="text-gray-800 text-sm ">
+                      <p className=" text-gray-800 text-sm ">
                         {complaintData.relation_with_person || "NA"}
                       </p>
-
                       <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
+
+                        {/* Cause Date */}
                         कार्यवाही तिथि
                       </p>
-                      <p className="text-gray-800 text-sm ">
-                        {complaintData.cause_date || "NA"}
+                      <p className=" text-gray-800 text-sm ">
+                        {complaintData.
+                          cause_date || "NA"}
                       </p>
+
                     </>
                   )}
                 </div>
 
-                {/* Column 3 */}
                 <div>
                   <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                    {/* CORRESPONDENCE DISTRICT */}
                     पत्राचार हेतु जिला
                   </p>
-                  <p className="text-gray-800 text-sm ">
-                    {complaintData.permanent_district || "N/A"}
+                  <p className=" text-gray-800 text-sm ">
+                    {complaintData.correspondence_district || "N/A"}
                   </p>
 
-                  <p className="text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+
+                    {/* previously_submitted */}
                     पूर्व में प्रस्तुत
+
                   </p>
-                  <p className="text-gray-800 text-sm ">
-                    {complaintData.previously_submitted || "N/A"}
+                  <p className=" text-gray-800 text-sm ">
+                    {complaintData.
+                      previously_submitted
+                      || "N/A"}
                   </p>
 
-                  <p className="text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+
+                    {/* category */}
                     श्रेणी
+
                   </p>
-                  <p className="text-gray-800 text-sm ">
+                  <p className=" text-gray-800 text-sm ">
                     {complaintData.category || "N/A"}
                   </p>
+
                 </div>
               </div>
 
@@ -692,23 +769,19 @@ const {
                 <div className="flex gap-2">
                   <button
                     onClick={handleMarkAsReceived}
-                    disabled={markAsReceivedMutation.isPending}
+                 disabled={returnWithRemarksMutation.isPending}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {markAsReceivedMutation.isPending
-                      ? "Processing..."
-                      : "Return with Remarks"}
+               {returnWithRemarksMutation.isPending ? "Processing..." : "Return with Remarks"}
                   </button>
 
 
                   <button
                     onClick={handleforwardphysical}
-                    disabled={forwardPhysicallyMutation.isPending}
+                    disabled={forwardComplaintMutation.isPending}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {forwardPhysicallyMutation.isPending
-                      ? "Processing..."
-                      : "Send / Mark"}
+                 {forwardComplaintMutation.isPending ? "Processing..." : "Send / Mark"}
                   </button>
                 </div>
               </div>
@@ -731,10 +804,10 @@ const {
             {/* Close Button */}
             <button
               onClick={handleConfirmNo}
-              disabled={
-                markAsReceivedMutation.isPending ||
-                forwardPhysicallyMutation.isPending
-              }
+             disabled={
+  returnWithRemarksMutation.isPending ||
+  forwardComplaintMutation.isPending
+}
               className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               aria-label="Close"
             >
@@ -854,9 +927,10 @@ const {
               <button
                 onClick={handleConfirmNo}
                 disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardPhysicallyMutation.isPending
-                }
+  returnWithRemarksMutation.isPending ||
+  forwardComplaintMutation.isPending
+}
+
                 className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {confirmConfig.type === "assign" || confirmConfig.type === "pullback" ? "No" : "Cancel"}
@@ -865,23 +939,25 @@ const {
 
               <button
                 onClick={handleConfirmYes}
-                disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardPhysicallyMutation.isPending ||
-                  (confirmConfig.type === "receive" && !remark.trim()) ||
-                  (confirmConfig.type === "forward" &&
-                    (!remark.trim() ||
-                      !selectedForwardTo ||
-                      (isLoadingOptions || isFetchingOptions)))
-                }
+              disabled={
+  returnWithRemarksMutation.isPending ||
+  forwardComplaintMutation.isPending ||
+  (confirmConfig.type === "receive" && !remark.trim()) ||
+  (confirmConfig.type === "forward" &&
+    (!remark.trim() ||
+      !selectedForwardTo ||
+      (isLoadingOptions || isFetchingOptions)))
+}
+
                 className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
-                {markAsReceivedMutation.isPending ||
-                forwardPhysicallyMutation.isPending
-                  ? "Sending..."
-                  : confirmConfig.type === "assign" || confirmConfig.type === "pullback"
-                  ? "Yes"
-                  : "Send"}
+              {returnWithRemarksMutation.isPending ||
+ forwardComplaintMutation.isPending
+  ? "Sending..."
+  : confirmConfig.type === "assign" || confirmConfig.type === "pullback"
+  ? "Yes"
+  : "Send"}
+
               </button>
             </div>
           </div>
