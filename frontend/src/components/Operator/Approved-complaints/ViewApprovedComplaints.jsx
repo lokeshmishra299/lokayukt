@@ -289,17 +289,24 @@ const ViewApprovedComplaints = () => {
               </div>
 
               {/* ===== DESCRIPTION ===== */}
-              <p className="text-[14px] text-gray-500 font-semibold uppercase my-2">
+               <p className="text-[14px] text-black font-semibold uppercase my-2">
                 {/* Description:{" "} */}
                 विवरण:{" "}
-                {complaintData.complaint_description ||
-                  "No detailed description available for this complaint."}
+                <span className="text-gray-500">
+                  {complaintData.complaint_description ||
+                    "No detailed description available for this complaint."}
+                </span>
+
               </p>
-              <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
+              <p className="text-[14px] text-black font-semibold uppercase mb-1">
                 {/* Delay Reason:{"  "} */}
                 विलंब का कारण:{"  "}
-                {complaintData.delay_reason ||
-                  "NA"}
+
+                <span className="text-gray-500">
+                  {complaintData.delay_reason ||
+                    "NA"}
+                </span>
+
               </p>
 
 
@@ -308,7 +315,7 @@ const ViewApprovedComplaints = () => {
               {/* ===== DETAILS GRID ===== */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
-                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
 
 
                     {/* CORRESPONDENCE NAME */}
@@ -318,7 +325,7 @@ const ViewApprovedComplaints = () => {
                     {complaintData.correspondence_name || "N/A"}
                   </p>
 
-                  <p className=" text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
+                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
 
 
                     {/* CORRESPONDENCE ADDRESS */}
@@ -333,7 +340,7 @@ const ViewApprovedComplaints = () => {
 
 
 
-                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
+                  <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
                     {/* PREVIOUSLY SUBMITTED DETAILS */}
                     पूर्व में प्रस्तुत विवरण
                   </p>
@@ -346,7 +353,7 @@ const ViewApprovedComplaints = () => {
                 </div>
 
                 <div>
-                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
                     {/* CORRESPONDENCE POST OFFICE */}
                     पत्राचार हेतु डाकघर
                   </p>
@@ -356,14 +363,14 @@ const ViewApprovedComplaints = () => {
 
                   {complaintData.dob && (
                     <>
-                      <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
                         {/* Relation With Person */}
                         व्यक्ति से संबंध
                       </p>
                       <p className=" text-gray-800 text-sm ">
                         {complaintData.relation_with_person || "NA"}
                       </p>
-                      <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1 mt-3">
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
 
                         {/* Cause Date */}
                         कार्यवाही तिथि
@@ -378,7 +385,7 @@ const ViewApprovedComplaints = () => {
                 </div>
 
                 <div>
-                  <p className="text-[14px] text-gray-500 font-semibold uppercase mb-1">
+                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
                     {/* CORRESPONDENCE DISTRICT */}
                     पत्राचार हेतु जिला
                   </p>
@@ -386,7 +393,7 @@ const ViewApprovedComplaints = () => {
                     {complaintData.correspondence_district || "N/A"}
                   </p>
 
-                  <p className=" text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
+                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
 
                     {/* previously_submitted */}
                     पूर्व में प्रस्तुत
@@ -398,7 +405,7 @@ const ViewApprovedComplaints = () => {
                       || "N/A"}
                   </p>
 
-                  <p className=" text-[14px] mt-3 text-gray-500 font-semibold uppercase mb-1">
+                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
 
                     {/* category */}
                     श्रेणी
