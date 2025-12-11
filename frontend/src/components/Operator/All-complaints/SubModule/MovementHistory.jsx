@@ -1,20 +1,41 @@
-import React from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
+const APP_URL = BASE_URL.replace("/api", "");
+const token = localStorage.getItem("access_token");
 
-const MovementHistory = () => {
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  },
+});
+
+const MovementHistory = ({complaint}) => {
+const [movemetHistory, setMovementHistory] = useState([])
+  useEffect(() => {
+    if (complaint) {
+      setMovementHistory(complaint.movement_history || []);
+    }
+  }, [complaint]);
+
+    console.log("Data he ", complaint)
   const items = [
     {
       title: "PS to Lokayukta (Shri ABC) → Lokayukta",
       desc: "File marked for review and orders",
       time: "15 Jan 2025, 3:00 PM",
       status: "Marked",
-      remark: "Urgent", // Added remark data
+      remark: "Urgent", 
     },
     {
       title: "UpLokayukta → PS to Lokayukta (Shri ABC)",
       desc: "Please prepare draft order for investigation",
       time: "13 Jan 2025, 11:30 AM",
       status: "Marked",
-      remark: "Draft needed", // Added remark data
+      remark: "Draft needed", 
     },
   ];
 
