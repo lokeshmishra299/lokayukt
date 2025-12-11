@@ -18,10 +18,10 @@ const MovementHistory = ({ complaint }) => {
     // }
 
     // forward_by_rk && forward_by_lokayukt present value 
-    if (item.forward_by_rk && item.forward_to_lokayukt) {
+    if (item.forward_by_ps && item.forward_to_lokayukt) {
       return `${recordSection} → Lokayukta`;
     }
-       if (item.forward_by_rk && item.forward_to_uplokayukt) {
+       if (item.forward_by_ps && item.forward_to_uplokayukt) {
       return `${recordSection} → UpLokayukta`;
     }
 
