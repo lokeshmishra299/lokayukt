@@ -704,12 +704,12 @@ const ViewAllComplaint = () => {
 
             <h3 className="text-xl font-semibold mb-6 border-b pb-2 text-gray-800">
               {viewModalConfig.type === "correspondence"
-                ? "Correspondence Address Details"
+                ? "पत्राचार पता विवरण"
                 : viewModalConfig.type === "respondent"
-                ? "Respondent Details"
+                ? "प्रतिवादी का विवरण"
                 : viewModalConfig.type === "support"
-                ? "Supporting Persons Details"
-                : "Witness Details"}
+                ? " सहायक व्यक्तियों का विवरण"
+                : "गवाह का विवरण"}
             </h3>
 
             {/* Correspondence Content */}
