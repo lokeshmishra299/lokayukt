@@ -133,7 +133,25 @@ class LokAyuktComplaintsController extends Controller
         // dd($usersByRole['lok-ayukt']);
    }
 
-    public function getUsers(){
+//     public function getUsers(){
+     
+//         $usersByRole = User::with('role')
+//          ->whereNotNull('role_id')
+//         ->get()
+//         ->groupBy(fn ($user) => $user->role->name);
+        
+
+//          if(!empty($usersByRole['lok-ayukt'])){
+
+//            return response()->json($usersByRole['lok-ayukt']);
+//         }else{
+
+//             return response()->json(["message"=>"Data Not Found"]);
+//         }
+//         // dd($usersByRole['lok-ayukt']);
+//    }
+
+   public function getUsers(){
      
         $usersByRole = User::with('role')
          ->whereNotNull('role_id')
@@ -142,14 +160,17 @@ class LokAyuktComplaintsController extends Controller
         
 
          if(!empty($usersByRole['lok-ayukt'])){
+            $data[] =  $usersByRole['lok-ayukt'];
+            $data[] =  $usersByRole['up-lok-ayukt'];
 
-           return response()->json($usersByRole['lok-ayukt']);
+           return response()->json($data);
         }else{
 
             return response()->json(["message"=>"Data Not Found"]);
         }
         // dd($usersByRole['lok-ayukt']);
    }
+
 
    public function getUpLokayuktUsers(){
     $usersByRole = User::with('role')
