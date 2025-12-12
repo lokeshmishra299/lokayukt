@@ -16,10 +16,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
+import HideModule from "./SubModule/HideModule";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
 const token = localStorage.getItem("access_token");
+const UserID = localStorage.getItem("UserID")
+
+
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -671,8 +675,12 @@ const ViewAllComplaint = () => {
               </div>
             </div>
 
-            {/* Mobile Tab Navigation */}
-            <div className="md:hidden border-b bg-white">
+
+
+{/* Mobile Phone View */}
+            {
+              complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ?
+                <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
                 {["documents", "notings", "movement"].map((tab) => (
                   <button
@@ -694,9 +702,16 @@ const ViewAllComplaint = () => {
                 ))}
               </div>
             </div>
+            :
+            <div>
 
-            {/* Desktop Tab Navigation */}
-            <div className="hidden md:flex border-b px-6">
+            </div>
+            }
+
+{/* Desktop View */}
+   {
+     complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ?
+    <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
                 {["documents", "notings", "movement"].map((tab) => (
                   <button
@@ -718,6 +733,16 @@ const ViewAllComplaint = () => {
                 ))}
               </div>
             </div>
+            :
+            <div>
+
+            </div>
+
+   }
+          
+
+      
+      
 
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
@@ -731,7 +756,12 @@ const ViewAllComplaint = () => {
             </div>
 
             {/* Footer Buttons */}
-            <div className="border-t p-4">
+
+
+            {
+              complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ?
+
+               <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
                 <div>
                   <button
@@ -784,6 +814,15 @@ const ViewAllComplaint = () => {
                 </div>
               </div>
             </div>
+            :
+            <div>
+
+            </div>
+            
+              
+
+            }
+           
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-center text-gray-500">

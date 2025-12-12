@@ -3,6 +3,7 @@ import { FaEye, FaTimes, FaSpinner } from "react-icons/fa";
 import { BsFileEarmarkPdf, BsDownload } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
+import HideModule from "./HideModule";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -14,6 +15,12 @@ const api = axios.create({
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
+
+
+const UserID = localStorage.getItem("UserID")
+// const getApi = ()=>{
+//   const res = api.get("/")
+// }
 
 const Documents = ({ complaint }) => {
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
@@ -101,92 +108,86 @@ const Documents = ({ complaint }) => {
     );
   }
 
+
+
+
+
+
   return (
-    <div className="">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Documents 
-        </h2>
+  <div className="">
+    {complaint.assign_to_ps == UserID || complaint.assign_to_ps == null ? (
+      <div>
 
-        {/* <button
-          onClick={handleDownloadPdf}
-          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100"
-        >
-          <BsDownload className="w-4 h-4" />
-          Download case PDF
-        </button> */}
-      </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+          <h2 className="text-lg font-semibold text-gray-800">Documents</h2>
+        </div>
 
-      {/* Docs */}
-      <div className="space-y-3">
-        {documents.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No documents available
-          </div>
-        ) : (
-          documents.map((doc) => (
-            <div
-              key={doc.id}
-              className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg"
-            >
-              {/* Icon + Filename */}
-              <div className="flex items-center gap-3">
-                <BsFileEarmarkPdf className="w-6 h-6 text-blue-600" />
-                <span className="text-sm font-medium">{doc.title || "NA"}</span>
+        <div className="space-y-3">
+          {documents.length === 0 ? (
+            <div className="p-8 text-center text-gray-500">No documents available</div>
+          ) : (
+            documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <BsFileEarmarkPdf className="w-6 h-6 text-blue-600" />
+                  <span className="text-sm font-medium">{doc.title || "NA"}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleViewPdf(doc.file)}
+                    disabled={loadingDoc === doc.file}
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 disabled:opacity-50"
+                  >
+                    {loadingDoc === doc.file ? (
+                      <FaSpinner className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <FaEye className="w-4 h-4" />
+                    )}
+                    View
+                  </button>
+                </div>
               </div>
+            ))
+          )}
+        </div>
 
-              {/* Actions */}
-              <div className="flex items-center gap-2">
+
+        {pdfViewUrl && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">
+              <div className="flex items-center justify-between p-4 border-b">
+                <h3 className="text-lg font-semibold">PDF Viewer</h3>
                 <button
-                  onClick={() => handleViewPdf(doc.file)}
-                  disabled={loadingDoc === doc.file}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 disabled:opacity-50"
+                  onClick={() => setPdfViewUrl(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg"
                 >
-                  {loadingDoc === doc.file ? (
-                    <FaSpinner className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <FaEye className="w-4 h-4" />
-                  )}
-                  View
+                  <FaTimes className="w-5 h-5" />
                 </button>
-
-                {/* <button
-                  onClick={() => handleDownloadPdf()}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100"
-                >
-                  <BsDownload className="w-4 h-4" />
-                </button> */}
               </div>
+
+              <iframe
+                src={`${pdfViewUrl}#zoom=page-width`}
+                className="w-full h-full border-0"
+                title="PDF Viewer"
+              />
             </div>
-          ))
+          </div>
         )}
       </div>
+    ) : (
+      <div>
+        <HideModule/>
+      </div>
+    )}
+  </div>
+);
 
-      {/* PDF Modal */}
-      {pdfViewUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-lg font-semibold">PDF Viewer</h3>
-              <button
-                onClick={() => setPdfViewUrl(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
-              >
-                <FaTimes className="w-5 h-5" />
-              </button>
-            </div>
+     
 
-            <iframe
-              src={`${pdfViewUrl}#zoom=page-width`}
-              className="w-full h-full border-0"
-              title="PDF Viewer"
-            />
-          </div>
-        </div>
-      )}
-    </div>
-  );
 };
 
 export default Documents;
