@@ -269,7 +269,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-by-lokayukt/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbylokayukt']);
         Route::post('/request-report/{complainId}',[LokAyuktReportController::class,'requestReport']);
         Route::get('/request-list/{complainId}',[LokAyuktReportController::class,'requestReportList']);
-                Route::get('/request-list-cio/{complainId}',[LokAyuktReportController::class,'requestinvestigationReport']);
+        Route::get('/request-list-cio/{complainId}',[LokAyuktReportController::class,'requestinvestigationReport']);
         /*
          * Forward Report By Subroles
          */
@@ -377,6 +377,7 @@ Route::middleware('auth:sanctum')->group(function(){
          Route::post('/return-complain-by-ps/{complainId}',[PSComplaintsController::class,'returnComplainByPs']);
         Route::post('/pull-back-by-ps/{complainId}',[PSComplaintsController::class,'pullBackByPs']);
         Route::post('forward-complain-by-ps/{complainId}',[PSComplaintsController::class,'forwardComplaintbyPS']);
+        Route::post('assign-by-ps/{complainId}',[PSComplaintsController::class,'assignToPs']);
       
       
        

@@ -141,10 +141,11 @@ class PSComplaintsController extends Controller
     ->get();
       $complainDetails->actions =  DB::table('complaint_actions')
     ->where('complaint_id', $id)
-     ->where(function($q){
-                            $q->where('status','Verified')
-                            ->Orwhere('status', 'Forwarded');               
-                         })
+    ->where('status','Forwarded')
+    //  ->where(function($q){
+    //                         $q->where('status','Forwarded');
+                                     
+    //                      })
     ->get();
 
            
@@ -516,7 +517,7 @@ class PSComplaintsController extends Controller
     //                     $apcAction->complaint_id = $complainId;
     //                     $apcAction->forward_by_lokayukt = $user;
 
-    //                     $apcAction->forward_to_uplokayukt = $request->forward_to;
+    //                                                        = $request->forward_to;
                        
     //                     $apcAction->status = 'Forwarded';
     //                     $apcAction->type = '1';
@@ -882,7 +883,7 @@ class PSComplaintsController extends Controller
         $validation = Validator::make($request->all(), [
             // 'forward_by_so_us' => 'required|exists:users,id',
             // 'forward_to_d_a' => 'required|exists:users,id',
-            'remarks' => 'required',
+            'remark' => 'required',
          
           
         ], [
@@ -890,7 +891,7 @@ class PSComplaintsController extends Controller
             // 'forward_by_so_us.exists' => 'Forward by user does not exist.',
             // 'forward_to_d_a.required' => 'Forward to user is required.',
             // 'forward_to_d_a.exists' => 'Forward to user does not exist.',
-            'remarks.required' => 'Remark is required.',
+            'remark.required' => 'Remark is required.',
            
         ]);
 
@@ -906,6 +907,7 @@ class PSComplaintsController extends Controller
             //  dd($cmp);
             if($cmp){
                 $cmp->approved_rejected_by_rk = 0;
+                $cmp->status = 'Return';
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Section Officer / Under Secretary';
                 // $remark.='\n';
@@ -919,7 +921,7 @@ class PSComplaintsController extends Controller
                     $apcAction = new ComplaintAction();
                     $apcAction->complaint_id = $complainId;
                     $apcAction->status = 'Return';
-                    $apcAction->remarks = $request->remarks;
+                    $apcAction->remarks = $request->remark;
                     $apcAction->save();
                 }
                 // $cmpAction =new ComplaintAction();
@@ -961,12 +963,41 @@ class PSComplaintsController extends Controller
              
             if($cmp){
                 $cmp->approved_rejected_by_rk = 0;
+                $cmp->status = 'Pull Back';
                 $cmp->save(); 
             }
           
              return response()->json([
                     'status' => true,
                     'message' => 'Pull Back Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+    public function assignToPs(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+        $userName = Auth::user()->name;
+       
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->assign_to_ps = $user;
+                $cmp->save(); 
+            }
+          
+             return response()->json([
+                    'status' => true,
+                    'message' => "Assign.' '$userName' '.successfully",
                     'data' => $cmp
                 ], 200);
         }else{

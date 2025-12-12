@@ -1656,7 +1656,8 @@ class OperatorComplaintsController extends Controller
                 )
                 ->where('form_status',1)
                 ->where('approved_rejected_by_rk',1)
-                 ->where('in_draft','0')
+                ->where('approved_rejected_by_ps',1)
+                //  ->where('in_draft','0')
                   ->distinct('cm.id')
                 ->get();
         // dd($deadpersondetails);
