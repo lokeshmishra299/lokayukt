@@ -775,14 +775,22 @@ const handleConfirmYes = () => {
                {returnWithRemarksMutation.isPending ? "Processing..." : "Return with Remarks"}
                   </button>
 
+{
+  complaintData.approved_rejected_by_ps == "1" ? (
+    <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">Forwarded</span>
+  ) : (
+    <button
+      onClick={handleforwardphysical}
+      disabled={forwardComplaintMutation.isPending}
+      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {forwardComplaintMutation.isPending ? "Processing..." : "Send / Mark"}
+    </button>
+  )
+}
 
-                  <button
-                    onClick={handleforwardphysical}
-                    disabled={forwardComplaintMutation.isPending}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                 {forwardComplaintMutation.isPending ? "Processing..." : "Send / Mark"}
-                  </button>
+
+                
                 </div>
               </div>
             </div>
