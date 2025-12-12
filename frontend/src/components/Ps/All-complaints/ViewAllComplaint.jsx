@@ -742,15 +742,15 @@ const ViewAllComplaint = () => {
                   </button>
 
                   {complaintData.assign_to_ps ? (
-                    <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
-                      Assined
+                    <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                     Assigned
                     </span>
                   ) : (
                     <button
                       onClick={handleAssignToSelf}
                       className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
                     >
-                      Assined To My Self
+                      Assigned To My Self
                     </button>
                   )}
                 </div>
