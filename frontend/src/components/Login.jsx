@@ -78,6 +78,7 @@ const Login = () => {
           }
           else if (userRole === "ps") {
             window.open("/ps/dashboard", "_self");
+            localStorage.setItem("UserID", response.data.data.user.id);
           }
           else {
             toast.error("Unauthorized role.");
