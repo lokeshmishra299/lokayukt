@@ -64,6 +64,12 @@ const AllComplaints = () => {
     queryFn: getAllComplaints,
   });
 
+  
+  const stats = {
+  overdue: data?.older7DaysCount || 0,
+  receivedToday: data?.todayCount || 0,
+};
+
   const getDistrict = async () => {
     const res = await api.get("/uplokayukt/all-district");
     return res.data.data;
@@ -176,7 +182,7 @@ const AllComplaints = () => {
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Send To uplokayukt Successfully!", {
+        toast.success("Send To Uplokayukt Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -234,15 +240,28 @@ const AllComplaints = () => {
     };
   };
 
-  const stats = getStatistics();
-
-const getDaysDifference = (dateString) => {
+    // **************************count days*******************************************************
+  const getDaysDifference = (date) => {
+  const created = new Date(date);
   const today = new Date();
-  const createdDate = new Date(dateString);
 
-  const diffTime = today - createdDate;
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const diffTime = today - created; // milliseconds difference
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays;
 };
+
+
+
+
+
+// const getDaysDifference = (dateString) => {
+//   const today = new Date();
+//   const createdDate = new Date(dateString);
+
+//   const diffTime = today - createdDate;
+//   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+// };
 
 
   return (
@@ -329,9 +348,7 @@ const getDaysDifference = (dateString) => {
                     </option>
                   ))}
                 </select>
-
-                <select
-                  className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
+                <select className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedFeeStatus}
                   onChange={(e) => setSelectedFeeStatus(e.target.value)}
                 >
@@ -340,29 +357,24 @@ const getDaysDifference = (dateString) => {
                   <option value="pending">Pending</option>
                   <option value="exempted">Exempted</option>
                 </select>
-
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   disabled={typesLoading}
                   value={selectedCaseType}
-                  onChange={(e) => setSelectedCaseType(e.target.value)}
-                >
+                  onChange={(e) => setSelectedCaseType(e.target.value)}               >
                   <option value="">Case Type: All</option>
                   {complaintTypesData?.map((type) => (
                     <option key={type.id} value={type.id}>
                       {type.name}
-                    </option>
-                  ))}
+                    </option> ))}
                 </select>
               </div>
-
               <div className="flex items-center gap-2">
                 <span className="text-gray-600 text-xs whitespace-nowrap">Sort by:</span>
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={sortOrder}
-                  onChange={handleSortChange}
-                >
+                  onChange={handleSortChange}>
                 <option value="desc">Received Date </option> 
                 <option value="asc">Ascending Order</option> 
                 <option value="desc">Decending Order</option>
@@ -372,7 +384,6 @@ const getDaysDifference = (dateString) => {
               </div>
             </div>
           </div>
-
           <div className="flex-1 overflow-y-auto">
             {isLoading && !data ? (
               <div className="flex items-center justify-center h-full">
@@ -394,20 +405,24 @@ const getDaysDifference = (dateString) => {
                         <p className="text-sm font-semibold text-gray-900 mb-1">
                           File No. {complaint.complain_no}
                         </p>
-                        <p className="text-xs text-gray-700 mb-1">
-                          {complaint.description ||
+                       <p className="text-xs text-gray-700 mb-1">
+                          Description: {complaint.complaint_description ||
                             "No description available"}
                         </p>
-                        <div className="text-[11px] text-gray-600 mb-1">
-                          <span className="text-gray-500">Complainant:</span>
-                          <span className="ml-1">{complaint.name}</span>
+                       <div className="text-[11px] text-gray-600 mb-1">
+                          <span className="text-gray-500">
+                            Cause Date
+                            :</span>
+                          <span className="ml-1">{complaint.cause_date || "NA"}</span>
                           <span className="mx-1 text-gray-400">•</span>
-                          <span className="text-gray-500">District:</span>
+                          <span className="text-gray-500">
+                            Category
+                            :</span>
                           <span className="ml-1">
-                            {complaint.district_name}
+                            {complaint.category || "NA"}
                           </span>
                         </div>
-                        <div className="text-[10px] text-gray-400">
+                         <div className="text-[10px] text-gray-400">
                           Received:{" "}
                           {new Date(complaint.created_at).toLocaleDateString(
                             "en-GB",
@@ -428,25 +443,21 @@ const getDaysDifference = (dateString) => {
                           )}
                         </div>
                       </div>
-
-                      <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
+                     <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
                         <div className="flex gap-1.5">
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
                             New Case
                           </span>
                           {complaint.fee_exempted === 1 && (
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                              With uplokayukt
+                              With uplokayukta
                             </span>
                           )}
                         </div>
-
-                        <div className="flex gap-1.5">
-                       <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-  {getDaysDifference(complaint.created_at)}d
-</span>
-
-                                                                  <span
+                         <div className="flex gap-1.5">
+                         <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+                      {getDaysDifference(complaint.created_at)}d</span>
+                                                             <span
   className={`
     px-2 py-0.5 rounded text-[11px] font-medium
     ${
@@ -470,16 +481,13 @@ const getDaysDifference = (dateString) => {
     : ""}
 </span>
                         </div>
-
-                        <div className="flex gap-2 w-full sm:w-auto">
+                     <div className="flex gap-2 w-full sm:w-auto">
                           <button
                             onClick={(e) => handleViewDetails(e, complaint.id)}
-                            className="flex-1 sm:flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap"
-                          >
+                            className="flex-1 sm:flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap">
                             View Details
                           </button>
-{/* 
-                          {isApprovedByRO(complaint) ? (
+                        {/*{isApprovedByRO(complaint) ? (
                             <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
                             <svg
                               className="w-3 h-3"

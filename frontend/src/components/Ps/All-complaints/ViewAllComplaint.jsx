@@ -209,6 +209,22 @@ const pullBackMutation = useMutation({
 
 
 
+const assignToSelfMutation = useMutation({
+  mutationFn: async ({ complaintId }) => {
+    const res = await api.post(`/ps/assign-by-ps/${complaintId}`);
+    return res.data;
+  },
+  onSuccess: (data) => {
+    toast.success(data.message || "Assigned to yourself successfully");
+    queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+    setConfirmConfig({ open: false, type: null });
+  },
+  onError: (error) => {
+    toast.error(error?.response?.data?.message || "Failed to assign");
+  },
+});
+
+
 const returnWithRemarksMutation = useMutation({
   mutationFn: async ({ complaintId, remarkData }) => {
     const res = await api.post(`/ps/return-complain-by-ps/${complaintId}`, {
@@ -273,12 +289,12 @@ const handleConfirmYes = () => {
   if (confirmConfig.type === "pullback") {
     pullBackMutation.mutate({ complaintId: id });
   }
+  
+if (confirmConfig.type === "assign") {
+  assignToSelfMutation.mutate({ complaintId: id });
+}
 
-  if (confirmConfig.type === "assign") {
-    setassinedMyself(true);
-    toast.success("Assigned to yourself");
-    setConfirmConfig({ open: false, type: null });
-  }
+
 };
 
 
