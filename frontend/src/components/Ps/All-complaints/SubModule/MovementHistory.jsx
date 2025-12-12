@@ -9,7 +9,7 @@ const MovementHistory = ({ complaint }) => {
 
 
   const getMovementTitle = (item) => {
-    // const record = "Recived ";
+    const record = "Recived ";
     const recordSection = "PS";
 
     // forward_by_rk && forward_to_lokayukt is 0 or null
