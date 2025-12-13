@@ -340,22 +340,26 @@ const Complaints = () => {
 
 
 
-  const handleMainComplainant = (id) => {
+const handleMainComplainant = (id) => {
   setComplainants(prev =>
-    prev.map(c => ({
-      ...c,
-      isMain: c.id === id ? 1 : 0 
-    }))
+    prev.map(c => {
+      if (c.id === id) {
+        return { ...c, isMain: c.isMain === 1 ? 0 : 1 };
+      }
+      return { ...c, isMain: 0 }; // ensure only one main
+    })
   );
 };
 
 
 const handleMainRespondent = (id) => {
   setPersons(prev =>
-    prev.map(p => ({
-      ...p,
-      isMain: p.id === id ? 1 : 0 
-    }))
+    prev.map(p => {
+      if (p.id === id) {
+        return { ...p, isMain: p.isMain === 1 ? 0 : 1 };
+      }
+      return { ...p, isMain: 0 };
+    })
   );
 };
 
@@ -869,6 +873,7 @@ persons.forEach((person, index) => {
       fatherName: '',
       occupation: '',
       isPublicServant: 'चुनें',
+       isMain: 0,
     }]);
     setPersons([{
       id: 1,
@@ -877,7 +882,8 @@ persons.forEach((person, index) => {
       currentAddress: '',
       district: '',
       departmentNature: '',
-      officerCategory: ''
+      officerCategory: '',
+       isMain: 0,
     }]);
     setFormData({
       relation: '',
@@ -1116,13 +1122,23 @@ persons.forEach((person, index) => {
              
             >
               <div className="relative flex items-center justify-center">
-               <input
-  type="radio"
-  name="main_complainant"
-  checked={complainant.isMain === 1}
-  onChange={() => handleMainComplainant(complainant.id)}
-  className="accent-orange-500"
-/>
+<label
+  className={`flex items-center p-4  rounded-lg cursor-pointer transition-all duration-200
+    ${complainant.isMain === 1
+      ? ''
+      : ''}
+  `}
+>
+  <input
+    type="checkbox"
+    checked={complainant.isMain === 1}
+    onChange={() => handleMainComplainant(complainant.id)}
+    className="accent-orange-500"
+  />
+
+</label>
+
+
               </div>
               <div className="ml-3 text-sm select-none">
                 <label className="font-medium text-gray-900 cursor-pointer">
@@ -1325,8 +1341,7 @@ persons.forEach((person, index) => {
 
       {showPersons[person.id] && (
         <div className="p-5 animate-slideDown">
-          
-          {/* Row 1: District & Nature of Department */}
+   
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-gray-700 text-sm font-medium mb-2">
@@ -1364,7 +1379,7 @@ persons.forEach((person, index) => {
             </div>
           </div>
 
-          {/* Row 2: Officer Category & Designation */}
+     
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-gray-700 text-sm font-medium mb-2">
@@ -1402,7 +1417,6 @@ persons.forEach((person, index) => {
             </div>
           </div>
 
-          {/* Row 3: Name & Address */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-medium mb-2">
               अधिकारी का नाम: <span className="text-red-500">*</span>
@@ -1427,7 +1441,6 @@ persons.forEach((person, index) => {
             />
           </div>
 
-          {/* --- NEW SECTION: Main Respondent Selection --- */}
           <div className="mb-2">
              <div 
                className={`flex items-center p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
@@ -1438,13 +1451,22 @@ persons.forEach((person, index) => {
             
              >
               <div className="relative flex items-center justify-center">
-               <input
-  type="radio"
-  name="main_respondent"
-  checked={person.isMain === 1}
-  onChange={() => handleMainRespondent(person.id)}
-  className="accent-orange-500"
-/>
+<label
+  className={`flex items-center p-4  rounded-lg cursor-pointer transition-all duration-200
+    ${person.isMain === 1
+      ? ''
+      : ''}
+  `}
+>
+  <input
+    type="checkbox"
+    checked={person.isMain === 1}
+    onChange={() => handleMainRespondent(person.id)}
+    className="accent-orange-500"
+  />
+
+</label>
+
               </div>
               <div className="ml-3 text-sm select-none">
                 <label className="font-medium text-gray-900 cursor-pointer">
