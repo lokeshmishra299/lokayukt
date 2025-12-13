@@ -89,6 +89,7 @@ class OperatorComplaintsController extends Controller
                 DB::table('complainants')->insert([
                     'complaint_id'          => $complaintId,
                     'complainant_name'      => trim($name),
+                    'is_main'               => $request->is_main[$i] ?? '',
                     'father_name'           => $request->father_name[$i] ?? '',
                     'occupation'            => $request->occupation[$i] ?? '',
                     'is_public_servant'     => $request->is_public_servant[$i] ?? 'no',
@@ -146,6 +147,7 @@ class OperatorComplaintsController extends Controller
                     'officer_category'    => $request->officer_category[$i] ?? '',
                     'department_name'     => $request->department_name[$i] ?? '',
                     'current_address'     => $request->current_address[$i] ?? '',
+                    'is_main'             => $request->is_main[$i] ?? '',
                     'respondent_district' => $request->respondent_district[$i] ?? null,
                 ]);
             }
