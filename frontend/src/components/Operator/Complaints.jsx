@@ -318,6 +318,7 @@ const Complaints = () => {
       fatherName: '',
       occupation: '',
       isPublicServant: 'चुनें',
+         isMain: 0,
     }
   ]);
 
@@ -332,9 +333,32 @@ const Complaints = () => {
       currentAddress: '',
       district: '',
       departmentNature: '',
-      officerCategory: ''
+      officerCategory: '',
+      isMain: 0, 
     }
   ]);
+
+
+
+  const handleMainComplainant = (id) => {
+  setComplainants(prev =>
+    prev.map(c => ({
+      ...c,
+      isMain: c.id === id ? 1 : 0 
+    }))
+  );
+};
+
+
+const handleMainRespondent = (id) => {
+  setPersons(prev =>
+    prev.map(p => ({
+      ...p,
+      isMain: p.id === id ? 1 : 0 
+    }))
+  );
+};
+
 
   const [showPersons, setShowPersons] = useState({ 1: true });
 
@@ -444,6 +468,7 @@ const Complaints = () => {
       fatherName: '',
       occupation: '',
       isPublicServant: 'चुनें',
+        isMain: 0, 
     };
     setComplainants([...complainants, newComplainant]);
     setShowComplainants({ ...showComplainants, [newComplainant.id]: true });
@@ -485,7 +510,8 @@ const Complaints = () => {
       currentAddress: '',
       district: '',
       departmentNature: '',
-      officerCategory: ''
+      officerCategory: '',
+        isMain: 0,
     };
     setPersons([...persons, newPerson]);
     setShowPersons({ ...showPersons, [newPerson.id]: true });
@@ -615,6 +641,8 @@ const Complaints = () => {
     if (formData.previousComplaint === 'हाँ' && !formData.previousComplaintDetails.trim()) {
       newErrors.previously_submitted_details = ['यदि पहले प्रस्तुत किया है तो विवरण आवश्यक है।'];
     }
+
+
 
     // if (!formData.complaintType) {
     //   newErrors.category = ['शिकायत की श्रेणी चुनें (अभिकथन/शिकायत)।'];
@@ -792,6 +820,17 @@ const Complaints = () => {
       // 12. Description
       submitData.append('complaint_description', formData.complaintDescription);
 
+
+complainants.forEach((complainant, index) => {
+  submitData.append(`is_main_c[${index}]`, complainant.isMain ?? 0);
+});
+
+
+persons.forEach((person, index) => {
+  submitData.append(`is_main_r[${index}]`, person.isMain ?? 0);
+});
+
+
       await api.post('/operator/add-complaint', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -890,183 +929,219 @@ const Complaints = () => {
         <form onSubmit={handlePreview}>
           {/* 1. Complainants */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 md:mb-0">
-                1. परिवादी का विवरण:
-              </h3>
-              <button
-                type="button"
-                className="bg-white text-[12px] text-orange-500 border-2 border-orange-500 hover:bg-orange-500 hover:text-white px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap"
-                onClick={addComplainant}
-              >
-                + अन्य परिवादी जोड़ें
-              </button>
+  <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+    <h3 className="text-lg font-semibold text-gray-800 mb-3 md:mb-0">
+      1. परिवादी का विवरण:
+    </h3>
+    <button
+      type="button"
+      className="bg-white text-[12px] text-orange-500 border-2 border-orange-500 hover:bg-orange-500 hover:text-white px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap"
+      onClick={addComplainant}
+    >
+      + अन्य परिवादी जोड़ें
+    </button>
+  </div>
+
+  <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+    प्रत्येक कार्ड एक परिवादी के लिए है। आवश्यकता अनुसार अतिरिक्त परिवादी जोड़े जा सकते हैं।
+  </p>
+
+  {complainants.map((complainant, index) => (
+    <div key={complainant.id} className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
+      <div className="bg-gray-50 px-5 py-3 flex justify-between items-center border-b border-gray-200">
+        <h4 className="text-base font-medium text-gray-700">परिवादी {index + 1}</h4>
+        <div className="flex gap-2">
+          {complainants.length > 1 && (
+            <button
+              type="button"
+              className="text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded text-sm transition-all duration-200"
+              onClick={() => removeComplainant(complainant.id)}
+            >
+              हटाएँ
+            </button>
+          )}
+          <button
+            type="button"
+            className="bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1 rounded text-lg font-bold transition-all duration-200 min-w-[35px]"
+            onClick={() => toggleComplainant(complainant.id)}
+          >
+            {showComplainants[complainant.id] ? '−' : '+'}
+          </button>
+        </div>
+      </div>
+
+      {showComplainants[complainant.id] && (
+        <div className="p-5 animate-slideDown">
+          {/* Name and Father Name Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                परिवादी का नाम <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.complainant_name ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={complainant.name}
+                onChange={(e) => updateComplainant(complainant.id, 'name', e.target.value)}
+              />
             </div>
-
-            <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-              प्रत्येक कार्ड एक परिवादी के लिए है। आवश्यकता अनुसार अतिरिक्त परिवादी जोड़े जा सकते हैं।
-            </p>
-
-            {complainants.map((complainant, index) => (
-              <div key={complainant.id} className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
-                <div className="bg-gray-50 px-5 py-3 flex justify-between items-center border-b border-gray-200">
-                  <h4 className="text-base font-medium text-gray-700">परिवादी {index + 1}</h4>
-                  <div className="flex gap-2">
-                    {complainants.length > 1 && (
-                      <button
-                        type="button"
-                        className="text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded text-sm transition-all duration-200"
-                        onClick={() => removeComplainant(complainant.id)}
-                      >
-                        हटाएँ
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      className="bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1 rounded text-lg font-bold transition-all duration-200 min-w-[35px]"
-                      onClick={() => toggleComplainant(complainant.id)}
-                    >
-                      {showComplainants[complainant.id] ? '−' : '+'}
-                    </button>
-                  </div>
-                </div>
-
-                {showComplainants[complainant.id] && (
-                <div className="p-5 animate-slideDown">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-gray-700 text-sm font-medium mb-2">
-                        परिवादी का नाम  <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                          errors.complainant_name ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        value={complainant.name}
-                        onChange={(e) => updateComplainant(complainant.id, 'name', e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-700 text-sm font-medium mb-2">
-                        पिता का नाम <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                          errors.father_name ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        value={complainant.fatherName}
-                        onChange={(e) => updateComplainant(complainant.id, 'fatherName', e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <label className="block text-gray-700 text-sm font-medium mb-2">
-                        व्यवसाय (क) <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                          errors.occupation ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        value={complainant.occupation}
-                        onChange={(e) => updateComplainant(complainant.id, 'occupation', e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-700 text-sm font-medium mb-2">
-                        क्या आप लोक सेवक हैं या नहीं (ख) <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                          errors.is_public_servant ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        value={complainant.isPublicServant}
-                        onChange={(e) => updateComplainant(complainant.id, 'isPublicServant', e.target.value)}
-                      >
-                        <option value="चुनें">चुनें</option>
-                        <option value="हाँ">हाँ</option>
-                        <option value="नहीं">नहीं</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {errors.complainant_name && (
-                    <p className="text-red-500 text-sm mb-4">{errors.complainant_name[0]}</p>
-                  )}
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-gray-700 text-sm font-medium mb-2">
-                        (ग) डाकघर या पुलिस थाना <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                          errors.permanent_post_office ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        value={formData.permanentAddress.postOffice}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            permanentAddress: { ...formData.permanentAddress, postOffice: e.target.value },
-                          })
-                        }
-                      />
-                    </div>
-                    {/* UPDATED: District as Dropdown */}
-                    <div>
-                      <label className="block text-gray-700 text-sm font-medium mb-2">
-                        (घ) जिला <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                          errors.permanent_district ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                        value={formData.permanentAddress.district}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            permanentAddress: { ...formData.permanentAddress, district: e.target.value },
-                          })
-                        }
-                      >
-                         <option value="">ज़िला चुनें</option>
-                          {districtList.map((dist, i) => (
-                            <option key={i} value={dist.district_code}> 
-                              {dist.district_name} / {dist.dist_name_hi}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="w-full mb-4">
-                    <label className="block text-gray-700 text-sm font-medium mb-2">
-                      (ख) स्थान <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                        errors.permanent_place ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      value={formData.permanentAddress.place}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          permanentAddress: { ...formData.permanentAddress, place: e.target.value },
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-               )}
-              </div>
-            ))}
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                पिता का नाम <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.father_name ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={complainant.fatherName}
+                onChange={(e) => updateComplainant(complainant.id, 'fatherName', e.target.value)}
+              />
+            </div>
           </div>
+
+          {/* Occupation and Public Servant Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                व्यवसाय (क) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.occupation ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={complainant.occupation}
+                onChange={(e) => updateComplainant(complainant.id, 'occupation', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                क्या आप लोक सेवक हैं या नहीं (ख) <span className="text-red-500">*</span>
+              </label>
+              <select
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.is_public_servant ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={complainant.isPublicServant}
+                onChange={(e) => updateComplainant(complainant.id, 'isPublicServant', e.target.value)}
+              >
+                <option value="चुनें">चुनें</option>
+                <option value="हाँ">हाँ</option>
+                <option value="नहीं">नहीं</option>
+              </select>
+            </div>
+          </div>
+
+          {errors.complainant_name && (
+            <p className="text-red-500 text-sm mb-4">{errors.complainant_name[0]}</p>
+          )}
+
+          {/* Address Row (Post Office & District) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                (ग) डाकघर या पुलिस थाना <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.permanent_post_office ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={formData.permanentAddress.postOffice}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    permanentAddress: { ...formData.permanentAddress, postOffice: e.target.value },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                (घ) जिला <span className="text-red-500">*</span>
+              </label>
+              <select
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.permanent_district ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={formData.permanentAddress.district}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    permanentAddress: { ...formData.permanentAddress, district: e.target.value },
+                  })
+                }
+              >
+                <option value="">ज़िला चुनें</option>
+                {districtList.map((dist, i) => (
+                  <option key={i} value={dist.district_code}>
+                    {dist.district_name} / {dist.dist_name_hi}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Place Row */}
+          <div className="w-full mb-4 mt-4">
+            <label className="block text-gray-700 text-sm font-medium mb-2">
+              (ख) स्थान <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                errors.permanent_place ? 'border-red-500' : 'border-gray-300'
+              }`}
+              value={formData.permanentAddress.place}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  permanentAddress: { ...formData.permanentAddress, place: e.target.value },
+                })
+              }
+            />
+          </div>
+
+          {/* --- NEW SECTION: Main Complainant Selection --- */}
+          <div className="w-full mb-2">
+            <div
+              className={`flex items-center p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
+                complainant.isMain
+                  ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500'
+                  : 'bg-white border-gray-300 hover:bg-gray-50'
+              }`}
+             
+            >
+              <div className="relative flex items-center justify-center">
+               <input
+  type="radio"
+  name="main_complainant"
+  checked={complainant.isMain === 1}
+  onChange={() => handleMainComplainant(complainant.id)}
+  className="accent-orange-500"
+/>
+              </div>
+              <div className="ml-3 text-sm select-none">
+                <label className="font-medium text-gray-900 cursor-pointer">
+                  मुख्य परिवादी (Main Complainant)
+                </label>
+                {/* <p className="text-gray-500 text-xs mt-0.5">
+                  क्या यह शिकायतकर्ता मुख्य परिवादी है? क्लिक करके चुनें/हटाएँ।
+                </p> */}
+              </div>
+            </div>
+          </div>
+          {/* --- END NEW SECTION --- */}
+
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
 
           {/* 2. Relation */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -1202,240 +1277,273 @@ const Complaints = () => {
           </div>
 
           {/* 4. Persons / Respondents */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 md:mb-0">
-                4. जिस व्यक्ति के विरुद्ध परिवाद किया जा रहा है उसका विवरण :
-              </h3>
-              <button
-                type="button"
-                className="bg-white text-[12px] text-orange-500 border-2 border-orange-500 hover:bg-orange-500 hover:text-white px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap"
-                onClick={addPerson}
-              >
-                + अन्य व्यक्ति जोड़ें
-              </button>
-            </div>
+         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+  <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-4">
+    <h3 className="text-lg font-semibold text-gray-800 mb-3 md:mb-0">
+      4. जिस व्यक्ति के विरुद्ध परिवाद किया जा रहा है उसका विवरण :
+    </h3>
+    <button
+      type="button"
+      className="bg-white text-[12px] text-orange-500 border-2 border-orange-500 hover:bg-orange-500 hover:text-white px-5 py-2.5 rounded-lg font-semibold transition-all duration-300 whitespace-nowrap"
+      onClick={addPerson}
+    >
+      + अन्य व्यक्ति जोड़ें
+    </button>
+  </div>
 
-            <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-              (1) नाम, पदनाम जो मामले के विषय में परिवाद किये जाने के समय पर रहा हो और वर्तमान पता (यदि ज्ञात हो)
-            </p>
+  <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+    (1) नाम, पदनाम जो मामले के विषय में परिवाद किये जाने के समय पर रहा हो और वर्तमान पता (यदि ज्ञात हो)
+  </p>
 
-            {errors.respondent_name && (
-              <p className="text-red-500 text-sm mb-2">{errors.respondent_name[0]}</p>
-            )}
+  {errors.respondent_name && (
+    <p className="text-red-500 text-sm mb-2">{errors.respondent_name[0]}</p>
+  )}
 
-            {persons.map((person, index) => (
-              <div key={person.id} className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
-                <div className="bg-gray-50 px-5 py-3 flex justify-between items-center border-b border-gray-200">
-                  <h4 className="text-base font-medium text-gray-700">व्यक्ति {index + 1}</h4>
-                  <div className="flex gap-2">
-                    {persons.length > 1 && (
-                      <button
-                        type="button"
-                        className="text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded text-sm transition-all duration-200"
-                        onClick={() => removePerson(person.id)}
-                      >
-                        हटाएँ
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      className="bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1 rounded text-lg font-bold transition-all duration-200 min-w-[35px]"
-                      onClick={() => togglePerson(person.id)}
-                    >
-                      {showPersons[person.id] ? '−' : '+'}
-                    </button>
-                  </div>
-                </div>
+  {persons.map((person, index) => (
+    <div key={person.id} className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
+      <div className="bg-gray-50 px-5 py-3 flex justify-between items-center border-b border-gray-200">
+        <h4 className="text-base font-medium text-gray-700">व्यक्ति {index + 1}</h4>
+        <div className="flex gap-2">
+          {persons.length > 1 && (
+            <button
+              type="button"
+              className="text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded text-sm transition-all duration-200"
+              onClick={() => removePerson(person.id)}
+            >
+              हटाएँ
+            </button>
+          )}
+          <button
+            type="button"
+            className="bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1 rounded text-lg font-bold transition-all duration-200 min-w-[35px]"
+            onClick={() => togglePerson(person.id)}
+          >
+            {showPersons[person.id] ? '−' : '+'}
+          </button>
+        </div>
+      </div>
 
-                {showPersons[person.id] && (
-                  <div className="p-5 animate-slideDown">
-                    
-                    {/* Row 1: District & Nature of Department - UPDATED TO DROPDOWNS */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-gray-700 text-sm font-medium mb-2">
-                          ज़िला: <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
-                          value={person.district || ''} 
-                          onChange={(e) => updatePerson(person.id, 'district', e.target.value)}
-                        >
-                          <option value="">ज़िला चुनें</option>
-                          {districtList.map((dist, i) => (
-                            <option key={i} value={dist.district_code}>
-                              {dist.district_name} / {dist.dist_name_hi}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 text-sm font-medium mb-2">
-                          विभाग का नाम: <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
-                          value={person.departmentNature || ''}
-                          onChange={(e) => updatePerson(person.id, 'departmentNature', e.target.value)}
-                        >
-                          <option value="">विभाग चुनें</option>
-                          {departmentList.map((dept, i) => (
-                            <option key={i} value={dept.name}>
-                              {dept.name} / {dept.name_hindi}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Row 2: Officer Category & Designation - UPDATED TO DROPDOWNS */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      <div>
-                        <label className="block text-gray-700 text-sm font-medium mb-2">
-                          अधिकारी की श्रेणी: <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
-                          value={person.officerCategory || ''}
-                          onChange={(e) => updatePerson(person.id, 'officerCategory', e.target.value)}
-                        >
-                          <option value="">श्रेणी चुनें</option>
-                          {subjectList.map((subj, i) => (
-                            <option key={i} value={subj.name}>
-                              {subj.name} / {subj.name_h}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-gray-700 text-sm font-medium mb-2">
-                          पदनाम: <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
-                          value={person.designation || ''}
-                          onChange={(e) => updatePerson(person.id, 'designation', e.target.value)}
-                        >
-                          <option value="">पदनाम चुनें</option>
-                          {designationList.map((desig, i) => (
-                            <option key={i} value={desig.name}>
-                              {desig.name} / {desig.name_h}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    {/* Row 3: Name & Address */}
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-medium mb-2">
-                        अधिकारी का नाम: <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                        value={person.name || ''}
-                        onChange={(e) => updatePerson(person.id, 'name', e.target.value)}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-700 text-sm font-medium mb-2">
-                      वर्तमान पता (यदि ज्ञात हो): <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        rows="3"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
-                        value={person.currentAddress || ''}
-                        onChange={(e) => updatePerson(person.id, 'currentAddress', e.target.value)}
-                      />
-                    </div>
-
-                  </div>
-                )}
-              </div>
-            ))}
-
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-medium mb-2">
-                (2) दिनांक जब परिवाद का कारण उत्पन्न हुआ : <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                  errors.cause_date ? 'border-red-500' : 'border-gray-300'
-                }`}
-                value={formData.complaintDate}
-                onChange={(e) => handleFormDataChange('complaintDate', e.target.value)}
-              />
-              {errors.cause_date && (
-                <p className="text-red-500 text-sm mt-1">{errors.cause_date[0]}</p>
-              )}
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-medium mb-2">
-                (3) यदि परिवाद धारा 8 (4) के अधीन समय व्यतीत हो जाने पर किया गया है तो विलम्ब का कारण : <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                rows="4"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y ${
-                  errors.delay_reason ? 'border-red-500' : 'border-gray-300'
-                }`}
-                value={formData.delayReason}
-                onChange={(e) => handleFormDataChange('delayReason', e.target.value)}
-              />
-              {errors.delay_reason && (
-                <p className="text-red-500 text-sm mt-1">{errors.delay_reason[0]}</p>
-              )}
-            </div>
-
+      {showPersons[person.id] && (
+        <div className="p-5 animate-slideDown">
+          
+          {/* Row 1: District & Nature of Department */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-gray-700 text-sm font-medium mb-3">
-                (4) क्या परिवाद पहले किसी वरिष्ठ अधिकारी / अधिकरण / न्यायालय के समक्ष किया गया था? <span className="text-red-500">*</span>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                ज़िला: <span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-6 mb-3">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="previousComplaint"
-                    value="हाँ"
-                    className="w-4 h-4 text-orange-500 focus:ring-orange-500"
-                    checked={formData.previousComplaint === 'हाँ'}
-                    onChange={(e) => handleFormDataChange('previousComplaint', e.target.value)}
-                  />
-                  <span className="text-gray-700">हाँ</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="previousComplaint"
-                    value="नहीं"
-                    className="w-4 h-4 text-orange-500 focus:ring-orange-500"
-                    checked={formData.previousComplaint === 'नहीं'}
-                    onChange={(e) => handleFormDataChange('previousComplaint', e.target.value)}
-                  />
-                  <span className="text-gray-700">नहीं</span>
-                </label>
-              </div>
-              {errors.previously_submitted && (
-                <p className="text-red-500 text-sm mb-2">{errors.previously_submitted[0]}</p>
-              )}
-              {errors.previously_submitted_details && (
-                <p className="text-red-500 text-sm mb-2">{errors.previously_submitted_details[0]}</p>
-              )}
-              {formData.previousComplaint === 'हाँ' && (
-                <textarea
-                  placeholder="यदि हाँ, तो परिणाम / स्थिति तथा यदि नहीं, तो संक्षेप में कारण लिखें।"
-                  rows="4"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
-                  value={formData.previousComplaintDetails}
-                  onChange={(e) => handleFormDataChange('previousComplaintDetails', e.target.value)}
-                />
-              )}
+              <select
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
+                value={person.district || ''} 
+                onChange={(e) => updatePerson(person.id, 'district', e.target.value)}
+              >
+                <option value="">ज़िला चुनें</option>
+                {districtList.map((dist, i) => (
+                  <option key={i} value={dist.district_code}>
+                    {dist.district_name} / {dist.dist_name_hi}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                विभाग का नाम: <span className="text-red-500">*</span>
+              </label>
+              <select
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
+                value={person.departmentNature || ''}
+                onChange={(e) => updatePerson(person.id, 'departmentNature', e.target.value)}
+              >
+                <option value="">विभाग चुनें</option>
+                {departmentList.map((dept, i) => (
+                  <option key={i} value={dept.name}>
+                    {dept.name} / {dept.name_hindi}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
+
+          {/* Row 2: Officer Category & Designation */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                अधिकारी की श्रेणी: <span className="text-red-500">*</span>
+              </label>
+              <select
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
+                value={person.officerCategory || ''}
+                onChange={(e) => updatePerson(person.id, 'officerCategory', e.target.value)}
+              >
+                <option value="">श्रेणी चुनें</option>
+                {subjectList.map((subj, i) => (
+                  <option key={i} value={subj.name}>
+                    {subj.name} / {subj.name_h}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                पदनाम: <span className="text-red-500">*</span>
+              </label>
+              <select
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
+                value={person.designation || ''}
+                onChange={(e) => updatePerson(person.id, 'designation', e.target.value)}
+              >
+                <option value="">पदनाम चुनें</option>
+                {designationList.map((desig, i) => (
+                  <option key={i} value={desig.name}>
+                    {desig.name} / {desig.name_h}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Row 3: Name & Address */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-medium mb-2">
+              अधिकारी का नाम: <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+              value={person.name || ''}
+              onChange={(e) => updatePerson(person.id, 'name', e.target.value)}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700 text-sm font-medium mb-2">
+            वर्तमान पता (यदि ज्ञात हो): <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              rows="3"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
+              value={person.currentAddress || ''}
+              onChange={(e) => updatePerson(person.id, 'currentAddress', e.target.value)}
+            />
+          </div>
+
+          {/* --- NEW SECTION: Main Respondent Selection --- */}
+          <div className="mb-2">
+             <div 
+               className={`flex items-center p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
+                 person.isMain 
+                   ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500' 
+                   : 'bg-white border-gray-300 hover:bg-gray-50'
+               }`}
+            
+             >
+              <div className="relative flex items-center justify-center">
+               <input
+  type="radio"
+  name="main_respondent"
+  checked={person.isMain === 1}
+  onChange={() => handleMainRespondent(person.id)}
+  className="accent-orange-500"
+/>
+              </div>
+              <div className="ml-3 text-sm select-none">
+                <label className="font-medium text-gray-900 cursor-pointer">
+                  मुख्य उत्तरदाता (Main Respondent)
+                </label>
+                <p className="text-gray-500 text-xs mt-0.5">
+                  क्या यह मुख्य व्यक्ति/अधिकारी है जिसके विरुद्ध शिकायत है?
+                </p>
+              </div>
+            </div>
+          </div>
+          {/* --- END NEW SECTION --- */}
+
+        </div>
+      )}
+    </div>
+  ))}
+
+  {/* Rest of the form (Date, Delay Reason, Previous Complaint) - UNTOUCHED */}
+  <div className="mb-4">
+    <label className="block text-gray-700 text-sm font-medium mb-2">
+      (2) दिनांक जब परिवाद का कारण उत्पन्न हुआ : <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="date"
+      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+        errors.cause_date ? 'border-red-500' : 'border-gray-300'
+      }`}
+      value={formData.complaintDate}
+      onChange={(e) => handleFormDataChange('complaintDate', e.target.value)}
+    />
+    {errors.cause_date && (
+      <p className="text-red-500 text-sm mt-1">{errors.cause_date[0]}</p>
+    )}
+  </div>
+
+  <div className="mb-4">
+    <label className="block text-gray-700 text-sm font-medium mb-2">
+      (3) यदि परिवाद धारा 8 (4) के अधीन समय व्यतीत हो जाने पर किया गया है तो विलम्ब का कारण : <span className="text-red-500">*</span>
+    </label>
+    <textarea
+      rows="4"
+      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y ${
+        errors.delay_reason ? 'border-red-500' : 'border-gray-300'
+      }`}
+      value={formData.delayReason}
+      onChange={(e) => handleFormDataChange('delayReason', e.target.value)}
+    />
+    {errors.delay_reason && (
+      <p className="text-red-500 text-sm mt-1">{errors.delay_reason[0]}</p>
+    )}
+  </div>
+
+  <div>
+    <label className="block text-gray-700 text-sm font-medium mb-3">
+      (4) क्या परिवाद पहले किसी वरिष्ठ अधिकारी / अधिकरण / न्यायालय के समक्ष किया गया था? <span className="text-red-500">*</span>
+    </label>
+    <div className="flex gap-6 mb-3">
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input
+          type="radio"
+          name="previousComplaint"
+          value="हाँ"
+          className="w-4 h-4 text-orange-500 focus:ring-orange-500"
+          checked={formData.previousComplaint === 'हाँ'}
+          onChange={(e) => handleFormDataChange('previousComplaint', e.target.value)}
+        />
+        <span className="text-gray-700">हाँ</span>
+      </label>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input
+          type="radio"
+          name="previousComplaint"
+          value="नहीं"
+          className="w-4 h-4 text-orange-500 focus:ring-orange-500"
+          checked={formData.previousComplaint === 'नहीं'}
+          onChange={(e) => handleFormDataChange('previousComplaint', e.target.value)}
+        />
+        <span className="text-gray-700">नहीं</span>
+      </label>
+    </div>
+    {errors.previously_submitted && (
+      <p className="text-red-500 text-sm mb-2">{errors.previously_submitted[0]}</p>
+    )}
+    {errors.previously_submitted_details && (
+      <p className="text-red-500 text-sm mb-2">{errors.previously_submitted_details[0]}</p>
+    )}
+    {formData.previousComplaint === 'हाँ' && (
+      <textarea
+        placeholder="यदि हाँ, तो परिणाम / स्थिति तथा यदि नहीं, तो संक्षेप में कारण लिखें।"
+        rows="4"
+        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
+        value={formData.previousComplaintDetails}
+        onChange={(e) => handleFormDataChange('previousComplaintDetails', e.target.value)}
+      />
+    )}
+  </div>
+</div>
+
 
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5 px-2">

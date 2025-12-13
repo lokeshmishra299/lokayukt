@@ -298,7 +298,7 @@ const ViewAllComplaint = () => {
                 </div>
               </div>
 
-              {/* ===== DESCRIPTION ===== */}
+        {/* Discription */}
 
               <p className="text-[14px] text-black font-semibold uppercase my-2">
                 {/* Description:{" "} */}
