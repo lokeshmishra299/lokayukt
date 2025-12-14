@@ -27,20 +27,15 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
       : '';
 
   return (
-    <div ref={ref} className="  rounded-md text-[12px] leading-relaxed text-gray-900">
-    
+    <div ref={ref} className="rounded-md text-[12px] leading-relaxed text-gray-900">
       <div className="w-full h-full px-8 pt-8 pb-10">
-
-  
         <div className="text-center mb-2">
           <p className="font-semibold text-[13px]">
-          "शिकायत", "अभिकथन" उत्तर प्रदेश लोक आयुक्त तथा माननीय उप लोक आयुक्त अधिनियम, 1975
-         
+            "शिकायत", "अभिकथन" उत्तर प्रदेश लोक आयुक्त तथा माननीय उप लोक आयुक्त अधिनियम, 1975
           </p>
         </div>
 
-       
-        <div className=" text-[12px]">
+        <div className="text-[12px]">
           {/* 1 */}
           <div className="flex gap-2">
             <span className="min-w-[18px]">1.</span>
@@ -48,7 +43,9 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
               <span>परिवादी का नाम :</span>
               <div className="mt-0.5 pl-4 space-y-0.5">
                 {complainants.map((c, idx) => (
-                  <div key={c.id || idx}>परिवादी {idx + 1} : {c.name || '——'}</div>
+                  <div key={c.id || idx}>
+                    परिवादी {idx + 1} {c.isMain === 1 ? '(मुख्य)' : ''} : {c.name || '——'}
+                  </div>
                 ))}
               </div>
             </div>
@@ -67,9 +64,9 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
             </div>
           </div>
 
-      
+          {/* 3 */}
           <div className="flex gap-2">
-            <span className="min-w-[18px]">2.</span>
+            <span className="min-w-[18px]">3.</span>
             <div className="flex-1 space-y-0.5">
               <div>
                 <span>(क) व्यवसाय :</span>
@@ -89,9 +86,34 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                   ))}
                 </div>
               </div>
-              <div>
+
+            </div>
+          </div>
+
+          {/* 4 स्थायी पता */}
+          <div className="flex gap-2 mt-1">
+            <span className="min-w-[18px]">4.</span>
+            <div className="flex-1 space-y-0.5">
+              <div>स्थायी पता :</div>
+              <div className="pl-4 space-y-2 mt-1">
+                {complainants.map((c, idx) => (
+                   <div key={c.id || idx} className="mb-1 pb-1 border-b border-gray-100 last:border-0 last:mb-0 last:pb-0">
+                      <div className="font-semibold text-[11px] mb-0.5">
+                        [ परिवादी {idx + 1} {c.isMain === 1 ? '(मुख्य)' : ''} ]
+                      </div>
+                      {/* <div>(क) नाम : {c.name || '——'}</div> */}
+                      <div>(ख) स्थान : {c.place || '——'}</div>
+                      <div>(ग) डाकघर या पुलिस थाना : {c.postOffice || '——'}</div>
+                      <div>(घ) जिला : {c.district || '——'}</div>
+                   </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+                        <div>
                 <span>
-                   यदि परिवाद किसी दूसरे व्यक्ति की ओर से है तो उस व्यक्ति के साथ अपना संबंध बतायें। यह साबित करने के लिए कि
+                  यदि परिवाद किसी दूसरे व्यक्ति की ओर से है तो उस व्यक्ति के साथ अपना संबंध बतायें। यह साबित करने के लिए कि
                   आप उसकी सम्पदा का प्रतिनिधित्व करतें हैं या उसने इस निमित्त आपको प्राधिकृत किया है, दस्तावेज भी यदि कोई हो,
                   संलग्न करें।
                 </span>
@@ -104,22 +126,6 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                   )}
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* 4 स्थायी पता */}
-          <div className="flex gap-2 mt-1">
-            <span className="min-w-[18px]">4.</span>
-            <div className="flex-1 space-y-0.5">
-              <div>स्थायी पता :</div>
-              <div className="pl-4 space-y-0.5">
-                <div>(क) नाम : {formData.permanentAddress.name || '——'}</div>
-                <div>(ख) स्थान : {formData.permanentAddress.place || '——'}</div>
-                <div>(ग) डाकघर या पुलिस थाना : {formData.permanentAddress.postOffice || '——'}</div>
-                <div>(घ) जिला : {formData.permanentAddress.district || '——'}</div>
-              </div>
-            </div>
-          </div>
 
           {/* 5 पत्राचार पता */}
           <div className="flex gap-2">
@@ -143,13 +149,13 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                 (1) जिस व्यक्ति के विरूद्ध परिवाद किया जा रहा है उसका नाम, पदनाम जो मामले के विषय में परिवाद किये जाने के समय पर रहा हो और वर्तमान
                 पता यदि ज्ञात हो :
               </div>
-              <div className="pl-4 space-y-0.5">
+              <div className="pl-4 space-y-2 mt-1">
                 {persons.map((p, idx) => (
                   <div
                     key={p.id || idx}
-                    className="border border-dashed border-orange-300 px-2 py-1 rounded-sm"
+                    className="border border-dashed border-orange-300 px-2 py-1 rounded-sm mb-1"
                   >
-                    <div>व्यक्ति {idx + 1}</div>
+                    <div className="font-bold mb-0.5">व्यक्ति {idx + 1} {p.isMain === 1 ? '(मुख्य)' : ''}</div>
                     <div>नाम : {p.name || '——'}</div>
                     <div>पदनाम : {p.designation || '——'}</div>
                     <div>वर्तमान पता : {p.currentAddress || '——'}</div>
@@ -221,28 +227,36 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
             </div>
           )}
 
-          {/* 9 - Updated to map array */}
+          {/* 9 - FIXED: Now properly maps array data */}
           <div className="flex gap-2 mt-1">
             <span className="min-w-[18px]">9.</span>
             <div className="flex-1">
               ऐसे व्यक्तियों की सूची जिन्होने परिवाद के समर्थन में शपथपत्र दिये हों।
               <div className="mt-0.5 pl-4">
-                {Array.isArray(formData.supportingPersons) 
-                  ? formData.supportingPersons.map(p => `${p.name} (${p.address})`).join(', ')
-                  : formData.supportingPersons || '——'}
+                {Array.isArray(formData.supportingPersons) && formData.supportingPersons.length > 0
+                  ? formData.supportingPersons.map((p, i) => (
+                      <div key={i} className="mb-0.5">
+                        {i + 1}. {p.name} {p.address ? `(पता: ${p.address})` : ''}
+                      </div>
+                    ))
+                  : '——'}
               </div>
             </div>
           </div>
 
-          {/* 10 */}
+          {/* 10 - FIXED: Now properly maps array data */}
           <div className="flex gap-2">
             <span className="min-w-[18px]">10.</span>
             <div className="flex-1">
               क्या ऐसे अन्य व्यक्ति भी है जिन्हे परिवाद से सम्बन्धित तथ्यों के बारे में जानकारी हो, जिन्हे लोक आयुक्त/उप लोक आयुक्त द्वारा समन करना चाहें।
               <div className="mt-0.5 pl-4">
-                {Array.isArray(formData.otherPersons) 
-                  ? formData.otherPersons.map(p => `${p.name} (${p.address})`).join(', ')
-                  : formData.otherPersons || '——'}
+                {Array.isArray(formData.otherPersons) && formData.otherPersons.length > 0
+                  ? formData.otherPersons.map((p, i) => (
+                      <div key={i} className="mb-0.5">
+                        {i + 1}. {p.name} {p.address ? `(पता: ${p.address})` : ''}
+                      </div>
+                    ))
+                  : '——'}
               </div>
             </div>
           </div>
@@ -263,7 +277,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
           <div className="flex gap-2">
             <span className="min-w-[18px]">12.</span>
             <div className="flex-1">
-              परिवाद का विवरण - कृपया यहाँ पर परिवाद के सम्पूर्ण तथ्य बतायें। 
+              परिवाद का विवरण - कृपया यहाँ पर परिवाद के सम्पूर्ण तथ्य बतायें।
               <div className="mt-0.5 pl-4 whitespace-pre-wrap break-words">
                 {formData.complaintDescription || '——'}
               </div>
@@ -275,6 +289,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
     </div>
   );
 });
+
 
 ComplaintPrintView.displayName = 'ComplaintPrintView';
 
@@ -693,148 +708,200 @@ const handleMainRespondent = (id) => {
     return newErrors;
   };
 
-  const handlePreview = (e) => {
-    e.preventDefault();
+  // const handlePreview = (e) => {
 
-    const validationErrors = validateForm();
 
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      toast.error('कृपया सभी आवश्यक फ़ील्ड भरें!', {
+  //   e.preventDefault();
+
+  //   const validationErrors = validateForm();
+
+  //   if (Object.keys(validationErrors).length > 0) {
+  //     setErrors(validationErrors);
+  //     toast.error('कृपया सभी आवश्यक फ़ील्ड भरें!', {
+  //       position: "top-right",
+  //       autoClose: 3000,
+  //     });
+  //     // window.scrollTo({ top: 0, behavior: 'smooth' });
+  //     return;
+  //   }
+
+  //   setErrors({});
+  //   setShowPreview(true);
+  // };
+
+
+    const handlePreview = (e) => {
+    if (e) e.preventDefault();
+
+    // 1. Validation Logic (Logic yahi likh diya taaki naye array ko check kare)
+    const newErrors = {};
+
+    // --- Check Complainants Array ---
+    complainants.forEach((comp, index) => {
+      // Basic Fields
+      if (!comp.name) newErrors[`complainant_name`] = `Parivadi ${index+1}: Name missing`;
+      if (!comp.fatherName) newErrors[`father_name`] = `Parivadi ${index+1}: Father Name missing`;
+      if (!comp.occupation) newErrors[`occupation`] = `Parivadi ${index+1}: Occupation missing`;
+      
+      // ✅ Address Fields (Ab ye Array me check honge)
+      if (!comp.district) newErrors[`permanent_district`] = `Parivadi ${index+1}: District missing`;
+      if (!comp.postOffice) newErrors[`permanent_post_office`] = `Parivadi ${index+1}: Post Office missing`;
+      if (!comp.place) newErrors[`permanent_place`] = `Parivadi ${index+1}: Place missing`;
+    });
+
+    // --- Check Other Mandatory Fields ---
+    if (!formData.complaintDescription) {
+      newErrors.complaint_description = "Complaint Description is missing";
+    }
+
+    // 2. Error Reporting (Console me dikhana)
+    if (Object.keys(newErrors).length > 0) {
+      // 🛑 Console Group Start
+      console.group("❌ PREVIEW BLOCKED - Validation Errors:");
+      console.error("List of Errors:", newErrors);
+      console.log("Current Complainants Data:", complainants); // Isse pata chalega data save hua ya nahi
+      console.groupEnd();
+      // 🛑 Console Group End
+
+      setErrors(newErrors);
+      toast.error('कृपया सभी आवश्यक फ़ील्ड भरें! (Console देखें)', {
         position: "top-right",
         autoClose: 3000,
       });
-      // window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Scroll to top (Optional)
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
+    // 3. Success
+    console.log("✅ Validation Passed! Opening Preview...");
     setErrors({});
     setShowPreview(true);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    // 1. Prevent Default Check
+    if (e) e.preventDefault(); 
+    
     setIsSubmitting(true);
-    setErrors({});
+    setErrors({})
+
+    // --- VALIDATION START ---
+    const newErrors = {};
+    
+    // Validate Complainants Array
+    complainants.forEach((comp, index) => {
+      // Basic Fields
+      if (!comp.name) newErrors[`complainant_name_${index}`] = "परिवादी का नाम अनिवार्य है";
+      if (!comp.fatherName) newErrors[`father_name_${index}`] = "पिता का नाम अनिवार्य है";
+      if (!comp.occupation) newErrors[`occupation_${index}`] = "व्यवसाय अनिवार्य है";
+      
+      // Address Fields (Ab ye array me hain)
+      if (!comp.district) newErrors[`permanent_district_${index}`] = "जिला अनिवार्य है";
+      if (!comp.postOffice) newErrors[`permanent_post_office_${index}`] = "डाकघर/थाना अनिवार्य है";
+      if (!comp.place) newErrors[`permanent_place_${index}`] = "स्थान अनिवार्य है";
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsSubmitting(false);
+      toast.error("कृपया सभी अनिवार्य फ़ील्ड भरें।", { position: "top-right" });
+      return;
+    }
+    // --- VALIDATION END ---
 
     try {
       const submitData = new FormData();
 
-      // 1. Complainants
+      // 1. Complainants & Their Addresses (MERGED LOOP)
       complainants.forEach((complainant, index) => {
-        submitData.append(`complainant_name[${index}]`, complainant.name);
-        submitData.append(`father_name[${index}]`, complainant.fatherName);
-        submitData.append(`occupation[${index}]`, complainant.occupation);
-        submitData.append(
-          `is_public_servant[${index}]`,
-          complainant.isPublicServant === 'हाँ' ? 'yes' : 'no'
-        );
+        // Personal Details
+        submitData.append(`complainant_name[${index}]`, complainant.name || '');
+        submitData.append(`father_name[${index}]`, complainant.fatherName || '');
+        submitData.append(`occupation[${index}]`, complainant.occupation || '');
+        submitData.append(`is_public_servant[${index}]`, complainant.isPublicServant === 'हाँ' ? 'yes' : 'no');
+        submitData.append(`is_main_c[${index}]`, complainant.isMain ? 1 : 0);
+
+        // ✅ FIXED: Address Fields ab Loop ke andar hain (Dynamic Index ke sath)
+        // Note: permanent_name usually same as complainant name in this context
+        submitData.append(`permanent_name[${index}]`, complainant.name || ''); 
+        submitData.append(`permanent_place[${index}]`, complainant.place || '');
+        submitData.append(`permanent_post_office[${index}]`, complainant.postOffice || '');
+        submitData.append(`permanent_district[${index}]`, complainant.district || '');
       });
 
       // 2. Respondents (Persons)
       persons.forEach((person, index) => {
-        submitData.append(`respondent_name[${index}]`, person.name);
-        submitData.append(`designation[${index}]`, person.designation);
-        submitData.append(`current_address[${index}]`, person.currentAddress);
-        
+        submitData.append(`respondent_name[${index}]`, person.name || '');
+        submitData.append(`designation[${index}]`, person.designation || '');
+        submitData.append(`current_address[${index}]`, person.currentAddress || '');
         submitData.append(`respondent_district[${index}]`, person.district || '');
         submitData.append(`department_name[${index}]`, person.departmentNature || '');
         submitData.append(`officer_category[${index}]`, person.officerCategory || '');
+        submitData.append(`is_main_r[${index}]`, person.isMain ? 1 : 0);
       });
 
-      // 3. Relation
-      submitData.append('relation_with_person', formData.relation);
+      // 3. Relation & Auth
+      submitData.append('relation_with_person', formData.relation || '');
       if (formData.authorizationFile) {
         submitData.append('authorization_document', formData.authorizationFile);
       }
 
-      // 4 & 5. Addresses 
-      // FIX: Changed to array format [0] to satisfy "must be an array" error
-      submitData.append('permanent_name[0]', formData.permanentAddress.name || (complainants[0] ? complainants[0].name : ''));
-      submitData.append('permanent_place[0]', formData.permanentAddress.place);
-      submitData.append('permanent_post_office[0]', formData.permanentAddress.postOffice);
-      submitData.append('permanent_district[0]', formData.permanentAddress.district);
+      // 4. Correspondence Address (Ye abhi bhi global formData se aa raha hai - agar UI me alag hai)
+      submitData.append('correspondence_name', formData.correspondenceAddress.name || '');
+      submitData.append('correspondence_place', formData.correspondenceAddress.place || '');
+      submitData.append('correspondence_post_office', formData.correspondenceAddress.postOffice || '');
+      submitData.append('correspondence_district', formData.correspondenceAddress.district || '');
 
-      submitData.append('correspondence_name', formData.correspondenceAddress.name);
-      submitData.append('correspondence_place', formData.correspondenceAddress.place);
-      submitData.append('correspondence_post_office', formData.correspondenceAddress.postOffice);
-      submitData.append('correspondence_district', formData.correspondenceAddress.district);
-
-      // 6. Cause Date
-      submitData.append('cause_date', formData.complaintDate);
-      submitData.append('delay_reason', formData.delayReason);
+      // 5. Complaint Details
+      submitData.append('cause_date', formData.complaintDate || '');
+      submitData.append('delay_reason', formData.delayReason || '');
       
-      const prevVal =
-        formData.previousComplaint === 'हाँ'
-          ? 'yes'
-          : formData.previousComplaint === 'नहीं'
-          ? 'no'
-          : '';
+      const prevVal = formData.previousComplaint === 'हाँ' ? 'yes' : formData.previousComplaint === 'नहीं' ? 'no' : '';
       submitData.append('previously_submitted', prevVal);
       if (prevVal === 'yes') {
         submitData.append('previously_submitted_details', formData.previousComplaintDetails || '');
       }
 
-      // 7. Category
-      const categoryVal =
-        formData.complaintType === 'अभिकथन'
-          ? 'assertion'
-          : formData.complaintType === 'शिकायत'
-          ? 'complaint'
-          : '';
+      // 6. Category
+      const categoryVal = formData.complaintType === 'अभिकथन' ? 'assertion' : formData.complaintType === 'शिकायत' ? 'complaint' : '';
       submitData.append('category', categoryVal);
 
-      // 8. Challan (Only if assertion)
+      // 7. Challan
       if (formData.complaintType === 'अभिकथन') {
-        submitData.append('challan_number', formData.challanNumber);
-        submitData.append('challan_date', formData.challanDate);
-
+        submitData.append('challan_number', formData.challanNumber || '');
+        submitData.append('challan_date', formData.challanDate || '');
         if (formData.challanFile) {
             submitData.append('challan_file', formData.challanFile);
         }
       }
 
-      // 9. Supporting Persons
-      // FIX: Added individual fields loop for support_name/support_address
+      // 8. Support Persons (Loop Fixed)
       if (Array.isArray(formData.supportingPersons)) {
         formData.supportingPersons.forEach((p, i) => {
-            submitData.append(`support_name[${i}]`, p.name);
-            submitData.append(`support_address[${i}]`, p.address);
+            submitData.append(`support_name[${i}]`, p.name || '');
+            submitData.append(`support_address[${i}]`, p.address || '');
         });
-        // Keeping JSON as fallback
-        submitData.append('supporting_affidavit_list', JSON.stringify(formData.supportingPersons));
       }
 
-      // 10. Other Witnesses
-      // FIX: Added individual fields loop for witness_name/witness_address
+      // 9. Other Witnesses (Loop Fixed)
       if (Array.isArray(formData.otherPersons)) {
          formData.otherPersons.forEach((p, i) => {
-            submitData.append(`witness_name[${i}]`, p.name);
-            submitData.append(`witness_address[${i}]`, p.address);
+            submitData.append(`witness_name[${i}]`, p.name || '');
+            submitData.append(`witness_address[${i}]`, p.address || '');
          });
-         // Keeping JSON as fallback
-         submitData.append('other_witnesses', JSON.stringify(formData.otherPersons));
       }
 
-      // 11. Attached Documents
+      // 10. Documents & Description
       if (formData.attachedDocumentsFile) {
         submitData.append('attached_documents', formData.attachedDocumentsFile);
       }
       submitData.append('attached_documents_description', formData.attachedDocuments || '');
-
-      // 12. Description
-      submitData.append('complaint_description', formData.complaintDescription);
+      submitData.append('complaint_description', formData.complaintDescription || '');
 
 
-complainants.forEach((complainant, index) => {
-  submitData.append(`is_main_c[${index}]`, complainant.isMain ?? 0);
-});
-
-
-persons.forEach((person, index) => {
-  submitData.append(`is_main_r[${index}]`, person.isMain ?? 0);
-});
-
-
+      // API Call
       await api.post('/operator/add-complaint', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -847,7 +914,9 @@ persons.forEach((person, index) => {
       });
       setShowPreview(false);
       handleReset();
+
     } catch (error) {
+      console.error("Submission Error:", error);
       if (error.response && error.response.data && error.response.data.errors) {
         setErrors(error.response.data.errors);
         setShowPreview(false);
@@ -952,7 +1021,7 @@ persons.forEach((person, index) => {
     प्रत्येक कार्ड एक परिवादी के लिए है। आवश्यकता अनुसार अतिरिक्त परिवादी जोड़े जा सकते हैं।
   </p>
 
-  {complainants.map((complainant, index) => (
+  {/* {complainants.map((complainant, index) => (
     <div key={complainant.id} className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
       <div className="bg-gray-50 px-5 py-3 flex justify-between items-center border-b border-gray-200">
         <h4 className="text-base font-medium text-gray-700">परिवादी {index + 1}</h4>
@@ -978,7 +1047,7 @@ persons.forEach((person, index) => {
 
       {showComplainants[complainant.id] && (
         <div className="p-5 animate-slideDown">
-          {/* Name and Father Name Row */}
+   
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-gray-700 text-sm font-medium mb-2">
@@ -1008,7 +1077,7 @@ persons.forEach((person, index) => {
             </div>
           </div>
 
-          {/* Occupation and Public Servant Row */}
+        
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-gray-700 text-sm font-medium mb-2">
@@ -1045,7 +1114,7 @@ persons.forEach((person, index) => {
             <p className="text-red-500 text-sm mb-4">{errors.complainant_name[0]}</p>
           )}
 
-          {/* Address Row (Post Office & District) */}
+        
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-gray-700 text-sm font-medium mb-2">
@@ -1091,7 +1160,7 @@ persons.forEach((person, index) => {
             </div>
           </div>
 
-          {/* Place Row */}
+      
           <div className="w-full mb-4 mt-4">
             <label className="block text-gray-700 text-sm font-medium mb-2">
               (ख) स्थान <span className="text-red-500">*</span>
@@ -1111,7 +1180,7 @@ persons.forEach((person, index) => {
             />
           </div>
 
-          {/* --- NEW SECTION: Main Complainant Selection --- */}
+      
           <div className="w-full mb-2">
             <div
               className={`flex items-center p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
@@ -1144,18 +1213,201 @@ persons.forEach((person, index) => {
                 <label className="font-medium text-gray-900 cursor-pointer">
                   मुख्य परिवादी (Main Complainant)
                 </label>
-                {/* <p className="text-gray-500 text-xs mt-0.5">
-                  क्या यह शिकायतकर्ता मुख्य परिवादी है? क्लिक करके चुनें/हटाएँ।
-                </p> */}
+           
               </div>
             </div>
           </div>
-          {/* --- END NEW SECTION --- */}
+  
+
+        </div>
+      )}
+    </div>
+  ))} */}
+
+
+  {complainants.map((complainant, index) => (
+    <div key={complainant.id} className="border border-gray-200 rounded-lg mb-4 overflow-hidden">
+      <div className="bg-gray-50 px-5 py-3 flex justify-between items-center border-b border-gray-200">
+        <h4 className="text-base font-medium text-gray-700">परिवादी {index + 1}</h4>
+        <div className="flex gap-2">
+          {complainants.length > 1 && (
+            <button
+              type="button"
+              className="text-red-600 hover:bg-red-50 border border-red-600 px-3 py-1 rounded text-sm transition-all duration-200"
+              onClick={() => removeComplainant(complainant.id)}
+            >
+              हटाएँ
+            </button>
+          )}
+          <button
+            type="button"
+            className="bg-white hover:bg-gray-100 border border-gray-300 px-3 py-1 rounded text-lg font-bold transition-all duration-200 min-w-[35px]"
+            onClick={() => toggleComplainant(complainant.id)}
+          >
+            {showComplainants[complainant.id] ? '−' : '+'}
+          </button>
+        </div>
+      </div>
+
+      {showComplainants[complainant.id] && (
+        <div className="p-5 animate-slideDown">
+          {/* Name and Father Name Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                परिवादी का नाम <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.complainant_name ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={complainant.name || ''}
+                onChange={(e) => updateComplainant(complainant.id, 'name', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                पिता का नाम <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.father_name ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={complainant.fatherName || ''}
+                onChange={(e) => updateComplainant(complainant.id, 'fatherName', e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Occupation and Public Servant Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                व्यवसाय (क) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.occupation ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={complainant.occupation || ''}
+                onChange={(e) => updateComplainant(complainant.id, 'occupation', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                क्या आप लोक सेवक हैं या नहीं (ख) <span className="text-red-500">*</span>
+              </label>
+              <select
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.is_public_servant ? 'border-red-500' : 'border-gray-300'
+                }`}
+                value={complainant.isPublicServant || ''}
+                onChange={(e) => updateComplainant(complainant.id, 'isPublicServant', e.target.value)}
+              >
+                <option value="चुनें">चुनें</option>
+                <option value="हाँ">हाँ</option>
+                <option value="नहीं">नहीं</option>
+              </select>
+            </div>
+          </div>
+
+          {errors.complainant_name && (
+            <p className="text-red-500 text-sm mb-4">{errors.complainant_name[0]}</p>
+          )}
+
+          {/* ✅ FIXED SECTION: Address Fields now linked to 'complainant' object */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                (ग) डाकघर या पुलिस थाना <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.permanent_post_office ? 'border-red-500' : 'border-gray-300'
+                }`}
+                // ✅ Fixed: Using complainant.postOffice
+                value={complainant.postOffice || ''}
+                // ✅ Fixed: Updating specific complainant
+                onChange={(e) => updateComplainant(complainant.id, 'postOffice', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                (घ) जिला <span className="text-red-500">*</span>
+              </label>
+              <select
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  errors.permanent_district ? 'border-red-500' : 'border-gray-300'
+                }`}
+                // ✅ Fixed: Using complainant.district
+                value={complainant.district || ''}
+                // ✅ Fixed: Updating specific complainant
+                onChange={(e) => updateComplainant(complainant.id, 'district', e.target.value)}
+              >
+                <option value="">ज़िला चुनें</option>
+                {districtList.map((dist, i) => (
+                  <option key={i} value={dist.district_code}>
+                    {dist.district_name} / {dist.dist_name_hi}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* ✅ FIXED SECTION: Place Field */}
+          <div className="w-full mb-4 mt-4">
+            <label className="block text-gray-700 text-sm font-medium mb-2">
+              (ख) स्थान <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                errors.permanent_place ? 'border-red-500' : 'border-gray-300'
+              }`}
+              // ✅ Fixed: Using complainant.place
+              value={complainant.place || ''}
+              // ✅ Fixed: Updating specific complainant
+              onChange={(e) => updateComplainant(complainant.id, 'place', e.target.value)}
+            />
+          </div>
+
+          {/* Main Complainant Selection */}
+          <div className="w-full mb-2">
+            <div
+              className={`flex items-center p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
+                complainant.isMain
+                  ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500'
+                  : 'bg-white border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <div className="relative flex items-center justify-center">
+                <label className="flex items-center p-4 rounded-lg cursor-pointer transition-all duration-200">
+                  <input
+                    type="checkbox"
+                    checked={complainant.isMain === 1}
+                    onChange={() => handleMainComplainant(complainant.id)}
+                    className="accent-orange-500"
+                  />
+                </label>
+              </div>
+              <div className="ml-3 text-sm select-none">
+                <label className="font-medium text-gray-900 cursor-pointer">
+                  मुख्य परिवादी (Main Complainant)
+                </label>
+              </div>
+            </div>
+          </div>
+          {/* END NEW SECTION */}
 
         </div>
       )}
     </div>
   ))}
+
 </div>
 
 
@@ -1353,7 +1605,7 @@ persons.forEach((person, index) => {
                 onChange={(e) => updatePerson(person.id, 'district', e.target.value)}
               >
                 <option value="">ज़िला चुनें</option>
-                {districtList.map((dist, i) => (
+                  {districtList.map((dist, i) => (
                   <option key={i} value={dist.district_code}>
                     {dist.district_name} / {dist.dist_name_hi}
                   </option>
