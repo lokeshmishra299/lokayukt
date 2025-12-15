@@ -237,53 +237,181 @@ class OperatorReportController extends Controller
     // ->where('cm.id', $id)
     // ->first();
 
-    $complainDetails = DB::table('complaints as cm')
-    // ->leftJoin('district_master as dd', 'cm.permanent_district', '=', 'dd.district_code')
+    // $complainDetails = DB::table('complaints as cm')
+    // // ->leftJoin('district_master as dd', 'cm.permanent_district', '=', 'dd.district_code')
+    // ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
+    // ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
+    // ->leftJoin('complainants as cpt', DB::raw("cm.id"), '=', DB::raw("cpt.complaint_id "))
+    // ->leftJoin('respondents as r', DB::raw("cm.id"), '=', DB::raw("r.complaint_id"))
+    // ->select(
+    //     'cm.*',
+    //     // 'dd.district_name as permanent_district_name',
+    //     'ddn.district_name as correspondence_district',
+    //     'ca.remarks as ca_remark',
+    //     'ca.subject as ca_subject',
+    //     'ca.status as ca_status',
+    //     // 'ca.created_at as created_at',
+    //     // 'cpt.complainant_name as comp_name',
+    //     // 'cpt.father_name as comp_fname',
+    //     // 'cpt.occupation as comp_occupation',
+    //     // 'cpt.is_public_servant as comp_public_servant',
+    //     // 'r.respondent_name as r_name',
+    //     // 'r.designation as r_desig',
+    //     // 'r.current_address as r_address',
+    // )
+    // ->where('cm.id', $id)
+    // ->first();
+    // $complainDetails->complainants =  DB::table('complainants')
+    //  ->leftJoin('district_master as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
+    // ->select('complainants.*','ddn.district_name')
+    //  ->where('complaint_id', $id)
+    // ->get();
+    //  $complainDetails->respondant =  DB::table('respondents')
+    //   ->leftJoin('district_master as r', 'respondents.respondent_district', '=', 'r.district_code')
+    // ->select('respondents.*','r.district_name')
+    // ->where('complaint_id', $id)
+    // ->get();
+    //  $complainDetails->support =  DB::table('complaint_supporting')
+    // ->where('complaint_id', $id)
+    // ->get();
+    //  $complainDetails->witness =  DB::table('complaint_witness')
+    // ->where('complaint_id', $id)
+    // ->get();
+    //  $complainDetails->actions =  DB::table('complaint_actions')
+    // ->where('complaint_id', $id)
+    //  ->where(function($q){
+    //                         $q->where('status','Verified')
+    //                         ->Orwhere('status', 'Forwarded');               
+    //                      })
+    // ->get();
+
+    /*--------------------------------------------------
+| MAIN COMPLAINT + MAIN COMPLAINANT + MAIN RESPONDENT
+|--------------------------------------------------*/
+// $complainDetails = DB::table('complaints as cm')
+//     ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
+//     // MAIN COMPLAINANT (is_main = 1)
+//     ->leftJoin('complainants as cpt', function ($join) {
+//         $join->on('cm.id', '=', 'cpt.complaint_id')
+//              ->where('cpt.is_main', 1);
+//     })
+
+//     // MAIN RESPONDENT (is_main = 1)
+//     ->leftJoin('respondents as r', function ($join) {
+//         $join->on('cm.id', '=', 'r.complaint_id')
+//              ->where('r.is_main', 1);
+//     })
+
+//     ->leftJoin('complaint_actions as ca', 'cm.id', '=', 'ca.complaint_id')
+
+//     ->select(
+//         'cm.*',
+//         'ddn.district_name as correspondence_district',
+
+//         // main complainant
+//         'cpt.complainant_name as main_complainant_name',
+//         'cpt.father_name as main_complainant_father',
+//         // 'cpt.mobile_no as main_complainant_mobile',
+//         // 'cpt.mobile_no as main_complainant_mobile',
+//         // 'cpt.mobile_no as main_complainant_mobile',
+
+//         // main respondent
+//         'r.respondent_name as main_respondent_name',
+//         'r.designation as main_respondent_designation',
+
+//         // last action (if exists)
+//         'ca.remarks as ca_remark',
+//         'ca.subject as ca_subject',
+//         'ca.status as ca_status'
+//     )
+//     ->where('cm.id', $id)
+//     ->first();
+
+$complainDetails = DB::table('complaints as cm')
+
     ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
-    ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
-    ->leftJoin('complainants as cpt', DB::raw("cm.id"), '=', DB::raw("cpt.complaint_id "))
-    ->leftJoin('respondents as r', DB::raw("cm.id"), '=', DB::raw("r.complaint_id"))
+
+    // MAIN COMPLAINANT ONLY
+    ->join('complainants as cpt', function ($join) {
+        $join->on('cm.id', '=', 'cpt.complaint_id')
+             ->where('cpt.is_main', 1);
+    })
+
+    // MAIN RESPONDENT ONLY
+    ->join('respondents as r', function ($join) {
+        $join->on('cm.id', '=', 'r.complaint_id')
+             ->where('r.is_main', 1);
+    })
+
+    ->leftJoin('complaint_actions as ca', 'cm.id', '=', 'ca.complaint_id')
+
     ->select(
         'cm.*',
-        // 'dd.district_name as permanent_district_name',
         'ddn.district_name as correspondence_district',
+
+        // main complainant
+        'cpt.complainant_name as main_complainant_name',
+        'cpt.father_name as main_complainant_father',
+
+        // main respondent
+        'r.respondent_name as main_respondent_name',
+        'r.designation as main_respondent_designation',
+
+        // action
         'ca.remarks as ca_remark',
         'ca.subject as ca_subject',
-        'ca.status as ca_status',
-        // 'ca.created_at as created_at',
-        // 'cpt.complainant_name as comp_name',
-        // 'cpt.father_name as comp_fname',
-        // 'cpt.occupation as comp_occupation',
-        // 'cpt.is_public_servant as comp_public_servant',
-        // 'r.respondent_name as r_name',
-        // 'r.designation as r_desig',
-        // 'r.current_address as r_address',
+        'ca.status as ca_status'
     )
+
     ->where('cm.id', $id)
     ->first();
+
+
+/*--------------------------------------------------
+| ALL Complainant
+|--------------------------------------------------*/
     $complainDetails->complainants =  DB::table('complainants')
      ->leftJoin('district_master as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
     ->select('complainants.*','ddn.district_name')
      ->where('complaint_id', $id)
     ->get();
-     $complainDetails->respondant =  DB::table('respondents')
-      ->leftJoin('district_master as r', 'respondents.respondent_district', '=', 'r.district_code')
-    ->select('respondents.*','r.district_name')
+/*--------------------------------------------------
+| ALL RESPONDENTS
+|--------------------------------------------------*/
+$complainDetails->respondant = DB::table('respondents')
+    ->leftJoin('district_master as r', 'respondents.respondent_district', '=', 'r.district_code')
+    ->select('respondents.*', 'r.district_name')
     ->where('complaint_id', $id)
     ->get();
-     $complainDetails->support =  DB::table('complaint_supporting')
+
+
+/*--------------------------------------------------
+| SUPPORTING DOCUMENTS
+|--------------------------------------------------*/
+$complainDetails->support = DB::table('complaint_supporting')
     ->where('complaint_id', $id)
     ->get();
-     $complainDetails->witness =  DB::table('complaint_witness')
+
+
+/*--------------------------------------------------
+| WITNESSES
+|--------------------------------------------------*/
+$complainDetails->witness = DB::table('complaint_witness')
     ->where('complaint_id', $id)
     ->get();
-     $complainDetails->actions =  DB::table('complaint_actions')
+
+
+/*--------------------------------------------------
+| ACTIONS (Verified / Forwarded only)
+|--------------------------------------------------*/
+$complainDetails->actions = DB::table('complaint_actions')
     ->where('complaint_id', $id)
-     ->where(function($q){
-                            $q->where('status','Verified')
-                            ->Orwhere('status', 'Forwarded');               
-                         })
+    ->where(function ($q) {
+        $q->where('status', 'Verified')
+          ->orWhere('status', 'Forwarded');
+    })
     ->get();
+
 
     // dd($complainDetails);
 
