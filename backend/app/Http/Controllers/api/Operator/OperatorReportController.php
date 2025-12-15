@@ -330,7 +330,7 @@ class OperatorReportController extends Controller
 $complainDetails = DB::table('complaints as cm')
 
     ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
-
+  
     // MAIN COMPLAINANT ONLY
     ->join('complainants as cpt', function ($join) {
         $join->on('cm.id', '=', 'cpt.complaint_id')
@@ -342,6 +342,8 @@ $complainDetails = DB::table('complaints as cm')
         $join->on('cm.id', '=', 'r.complaint_id')
              ->where('r.is_main', 1);
     })
+  ->leftJoin('district_master as dmc', 'cpt.permanent_district', '=', 'dmc.district_code')
+    ->leftJoin('district_master as rmc', 'r.respondent_district', '=', 'rmc.district_code')
 
     ->leftJoin('complaint_actions as ca', 'cm.id', '=', 'ca.complaint_id')
 
@@ -352,7 +354,8 @@ $complainDetails = DB::table('complaints as cm')
         // main complainant
         'cpt.complainant_name as main_complainant_name',
         'cpt.father_name as main_complainant_father',
-
+        'rmc.district_name as main_complainant_district',
+        'dmc.district_name as main_respondant_district',
         // main respondent
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',
