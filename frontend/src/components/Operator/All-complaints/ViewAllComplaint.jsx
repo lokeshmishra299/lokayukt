@@ -397,19 +397,21 @@ main_respondent_designation
                 <div>
                   <p className="text-[14px] text-black font-semibold uppercase mb-1">
                     {/* CORRESPONDENCE DISTRICT */}
-                    पत्राचार हेतु जिला
+                    मुख्य परिवादी का जिला
                   </p>
                   <p className=" text-gray-800 text-sm ">
-                    {complaintData.correspondence_district || "N/A"}
+                    {complaintData.main_complainant_district || "N/A"}
                   </p>
 
                   <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
                     {/* previously_submitted */}
-                   मुख्य प्रतिवादी का नाम
+                   मुख्य प्रतिवादी का जिला
                   </p>
                   <p className=" text-gray-800 text-sm ">
                     {complaintData.
-main_respondent_name
+
+main_respondant_district
+
 || "N/A"}
                   </p>
 
