@@ -17,6 +17,8 @@ import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 import HideModule from "./SubModule/HideModule";
+import Fees from "./SubModule/Fees";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -151,7 +153,7 @@ const ViewAllComplaint = () => {
   const { id } = useParams();
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("documents");
+  const [activeTab, setActiveTab] = useState("fee");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
@@ -682,7 +684,7 @@ const ViewAllComplaint = () => {
               complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ?
                 <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["documents", "notings", "movement"].map((tab) => (
+                {["fee", "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -695,6 +697,7 @@ const ViewAllComplaint = () => {
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
+                    {tab === "fee" && "Fee Verification"}
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
@@ -713,7 +716,7 @@ const ViewAllComplaint = () => {
      complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ?
     <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["documents", "notings", "movement"].map((tab) => (
+                {["fee","documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -723,6 +726,7 @@ const ViewAllComplaint = () => {
                         : "text-gray-600 hover:text-gray-800"
                     }`}
                   >
+                      {tab === "fee" && "Fee Verification"}
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
@@ -746,6 +750,12 @@ const ViewAllComplaint = () => {
 
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+
+              {activeTab === "fee" && (
+    <Fees complaint={complaintData} />
+  )}
+
+
               {activeTab === "documents" && (
                 <Documents complaint={complaintData} />
               )}

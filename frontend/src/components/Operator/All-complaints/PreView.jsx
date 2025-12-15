@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useRef } from "react";
 import { FaPrint } from "react-icons/fa";
+import html2pdf from "html2pdf.js";
 
 const PreView = ({ complaintData }) => {
+  const contentRef = useRef(null);
+
   // Helper to handle null/undefined/empty
   const safeData = (data, fallback = "—") => 
     (data !== null && data !== undefined && data !== "null" && data !== "") ? data : fallback;
@@ -32,6 +35,23 @@ const PreView = ({ complaintData }) => {
   const validSupport = Array.isArray(data.support) ? data.support : [];
   const validWitness = Array.isArray(data.witness) ? data.witness : [];
 
+  // PDF Download Handler
+  const handlePdfDownload = () => {
+    const element = contentRef.current;
+    const opt = {
+      margin: 0, // Removed margin so background color fills the page
+      filename: `शिकायत_${safeData(data.complain_no)}.pdf`,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { 
+        scale: 2, 
+        backgroundColor: "#FFFBF2", // Force background color
+        useCORS: true 
+      },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+    html2pdf().set(opt).from(element).save();
+  };
+
   return (
     <div className="w-full h-full bg-[#FFFBF2] rounded-lg flex flex-col overflow-hidden shadow-xl border border-gray-200">
       
@@ -43,17 +63,19 @@ const PreView = ({ complaintData }) => {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => window.print()}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+            onClick={handlePdfDownload}
+            className="flex items-center relative right-8 gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition"
           >
-            <FaPrint className="text-xs text-white" />
-            <span className="text-white">डाउनलोड करें</span>
+            <FaPrint className="text-xs" />
+            <span>डाउनलोड करें</span>
           </button>
         </div>
       </div>
 
+      {/* Content */}
       <div className="flex-1 overflow-y-auto bg-[#FFFBF2] p-6 md:p-8 flex justify-center">
-        <div className="w-full max-w-4xl text-[13px] text-gray-900 leading-relaxed">
+        {/* Added bg-[#FFFBF2] and p-8 here so the captured element has the color */}
+        <div ref={contentRef} className="w-full max-w-4xl text-[13px] text-gray-900 leading-relaxed bg-[#FFFBF2] p-8">
           
           <div className="text-center mb-8">
             <h1 className="font-semibold text-sm">
@@ -121,21 +143,6 @@ const PreView = ({ complaintData }) => {
                       ))
                     ) : <div className="pl-4 mt-0.5 font-medium">NA</div>}
                 </div>
-
-                {/* 3(c) Relation */}
-                {/* <div>
-                    <span>
-                      यदि परिवाद किसी दूसरे व्यक्ति की ओर से है तो उस व्यक्ति के साथ अपना संबंध बतायें। 
-                    </span>
-                    <div className="pl-4 mt-0.5 font-medium">
-                      {safeData(data.relation_with_person)}
-                    </div>
-                    {data.authorization_document && (
-                        <div className="pl-4 mt-0.5 text-xs text-blue-600 break-all">
-                          (संलग्न: {data.authorization_document})
-                        </div>
-                    )}
-                </div> */}
               </div>
             </div>
 
@@ -171,7 +178,7 @@ const PreView = ({ complaintData }) => {
               </div>
             </div>
 
-            {/* 6. Respondent Details - UPDATED MAPPING HERE */}
+            {/* 6. Respondent Details */}
             <div className="flex gap-2">
               <span className="min-w-[20px]">6.</span>
               <div className="flex-1">
@@ -188,17 +195,9 @@ const PreView = ({ complaintData }) => {
                             </div>
                             <div className="space-y-1 font-medium text-gray-800 text-sm">
                                 <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">नाम:</span> <span>{safeData(resp.respondent_name)}</span></div>
-                                
-                                {/* Mapping Designation directly */}
                                 <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">पदनाम:</span> <span>{safeData(resp.designation)}</span></div>
-                                
-                                {/* Mapping Department Name directly */}
                                 <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">विभाग:</span> <span>{safeData(resp.department_name)}</span></div>
-                                
-                                {/* Mapping District Name directly, fallback to respondent_district ID if name missing */}
                                 <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">जिला:</span> <span>{safeData(resp.district_name || resp.respondent_district)}</span></div>
-                                
-                                {/* Mapping Current Address directly */}
                                 <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">पता:</span> <span>{safeData(resp.current_address)}</span></div>
                             </div>
                         </div>
@@ -296,7 +295,7 @@ const PreView = ({ complaintData }) => {
               <div className="flex-1">
                 <span>परिवाद से सम्बन्धित संलग्न दस्तावेजों की सूची :</span>
                 <div className="pl-4 mt-0.5 font-medium break-all">
-                  {safeData(data.attached_documents)}
+                  {safeData(data.attached_documents_description)}
                 </div>
               </div>
             </div>
