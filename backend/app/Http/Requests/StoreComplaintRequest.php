@@ -65,6 +65,7 @@ class StoreComplaintRequest extends FormRequest
             // 'support_address'   => 'required|string',
             // 'witness_name'             => 'required|string',
             // 'witness_address'             => 'required|string|250',
+            'attached_documents_description'          => 'required|string|max:255',
             'attached_documents'          => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             'complaint_description'       => 'required|string',
 
@@ -181,6 +182,7 @@ class StoreComplaintRequest extends FormRequest
             ----------------------------------------- */
             'supporting_affidavit_list.required' => 'Supporting affidavit list required.',
             'other_witnesses.required' => 'Other witnesses detail required.',
+            'attached_documents_description.required' => 'Attached documents Description detail required.',
             'attached_documents.required' => 'Attached documents detail required.',
             'complaint_description.required' => 'Complaint description is required.',
 

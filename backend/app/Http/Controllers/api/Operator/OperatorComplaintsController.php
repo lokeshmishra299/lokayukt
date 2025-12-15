@@ -61,6 +61,7 @@ class OperatorComplaintsController extends Controller
             'challan_number'              => $request->challan_number,
             'challan_date'                => $request->challan_date,
             'challan_file'                => $challanFile,
+            'attached_documents_description' => $request->attached_documents_description,
             'attached_documents'          => $attached_documents,
             'complaint_description'       => $request->complaint_description,
         ]);
@@ -89,7 +90,7 @@ class OperatorComplaintsController extends Controller
                 DB::table('complainants')->insert([
                     'complaint_id'          => $complaintId,
                     'complainant_name'      => trim($name),
-                    'is_main'               => $request->is_main[$i] ?? '',
+                    'is_main'               => $request->is_main_c[$i] ?? '',
                     'father_name'           => $request->father_name[$i] ?? '',
                     'occupation'            => $request->occupation[$i] ?? '',
                     'is_public_servant'     => $request->is_public_servant[$i] ?? 'no',
@@ -147,7 +148,7 @@ class OperatorComplaintsController extends Controller
                     'officer_category'    => $request->officer_category[$i] ?? '',
                     'department_name'     => $request->department_name[$i] ?? '',
                     'current_address'     => $request->current_address[$i] ?? '',
-                    'is_main'             => $request->is_main[$i] ?? '',
+                    'is_main'             => $request->is_main_r[$i] ?? '',
                     'respondent_district' => $request->respondent_district[$i] ?? null,
                 ]);
             }
