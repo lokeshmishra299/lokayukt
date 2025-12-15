@@ -2,34 +2,40 @@ import React from "react";
 import { FaPrint } from "react-icons/fa";
 
 const PreView = ({ complaintData }) => {
+  // Helper to handle null/undefined/empty
+  const safeData = (data, fallback = "—") => 
+    (data !== null && data !== undefined && data !== "null" && data !== "") ? data : fallback;
 
-  const safeData = (data, fallback = "—") => (data !== null && data !== undefined && data !== "null") ? data : fallback;
-
+  // Helper to format Date
   const formatDate = (dateString) => {
     if (!dateString) return "—";
-    return new Date(dateString).toLocaleDateString("hi-IN", {
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? "—" : date.toLocaleDateString("hi-IN", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
     });
   };
 
+  // Extract data object safely
+  const data = complaintData?.data || complaintData || {};
 
-  const data = complaintData?.data || complaintData;
-
-  const validComplainants = data.complainants 
-    ? data.complainants.filter(c => c.complainant_name) 
+  // --- ARRAY DATA PREPARATION ---
+  const validComplainants = Array.isArray(data.complainants) 
+    ? data.complainants 
     : [];
 
-  const validRespondents = data.respondant 
-    ? data.respondant.filter(r => r.respondent_name) 
+  const validRespondents = Array.isArray(data.respondant) 
+    ? data.respondant
     : [];
+
+  const validSupport = Array.isArray(data.support) ? data.support : [];
+  const validWitness = Array.isArray(data.witness) ? data.witness : [];
 
   return (
-
     <div className="w-full h-full bg-[#FFFBF2] rounded-lg flex flex-col overflow-hidden shadow-xl border border-gray-200">
       
-  
+      {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white shrink-0">
         <h2 className="text-xl font-bold text-gray-800">
           शिकायत पूर्वावलोकन - {safeData(data.complain_no)}
@@ -38,7 +44,7 @@ const PreView = ({ complaintData }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => window.print()}
-            className="flex items-center mr-8 gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-blue-600 hover:bg-blue-700 rounded-lg transition"
           >
             <FaPrint className="text-xs text-white" />
             <span className="text-white">डाउनलोड करें</span>
@@ -46,9 +52,7 @@ const PreView = ({ complaintData }) => {
         </div>
       </div>
 
-
       <div className="flex-1 overflow-y-auto bg-[#FFFBF2] p-6 md:p-8 flex justify-center">
-        
         <div className="w-full max-w-4xl text-[13px] text-gray-900 leading-relaxed">
           
           <div className="text-center mb-8">
@@ -59,7 +63,7 @@ const PreView = ({ complaintData }) => {
 
           <div className="space-y-4">
             
-   
+            {/* 1. Complainant Name */}
             <div className="flex gap-2">
               <span className="min-w-[20px]">1.</span>
               <div className="flex-1">
@@ -119,7 +123,7 @@ const PreView = ({ complaintData }) => {
                 </div>
 
                 {/* 3(c) Relation */}
-                <div>
+                {/* <div>
                     <span>
                       यदि परिवाद किसी दूसरे व्यक्ति की ओर से है तो उस व्यक्ति के साथ अपना संबंध बतायें। 
                     </span>
@@ -127,23 +131,22 @@ const PreView = ({ complaintData }) => {
                       {safeData(data.relation_with_person)}
                     </div>
                     {data.authorization_document && (
-                        <div className="pl-4 mt-0.5 text-xs text-blue-600">
-                          (संलग्न दस्तावेज़ उपलब्ध)
+                        <div className="pl-4 mt-0.5 text-xs text-blue-600 break-all">
+                          (संलग्न: {data.authorization_document})
                         </div>
                     )}
-                </div>
+                </div> */}
               </div>
             </div>
 
-            {/* 4. Permanent Address - Removes white background */}
+            {/* 4. Permanent Address */}
             <div className="flex gap-2">
               <span className="min-w-[20px]">4.</span>
               <div className="flex-1">
                 <span>स्थायी पता :</span>
                 {validComplainants.length > 0 ? (
                     validComplainants.map((comp, index) => (
-                        // Removed bg-white, kept border for separation only
-                        <div key={index} className="pl-4 mt-2 font-medium  rounded p-2 mb-2">
+                        <div key={index} className="pl-4 mt-2 font-medium rounded p-2 mb-2 border border-dashed border-gray-400">
                              <div className="font-bold text-blue-800 underline mb-1">परिवादी {index + 1}</div>
                              <p><span className="font-semibold text-gray-700">(क) स्थान :</span> {safeData(comp.permanent_place)}</p>
                              <p><span className="font-semibold text-gray-700">(ख) डाकघर :</span> {safeData(comp.permanent_post_office)}</p>
@@ -168,7 +171,7 @@ const PreView = ({ complaintData }) => {
               </div>
             </div>
 
-            {/* 6. Respondent Details - Removes white background */}
+            {/* 6. Respondent Details - UPDATED MAPPING HERE */}
             <div className="flex gap-2">
               <span className="min-w-[20px]">6.</span>
               <div className="flex-1">
@@ -179,17 +182,24 @@ const PreView = ({ complaintData }) => {
                 <div className="pl-4 mt-2 space-y-4">
                   {validRespondents.length > 0 ? (
                     validRespondents.map((resp, index) => (
-                        // Removed bg-gray-50/white
-                        <div key={index} className=" p-3 rounded shadow-sm">
+                        <div key={index} className="p-3 rounded shadow-sm border border-gray-200">
                             <div className="font-bold underline decoration-gray-400 mb-2 text-blue-800">
                                 विपक्षी संख्या {index + 1}
                             </div>
                             <div className="space-y-1 font-medium text-gray-800 text-sm">
                                 <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">नाम:</span> <span>{safeData(resp.respondent_name)}</span></div>
-                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">पदनाम:</span> <span>{safeData(resp.respondent_designation)}</span></div>
-                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">विभाग:</span> <span>{safeData(resp.respondent_department)}</span></div>
-                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">जिला:</span> <span>{safeData(resp.respondent_district)}</span></div>
-                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">पता:</span> <span>{safeData(resp.respondent_address)}</span></div>
+                                
+                                {/* Mapping Designation directly */}
+                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">पदनाम:</span> <span>{safeData(resp.designation)}</span></div>
+                                
+                                {/* Mapping Department Name directly */}
+                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">विभाग:</span> <span>{safeData(resp.department_name)}</span></div>
+                                
+                                {/* Mapping District Name directly, fallback to respondent_district ID if name missing */}
+                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">जिला:</span> <span>{safeData(resp.district_name || resp.respondent_district)}</span></div>
+                                
+                                {/* Mapping Current Address directly */}
+                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">पता:</span> <span>{safeData(resp.current_address)}</span></div>
                             </div>
                         </div>
                     ))
@@ -224,7 +234,7 @@ const PreView = ({ complaintData }) => {
                <div>
                  क्या यह (क) कोई अभिकथन है? या (ख) शिकायत है?
                  <div className="pl-4 mt-0.5 font-medium">
-                    श्रेणी : {safeData(data.category)}
+                   श्रेणी : {safeData(data.category)}
                  </div>
                </div>
             </div>
@@ -235,8 +245,8 @@ const PreView = ({ complaintData }) => {
                <div className="flex-1">
                  <span>चालान का विवरण (यदि लागू हो) :</span>
                  <div className="pl-4 mt-0.5 space-y-0.5 font-medium">
-                   <p>चालान संख्या: {safeData(data.challan_number)}</p>
-                   <p>दिनांक: {formatDate(data.challan_date)}</p>
+                   <p>चालान संख्या: {safeData(data.challan_number) || "NA"}</p>
+                   <p>दिनांक: {formatDate(data.challan_date) || "NA"}</p>
                    {data.challan_file && (
                      <p className="text-xs text-blue-600">(चालान फाइल संलग्न)</p>
                    )}
@@ -244,17 +254,17 @@ const PreView = ({ complaintData }) => {
                </div>
             </div>
             
-             {/* 9. Witnesses */}
+             {/* 9. Witnesses (Support) */}
             <div className="flex gap-2">
               <span className="min-w-[20px]">9.</span>
               <div className="flex-1">
                 <span>उन व्यक्तियों के नाम और पते जो शपथ पत्र देंगे :</span>
-                {data.support && data.support.length > 0 ? (
+                {validSupport.length > 0 ? (
                   <ul className="pl-4 mt-1 list-decimal list-inside font-medium space-y-1">
-                    {data.support.map((person, idx) => (
+                    {validSupport.map((person, idx) => (
                         <li key={idx}>
-                          <span className="font-bold">{safeData(person.name)}</span> 
-                          <span className="text-gray-600 text-xs ml-1">({safeData(person.address)})</span>
+                          <span className="font-bold">{safeData(person.support_name)}</span> 
+                          <span className="text-gray-600 text-xs ml-1">({safeData(person.support_address)})</span>
                         </li>
                     ))}
                   </ul>
@@ -267,13 +277,13 @@ const PreView = ({ complaintData }) => {
               <span className="min-w-[20px]">10.</span>
               <div className="flex-1">
                 <span>अन्य गवाहों के नाम और पते :</span>
-                {data.witness && data.witness.length > 0 ? (
+                {validWitness.length > 0 ? (
                   <ul className="pl-4 mt-1 list-decimal list-inside font-medium space-y-1">
-                    {data.witness.map((person, idx) => (
-                         <li key={idx}>
-                           <span className="font-bold">{safeData(person.name)}</span> 
-                           <span className="text-gray-600 text-xs ml-1">({safeData(person.address)})</span>
-                         </li>
+                    {validWitness.map((person, idx) => (
+                          <li key={idx}>
+                            <span className="font-bold">{safeData(person.witness_name)}</span> 
+                            <span className="text-gray-600 text-xs ml-1">({safeData(person.witness_address)})</span>
+                          </li>
                     ))}
                   </ul>
                 ) : <div className="pl-4 mt-0.5 font-medium">NA</div>}
@@ -285,19 +295,18 @@ const PreView = ({ complaintData }) => {
               <span className="min-w-[20px]">11.</span>
               <div className="flex-1">
                 <span>परिवाद से सम्बन्धित संलग्न दस्तावेजों की सूची :</span>
-                <div className="pl-4 mt-0.5 font-medium">
+                <div className="pl-4 mt-0.5 font-medium break-all">
                   {safeData(data.attached_documents)}
                 </div>
               </div>
             </div>
 
-             {/* 12. Full Description - Removes white background */}
+             {/* 12. Full Description */}
              <div className="flex gap-2">
               <span className="min-w-[20px]">12.</span>
               <div className="flex-1">
                 <span>परिवाद का विवरण - कृपया यहाँ पर परिवाद के सम्पूर्ण तथ्य बतायें।</span>
-                {/* Removed bg-gray-50/white */}
-                <div className="pl-4 mt-1 whitespace-pre-wrap break-words font-medium  p-3 rounded">
+                <div className="pl-4 mt-1 whitespace-pre-wrap break-words font-medium p-3 rounded">
                    {safeData(data.complaint_description)}
                 </div>
               </div>
