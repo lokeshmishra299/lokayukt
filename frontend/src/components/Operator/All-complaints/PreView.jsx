@@ -39,12 +39,12 @@ const PreView = ({ complaintData }) => {
   const handlePdfDownload = () => {
     const element = contentRef.current;
     const opt = {
-      margin: 0, // Removed margin so background color fills the page
+      margin: 0, 
       filename: `शिकायत_${safeData(data.complain_no)}.pdf`,
       image: { type: "jpeg", quality: 0.98 },
       html2canvas: { 
         scale: 2, 
-        backgroundColor: "#FFFBF2", // Force background color
+        backgroundColor: "#FFFBF2", 
         useCORS: true 
       },
       jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
@@ -53,10 +53,10 @@ const PreView = ({ complaintData }) => {
   };
 
   return (
-    <div className="w-full h-full bg-[#FFFBF2] rounded-lg flex flex-col overflow-hidden shadow-xl border border-gray-200">
+    <div className="w-full h-full bg-[#FFFBF2] rounded-lg flex flex-col overflow-hidden shadow-xl border ">
       
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white shrink-0">
+      
+      <div className="flex items-center justify-between px-6 py-4   bg-white shrink-0">
         <h2 className="text-xl font-bold text-gray-800">
           शिकायत पूर्वावलोकन - {safeData(data.complain_no)}
         </h2>
@@ -72,7 +72,7 @@ const PreView = ({ complaintData }) => {
         </div>
       </div>
 
-      {/* Content */}
+   
       <div className="flex-1 overflow-y-auto bg-[#FFFBF2] p-6 md:p-8 flex justify-center">
         {/* Added bg-[#FFFBF2] and p-8 here so the captured element has the color */}
         <div ref={contentRef} className="w-full max-w-4xl text-[13px] text-gray-900 leading-relaxed bg-[#FFFBF2] p-8">
@@ -85,14 +85,14 @@ const PreView = ({ complaintData }) => {
 
           <div className="space-y-4">
             
-            {/* 1. Complainant Name */}
+         
             <div className="flex gap-2">
               <span className="min-w-[20px]">1.</span>
               <div className="flex-1">
                 <span>परिवादी का नाम :</span>
                 {validComplainants.length > 0 ? (
                   validComplainants.map((comp, index) => (
-                    <div key={index} className="pl-4 mt-1 font-medium border-b border-gray-300 pb-1 last:border-0">
+                    <div key={index} className="pl-4 mt-1 font-medium  border-gray-300 pb-1 last:border-0">
                       <span className="font-bold text-gray-700">परिवादी {index + 1}:</span> {safeData(comp.complainant_name)}
                     </div>
                   ))
@@ -100,14 +100,14 @@ const PreView = ({ complaintData }) => {
               </div>
             </div>
 
-            {/* 2. Father's Name */}
+       
             <div className="flex gap-2">
               <span className="min-w-[20px]">2.</span>
               <div className="flex-1">
                 <span>पिता का नाम :</span>
                 {validComplainants.length > 0 ? (
                   validComplainants.map((comp, index) => (
-                    <div key={index} className="pl-4 mt-1 font-medium border-b border-gray-300 pb-1 last:border-0">
+                    <div key={index} className="pl-4 mt-1 font-medium  border-gray-300 pb-1 last:border-0">
                       <span className="font-bold text-gray-700">परिवादी {index + 1}:</span> {safeData(comp.father_name)}
                     </div>
                   ))
@@ -115,29 +115,29 @@ const PreView = ({ complaintData }) => {
               </div>
             </div>
 
-            {/* 3. Occupation & Details */}
+         
             <div className="flex gap-2">
               <span className="min-w-[20px]">3.</span> 
               <div className="flex-1 space-y-2">
                 
-                {/* 3(a) Occupation */}
+        
                 <div>
                     <span>(क) व्यवसाय :</span>
                     {validComplainants.length > 0 ? (
                       validComplainants.map((comp, index) => (
-                        <div key={index} className="pl-4 mt-1 font-medium border-b border-gray-300 pb-1 last:border-0">
+                        <div key={index} className="pl-4 mt-1 font-medium  border-gray-300 pb-1 last:border-0">
                           <span className="font-bold text-gray-700">परिवादी {index + 1}:</span> {safeData(comp.occupation)}
                         </div>
                       ))
                     ) : <div className="pl-4 mt-0.5 font-medium">NA</div>}
                 </div>
 
-                {/* 3(b) Public Servant */}
+             
                 <div>
                     <span>(ख) क्या आप लोक सेवक हैं या नहीं :</span>
                     {validComplainants.length > 0 ? (
                       validComplainants.map((comp, index) => (
-                        <div key={index} className="pl-4 mt-1 font-medium border-b border-gray-300 pb-1 last:border-0">
+                        <div key={index} className="pl-4 mt-1 font-medium  border-gray-300 pb-1 last:border-0">
                           <span className="font-bold text-gray-700">परिवादी {index + 1}:</span> {safeData(comp.is_public_servant)}
                         </div>
                       ))
@@ -146,7 +146,7 @@ const PreView = ({ complaintData }) => {
               </div>
             </div>
 
-            {/* 4. Permanent Address */}
+          
             <div className="flex gap-2">
               <span className="min-w-[20px]">4.</span>
               <div className="flex-1">
@@ -164,7 +164,7 @@ const PreView = ({ complaintData }) => {
               </div>
             </div>
 
-            {/* 5. Correspondence Address */}
+        
             <div className="flex gap-2">
               <span className="min-w-[20px]">5.</span>
               <div className="flex-1">
@@ -178,7 +178,7 @@ const PreView = ({ complaintData }) => {
               </div>
             </div>
 
-            {/* 6. Respondent Details */}
+         
             <div className="flex gap-2">
               <span className="min-w-[20px]">6.</span>
               <div className="flex-1">
@@ -189,7 +189,7 @@ const PreView = ({ complaintData }) => {
                 <div className="pl-4 mt-2 space-y-4">
                   {validRespondents.length > 0 ? (
                     validRespondents.map((resp, index) => (
-                        <div key={index} className="p-3 rounded shadow-sm border border-gray-200">
+                        <div key={index} className="p-3 rounded shadow-sm border ">
                             <div className="font-bold underline decoration-gray-400 mb-2 text-blue-800">
                                 विपक्षी संख्या {index + 1}
                             </div>
@@ -227,7 +227,7 @@ const PreView = ({ complaintData }) => {
               </div>
             </div>
 
-            {/* 7. Category */}
+       
             <div className="flex gap-2">
                <span className="min-w-[20px]">7.</span>
                <div>
@@ -238,7 +238,7 @@ const PreView = ({ complaintData }) => {
                </div>
             </div>
 
-            {/* 8. Challan Details */}
+       
             <div className="flex gap-2">
                <span className="min-w-[20px]">8.</span>
                <div className="flex-1">
@@ -253,43 +253,64 @@ const PreView = ({ complaintData }) => {
                </div>
             </div>
             
-             {/* 9. Witnesses (Support) */}
-            <div className="flex gap-2">
-              <span className="min-w-[20px]">9.</span>
-              <div className="flex-1">
-                <span>उन व्यक्तियों के नाम और पते जो शपथ पत्र देंगे :</span>
-                {validSupport.length > 0 ? (
-                  <ul className="pl-4 mt-1 list-decimal list-inside font-medium space-y-1">
-                    {validSupport.map((person, idx) => (
-                        <li key={idx}>
-                          <span className="font-bold">{safeData(person.support_name)}</span> 
-                          <span className="text-gray-600 text-xs ml-1">({safeData(person.support_address)})</span>
-                        </li>
-                    ))}
-                  </ul>
-                ) : <div className="pl-4 mt-0.5 font-medium">NA</div>}
-              </div>
-            </div>
+      <div className="flex gap-2">
+  <span className="min-w-[20px]">9.</span>
 
-             {/* 10. Other Witnesses */}
+  <div className="flex-1">
+    <span>उन व्यक्तियों के नाम और पते जो शपथ पत्र देंगे :</span>
+
+    {validSupport.length > 0 ? (
+      <ul className="pl-4 mt-1 list-decimal list-inside space-y-2">
+        {validSupport.map((person, idx) => (
+          <li key={idx} className="font-medium">
+            <div>
+              <span className="font-bold">नाम :</span>{" "}
+              {safeData(person.support_name)}
+            </div>
+            <div className="text-gray-600 text-sm">
+              <span className="font-semibold">पता :</span>{" "}
+              {safeData(person.support_address)}
+            </div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div className="pl-4 mt-0.5 font-medium">NA</div>
+    )}
+  </div>
+</div>
+
+
+     
              <div className="flex gap-2">
-              <span className="min-w-[20px]">10.</span>
-              <div className="flex-1">
-                <span>अन्य गवाहों के नाम और पते :</span>
-                {validWitness.length > 0 ? (
-                  <ul className="pl-4 mt-1 list-decimal list-inside font-medium space-y-1">
-                    {validWitness.map((person, idx) => (
-                          <li key={idx}>
-                            <span className="font-bold">{safeData(person.witness_name)}</span> 
-                            <span className="text-gray-600 text-xs ml-1">({safeData(person.witness_address)})</span>
-                          </li>
-                    ))}
-                  </ul>
-                ) : <div className="pl-4 mt-0.5 font-medium">NA</div>}
-              </div>
-            </div>
+  <span className="min-w-[20px]">10.</span>
 
-            {/* 11. Attachments */}
+  <div className="flex-1">
+    <span>अन्य गवाहों के नाम और पते :</span>
+
+    {validWitness.length > 0 ? (
+      <ul className="pl-4 mt-1 list-decimal list-inside space-y-2">
+        {validWitness.map((person, idx) => (
+          <li key={idx} className="font-medium">
+            <div>
+              <span className="font-bold">नाम :</span>{" "}
+              {safeData(person.witness_name)}
+            </div>
+            <div className="text-gray-600 text-sm">
+              <span className="font-semibold">पता :</span>{" "}
+              {safeData(person.witness_address)}
+            </div>
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div className="pl-4 mt-0.5 font-medium">NA</div>
+    )}
+  </div>
+</div>
+
+
+      
             <div className="flex gap-2">
               <span className="min-w-[20px]">11.</span>
               <div className="flex-1">
@@ -300,7 +321,6 @@ const PreView = ({ complaintData }) => {
               </div>
             </div>
 
-             {/* 12. Full Description */}
              <div className="flex gap-2">
               <span className="min-w-[20px]">12.</span>
               <div className="flex-1">
