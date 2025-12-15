@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
-import FileDetails from "./SubModule/FileDetails";
+import Fees from "./SubModule/Fees";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -550,7 +550,7 @@ const ViewAllComplaint = () => {
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
 
             {activeTab === "fee" && (
-  <FileDetails complaint={complaintData} />
+  <Fees complaint={complaintData} />
 )}
 
 
