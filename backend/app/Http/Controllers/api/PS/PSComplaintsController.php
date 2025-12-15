@@ -103,7 +103,9 @@ class PSComplaintsController extends Controller
     // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
     ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
     ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
-      ->join('complainants as cpt', function ($join) {
+    
+
+    ->join('complainants as cpt', function ($join) {
         $join->on('cm.id', '=', 'cpt.complaint_id')
              ->where('cpt.is_main', 1);
     })
@@ -113,6 +115,8 @@ class PSComplaintsController extends Controller
         $join->on('cm.id', '=', 'r.complaint_id')
              ->where('r.is_main', 1);
     })
+      ->leftJoin('district_master as dmc', 'cpt.permanent_district', '=', 'dmc.district_code')
+    ->leftJoin('district_master as rmc', 'r.respondent_district', '=', 'rmc.district_code')
     // ->leftJoin('complainants as cpt', DB::raw("cm.id"), '=', DB::raw("cpt.	complaint_id "))
     // ->leftJoin('respondents as r', DB::raw("cm.id"), '=', DB::raw("r.complaint_id"))
     ->select(
@@ -128,6 +132,8 @@ class PSComplaintsController extends Controller
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',
          'ddn.district_name as correspondence_district',
+              'rmc.district_name as main_complainant_district',
+        'dmc.district_name as main_respondant_district',
         // 'r.*',
         // 'r.respondent_name as r_name',
         // 'r.designation as r_desig',
