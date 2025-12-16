@@ -1,6 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -24,6 +26,8 @@ const Fees = ({ complaint }) => {
     remarks: "",
   });
 
+  const [selectedFeeOption, setSelectedFeeOption] = useState("partial");
+
   const handleFeeChange = (value) => {
     const feeMap = {
       full: "1",
@@ -41,20 +45,36 @@ const Fees = ({ complaint }) => {
 
   const handleApprove = async () => {
     try {
-      setErrorss(false);
+      setErrorss(null); 
       const res = await api.post(
         `/lokayukt/fee-exempted/${id}`,
         fessSubmitForm
       );
+      
       console.log("Fee Submitted:", res.data);
+      
+      // Success Toast
+      toast.success("Fee Verified Successfully!");
+
+      // Clear Remarks Field
+      setFessSubmitForm((prev) => ({
+        ...prev,
+        remarks: "",
+      }));
+
     } catch (error) {
-      setErrorss(true)
-      console.log("Error he", error)
-      setErrorss(error?.response?.data || null)
+      console.log("Error he", error);
+      const errorData = error?.response?.data || null;
+      setErrorss(errorData);
+      
+      // Error Toast
+      if (errorData?.message) {
+        // (errorData.message);
+      } else {
+        // ("Something went wrong while verifying fee.");
+      }
     }
   };
-
-  const [selectedFeeOption, setSelectedFeeOption] = useState("partial");
 
   return (
     <div className="w-full space-y-6">
@@ -146,20 +166,11 @@ const Fees = ({ complaint }) => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
             />
 
-            {/* {erorrss?.errors?.remarks && (
+            {erorrss && erorrss.errors && erorrss.errors.remarks && (
               <p className="text-red-600 text-sm">
-                {erorrss.errors.remarks[0]}
+                {erorrss.errors.remarks}
               </p>
-            )} */}
-
-            {
-              erorrss && (
-                <p  className="text-red-600 text-sm">
-                  {erorrss.errors.remarks}
-                </p>
-              )
-            }
-          
+            )}
           </div>
 
           <div className="flex justify-end">
@@ -172,6 +183,20 @@ const Fees = ({ complaint }) => {
           </div>
         </div>
       </div>
+
+      {/* Toast Container Configured exactly like Login.js */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };
