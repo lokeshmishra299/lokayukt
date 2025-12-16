@@ -233,7 +233,7 @@ const ViewAllComplaint = () => {
           }
   
           // 2️ Send To Other Pool → API: /lokayukt/get-lokayukt-uplokayukt
-          const res = await api.get("/lokayukt/get-lokayukt-uplokayukt");
+          const res = await api.get("/lokayukt/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
   
@@ -290,7 +290,7 @@ const ViewAllComplaint = () => {
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/lokayukt/forward-complain-by-ps/${complaintId}`, {
+        const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
         });
