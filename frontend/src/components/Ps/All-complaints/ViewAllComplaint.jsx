@@ -151,6 +151,12 @@ const SearchableDropdown = ({
 const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+
+    const capitalizeFirstLetter = (text = "") => {
+  if (!text) return "N/A";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
   const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState("fee");
@@ -509,104 +515,122 @@ const ViewAllComplaint = () => {
               </p> */}
 
               {/* ===== DETAILS GRID (Hindi) ===== */}
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div>
-                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                    {/* CORRESPONDENCE NAME */}
-                    मुख्य परिवादी का नाम
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.main_complainant_name || "N/A"}
-                  </p>
+                      <div className="space-y-3 mb-6">
+  
+  {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
+  <div>
+    <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
+      मुख्य परिवादी का विवरण 
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Name */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+           नाम
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_complainant_name) || "N/A"}
+        </p>
+      </div>
 
+      {/* Father's Name */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          पिता का नाम
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_complainant_father) || "N/A"}
+        </p>
+      </div>
 
+      {/* District */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+        जिला
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_complainant_district) || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
 
-                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
-                    {/* CORRESPONDENCE ADDRESS */}
-                    मुख्य प्रतिवादी का नाम
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.
-main_respondent_name
- || "N/A"}
-                  </p>
+  {/* ----------------- मुख्य प्रतिवादी का विवरण ----------------- */}
+  <div>
+    <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
+      मुख्य प्रतिवादी का विवरण
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Name */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          नाम
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_respondent_name) || "N/A"}
+        </p>
+      </div>
 
-                 <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
-                        {/* Relation With Person */}
-                        व्यक्ति से संबंध
-                      </p>
-                      <p className=" text-gray-800 text-sm ">
-                        {complaintData.relation_with_person || "NA"}
-                      </p>
-                </div>
+      {/* Designation */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+         पद
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_respondent_designation) || "N/A"}
+        </p>
+      </div>
 
-                <div>
-                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                    {/* CORRESPONDENCE POST OFFICE */}
-                    मुख्य परिवादी के पिता का नाम
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.main_complainant_father|| "N/A"}
-                  </p>
+      {/* District */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+         जिला
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_respondant_district) || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
 
+  {/* ----------------- अन्य विवरण ----------------- */}
+  <div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Relation */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          व्यक्ति से संबंध
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.relation_with_person) || "NA"}
+        </p>
+      </div>
 
-                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
-                    {/* previously_submitted */}
-                 मुख्य प्रतिवादी का पद
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.
-main_respondent_designation
- || "N/A"}
-                  </p>
+      {/* Cause Date */}
+      {complaintData.dob && (
+        <div>
+          <p className="text-[14px] text-black font-semibold uppercase mb-1">
+            कार्यवाही तिथि
+          </p>
+          <p className="text-gray-800 text-sm">
+            {capitalizeFirstLetter(complaintData.cause_date) || "NA"}
+          </p>
+        </div>
+      )}
 
-                  
+      {/* Category */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          श्रेणी
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.category) || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
 
-                  {complaintData.dob && (
-                    <>
-                    
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
-                        {/* Cause Date */}
-                        कार्यवाही तिथि
-                      </p>
-                      <p className=" text-gray-800 text-sm ">
-                        {complaintData.cause_date || "NA"}
-                      </p>
-                    </>
-                  )}
-                </div>
-
-                <div>
-                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                    {/* CORRESPONDENCE DISTRICT */}
-                    मुख्य परिवादी का जिला
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.main_complainant_district || "N/A"}
-                  </p>
-
-                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
-                    {/* previously_submitted */}
-                   मुख्य प्रतिवादी का जिला
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.
-
-main_respondant_district
-
-|| "N/A"}
-                  </p>
-
-                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
-                    {/* category */}
-                    श्रेणी
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.category || "N/A"}
-                  </p>
-                </div>
-              </div>
-
+</div>
               {/* Fee Status and Fee Type Section (Hindi) */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
