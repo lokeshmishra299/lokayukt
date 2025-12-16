@@ -184,37 +184,67 @@ const ViewAllComplaint = () => {
     retry: 2,
   });
 
-  const {
-    data: forwardOptionsData,
-    isLoading: isLoadingOptions,
-    isFetching: isFetchingOptions,
-    error: forwardOptionsError,
-  } = useQuery({
-    queryKey: ["lokayukt-options"],
-    queryFn: async () => {
-      try {
-        const res = await api.get("/lokayukt/get-lokayukt");
-        if (Array.isArray(res.data)) {
-          return res.data;
-        } else if (res.data && Array.isArray(res.data.data)) {
-          return res.data.data;
-        } else if (res.data && res.data.data) {
-          if (typeof res.data.data === "object" && res.data.data !== null) {
-            return Object.values(res.data.data);
+  // const {
+  //   data: forwardOptionsData,
+  //   isLoading: isLoadingOptions,
+  //   isFetching: isFetchingOptions,
+  //   error: forwardOptionsError,
+  // } = useQuery({
+  //   queryKey: ["lokayukt-options"],
+  //   queryFn: async () => {
+  //     try {
+  //       const res = await api.get("/lokayukt/get-lokayukt");
+  //       if (Array.isArray(res.data)) {
+  //         return res.data;
+  //       } else if (res.data && Array.isArray(res.data.data)) {
+  //         return res.data.data;
+  //       } else if (res.data && res.data.data) {
+  //         if (typeof res.data.data === "object" && res.data.data !== null) {
+  //           return Object.values(res.data.data);
+  //         }
+  //         return [];
+  //       } else {
+  //         return [];
+  //       }
+  //     } catch (error) {
+  //       throw error;
+  //     }
+  //   },
+  //   enabled: confirmConfig.open && confirmConfig.type === "forward",
+  //   staleTime: 0,
+  //   gcTime: 1000 * 60 * 5,
+  //   retry: 2,
+  // });
+
+
+   const {
+      data: forwardOptionsData,
+      isLoading: isLoadingOptions,
+      isFetching: isFetchingOptions,
+      error: forwardOptionsError,
+    } = useQuery({
+      queryKey: ["lokayukt-options", forwardType], // <-- NOTE: forwardType added
+      queryFn: async () => {
+        try {
+          // 1️ Send To My Pool → API: /lokayukt/get-users
+          if (forwardType === "self") {
+            const res = await api.get("/lokayukt/get-users");
+            return res.data?.data || res.data || [];
           }
-          return [];
-        } else {
-          return [];
+  
+          // 2️ Send To Other Pool → API: /lokayukt/get-lokayukt-uplokayukt
+          const res = await api.get("/lokayukt/get-lokayukt-uplokayukt");
+          const raw = res.data?.data || res.data || [];
+          const flatList = Array.isArray(raw) ? raw.flat() : [];
+  
+          return flatList;
+        } catch (error) {
+          throw error;
         }
-      } catch (error) {
-        throw error;
-      }
-    },
-    enabled: confirmConfig.open && confirmConfig.type === "forward",
-    staleTime: 0,
-    gcTime: 1000 * 60 * 5,
-    retry: 2,
-  });
+      },
+      enabled: confirmConfig.open && confirmConfig.type === "forward",
+      staleTime: 0,
+    });
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
@@ -237,25 +267,46 @@ const ViewAllComplaint = () => {
     },
   });
 
-  const forwardPhysicallyMutation = useMutation({
-    mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-      const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
-        forward_to: forwardTo,
-        remark: remarkData,
-      });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || "Forwarded successfully");
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setRemark("");
-      setSelectedForwardTo("");
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to forward");
-    },
-  });
+  // const forwardComplaintMutation = useMutation({
+  //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+  //     const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
+  //       forward_to: forwardTo,
+  //       remark: remarkData,
+  //     });
+  //     return res.data;
+  //   },
+  //   onSuccess: (data) => {
+  //     toast.success(data.message || "Forwarded successfully");
+  //     queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+  //     setRemark("");
+  //     setSelectedForwardTo("");
+  //     setConfirmConfig({ open: false, type: null });
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error?.response?.data?.message || "Failed to forward");
+  //   },
+  // });
+
+  
+  const forwardComplaintMutation = useMutation({
+      mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+        const res = await api.post(`/lokayukt/forward-complain-by-ps/${complaintId}`, {
+          forward_to: forwardTo,
+          remark: remarkData,
+        });
+        return res.data;
+      },
+      onSuccess: (data) => {
+        toast.success(data.message || "Forwarded successfully");
+        queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+        setRemark("");
+        setSelectedForwardTo("");
+        setConfirmConfig({ open: false, type: null });
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || "Failed to forward");
+      },
+    });
 
   const handleMarkAsReceived = () =>
     setConfirmConfig({ open: true, type: "receive" });
@@ -278,7 +329,7 @@ const ViewAllComplaint = () => {
         toast.error("Please select forward to and enter a remark");
         return;
       }
-      forwardPhysicallyMutation.mutate({
+      forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
         remarkData: remark,
@@ -720,10 +771,10 @@ const ViewAllComplaint = () => {
 
                   <button
                     onClick={handleforwardphysical}
-                    disabled={forwardPhysicallyMutation.isPending}
+                    disabled={forwardComplaintMutation.isPending}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {forwardPhysicallyMutation.isPending
+                    {forwardComplaintMutation.isPending
                       ? "Processing..."
                       : "Send / Mark"}
                   </button>
@@ -750,7 +801,7 @@ const ViewAllComplaint = () => {
                   onClick={handleConfirmNo}
                   disabled={
                     markAsReceivedMutation.isPending ||
-                   forwardPhysicallyMutation.isPending
+                   forwardComplaintMutation.isPending
                   }
                   className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Close"
@@ -870,7 +921,7 @@ const ViewAllComplaint = () => {
                     onClick={handleConfirmNo}
                     disabled={
                       markAsReceivedMutation.isPending ||
-                     forwardPhysicallyMutation.isPending
+                     forwardComplaintMutation.isPending
                     }
                     className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -884,7 +935,7 @@ const ViewAllComplaint = () => {
                     onClick={handleConfirmYes}
                     disabled={
                       markAsReceivedMutation.isPending ||
-                     forwardPhysicallyMutation.isPending ||
+                     forwardComplaintMutation.isPending ||
                       (confirmConfig.type === "receive" && !remark.trim()) ||
                       (confirmConfig.type === "forward" &&
                         (!remark.trim() ||
@@ -895,7 +946,7 @@ const ViewAllComplaint = () => {
                     className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                   >
                     {markAsReceivedMutation.isPending ||
-                   forwardPhysicallyMutation.isPending
+                   forwardComplaintMutation.isPending
                       ? "Sending..."
                       : confirmConfig.type === "assign" ||
                         confirmConfig.type === "pullback"
