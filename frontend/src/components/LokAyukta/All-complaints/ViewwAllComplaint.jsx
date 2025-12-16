@@ -258,7 +258,7 @@ const ViewAllComplaint = () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_lokayukt == 0
+                    {complaintData.approved_rejected_by_rk == 0
                       ? "Received - Record Section"
                       : "In Motion – With Lokayukta"}
                   </span>
@@ -279,7 +279,7 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                      {complaintData.approved_rejected_by_lokayukt == 0
+                      {complaintData.approved_rejected_by_rk == 0
                         ? "Received - Record Section"
                         : "In Motion – With Lokayukta"}
                     </span>
