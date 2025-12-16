@@ -728,8 +728,15 @@ const ViewAllComplaint = () => {
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
 
-            {activeTab === "fee" && (
-  <Fees complaint={complaintData} />
+  {activeTab === "fee" && (
+  <Fees
+    complaint={complaintData}
+    onFeeApproved={() => {
+      queryClient.invalidateQueries({
+        queryKey: ["complaint-details", id],
+      });
+    }}
+  />
 )}
 
 

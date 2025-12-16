@@ -13,7 +13,7 @@ const api = axios.create({
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
-const Fees = ({ complaint }) => {
+const Fees = ({ complaint, onFeeApproved }) => {
   const { id } = useParams();
   const [erorrss, setErrorss] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // Added loading state
@@ -46,6 +46,11 @@ const Fees = ({ complaint }) => {
       // Success Toast
       toast.success("Fee Verified Successfully!");
       // Clear Remarks Field
+
+      
+    if (onFeeApproved) {
+      onFeeApproved();
+    }
       setFessSubmitForm((prev) => ({
         ...prev,
         remarks: "",
