@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye } from "react-icons/fa";
+import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
+import Fees from "./SubModule/Fees";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -22,12 +23,131 @@ const api = axios.create({
   },
 });
 
+
+const SearchableDropdown = ({
+  options,
+  value,
+  onChange,
+  placeholder,
+  disabled,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [wrapperRef]);
+
+  const selectedOption = options.find((opt) => opt.id == value);
+
+  const filteredOptions = options.filter((option) => {
+    const label = option.name || option.user_name || `User ${option.id}`;
+    const district = option.district_name || "";
+    const search = searchTerm.toLowerCase();
+    return (
+      label.toLowerCase().includes(search) ||
+      district.toLowerCase().includes(search)
+    );
+  });
+
+  const handleSelect = (option) => {
+    onChange(option.id);
+    setIsOpen(false);
+    setSearchTerm("");
+  };
+
+  return (
+    <div className="relative" ref={wrapperRef}>
+      <div
+        className={`w-full px-3 py-2 border rounded bg-white flex justify-between items-center cursor-pointer ${
+          disabled
+            ? "bg-gray-100 cursor-not-allowed text-gray-400"
+            : "border-gray-300 focus:ring-2 focus:ring-blue-500"
+        }`}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+      >
+        <span
+          className={`text-sm ${
+            !selectedOption ? "text-gray-500" : "text-gray-900"
+          }`}
+        >
+          {selectedOption
+            ? `${selectedOption.name || selectedOption.user_name}${
+                selectedOption.district_name
+                  ? ` (${selectedOption.district_name})`
+                  : ""
+              }`
+            : placeholder}
+        </span>
+        <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
+      </div>
+
+      {isOpen && !disabled && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-hidden flex flex-col">
+          <input
+            type="text"
+            className="w-full px-3 py-2 border-b border-gray-200 text-sm focus:outline-none bg-gray-50"
+            placeholder="Type to search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            autoFocus
+          />
+          <div className="overflow-y-auto flex-1">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
+                <div
+                  key={option.id}
+                  className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
+                    value == option.id
+                      ? "bg-blue-100 text-blue-800"
+                      : "text-gray-700"
+                  }`}
+                  onClick={() => handleSelect(option)}
+                >
+                  {option.name || option.user_name || `User ${option.id}`}
+                  {option.district_name ? (
+                    <span className="text-gray-500 text-xs ml-1">
+                      ({option.district_name})
+                    </span>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="px-3 py-2 text-sm text-gray-500">
+                No results found
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+
+    const capitalizeFirstLetter = (text = "") => {
+  if (!text) return "N/A";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("documents");
+  const [activeTab, setActiveTab] = useState("fee");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
@@ -46,6 +166,7 @@ const ViewAllComplaint = () => {
 
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
+  const [forwardType, setForwardType] = useState("self");
 
   const {
     data: complaintData,
@@ -63,37 +184,67 @@ const ViewAllComplaint = () => {
     retry: 2,
   });
 
-  const {
-    data: forwardOptionsData,
-    isLoading: isLoadingOptions,
-    isFetching: isFetchingOptions,
-    error: forwardOptionsError,
-  } = useQuery({
-    queryKey: ["uplokayukt-options"],
-    queryFn: async () => {
-      try {
-        const res = await api.get("/uplokayukt/get-uplokayukt");
-        if (Array.isArray(res.data)) {
-          return res.data;
-        } else if (res.data && Array.isArray(res.data.data)) {
-          return res.data.data;
-        } else if (res.data && res.data.data) {
-          if (typeof res.data.data === "object" && res.data.data !== null) {
-            return Object.values(res.data.data);
+  // const {
+  //   data: forwardOptionsData,
+  //   isLoading: isLoadingOptions,
+  //   isFetching: isFetchingOptions,
+  //   error: forwardOptionsError,
+  // } = useQuery({
+  //   queryKey: ["lokayukt-options"],
+  //   queryFn: async () => {
+  //     try {
+  //       const res = await api.get("/lokayukt/get-lokayukt");
+  //       if (Array.isArray(res.data)) {
+  //         return res.data;
+  //       } else if (res.data && Array.isArray(res.data.data)) {
+  //         return res.data.data;
+  //       } else if (res.data && res.data.data) {
+  //         if (typeof res.data.data === "object" && res.data.data !== null) {
+  //           return Object.values(res.data.data);
+  //         }
+  //         return [];
+  //       } else {
+  //         return [];
+  //       }
+  //     } catch (error) {
+  //       throw error;
+  //     }
+  //   },
+  //   enabled: confirmConfig.open && confirmConfig.type === "forward",
+  //   staleTime: 0,
+  //   gcTime: 1000 * 60 * 5,
+  //   retry: 2,
+  // });
+
+
+   const {
+      data: forwardOptionsData,
+      isLoading: isLoadingOptions,
+      isFetching: isFetchingOptions,
+      error: forwardOptionsError,
+    } = useQuery({
+      queryKey: ["lokayukt-options", forwardType], // <-- NOTE: forwardType added
+      queryFn: async () => {
+        try {
+          // 1️ Send To My Pool → API: /lokayukt/get-users
+          if (forwardType === "self") {
+            const res = await api.get("/uplokayukt/get-users");
+            return res.data?.data || res.data || [];
           }
-          return [];
-        } else {
-          return [];
+  
+          // 2️ Send To Other Pool → API: /lokayukt/get-lokayukt-uplokayukt
+          const res = await api.get("/uplokayukt/get-uplokayukt");
+          const raw = res.data?.data || res.data || [];
+          const flatList = Array.isArray(raw) ? raw.flat() : [];
+  
+          return flatList;
+        } catch (error) {
+          throw error;
         }
-      } catch (error) {
-        throw error;
-      }
-    },
-    enabled: confirmConfig.open && confirmConfig.type === "forward",
-    staleTime: 0,
-    gcTime: 1000 * 60 * 5,
-    retry: 2,
-  });
+      },
+      enabled: confirmConfig.open && confirmConfig.type === "forward",
+      staleTime: 0,
+    });
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
@@ -116,25 +267,46 @@ const ViewAllComplaint = () => {
     },
   });
 
-  const forwardPhysicallyMutation = useMutation({
-    mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-      const res = await api.post(`/uplokayukt/forward-by-uplokayukt/${complaintId}`, {
-        forward_to: forwardTo,
-        remark: remarkData,
-      });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || "Forwarded successfully");
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setRemark("");
-      setSelectedForwardTo("");
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to forward");
-    },
-  });
+  // const forwardComplaintMutation = useMutation({
+  //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+  //     const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
+  //       forward_to: forwardTo,
+  //       remark: remarkData,
+  //     });
+  //     return res.data;
+  //   },
+  //   onSuccess: (data) => {
+  //     toast.success(data.message || "Forwarded successfully");
+  //     queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+  //     setRemark("");
+  //     setSelectedForwardTo("");
+  //     setConfirmConfig({ open: false, type: null });
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error?.response?.data?.message || "Failed to forward");
+  //   },
+  // });
+
+  
+  const forwardComplaintMutation = useMutation({
+      mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+        const res = await api.post(`/uplokayukt/forward-by-lokayukt/${complaintId}`, {
+          forward_to: forwardTo,
+          remark: remarkData,
+        });
+        return res.data;
+      },
+      onSuccess: (data) => {
+        toast.success(data.message || "Forwarded successfully");
+        queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+        setRemark("");
+        setSelectedForwardTo("");
+        setConfirmConfig({ open: false, type: null });
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || "Failed to forward");
+      },
+    });
 
   const handleMarkAsReceived = () =>
     setConfirmConfig({ open: true, type: "receive" });
@@ -157,7 +329,7 @@ const ViewAllComplaint = () => {
         toast.error("Please select forward to and enter a remark");
         return;
       }
-      forwardPhysicallyMutation.mutate({
+      forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
         remarkData: remark,
@@ -257,9 +429,9 @@ const ViewAllComplaint = () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_lokayukt == 0
+                    {complaintData.approved_rejected_by_rk == 0
                       ? "Received - Record Section"
-                      : "In Motion – With Uplokayukt"}
+                      : "In Motion – With Lokayukta"}
                   </span>
                 </div>
               </div>
@@ -278,7 +450,7 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                      {complaintData.approved_rejected_by_lokayukt == 0
+                      {complaintData.approved_rejected_by_rk == 0
                         ? "Received - Record Section"
                         : "In Motion – With Lokayukta"}
                     </span>
@@ -305,8 +477,8 @@ const ViewAllComplaint = () => {
 
               </p>
 
-                 <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                {/* Delay Reason:{"  "} */}
+                 {/* <p className="text-[14px] text-black font-semibold uppercase mb-1">
+              
                 विलंब का कारण:{"  "}
 
                 <span className="text-gray-500">
@@ -314,113 +486,125 @@ const ViewAllComplaint = () => {
                     "NA"}
                 </span>
 
-              </p>
+              </p> */}
 
               {/* ===== DETAILS GRID (Hindi) ===== */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div>
-                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                          <div className="space-y-3 mb-6">
+  
+  {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
+  <div>
+    <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
+      मुख्य परिवादी का विवरण 
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Name */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+           नाम
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_complainant_name) || "N/A"}
+        </p>
+      </div>
 
+      {/* Father's Name */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          पिता का नाम
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_complainant_father) || "N/A"}
+        </p>
+      </div>
 
-                    {/* CORRESPONDENCE NAME */}
-                    पत्राचार हेतु नाम
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.correspondence_name || "N/A"}
-                  </p>
+      {/* District */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+        जिला
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_complainant_district) || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
 
-                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
+  {/* ----------------- मुख्य प्रतिवादी का विवरण ----------------- */}
+  <div>
+    <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
+      मुख्य प्रतिवादी का विवरण
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Name */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          नाम
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_respondent_name) || "N/A"}
+        </p>
+      </div>
 
+      {/* Designation */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+         पद
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_respondent_designation) || "N/A"}
+        </p>
+      </div>
 
-                    {/* CORRESPONDENCE ADDRESS */}
-                    पत्राचार हेतु पता
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.correspondence_place || "N/A"}
-                  </p>
+      {/* District */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+         जिला
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_respondant_district) || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
 
+  {/* ----------------- अन्य विवरण ----------------- */}
+  <div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Relation */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          व्यक्ति से संबंध
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.relation_with_person) || "NA"}
+        </p>
+      </div>
 
+      {/* Cause Date */}
+      {complaintData.dob && (
+        <div>
+          <p className="text-[14px] text-black font-semibold uppercase mb-1">
+            कार्यवाही तिथि
+          </p>
+          <p className="text-gray-800 text-sm">
+            {capitalizeFirstLetter(complaintData.cause_date) || "NA"}
+          </p>
+        </div>
+      )}
 
+      {/* Category */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          श्रेणी
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.category) || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
 
-
-
-                  <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
-                    {/* PREVIOUSLY SUBMITTED DETAILS */}
-                    पूर्व में प्रस्तुत विवरण
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.previously_submitted_details || "N/A"}
-                  </p>
-
-
-
-                </div>
-
-                <div>
-                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                    {/* CORRESPONDENCE POST OFFICE */}
-                    पत्राचार हेतु डाकघर
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.correspondence_post_office || "N/A"}
-                  </p>
-
-                  {complaintData.dob && (
-                    <>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
-                        {/* Relation With Person */}
-                        व्यक्ति से संबंध
-                      </p>
-                      <p className=" text-gray-800 text-sm ">
-                        {complaintData.relation_with_person || "NA"}
-                      </p>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1 mt-3">
-
-                        {/* Cause Date */}
-                        कार्यवाही तिथि
-                      </p>
-                      <p className=" text-gray-800 text-sm ">
-                        {complaintData.
-                          cause_date || "NA"}
-                      </p>
-
-                    </>
-                  )}
-                </div>
-
-                <div>
-                  <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                    {/* CORRESPONDENCE DISTRICT */}
-                    पत्राचार हेतु जिला
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.correspondence_district || "N/A"}
-                  </p>
-
-                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
-
-                    {/* previously_submitted */}
-                    पूर्व में प्रस्तुत
-
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.
-                      previously_submitted
-                      || "N/A"}
-                  </p>
-
-                  <p className=" text-[14px] mt-3 text-black font-semibold uppercase mb-1">
-
-                    {/* category */}
-                    श्रेणी
-
-                  </p>
-                  <p className=" text-gray-800 text-sm ">
-                    {complaintData.category || "N/A"}
-                  </p>
-
-                </div>
-              </div>
+</div>
 
               {/* Fee Status and Fee Type Section (Hindi) */}
               <div className="flex flex-wrap gap-2 mb-4">
@@ -432,11 +616,7 @@ const ViewAllComplaint = () => {
                   }`}
                 >
                   शुल्क का प्रकार:{" "}
-                  {complaintData.fee_exempted === 1
-                    ? "Exempted"
-                    : complaintData.amount
-                    ? "Paid"
-                    : "Partial"}
+                  {complaintData.fee_exempted == 0 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "NA"}
                 </span>
 
                 <span
@@ -447,7 +627,7 @@ const ViewAllComplaint = () => {
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  स्थिति: {complaintData.payment_status || "Awaiting approval"}
+                  स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -497,7 +677,7 @@ const ViewAllComplaint = () => {
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["documents", "notings", "movement"].map((tab) => (
+                {["fee", "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -510,6 +690,8 @@ const ViewAllComplaint = () => {
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
+                  {tab === "fee" && "Fee Verification"}
+                      
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
@@ -521,7 +703,7 @@ const ViewAllComplaint = () => {
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["documents", "notings", "movement"].map((tab) => (
+                {["fee", "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -531,6 +713,7 @@ const ViewAllComplaint = () => {
                         : "text-gray-600 hover:text-gray-800"
                     }`}
                   >
+                    {tab === "fee" && "Fee Verification"}
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
@@ -544,6 +727,12 @@ const ViewAllComplaint = () => {
 
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+
+            {activeTab === "fee" && (
+  <Fees complaint={complaintData} />
+)}
+
+
               {activeTab === "documents" && (
                 <Documents complaint={complaintData} />
               )}
@@ -551,6 +740,8 @@ const ViewAllComplaint = () => {
               {activeTab === "movement" && (
                 <MovementHistory complaint={complaintData} />
               )}
+
+              
             </div>
 
             {/* Footer Buttons */}
@@ -580,10 +771,10 @@ const ViewAllComplaint = () => {
 
                   <button
                     onClick={handleforwardphysical}
-                    disabled={forwardPhysicallyMutation.isPending}
+                    disabled={forwardComplaintMutation.isPending}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {forwardPhysicallyMutation.isPending
+                    {forwardComplaintMutation.isPending
                       ? "Processing..."
                       : "Send / Mark"}
                   </button>
@@ -602,127 +793,170 @@ const ViewAllComplaint = () => {
       </div>
 
       {/* Unified Confirmation Modal (Receive/Forward/Pullback) */}
-      {confirmConfig.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative animate-in fade-in zoom-in duration-200">
-            <button
-              onClick={handleConfirmNo}
-              disabled={
-                markAsReceivedMutation.isPending ||
-                forwardPhysicallyMutation.isPending
-              }
-              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Close"
-            >
-              <FaTimes className="w-5 h-5 text-gray-600" />
-            </button>
-
-            <h3 className="text-lg font-semibold mb-4 pr-8">
-              {confirmConfig.type === "receive"
-                ? "Return with Remarks?"
-                : confirmConfig.type === "pullback"
-                ? "Pull Back Complaint?"
-                : "Forward To?"}
-            </h3>
-
-            {confirmConfig.type === "pullback" && (
-              <p className="text-gray-600 mb-6 text-sm">
-                Are you sure you want to pull back this complaint file?
-              </p>
-            )}
-
-            {confirmConfig.type === "forward" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Forward To <span className="text-red-500">*</span>
-                </label>
-
-                {isLoadingOptions || isFetchingOptions ? (
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50">
-                    Loading...
-                  </div>
-                ) : forwardOptionsError ? (
-                  <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50">
-                    Error loading options: {forwardOptionsError.message}
-                  </div>
-                ) : (
-                  <select
-                    value={selectedForwardTo}
-                    onChange={(e) => setSelectedForwardTo(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select User...</option>
-                    {Array.isArray(forwardOptionsData) &&
-                    forwardOptionsData.length > 0 ? (
-                      forwardOptionsData.map((option) => (
-                        <option key={option.id} value={option.id}>
-                          {option.name ||
-                            option.user_name ||
-                            `User ${option.id}`}
-                          {option.district_name
-                            ? ` (${option.district_name})`
-                            : ""}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>No options available</option>
-                    )}
-                  </select>
+     {confirmConfig.open && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+              <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+                {/* Close Button */}
+                <button
+                  onClick={handleConfirmNo}
+                  disabled={
+                    markAsReceivedMutation.isPending ||
+                   forwardComplaintMutation.isPending
+                  }
+                  className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Close"
+                >
+                  <FaTimes className="w-5 h-5 text-gray-600" />
+                </button>
+    
+                {/* Title */}
+                <h3 className="text-lg font-semibold mb-4 pr-8">
+                  {confirmConfig.type === "receive"
+                    ? "Mark as Received?"
+                    : confirmConfig.type === "forward"
+                    ? "Send"
+                    : confirmConfig.type === "pullback"
+                    ? "Pull Back Complaint?"
+                    : "Assign to Yourself?"}
+                </h3>
+    
+                {/* --- FORWARDING LOGIC START --- */}
+                {confirmConfig.type === "forward" && (
+                  <>
+                    {/* Radio Buttons Section */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Forward Type <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex flex-col gap-2">
+                        <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="forwardType"
+                            value="self"
+                            checked={forwardType === "self"}
+                            onChange={(e) => {
+                              setForwardType(e.target.value);
+                              setSelectedForwardTo("");
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-sm text-gray-700 font-medium">
+                            Send To My Pool
+                          </span>
+                        </label>
+                        <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="forwardType"
+                            value="uplokayukt"
+                            checked={forwardType === "uplokayukt"}
+                            onChange={(e) => {
+                              setForwardType(e.target.value);
+                              setSelectedForwardTo("");
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-sm text-gray-700 font-medium">
+                            Send To Other Pool
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+    
+                    {/* SEARCHABLE DROPDOWN */}
+                    <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
+                        Officer <span className="text-red-500">*</span>
+                      </label>
+    
+                      {isLoadingOptions || isFetchingOptions ? (
+                        <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50 text-sm">
+                          Loading options...
+                        </div>
+                      ) : forwardOptionsError ? (
+                        <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50 text-sm">
+                          Error: {forwardOptionsError.message}
+                        </div>
+                      ) : (
+                        <SearchableDropdown
+                          options={
+                            Array.isArray(forwardOptionsData)
+                              ? forwardOptionsData
+                              : []
+                          }
+                          value={selectedForwardTo}
+                          onChange={(val) => setSelectedForwardTo(val)}
+                          placeholder="Select Officer..."
+                        />
+                      )}
+                    </div>
+                  </>
                 )}
+                {/* --- FORWARDING LOGIC END --- */}
+    
+                {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
+                {confirmConfig.type !== "assign" &&
+                  confirmConfig.type !== "pullback" && (
+                    <>
+                      <div className="mb-5">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Remark <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          value={remark}
+                          onChange={(e) => setRemark(e.target.value)}
+                          rows={4}
+                          placeholder="Enter your remark here..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+                    </>
+                  )}
+    
+                {/* Buttons */}
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={handleConfirmNo}
+                    disabled={
+                      markAsReceivedMutation.isPending ||
+                     forwardComplaintMutation.isPending
+                    }
+                    className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {confirmConfig.type === "assign" ||
+                    confirmConfig.type === "pullback"
+                      ? "No"
+                      : "Cancel"}
+                  </button>
+    
+                  <button
+                    onClick={handleConfirmYes}
+                    disabled={
+                      markAsReceivedMutation.isPending ||
+                     forwardComplaintMutation.isPending ||
+                      (confirmConfig.type === "receive" && !remark.trim()) ||
+                      (confirmConfig.type === "forward" &&
+                        (!remark.trim() ||
+                          !selectedForwardTo ||
+                          isLoadingOptions ||
+                          isFetchingOptions))
+                    }
+                    className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                  >
+                    {markAsReceivedMutation.isPending ||
+                   forwardComplaintMutation.isPending
+                      ? "Sending..."
+                      : confirmConfig.type === "assign" ||
+                        confirmConfig.type === "pullback"
+                      ? "Yes"
+                      : "Send"}
+                  </button>
+                </div>
               </div>
-            )}
-
-            {confirmConfig.type !== "pullback" && (
-              <div className="mb-5">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Remark <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={remark}
-                  onChange={(e) => setRemark(e.target.value)}
-                  rows={4}
-                  placeholder="Enter your remark here..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                />
-              </div>
-            )}
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={handleConfirmNo}
-                disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardPhysicallyMutation.isPending
-                }
-                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {confirmConfig.type === "pullback" ? "No" : "Cancel"}
-              </button>
-
-              <button
-                onClick={handleConfirmYes}
-                disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardPhysicallyMutation.isPending ||
-                  (confirmConfig.type === "forward" &&
-                    (isLoadingOptions || isFetchingOptions)) ||
-                  (confirmConfig.type === "receive" && !remark.trim()) ||
-                  (confirmConfig.type === "forward" &&
-                    (!selectedForwardTo || !remark.trim()))
-                }
-                className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {markAsReceivedMutation.isPending ||
-                forwardPhysicallyMutation.isPending
-                  ? "Processing..."
-                  : confirmConfig.type === "pullback"
-                  ? "Yes"
-                  : "Send"}
-              </button>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
       {/* ===== VIEW DATA MODAL (Correspondence / Respondent / Support / Witness) ===== */}
       {viewModalConfig.open && (
@@ -797,57 +1031,124 @@ const ViewAllComplaint = () => {
             )} */}
 
               
-                {viewModalConfig.type === 'correspondence' && (
-    <div className="space-y-4">
-      {complaintData.complainants && complaintData.complainants.length > 0 ? (
-        complaintData.complainants.map((comp, idx) => (
-          <div key={idx} className="mb-4">
-            <h4 className="text-sm font-bold text-gray-700 mb-2">
-              परिवादी #{idx + 1}
-            </h4>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-              <div className="p-3 bg-gray-50 rounded">
-                <p className="text-xs text-gray-500 uppercase">नाम</p>
-                <p className="text-gray-800">{comp.complainant_name || 'N/A'}</p>
+     {viewModalConfig.type === "correspondence" && (
+              <div className="w-full">
+                {" "}
+                {/* यहाँ w-full और overflow handling */}
+                {complaintData.complainants &&
+                complaintData.complainants.length > 0 ? (
+                  <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th
+                            scope="col"
+                            className="px-6 py-4 text-left text-[14px] font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap border-r border-gray-200"
+                          >
+                            क्र. सं.
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-6 py-4 text-left text-[14px] font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap border-r border-gray-200"
+                          >
+                            नाम
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-6 py-4 text-left text-[14px] font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap border-r border-gray-200"
+                          >
+                            पिता का नाम
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-6 py-4 text-left text-[14px] font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap border-r border-gray-200"
+                          >
+                            जिला
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-6 py-4 text-left text-[14px] font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap border-r border-gray-200"
+                          >
+                            व्यवसाय
+                          </th>
+                          <th
+                            scope="col"
+                            className="px-6 py-4 text-left text-[14px] font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap border-r border-gray-200"
+                          >
+                            लोक सेवक?
+                          </th>
+                          {/* Address को थोड़ा ज़्यादा जगह दी है */}
+                          <th
+                            scope="col"
+                            className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-[200px]"
+                          >
+                            पूरा पता
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {complaintData.complainants.map((comp, idx) => (
+                          <tr
+                            key={idx}
+                            className="hover:bg-blue-50 transition-colors duration-150"
+                          >
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700 border-r border-gray-200 bg-gray-50">
+                              {idx + 1}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
+                              {comp.complainant_name || "-"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                              {comp.father_name || "-"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                              {comp.district_name || "-"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                              {comp.occupation || "-"}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                  comp.is_public_servant === "हाँ" ||
+                                  comp.is_public_servant === "Yes"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-gray-100 text-gray-600"
+                                }`}
+                              >
+                                {comp.is_public_servant || "-"}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-700 break-words">
+                              {comp.permanent_place || "-"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-10 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+                    <svg
+                      className="w-12 h-12 text-gray-400 mb-3"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+                      ></path>
+                    </svg>
+                    <span className="text-gray-500 font-medium">
+                      परिवादी का कोई डेटा उपलब्ध नहीं है
+                    </span>
+                  </div>
+                )}
               </div>
-
-              <div className="p-3 bg-gray-50 rounded">
-                <p className="text-xs text-gray-500 uppercase">पिता का नाम</p>
-                <p className="text-gray-800">{comp.father_name || 'N/A'}</p>
-              </div>
-
-              <div className="p-3 bg-gray-50 rounded">
-                <p className="text-xs text-gray-500 uppercase">जिला</p>
-                <p className="text-gray-800">{comp.district_name || 'N/A'}</p>
-              </div>
-
-              <div className="p-3 bg-gray-50 rounded">
-                <p className="text-xs text-gray-500 uppercase">क्या लोक सेवक हैं?</p>
-                <p className="text-gray-800">{comp.is_public_servant || 'N/A'}</p>
-              </div>
-
-              <div className="p-3 bg-gray-50 rounded">
-                <p className="text-xs text-gray-500 uppercase">व्यवसाय</p>
-                <p className="text-gray-800">{comp.occupation || 'N/A'}</p>
-              </div>
-
-              <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
-                <p className="text-xs text-gray-500 uppercase">पता</p>
-                <p className="text-gray-800">{comp.permanent_place || 'N/A'}</p>
-              </div>
-
-            </div>
-          </div>
-        ))
-      ) : (
-        <div className="text-center py-4 text-gray-500">
-          परिवादी का कोई डेटा उपलब्ध नहीं है।
-        </div>
-      )}
-    </div>
-  )}
+            )}
 
             {/* Respondent Content */}
             {/* {viewModalConfig.type === "respondent" && (
@@ -905,124 +1206,178 @@ const ViewAllComplaint = () => {
 
 
             
-              {viewModalConfig.type === 'respondent' && (
-  <div className="space-y-4">
-    {complaintData.respondant && complaintData.respondant.length > 0 ? (
-      complaintData.respondant.map((resp, idx) => (
-        <div key={idx} className="mb-4">
-          <h4 className="text-sm font-bold text-gray-700 mb-2">
-            प्रतिवादी #{idx + 1}
-          </h4>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">नाम</p>
-              <p className="text-gray-800">{resp.respondent_name || 'N/A'}</p>
-            </div>
-
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पदनाम</p>
-              <p className="text-gray-800">{resp.designation || 'N/A'}</p>
-            </div>
-
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">विभाग</p>
-              <p className="text-gray-800">{resp.department_name || 'N/A'}</p>
-            </div>
-
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">जिला</p>
-              <p className="text-gray-800">{resp.district_name || 'N/A'}</p>
-            </div>
-
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">अधिकारी की श्रेणी</p>
-              <p className="text-gray-800">{resp.officer_category || 'N/A'}</p>
-            </div>
-
-            <div className="sm:col-span-2 p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पता</p>
-              <p className="text-gray-800">{resp.current_address || 'N/A'}</p>
-            </div>
-
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className="text-center py-4 text-gray-500">
-        प्रतिवादी का कोई डेटा उपलब्ध नहीं है।
-      </div>
-    )}
-  </div>
-)}
+  {viewModalConfig.type === "respondent" && (
+              <div className="w-full">
+                {complaintData.respondant &&
+                complaintData.respondant.length > 0 ? (
+                  <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 whitespace-nowrap">
+                            क्र. सं.
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 whitespace-nowrap">
+                            प्रतिवादी का नाम
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 whitespace-nowrap">
+                            पदनाम
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 whitespace-nowrap">
+                            विभाग
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 whitespace-nowrap">
+                            जिला
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 whitespace-nowrap">
+                            अधिकारी की श्रेणी
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-bold text-gray-700 min-w-[250px]">
+                            वर्तमान पता
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {complaintData.respondant.map((resp, idx) => (
+                          <tr
+                            key={idx}
+                            className="hover:bg-blue-50 transition-colors"
+                          >
+                            <td className="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-100">
+                              {idx + 1}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                              {resp.respondent_name || "-"}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                              {resp.designation || "-"}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                              {resp.department_name || "-"}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                              {resp.district_name || "-"}
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                              {resp.officer_category || "-"}
+                            </td>
+                            {/* Address Column: whitespace-normal ensures text wrapping */}
+                            <td className="px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                              {resp.current_address || "-"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-gray-500 font-medium">
+                      प्रतिवादी का कोई डेटा उपलब्ध नहीं है।
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Support Content (Added to match buttons) */}
-          {viewModalConfig.type === 'support' && (
-  <div className="space-y-4">
-    {complaintData.support && complaintData.support.length > 0 ? (
-      complaintData.support.map((item, idx) => (
-        <div key={idx} className="mb-4">
-          <h4 className="text-sm font-bold text-gray-700 mb-2">
-            सहायक व्यक्ति #{idx + 1}
-          </h4>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">नाम</p>
-              <p className="text-gray-800">{item.support_name || 'N/A'}</p>
-            </div>
-
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पता</p>
-              <p className="text-gray-800">{item.support_address || 'N/A'}</p>
-            </div>
-
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className="text-center py-4 text-gray-500">
-        कोई सहायक व्यक्ति उपलब्ध नहीं है।
-      </div>
-    )}
-  </div>
-)}
+     {viewModalConfig.type === "support" && (
+              <div className="w-full">
+                {complaintData.support && complaintData.support.length > 0 ? (
+                  <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 w-16 whitespace-nowrap">
+                            क्र. सं.
+                          </th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 w-1/4 whitespace-nowrap">
+                            नाम
+                          </th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 whitespace-nowrap">
+                            पता
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {complaintData.support.map((item, idx) => (
+                          <tr
+                            key={idx}
+                            className="hover:bg-blue-50 transition-colors"
+                          >
+                            <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
+                              {idx + 1}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                              {item.support_name || "-"}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                              {item.support_address || "-"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-gray-500 font-medium">
+                      कोई सहायक व्यक्ति उपलब्ध नहीं है।
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Witness Content (Added to match buttons) */}
-                      {viewModalConfig.type === 'witness' && (
-  <div className="space-y-4">
-    {complaintData.witness && complaintData.witness.length > 0 ? (
-      complaintData.witness.map((item, idx) => (
-        <div key={idx} className="mb-4">
-          
-          <h4 className="text-sm font-bold text-gray-700 mb-2">
-            गवाह #{idx + 1}
-          </h4>
+  {viewModalConfig.type === "witness" && (
+              <div className="w-full">
+                {complaintData.witness && complaintData.witness.length > 0 ? (
+                  <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 w-16 whitespace-nowrap">
+                            क्र. सं.
+                          </th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 border-r border-gray-200 w-1/4 whitespace-nowrap">
+                            नाम
+                          </th>
+                          <th className="px-6 py-3 text-left text-sm font-bold text-gray-700 whitespace-nowrap">
+                            पता
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {complaintData.witness.map((item, idx) => (
+                          <tr
+                            key={idx}
+                            className="hover:bg-blue-50 transition-colors"
+                          >
+                            <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
+                              {idx + 1}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                              {item.witness_name || "-"}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                              {item.witness_address || "-"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-gray-500 font-medium">
+                      कोई गवाह डेटा उपलब्ध नहीं है।
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">नाम</p>
-              <p className="text-gray-800">{item.witness_name || 'N/A'}</p>
-            </div>
-
-            <div className="p-3 bg-gray-50 rounded">
-              <p className="text-xs text-gray-500 uppercase">पता</p>
-              <p className="text-gray-800">{item.witness_address || 'N/A'}</p>
-            </div>
-
-          </div>
-        </div>
-      ))
-    ) : (
-      <div className="text-center py-4 text-gray-500">
-        कोई गवाह डेटा उपलब्ध नहीं है।
-      </div>
-    )}
-  </div>
-)}
 
             <div className="mt-6 flex justify-end pt-4 border-t">
               <button
