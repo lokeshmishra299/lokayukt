@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye } from "react-icons/fa";
+import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,6 +22,119 @@ const api = axios.create({
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
+
+
+const SearchableDropdown = ({
+  options,
+  value,
+  onChange,
+  placeholder,
+  disabled,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [wrapperRef]);
+
+  const selectedOption = options.find((opt) => opt.id == value);
+
+  const filteredOptions = options.filter((option) => {
+    const label = option.name || option.user_name || `User ${option.id}`;
+    const district = option.district_name || "";
+    const search = searchTerm.toLowerCase();
+    return (
+      label.toLowerCase().includes(search) ||
+      district.toLowerCase().includes(search)
+    );
+  });
+
+  const handleSelect = (option) => {
+    onChange(option.id);
+    setIsOpen(false);
+    setSearchTerm("");
+  };
+
+  return (
+    <div className="relative" ref={wrapperRef}>
+      <div
+        className={`w-full px-3 py-2 border rounded bg-white flex justify-between items-center cursor-pointer ${
+          disabled
+            ? "bg-gray-100 cursor-not-allowed text-gray-400"
+            : "border-gray-300 focus:ring-2 focus:ring-blue-500"
+        }`}
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+      >
+        <span
+          className={`text-sm ${
+            !selectedOption ? "text-gray-500" : "text-gray-900"
+          }`}
+        >
+          {selectedOption
+            ? `${selectedOption.name || selectedOption.user_name}${
+                selectedOption.district_name
+                  ? ` (${selectedOption.district_name})`
+                  : ""
+              }`
+            : placeholder}
+        </span>
+        <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
+      </div>
+
+      {isOpen && !disabled && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-hidden flex flex-col">
+          <input
+            type="text"
+            className="w-full px-3 py-2 border-b border-gray-200 text-sm focus:outline-none bg-gray-50"
+            placeholder="Type to search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+            autoFocus
+          />
+          <div className="overflow-y-auto flex-1">
+            {filteredOptions.length > 0 ? (
+              filteredOptions.map((option) => (
+                <div
+                  key={option.id}
+                  className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
+                    value == option.id
+                      ? "bg-blue-100 text-blue-800"
+                      : "text-gray-700"
+                  }`}
+                  onClick={() => handleSelect(option)}
+                >
+                  {option.name || option.user_name || `User ${option.id}`}
+                  {option.district_name ? (
+                    <span className="text-gray-500 text-xs ml-1">
+                      ({option.district_name})
+                    </span>
+                  ) : (
+                    ""
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="px-3 py-2 text-sm text-gray-500">
+                No results found
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const ViewAllComplaint = () => {
   const navigate = useNavigate();
@@ -47,6 +160,7 @@ const ViewAllComplaint = () => {
 
   const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
+  const [forwardType, setForwardType] = useState("self");
 
   const {
     data: complaintData,
@@ -604,127 +718,170 @@ fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
       </div>
 
       {/* Unified Confirmation Modal (Receive/Forward/Pullback) */}
-      {confirmConfig.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative animate-in fade-in zoom-in duration-200">
-            <button
-              onClick={handleConfirmNo}
-              disabled={
-                markAsReceivedMutation.isPending ||
-                forwardPhysicallyMutation.isPending
-              }
-              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Close"
-            >
-              <FaTimes className="w-5 h-5 text-gray-600" />
-            </button>
-
-            <h3 className="text-lg font-semibold mb-4 pr-8">
-              {confirmConfig.type === "receive"
-                ? "Return with Remarks?"
-                : confirmConfig.type === "pullback"
-                ? "Pull Back Complaint?"
-                : "Forward To?"}
-            </h3>
-
-            {confirmConfig.type === "pullback" && (
-              <p className="text-gray-600 mb-6 text-sm">
-                Are you sure you want to pull back this complaint file?
-              </p>
-            )}
-
-            {confirmConfig.type === "forward" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Forward To <span className="text-red-500">*</span>
-                </label>
-
-                {isLoadingOptions || isFetchingOptions ? (
-                  <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50">
-                    Loading...
-                  </div>
-                ) : forwardOptionsError ? (
-                  <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50">
-                    Error loading options: {forwardOptionsError.message}
-                  </div>
-                ) : (
-                  <select
-                    value={selectedForwardTo}
-                    onChange={(e) => setSelectedForwardTo(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select User...</option>
-                    {Array.isArray(forwardOptionsData) &&
-                    forwardOptionsData.length > 0 ? (
-                      forwardOptionsData.map((option) => (
-                        <option key={option.id} value={option.id}>
-                          {option.name ||
-                            option.user_name ||
-                            `User ${option.id}`}
-                          {option.district_name
-                            ? ` (${option.district_name})`
-                            : ""}
-                        </option>
-                      ))
-                    ) : (
-                      <option disabled>No options available</option>
-                    )}
-                  </select>
+     {confirmConfig.open && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+              <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+                {/* Close Button */}
+                <button
+                  onClick={handleConfirmNo}
+                  disabled={
+                    markAsReceivedMutation.isPending ||
+                   forwardPhysicallyMutation.isPending
+                  }
+                  className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Close"
+                >
+                  <FaTimes className="w-5 h-5 text-gray-600" />
+                </button>
+    
+                {/* Title */}
+                <h3 className="text-lg font-semibold mb-4 pr-8">
+                  {confirmConfig.type === "receive"
+                    ? "Mark as Received?"
+                    : confirmConfig.type === "forward"
+                    ? "Send"
+                    : confirmConfig.type === "pullback"
+                    ? "Pull Back Complaint?"
+                    : "Assign to Yourself?"}
+                </h3>
+    
+                {/* --- FORWARDING LOGIC START --- */}
+                {confirmConfig.type === "forward" && (
+                  <>
+                    {/* Radio Buttons Section */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Forward Type <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex flex-col gap-2">
+                        <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="forwardType"
+                            value="self"
+                            checked={forwardType === "self"}
+                            onChange={(e) => {
+                              setForwardType(e.target.value);
+                              setSelectedForwardTo("");
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-sm text-gray-700 font-medium">
+                            Send To My Pool
+                          </span>
+                        </label>
+                        <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="forwardType"
+                            value="uplokayukt"
+                            checked={forwardType === "uplokayukt"}
+                            onChange={(e) => {
+                              setForwardType(e.target.value);
+                              setSelectedForwardTo("");
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-sm text-gray-700 font-medium">
+                            Send To Other Pool
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+    
+                    {/* SEARCHABLE DROPDOWN */}
+                    <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
+                        Officer <span className="text-red-500">*</span>
+                      </label>
+    
+                      {isLoadingOptions || isFetchingOptions ? (
+                        <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50 text-sm">
+                          Loading options...
+                        </div>
+                      ) : forwardOptionsError ? (
+                        <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50 text-sm">
+                          Error: {forwardOptionsError.message}
+                        </div>
+                      ) : (
+                        <SearchableDropdown
+                          options={
+                            Array.isArray(forwardOptionsData)
+                              ? forwardOptionsData
+                              : []
+                          }
+                          value={selectedForwardTo}
+                          onChange={(val) => setSelectedForwardTo(val)}
+                          placeholder="Select Officer..."
+                        />
+                      )}
+                    </div>
+                  </>
                 )}
+                {/* --- FORWARDING LOGIC END --- */}
+    
+                {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
+                {confirmConfig.type !== "assign" &&
+                  confirmConfig.type !== "pullback" && (
+                    <>
+                      <div className="mb-5">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Remark <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          value={remark}
+                          onChange={(e) => setRemark(e.target.value)}
+                          rows={4}
+                          placeholder="Enter your remark here..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+                    </>
+                  )}
+    
+                {/* Buttons */}
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={handleConfirmNo}
+                    disabled={
+                      markAsReceivedMutation.isPending ||
+                     forwardPhysicallyMutation.isPending
+                    }
+                    className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {confirmConfig.type === "assign" ||
+                    confirmConfig.type === "pullback"
+                      ? "No"
+                      : "Cancel"}
+                  </button>
+    
+                  <button
+                    onClick={handleConfirmYes}
+                    disabled={
+                      markAsReceivedMutation.isPending ||
+                     forwardPhysicallyMutation.isPending ||
+                      (confirmConfig.type === "receive" && !remark.trim()) ||
+                      (confirmConfig.type === "forward" &&
+                        (!remark.trim() ||
+                          !selectedForwardTo ||
+                          isLoadingOptions ||
+                          isFetchingOptions))
+                    }
+                    className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                  >
+                    {markAsReceivedMutation.isPending ||
+                   forwardPhysicallyMutation.isPending
+                      ? "Sending..."
+                      : confirmConfig.type === "assign" ||
+                        confirmConfig.type === "pullback"
+                      ? "Yes"
+                      : "Send"}
+                  </button>
+                </div>
               </div>
-            )}
-
-            {confirmConfig.type !== "pullback" && (
-              <div className="mb-5">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Remark <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={remark}
-                  onChange={(e) => setRemark(e.target.value)}
-                  rows={4}
-                  placeholder="Enter your remark here..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                />
-              </div>
-            )}
-
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={handleConfirmNo}
-                disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardPhysicallyMutation.isPending
-                }
-                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {confirmConfig.type === "pullback" ? "No" : "Cancel"}
-              </button>
-
-              <button
-                onClick={handleConfirmYes}
-                disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardPhysicallyMutation.isPending ||
-                  (confirmConfig.type === "forward" &&
-                    (isLoadingOptions || isFetchingOptions)) ||
-                  (confirmConfig.type === "receive" && !remark.trim()) ||
-                  (confirmConfig.type === "forward" &&
-                    (!selectedForwardTo || !remark.trim()))
-                }
-                className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {markAsReceivedMutation.isPending ||
-                forwardPhysicallyMutation.isPending
-                  ? "Processing..."
-                  : confirmConfig.type === "pullback"
-                  ? "Yes"
-                  : "Send"}
-              </button>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
       {/* ===== VIEW DATA MODAL (Correspondence / Respondent / Support / Witness) ===== */}
       {viewModalConfig.open && (

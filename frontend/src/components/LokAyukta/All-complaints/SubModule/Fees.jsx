@@ -20,6 +20,7 @@ const Fees = ({ complaint }) => {
   const { id } = useParams();
 
   const [erorrss, setErrorss] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Added loading state
 
   const [fessSubmitForm, setFessSubmitForm] = useState({
     fee_exempted: "2",
@@ -45,14 +46,16 @@ const Fees = ({ complaint }) => {
 
   const handleApprove = async () => {
     try {
-      setErrorss(null); 
+      setIsLoading(true); // Start loading
+      setErrorss(null);
+      
       const res = await api.post(
         `/lokayukt/fee-exempted/${id}`,
         fessSubmitForm
       );
-      
+
       console.log("Fee Submitted:", res.data);
-      
+
       // Success Toast
       toast.success("Fee Verified Successfully!");
 
@@ -66,13 +69,15 @@ const Fees = ({ complaint }) => {
       console.log("Error he", error);
       const errorData = error?.response?.data || null;
       setErrorss(errorData);
-      
+
       // Error Toast
       if (errorData?.message) {
-        // (errorData.message);
+        // toast.error(errorData.message);
       } else {
-        // ("Something went wrong while verifying fee.");
+        // toast.error("Something went wrong while verifying fee.");
       }
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -176,9 +181,12 @@ const Fees = ({ complaint }) => {
           <div className="flex justify-end">
             <button
               onClick={handleApprove}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition"
+              disabled={isLoading}
+              className={`bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition ${
+                isLoading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              Approve Fee
+              {isLoading ? "Approving..." : "Approve Fee"}
             </button>
           </div>
         </div>
