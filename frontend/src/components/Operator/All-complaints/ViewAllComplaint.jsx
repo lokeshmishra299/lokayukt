@@ -440,12 +440,8 @@ main_respondant_district
                     : complaintData.amount
                     ? "Paid"
                     : "Partial"} */}
-                  शुल्क का प्रकार:{" "}
-                  {complaintData.fee_exempted === 1
-                    ? "Exempted"
-                    : complaintData.amount
-                    ? "Paid"
-                    : "Partial"}
+                       शुल्क का प्रकार:{" "}
+                  {complaintData.fee_exempted == 0 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "NA"}
                 </span>
 
                 <span
@@ -456,7 +452,8 @@ main_respondant_district
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  स्थिति: {complaintData.payment_status || "Awaiting approval"}
+                       स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
+
                 </span>
 
                 {complaintData.challan_no && (
