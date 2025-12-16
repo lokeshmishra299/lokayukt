@@ -262,6 +262,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-file-preview/{id}',[LokAyuktComplaintsController::class,'getFilePreview']);
         Route::get('/return-complain-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'returnComplainByLokayukt']);
         Route::get('/pull-back-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'pullBackByLokayukt']);
+        Route::post('/fee-exempted/{complaint_id}',[LokAyuktComplaintsController::class,'approvedFeeByLokayukt']);
        
        
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);
