@@ -551,8 +551,7 @@ main_respondant_district
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  स्थिति: {complaintData.
-fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
+                  स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
