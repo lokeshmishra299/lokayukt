@@ -92,7 +92,7 @@ const Fees = ({ complaint }) => {
               Fee Approved
             </p>
             <p className="text-green-700 text-sm mt-1">
-              The fee has already been approved by the Lokayukt authority.
+              The fee has already been approved by the Lokayukt.
             </p>
           </div>
         </div>
