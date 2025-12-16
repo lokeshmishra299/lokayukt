@@ -33,6 +33,12 @@ const ViewAllComplaint = () => {
   const { id } = useParams();
   const queryClient = useQueryClient();
 
+  const capitalizeFirstLetter = (text = "") => {
+  if (!text) return "N/A";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
+
+
   const [activeTab, setActiveTab] = useState("documents");
 
   const [confirmConfig, setConfirmConfig] = useState({
@@ -332,7 +338,7 @@ const ViewAllComplaint = () => {
   {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
-      मुख्य परिवादी का विवरण
+      मुख्य परिवादी का विवरण 
     </h3>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Name */}
@@ -341,7 +347,7 @@ const ViewAllComplaint = () => {
            नाम
         </p>
         <p className="text-gray-800 text-sm">
-          {complaintData.main_complainant_name || "N/A"}
+          {capitalizeFirstLetter(complaintData.main_complainant_name) || "N/A"}
         </p>
       </div>
 
@@ -351,7 +357,7 @@ const ViewAllComplaint = () => {
           पिता का नाम
         </p>
         <p className="text-gray-800 text-sm">
-          {complaintData.main_complainant_father || "N/A"}
+          {capitalizeFirstLetter(complaintData.main_complainant_father) || "N/A"}
         </p>
       </div>
 
@@ -361,7 +367,7 @@ const ViewAllComplaint = () => {
         जिला
         </p>
         <p className="text-gray-800 text-sm">
-          {complaintData.main_complainant_district || "N/A"}
+          {capitalizeFirstLetter(complaintData.main_complainant_district) || "N/A"}
         </p>
       </div>
     </div>
@@ -379,7 +385,7 @@ const ViewAllComplaint = () => {
           नाम
         </p>
         <p className="text-gray-800 text-sm">
-          {complaintData.main_respondent_name || "N/A"}
+          {capitalizeFirstLetter(complaintData.main_respondent_name) || "N/A"}
         </p>
       </div>
 
@@ -389,7 +395,7 @@ const ViewAllComplaint = () => {
          पद
         </p>
         <p className="text-gray-800 text-sm">
-          {complaintData.main_respondent_designation || "N/A"}
+          {capitalizeFirstLetter(complaintData.main_respondent_designation) || "N/A"}
         </p>
       </div>
 
@@ -399,7 +405,7 @@ const ViewAllComplaint = () => {
          जिला
         </p>
         <p className="text-gray-800 text-sm">
-          {complaintData.main_respondant_district || "N/A"}
+          {capitalizeFirstLetter(complaintData.main_respondant_district) || "N/A"}
         </p>
       </div>
     </div>
@@ -414,7 +420,7 @@ const ViewAllComplaint = () => {
           व्यक्ति से संबंध
         </p>
         <p className="text-gray-800 text-sm">
-          {complaintData.relation_with_person || "NA"}
+          {capitalizeFirstLetter(complaintData.relation_with_person) || "NA"}
         </p>
       </div>
 
@@ -425,7 +431,7 @@ const ViewAllComplaint = () => {
             कार्यवाही तिथि
           </p>
           <p className="text-gray-800 text-sm">
-            {complaintData.cause_date || "NA"}
+            {capitalizeFirstLetter(complaintData.cause_date) || "NA"}
           </p>
         </div>
       )}
@@ -436,7 +442,7 @@ const ViewAllComplaint = () => {
           श्रेणी
         </p>
         <p className="text-gray-800 text-sm">
-          {complaintData.category || "N/A"}
+          {capitalizeFirstLetter(complaintData.category) || "N/A"}
         </p>
       </div>
     </div>
