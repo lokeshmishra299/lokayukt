@@ -1009,6 +1009,7 @@ class LokAyuktComplaintsController extends Controller
             ], 422);
              }
            $cmp->fee_exempted  = $request->fee_exempted;
+           $cmp->fee_approved_by_lokayukt  = 1;
      
             if($cmp->save()){
             
