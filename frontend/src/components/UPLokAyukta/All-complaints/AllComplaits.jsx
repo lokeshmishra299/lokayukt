@@ -182,7 +182,7 @@ const AllComplaints = () => {
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Send To Uplokayukt Successfully!", {
+        toast.success("Send To UpLokayukt Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -450,7 +450,7 @@ const AllComplaints = () => {
                           </span>
                           {complaint.fee_exempted === 1 && (
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                              With uplokayukta
+                              With Lokayukta
                             </span>
                           )}
                         </div>
@@ -510,7 +510,7 @@ const AllComplaints = () => {
                               className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
                             >
                               
-                              Send To uplokayukt
+                              Send To Lokayukt
                             </button>
                           )} */}
                         </div>

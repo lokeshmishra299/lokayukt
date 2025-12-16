@@ -223,16 +223,16 @@ const ViewAllComplaint = () => {
       isFetching: isFetchingOptions,
       error: forwardOptionsError,
     } = useQuery({
-      queryKey: ["lokayukt-options", forwardType], // <-- NOTE: forwardType added
+      queryKey: ["lokayukt-options", forwardType], // 
       queryFn: async () => {
         try {
-          // 1️ Send To My Pool → API: /lokayukt/get-users
+          //  Send To My Pool  API: /lokayukt/get-users
           if (forwardType === "self") {
             const res = await api.get("/lokayukt/get-users");
             return res.data?.data || res.data || [];
           }
   
-          // 2️ Send To Other Pool → API: /lokayukt/get-lokayukt-uplokayukt
+          //  Send To Other Pool  API: /lokayukt/get-lokayukt-uplokayukt
           const res = await api.get("/lokayukt/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];

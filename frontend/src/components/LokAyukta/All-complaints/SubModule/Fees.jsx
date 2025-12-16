@@ -4,11 +4,8 @@ import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCheckCircle } from "react-icons/fa";
-
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
-
 const token = localStorage.getItem("access_token");
-
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -16,50 +13,38 @@ const api = axios.create({
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
-
 const Fees = ({ complaint }) => {
   const { id } = useParams();
-
   const [erorrss, setErrorss] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // Added loading state
-
   const [fessSubmitForm, setFessSubmitForm] = useState({
     fee_exempted: "2",
     remarks: "",
   });
-
   const [selectedFeeOption, setSelectedFeeOption] = useState("partial");
-
   const handleFeeChange = (value) => {
     const feeMap = {
       full: "1",
       partial: "2",
       exemption: "0",
     };
-
     setSelectedFeeOption(value);
-
     setFessSubmitForm((prev) => ({
       ...prev,
       fee_exempted: feeMap[value],
     }));
   };
-
   const handleApprove = async () => {
     try {
       setIsLoading(true); // Start loading
       setErrorss(null);
-
       const res = await api.post(
         `/lokayukt/fee-exempted/${id}`,
         fessSubmitForm
       );
-
       console.log("Fee Submitted:", res.data);
-
       // Success Toast
       toast.success("Fee Verified Successfully!");
-
       // Clear Remarks Field
       setFessSubmitForm((prev) => ({
         ...prev,
@@ -69,7 +54,6 @@ const Fees = ({ complaint }) => {
       console.log("Error he", error);
       const errorData = error?.response?.data || null;
       setErrorss(errorData);
-
       // Error Toast
       if (errorData?.message) {
         // toast.error(errorData.message);
@@ -80,13 +64,11 @@ const Fees = ({ complaint }) => {
       setIsLoading(false); // Stop loading
     }
   };
-
   return (
     <>
       {complaint.fee_approved_by_lokayukt == 1 ? (
         <div className="w-full flex items-center gap-4 p-6 bg-green-50 border border-green-300 rounded-xl shadow-sm">
           <FaCheckCircle className="text-green-600" size={28} />
-
           <div>
             <p className="text-green-800 text-base font-semibold">
               Fee Approved
@@ -104,7 +86,6 @@ const Fees = ({ complaint }) => {
                 Fee Verification
               </h3>
             </div>
-
             <div className="p-5 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <label
@@ -126,7 +107,6 @@ const Fees = ({ complaint }) => {
                     Full Fee
                   </span>
                 </label>
-
                 <label
                   className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition ${
                     selectedFeeOption === "partial"
@@ -146,7 +126,6 @@ const Fees = ({ complaint }) => {
                     Partial Fee
                   </span>
                 </label>
-
                 <label
                   className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition ${
                     selectedFeeOption === "exemption"
@@ -167,12 +146,10 @@ const Fees = ({ complaint }) => {
                   </span>
                 </label>
               </div>
-
               <div className="space-y-2">
                 <label className="text-gray-700 text-sm font-medium">
                   Remarks / Comments
                 </label>
-
                 <textarea
                   value={fessSubmitForm.remarks}
                   onChange={(e) =>
@@ -185,14 +162,12 @@ const Fees = ({ complaint }) => {
                   placeholder="Enter comments…"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
                 />
-
                 {erorrss && erorrss.errors && erorrss.errors.remarks && (
                   <p className="text-red-600 text-sm">
                     {erorrss.errors.remarks}
                   </p>
                 )}
               </div>
-
               <div className="flex justify-end">
                 <button
                   onClick={handleApprove}
@@ -206,7 +181,6 @@ const Fees = ({ complaint }) => {
               </div>
             </div>
           </div>
-
           {/* Toast Container Configured exactly like Login.js */}
           <ToastContainer
             position="top-right"
@@ -225,5 +199,11 @@ const Fees = ({ complaint }) => {
     </>
   );
 };
-
 export default Fees;
+
+
+
+
+
+
+
