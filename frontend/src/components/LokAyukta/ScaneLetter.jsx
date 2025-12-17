@@ -74,8 +74,8 @@ const ScanLetter = () => {
   };
 
   return (
-    // Added p-4 for mobile padding
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+   
+    <div className="min-h-screen bg-gray-50">
       {/* Header Section - Responsive: Flex col on mobile, row on desktop */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
