@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCheckCircle } from "react-icons/fa";
-
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
 const api = axios.create({
@@ -14,7 +13,6 @@ const api = axios.create({
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
-
 const Fees = ({ complaint, onFeeApproved }) => {
   const { id } = useParams();
   const [erorrss, setErrorss] = useState(null);
@@ -68,7 +66,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
         // toast.error("Something went wrong while verifying fee.");
       }
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false); // Stop loading
     }
   };
   return (
