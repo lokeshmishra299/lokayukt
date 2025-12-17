@@ -48,7 +48,6 @@ useEffect(() => {
     api
       .get("/lokayukt/get-uplokayukt")
       .then((res) => {
-        // API direct array return kar rahi hai
         setUploadList(res.data);
       })
       .catch((err) => {
@@ -66,7 +65,7 @@ const handleSend = async () => {
     setIsSending(true);
 
     await api.post(
-      `/forward-to-uplokayukt/${complaintToApprove.id}`,
+      `/lokayukt/forward-to-uplokayukt/${complaintToApprove.id}`,
       {
         Uplokayukt_id: selectedUpload, 
       }
@@ -292,12 +291,12 @@ const handleSend = async () => {
     };
   };
 
-    // **************************count days*******************************************************
+
   const getDaysDifference = (date) => {
   const created = new Date(date);
   const today = new Date();
 
-  const diffTime = today - created; // milliseconds difference
+  const diffTime = today - created; 
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
   return diffDays;
@@ -305,15 +304,6 @@ const handleSend = async () => {
 
 
 
-
-
-// const getDaysDifference = (dateString) => {
-//   const today = new Date();
-//   const createdDate = new Date(dateString);
-
-//   const diffTime = today - createdDate;
-//   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-// };
 
 
   return (
@@ -647,12 +637,6 @@ const handleSend = async () => {
     </div>
   </div>
 )}
-
-
-
-
-
-
 
     </>
   );
