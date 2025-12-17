@@ -1,79 +1,78 @@
 import React from "react";
+import { FaArrowRight } from "react-icons/fa6";
 
-const MovementHistory = () => {
-  const items = [
-    {
-      title: "Record Section → Lokayukta",
-      desc: "File marked for review and orders",
-      time: "Current",
-      status: "12 Jan 2025, 2:45 PM",
-    },
-    {
-      title: "UpLokayukta → PS to Lokayukta (Shri ABC)",
-      desc: "Please prepare draft order for investigation",
-      time: "Current",
-      status: "12 Jan 2025, 2:45 PM",
-    },
-  ];
+const userName = localStorage.getItem("name");
+
+const MovementHistory = ({ complaint }) => {
+  const actions = complaint?.actions || [];
+  const finalItems = actions.length > 0 ? actions : [{ remarks: "NA" }];
+
+
+  const getMovementTitle = (item) => {
+    const record = "Recived ";
+    const recordSection = "Record Section";
+
+    // forward_by_rk && forward_to_lokayukt is 0 or null
+    if (item.forward_by_rk && (item.forward_to_lokayukt === 0 || item.forward_to_lokayukt === null)) {
+      return `${record} → Record Section`;
+    }
+
+    // forward_by_rk && forward_by_lokayukt present value 
+    if (item.forward_by_rk && item.forward_to_lokayukt) {
+      return `${recordSection} → Lokayukta`;
+    }
+
+   
+    return `${recordSection} → Record Section`;
+  };
 
   return (
     <div className="p-6">
-
       <div className="flex items-center gap-2 mb-4">
         <span className="text-[18px] text-gray-700">Movement</span>
         <span className="text-[18px] text-gray-700">History</span>
       </div>
 
-   
       <div className="relative pl-10">
-
-
         <div className="absolute left-[14px] top-[20px] bottom-[20px] w-[2px] bg-blue-300"></div>
 
-     
-        {items.map((item, index) => (
+        {finalItems.map((item, index) => (
           <div key={index} className="relative mb-4">
 
-       
-<div className="absolute left-[-32px] top-2 w-4 h-4 bg-white rounded-full border border-gray-300 flex items-center justify-center">
-    
-    
-    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+          
+            <div className="absolute left-[-32px] top-2 w-4 h-4 bg-white rounded-full border border-gray-300 flex items-center justify-center">
+              <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+            </div>
 
-</div>
+            
+            <div className="bg-white rounded-xl shadow border p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
 
+              <div className="flex-1">
+                
+                <p className="text-[14px] sm:text-[15px] text-gray-900 font-medium flex items-center gap-2">
+                  {getMovementTitle(item)} 
+                </p>
 
-         
-          <div className="bg-white rounded-xl shadow border p-4 pr-6 
-     flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                
+                <p className="text-[12px] text-gray-500 mt-1">
+                  {item.created_at || "No time"}
+                </p>
 
-  {/* LEFT SIDE */}
-  <div className="flex-1">
-    <div className="flex flex-wrap items-center gap-2">
-      <p className="text-[15px] text-gray-900">
-        {item.title}
-      </p>
+                
+                <p className="text-[13px] text-gray-600 mt-1 leading-snug">
+                  <span className="font-semibold text-gray-700 mr-1">Remark:</span>
+                  {item.remarks || "NA"}
+                </p>
+              </div>
 
-      <span className="px-1.5 py-[1px] text-[10px] border border-blue-300 
-            text-blue-600 bg-blue-50 rounded">
-        Current
-      </span>
-    </div>
+              
+              <div className="flex flex-col items-start sm:items-end gap-1.5 min-w-fit">
+                <span className="text-[11px] sm:text-[12px] bg-blue-100 text-blue-600 px-2 py-1 rounded-md whitespace-nowrap">
+                  {item.status || "Forwarded"}
+                </span>
+              </div>
 
-    <p className="text-[13px] text-gray-600 mt-1">
-      {item.desc}
-    </p>
-  </div>
-
-  {/* RIGHT SIDE — STATUS */}
-  <span className="text-[12px] px-2 py-1 rounded-md
-        self-start sm:self-auto">
-    {item.status}
-  </span>
-
-</div>
-
-
+            </div>
           </div>
         ))}
       </div>
