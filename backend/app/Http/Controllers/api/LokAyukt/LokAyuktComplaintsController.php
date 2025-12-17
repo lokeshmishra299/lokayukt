@@ -1248,4 +1248,37 @@ class LokAyuktComplaintsController extends Controller
         }
         
     }
+
+    public function addDispachLeters(Request $request)
+    {
+        $request->validate([
+            'complaint_id' => 'required|integer',
+            'letter_type'  => 'required|string|max:50',
+            'subject'      => 'required|string|max:255',
+            'file'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        // Upload file
+        $uploadedFile = $request->file('file');
+        $fileName = time().'_'.$uploadedFile->getClientOriginalName();
+
+        $filePath = $uploadedFile->storeAs(
+            'letters',
+            $fileName,
+            'public'
+        );
+
+        // Save DB
+        Letter::create([
+            'complaint_id' => $request->complaint_id,
+            'letter_type'  => $request->letter_type,
+            'subject'      => $request->subject,
+            'file'         => $filePath,
+        ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Letter uploaded successfully'
+        ]);
+    }
 }
