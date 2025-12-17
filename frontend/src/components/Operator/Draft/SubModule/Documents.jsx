@@ -28,6 +28,10 @@ const uploadApi = axios.create({
 
 const Documents = ({ complaint }) => {
   const [correspondenceType, setCorrespondenceType] = useState("Letter");
+  
+  // 1. New State for Title
+  const [title, setTitle] = useState("");
+  
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
@@ -67,6 +71,14 @@ const Documents = ({ complaint }) => {
       return;
     }
 
+    // Validation: Title is optional? If mandatory, uncomment below:
+    /*
+    if (!title.trim()) {
+      setFieldErrors((prev) => ({ ...prev, title: ["Title is required"] }));
+      return;
+    }
+    */
+
     setIsUploading(true);
 
     try {
@@ -77,12 +89,17 @@ const Documents = ({ complaint }) => {
       });
 
       formData.append("type", correspondenceType);
+      
+      // 2. Append Title to Form Data
+      formData.append("title", title);
+      
       formData.append("complain_id", complaint.id);
 
       await uploadApi.post("/operator/upload-document", formData);
 
       toast.success("Uploaded document successfully!");
       setUploadedFiles([]);
+      setTitle(""); // Clear title after upload
     } catch (error) {
       const res = error.response?.data;
 
@@ -129,31 +146,57 @@ const Documents = ({ complaint }) => {
             Attach letters, reminders, RTI replies received after file movement.
           </p>
 
-          {/* Correspondence Type */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Correspondence Type (for all files)
-            </label>
-            <select
-              value={correspondenceType}
-              onChange={(e) => {
-                setCorrespondenceType(e.target.value);
-                setFieldErrors((prev) => ({ ...prev, type: undefined }));
-              }}
-              className={`border px-3 py-2 rounded-lg w-full sm:w-60 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                fieldErrors.type ? "border-red-500" : "border-gray-300"
-              }`}
-            >
-              <option>Letter</option>
-              <option>Reminder</option>
-              <option>RTI Reply</option>
-              <option>Counter Order</option>
-            </select>
-            {fieldErrors.type && (
-              <p className="mt-1 text-xs text-red-600">
-                {fieldErrors.type[0]}
-              </p>
-            )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            
+
+              <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Document Title <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setFieldErrors((prev) => ({ ...prev, title: undefined }));
+                }}
+                placeholder="Add Title"
+                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                  fieldErrors.title ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {fieldErrors.title && (
+                <p className="mt-1 text-xs text-red-600">{fieldErrors.title[0]}</p>
+              )}
+            </div>
+            
+            {/* Correspondence Type */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Correspondence Type <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={correspondenceType}
+                onChange={(e) => {
+                  setCorrespondenceType(e.target.value);
+                  setFieldErrors((prev) => ({ ...prev, type: undefined }));
+                }}
+                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                  fieldErrors.type ? "border-red-500" : "border-gray-300"
+                }`}
+              >
+                <option>Letter</option>
+                <option>Reminder</option>
+                <option>RTI Reply</option>
+                <option>Counter Order</option>
+              </select>
+              {fieldErrors.type && (
+                <p className="mt-1 text-xs text-red-600">{fieldErrors.type[0]}</p>
+              )}
+            </div>
+
+            {/* 3. Title Input Field */}
+          
           </div>
 
           {/* PDF Upload Input */}
@@ -195,8 +238,8 @@ const Documents = ({ complaint }) => {
         {uploadedFiles.length > 0 && (
           <div className="p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-sm">
             <h3 className="text-[16px] sm:text-[17px] font-semibold mb-4">
-              Selected Documents ({uploadedFiles.length}) -
-              <span className="text-blue-600"> {correspondenceType}</span>
+              Selected Documents ({uploadedFiles.length}) - 
+              <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span>
             </h3>
 
             <div className="space-y-3">

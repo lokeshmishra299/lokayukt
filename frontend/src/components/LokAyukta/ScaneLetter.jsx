@@ -17,7 +17,7 @@ const ScanLetter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
-  // Mock Data for Scanned Letters
+
   const scannedLetters = [
     {
       id: 1,
@@ -51,7 +51,7 @@ const ScanLetter = () => {
     },
   ];
 
-  // Handle File Selection
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -59,12 +59,12 @@ const ScanLetter = () => {
     }
   };
 
-  // Trigger File Input Click
+
   const handleUploadAreaClick = () => {
     fileInputRef.current.click();
   };
 
-  // Remove Selected File
+
   const removeFile = (e) => {
     e.stopPropagation();
     setSelectedFile(null);
@@ -76,7 +76,6 @@ const ScanLetter = () => {
   return (
    
     <div className="min-h-screen bg-gray-50">
-      {/* Header Section - Responsive: Flex col on mobile, row on desktop */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -94,20 +93,20 @@ const ScanLetter = () => {
         </button>
       </div>
 
-      {/* Scanned Letters Table Card */}
+   
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 min-h-[500px]">
         <h2 className="text-lg font-semibold text-gray-800 mb-4 md:mb-6">
           Scanned Letters / स्कैन किए गए पत्र
         </h2>
 
-        {/* Overflow Auto handles horizontal scrolling on mobile */}
+     
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left text-gray-500 min-w-[800px]">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
               <tr>
                 <th className="px-6 py-3 whitespace-nowrap">Scan Date</th>
                 <th className="px-6 py-3 whitespace-nowrap">Letter No.</th>
-                <th className="px-6 py-3 whitespace-nowrap">Case No.</th>
+                <th className="px-6 py-3 whitespace-nowrap">Complaint No.</th>
                 <th className="px-6 py-3 whitespace-nowrap">Type</th>
                 <th className="px-6 py-3 whitespace-nowrap">Subject</th>
                 <th className="px-6 py-3 whitespace-nowrap">Pages</th>
@@ -165,11 +164,10 @@ const ScanLetter = () => {
         </div>
       </div>
 
-      {/* Modal Popup */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center  justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4">
           <div className="bg-white rounded-t-xl sm:mx-0 mx-5 md:rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn flex flex-col max-h-[90vh]">
-            {/* Modal Header */}
+
             <div className="flex justify-between  items-start p-4 md:p-5 border-b border-gray-100 shrink-0">
               <div>
                 <h3 className="text-lg font-bold text-gray-800">
@@ -190,9 +188,8 @@ const ScanLetter = () => {
               </button>
             </div>
 
-            {/* Modal Body - Scrollable */}
+
             <div className="p-4 md:p-6 space-y-4 overflow-y-auto">
-              {/* Case Number Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Case Number / प्रकरण संख्या
@@ -204,7 +201,7 @@ const ScanLetter = () => {
                 />
               </div>
 
-              {/* Letter Type Dropdown */}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Letter Type / पत्र प्रकार
@@ -217,7 +214,6 @@ const ScanLetter = () => {
                 </select>
               </div>
 
-              {/* Subject Input */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Subject / विषय
@@ -229,7 +225,7 @@ const ScanLetter = () => {
                 ></textarea>
               </div>
 
-              {/* File Upload Area */}
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Upload File / फाइल अपलोड करें
@@ -245,7 +241,7 @@ const ScanLetter = () => {
                 />
 
                 {!selectedFile ? (
-                  // Default Upload State
+             
                   <div
                     onClick={handleUploadAreaClick}
                     className="border-2 border-dashed border-blue-200 rounded-lg bg-blue-50/50 p-6 md:p-8 text-center cursor-pointer hover:bg-blue-50 transition-colors group"
@@ -261,7 +257,7 @@ const ScanLetter = () => {
                     </div>
                   </div>
                 ) : (
-                  // File Selected State
+    
                   <div className="border border-blue-200 rounded-lg bg-blue-50 p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3 overflow-hidden">
                       <FaFilePdf className="text-red-500 text-2xl shrink-0" />
@@ -286,7 +282,7 @@ const ScanLetter = () => {
               </div>
             </div>
 
-            {/* Modal Footer */}
+
             <div className="p-4 md:p-5 bg-gray-50 border-t border-gray-100 flex flex-col-reverse md:flex-row justify-end gap-3 shrink-0">
               <button
                 onClick={() => {
