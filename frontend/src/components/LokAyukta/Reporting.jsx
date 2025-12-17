@@ -126,10 +126,8 @@ const Reporting = () => {
         ))}
       </div>
 
-      {/* Content Card */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 min-h-[500px]">
         
-        {/* 1. Enrollment Date-wise View */}
         {activeTab === "enrollment" && (
           <div>
             <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-4 md:mb-6">
@@ -416,7 +414,7 @@ const Reporting = () => {
                             <th className="px-4 py-3 whitespace-nowrap">SL. No</th>
                             <th className="px-4 py-3 whitespace-nowrap">Dispatch No.</th>
                             <th className="px-4 py-3 whitespace-nowrap">Date</th>
-                            <th className="px-4 py-3 whitespace-nowrap">Case Number</th>
+                            <th className="px-4 py-3 whitespace-nowrap">Complaint No.</th>
                             <th className="px-4 py-3 whitespace-nowrap">Recipient</th>
                             <th className="px-4 py-3 whitespace-nowrap">Letter Type</th>
                             <th className="px-4 py-3 whitespace-nowrap">Mode</th>
