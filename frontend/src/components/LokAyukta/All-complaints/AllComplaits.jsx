@@ -37,6 +37,58 @@ const AllComplaints = () => {
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
 
+  const [uploadList, setUploadList] = useState([]);
+const [selectedUpload, setSelectedUpload] = useState("");
+const [isSending, setIsSending] = useState(false);
+
+
+
+useEffect(() => {
+  if (isConfirmModalOpen) {
+    api
+      .get("/lokayukt/get-uplokayukt")
+      .then((res) => {
+        // API direct array return kar rahi hai
+        setUploadList(res.data);
+      })
+      .catch((err) => {
+        console.error("Upload type API error:", err);
+      });
+  }
+}, [isConfirmModalOpen]);
+
+
+
+const handleSend = async () => {
+  if (!selectedUpload || !complaintToApprove) return;
+
+  try {
+    setIsSending(true);
+
+    await api.post(
+      `/forward-to-uplokayukt/${complaintToApprove.id}`,
+      {
+        Uplokayukt_id: selectedUpload, 
+      }
+    );
+
+    toast.success("Send To UpLokayukt Successfully!");
+
+    setIsConfirmModalOpen(false);
+    setSelectedUpload("");
+    setComplaintToApprove(null);
+
+    refetch();
+  } catch (error) {
+    console.error("Send error:", error);
+    toast.error("Send failed");
+  } finally {
+    setIsSending(false);
+  }
+};
+
+
+
 
 
   const sortComplaintsByDate = (complaints, order) => {
@@ -487,7 +539,7 @@ const AllComplaints = () => {
                             className="flex-1 sm:flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap">
                             View Details
                           </button>
-                        {/*{isApprovedByRO(complaint) ? (
+                        {isApprovedByRO(complaint) ? (
                             <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
                             <svg
                               className="w-3 h-3"
@@ -510,9 +562,9 @@ const AllComplaints = () => {
                               className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
                             >
                               
-                              Send To Lokayukt
+                              Send To UPLokayukt
                             </button>
-                          )} */}
+                          )} 
                         </div>
                       </div>
                     </div>
@@ -532,62 +584,76 @@ const AllComplaints = () => {
         </div>
       </div>
 
-      {isConfirmModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div className="p-4 sm:p-6">
-              <div className="flex items-center mb-4">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-green-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-4">
-                  <h3 className="text-base sm:text-lg font-medium text-gray-900">
-                    Confirm Approval
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-500">
-                    Are you sure you want to approve this complaint?
-                  </p>
-                  {complaintToApprove && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      File No: {complaintToApprove.complain_no}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleCancelApproval}
-                  disabled={isApproving}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleConfirmApproval}
-                  disabled={isApproving}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  {isApproving ? "Approving..." : "Yes, Approve"}
-                </button>
-              </div>
-            </div>
-          </div>
+
+{isConfirmModalOpen && (
+  <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center">
+    <div className="bg-white rounded-xl shadow-2xl w-[440px] relative">
+
+      {/* Close Button */}
+      <button
+        onClick={() => {
+          setIsConfirmModalOpen(false);
+          setSelectedUpload("");
+          setComplaintToApprove(null);
+        }}
+        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full 
+                   bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+
+      {/* Header */}
+      <div className="px-6 py-4 border-b">
+        <h3 className="text-lg font-semibold text-gray-800">
+          Send to UPLokayukt?
+        </h3>
+      </div>
+
+      {/* Body */}
+      <div className="px-6 py-5 space-y-5">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            UPLokayukt
+          </label>
+          <select
+            value={selectedUpload}
+            onChange={(e) => setSelectedUpload(e.target.value)}
+            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg 
+                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Select option</option>
+            {uploadList.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
         </div>
-      )}
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-end px-6 py-4 bg-gray-50 rounded-b-xl">
+        <button
+          onClick={handleSend}
+          disabled={isSending || !selectedUpload}
+          className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-2.5 rounded-lg 
+                     disabled:opacity-50 transition"
+        >
+          {isSending ? "Sending..." : "Send"}
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}
+
+
+
+
+
+
+
     </>
   );
 };

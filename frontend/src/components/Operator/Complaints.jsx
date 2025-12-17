@@ -751,7 +751,8 @@ const handleMainRespondent = (id) => {
 
     // --- Check Other Mandatory Fields ---
     if (!formData.complaintDescription) {
-      newErrors.complaint_description = "Complaint Description is missing";
+      // newErrors.complaint_description = "Complaint Description is missing";
+      newErrors.complaint_description = ["शिकायत का विवरण आवश्यक है।"];
     }
 
     // 2. Error Reporting (Console me dikhana)
@@ -764,7 +765,7 @@ const handleMainRespondent = (id) => {
       // 🛑 Console Group End
 
       setErrors(newErrors);
-      toast.error('कृपया सभी आवश्यक फ़ील्ड भरें! (Console देखें)', {
+      toast.error('कृपया सभी आवश्यक फ़ील्ड भरें!', {
         position: "top-right",
         autoClose: 3000,
       });
@@ -2224,6 +2225,8 @@ const handleMainRespondent = (id) => {
             </div>
 
             <div className="shrink-0 bg-gray-50 px-6 py-3 flex justify-end gap-4 border-t border-gray-200 flex-wrap">
+
+             
               <button
                 type="button"
                 onClick={() => setShowPreview(false)}
@@ -2232,6 +2235,17 @@ const handleMainRespondent = (id) => {
               >
                 संपादित करें
               </button>
+
+
+               <button
+                type="button"
+               
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200"
+                disabled={isSubmitting}
+              >
+                ड्राफ्ट सेव करें
+              </button>
+
               <button
                 type="button"
                 onClick={handleSubmit}
