@@ -1,115 +1,590 @@
-import React from "react";
-import { FiDownload, FiFileText } from "react-icons/fi";
+import React, { useState, useEffect, useRef } from "react";
+import { FaTimes, FaSpinner, FaDownload, FaPrint } from "react-icons/fa"; // Added FaPrint
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
-const Notes = () => {
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
+const token = localStorage.getItem("access_token");
+const storedUser = localStorage.getItem("user");
+const user = storedUser ? JSON.parse(storedUser) : null;
+
+// ========================
+// AXIOS INSTANCE
+// ========================
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  },
+});
+
+const Notes = ({ complaint }) => {
+  // ========================
+  // STATES
+  // ========================
+  const [open, setOpen] = useState(false);
+  const [note, setNote] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const popupRef = useRef(null); // Ref for PDF generation
+
+  // Data States
+  const [documents, setDocuments] = useState([]);
+  const [notesList, setNotesList] = useState([]); // State for API notes
+
+  // Form States
+  const [selectedDoc, setSelectedDoc] = useState("");
+  const [pdfViewUrl, setPdfViewUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
+  const [errors, setErrors] = useState({});
+
+  // ========================
+  // 1. GET DOCUMENT LIST
+  // ========================
+  useEffect(() => {
+    const fetchDocs = async () => {
+      try {
+        const res = await api.get(`/uplokayukt/get-document/${complaint?.id}`);
+        if (res.data.status) setDocuments(res.data.data);
+      } catch (err) {
+        console.log("Document fetch error:", err);
+      }
+    };
+
+    if (complaint?.id) fetchDocs();
+  }, [complaint?.id]);
+
+  // ========================
+  // 2. GET NOTES LIST (New Added)
+  // ========================
+  const fetchNotes = async () => {
+    if (!complaint?.id) return;
+    try {
+      const res = await api.get(`/uplokayukt/get-notes/${complaint.id}`);
+      if (res.data.status) {
+        setNotesList(res.data.data);
+      }
+    } catch (err) {
+      console.log("Notes fetch error:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotes();
+  }, [complaint?.id]);
+
+  // ========================
+  // URL FIX
+  // ========================
+  const normalizePath = (filePath) => {
+    if (!filePath) return "";
+    return filePath.replace(/^\//, "").replace("storage/", "storage/Document/");
+  };
+
+  const makeFileUrl = (filePath) => {
+    return `${BASE_URL.replace("/api", "")}/${normalizePath(filePath)}`;
+  };
+
+  // ========================
+  // SELECT DOCUMENT PREVIEW
+  // ========================
+  const handleSelectDoc = async (fileName) => {
+    setSelectedDoc(fileName);
+    setPdfViewUrl(null);
+
+    if (!fileName) return;
+
+    try {
+      setLoading(true);
+      const res = await api.get(`/uplokayukt/get-file-preview/${complaint.id}`);
+      if (res.data.status && res.data.data.length > 0) {
+        const match = res.data.data.find((p) => p.includes(fileName));
+        if (match) {
+          setPdfViewUrl(makeFileUrl(match));
+        }
+      }
+    } catch {
+      toast.error("PDF नहीं खुल पाया");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ========================
+  // SHOW FINAL PREVIEW POPUP
+  // ========================
+  const handleSubmitNote = () => {
+    setOpen(false);
+    setShowSuccess(true);
+  };
+
+  // ========================
+  // DOWNLOAD PDF FUNCTION
+  // ========================
+  const handleDownloadPdf = async () => {
+    if (!popupRef.current) return;
+
+    try {
+      // 1. Hide Header & Footer Buttons
+      const elementsToHide =
+        popupRef.current.querySelectorAll(".pdf-hide-section");
+      elementsToHide.forEach((el) => (el.style.display = "none"));
+
+      // 2. Generate Canvas
+      const canvas = await html2canvas(popupRef.current, {
+        scale: 2, // Higher scale for better quality
+        backgroundColor: "#ffffff",
+        useCORS: true, // if images are involved
+      });
+
+      // 3. Restore Header & Footer Buttons
+      elementsToHide.forEach((el) => (el.style.display = "flex"));
+
+      // 4. Create PDF
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Noting_${complaint?.file_number || "File"}.pdf`);
+
+      toast.success("PDF Downloaded successfully!");
+    } catch (err) {
+      console.error("PDF Generation Error:", err);
+      toast.error("Failed to generate PDF");
+    }
+  };
+
+  // ========================
+  // NEW: HANDLE PRINT FUNCTION
+  // ========================
+  const handlePrint = () => {
+    if (!popupRef.current) return;
+
+    // Open a new window for printing
+    const printWindow = window.open("", "_blank");
+
+    // Gather all styles from the current document (Tailwind, etc.)
+    const styles = Array.from(
+      document.querySelectorAll("link[rel='stylesheet'], style")
+    )
+      .map((node) => node.outerHTML)
+      .join("");
+
+    // Write content to the new window
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Print Note</title>
+          ${styles}
+          <style>
+            body { background-color: white; -webkit-print-color-adjust: exact; }
+            /* Explicitly hide the header/footer buttons in print view */
+            .pdf-hide-section { display: none !important; } 
+            .print-container { padding: 20px; }
+          </style>
+        </head>
+        <body class="print-container">
+          ${popupRef.current.innerHTML}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+
+    // Small delay to ensure styles load before printing
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
+  };
+
+  // ========================
+  // POST NOTE API
+  // ========================
+  const handleFinalSubmit = async () => {
+    setErrors({}); // clear previous errors
+
+    const selectedDocObj = documents.find((doc) => doc.file === selectedDoc);
+    const docId = selectedDocObj ? selectedDocObj.id : "";
+
+    const payload = {
+      complaint_id: complaint.id,
+      description: note,
+      d_id: docId,
+      range_from: pageRanges[0].from,
+      range_two: pageRanges[0].to,
+    };
+
+    try {
+      const res = await api.post("/uplokayukt/add-notes", payload);
+
+      // SUCCESS
+      if (res.data.status) {
+        toast.success("Note Added Successfully!");
+        setShowSuccess(false);
+
+        // Reset Form
+        setNote("");
+        setSelectedDoc("");
+        setPageRanges([{ from: "", to: "" }]);
+        setPdfViewUrl(null);
+
+        // Refresh the List
+        fetchNotes();
+      }
+      // BACKEND ERRORS
+      else if (res.data.errors) {
+        setErrors(res.data.errors);
+        Object.values(res.data.errors).forEach((msgArr) => {
+          toast.error(msgArr[0]);
+        });
+      }
+    } catch (err) {
+      toast.error("Server Error!");
+    }
+  };
+
+  // ========================
+  // INPUT HANDLER
+  // ========================
+  const handlePageRangeChange = (idx, field, value) => {
+    const updated = [...pageRanges];
+    updated[idx][field] = value;
+    setPageRanges(updated);
+  };
+
+  // ========================
+  // VALIDATION
+  // ========================
+  const isFormValid = () => {
+    return (
+      note.trim() !== "" &&
+      selectedDoc !== "" &&
+      pageRanges[0].from !== "" &&
+      pageRanges[0].to !== ""
+    );
+  };
+
+  // ========================
+  // HELPER: Get Doc Name by ID
+  // ========================
+  const getDocName = (dId) => {
+    if (!documents.length || !dId) return null;
+    const doc = documents.find((d) => d.id === dId);
+    return doc ? doc.file : null;
+  };
+
+  // ========================
+  // RENDER
+  // ========================
   return (
-    <div className="bg-white   rounded-lg space-y-6 w-full">
-
-      {/* Header Row */}
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
-        <p className="text-[16px] font-medium text-gray-800">Notes & Notings</p>
-
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-          <button className="flex items-center justify-center gap-2 border border-gray-300 px-3 py-2 text-xs rounded-lg hover:bg-gray-50 transition w-full sm:w-auto">
-            <FiDownload className="text-sm" />
-            Download all notes (PDF)
-          </button>
-
-          <button className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition w-full sm:w-auto">
-            Add Note / Noting
-          </button>
-        </div>
+    <div className="bg-white rounded-lg w-full p-4">
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-3">
+        <p className="text-[16px] font-medium text-gray-800">
+          Notes & Notings
+        </p>
+        <button
+          className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700"
+          onClick={() => setOpen(true)}
+        >
+          Add Note / Noting
+        </button>
       </div>
 
-      {/* NOTE CARD 1 */}
-      <NoteCard
-        name="Shri Vijay Sharma"
-        role="PS to Lokayukta"
-        time="14 Jan 2025, 3:45 PM"
-        text={`Initial review of the complaint shows prima facie evidence
-of procedural irregularities in the tender process. The complainant
-has provided substantial documentation including tender documents
-and email communications. Recommend detailed scrutiny of Annexure 1
-and Annexure 3 for timeline verification.`}
-        references={[
-          "Main Complaint (pp.1–3)",
-          "Annexure 1 - Tender Documents (pp.4–11)",
-          "Annexure 3 - Email Communications (pp.24–28)",
-        ]}
-      />
+      {/* DISPLAY NOTES (Dynamic from API) */}
+      <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+        {notesList.length === 0 ? (
+          <p className="text-sm text-gray-500 text-center py-4">
+            No notes available.
+          </p>
+        ) : (
+          notesList.map((item, index) => {
+            // Find doc name for display
+            const referencedFile = getDocName(item.d_id);
 
-      {/* NOTE CARD 2 */}
-      <NoteCard
-        name="Shri Ram Sharma"
-        role="PS to Lokayukta"
-        time="14 Jan 2025, 3:45 PM"
-        text={`After examining the documents and the preliminary note by PS,
-it appears that there are serious questions regarding the tender
-evaluation process. The timeline presented in the email communications
-contradicts the official tender records. Issue notice to the concerned
-department to file their response within 15 days. Also approve partial
-fee as the complainant has demonstrated financial hardship.`}
-        references={[
-          "Main Complaint (pp.1–3)",
-          "main 1 - Tender Documents (pp.4–11)",
-          "Annexure 3 - Email Communications (pp.24–28)",
-        ]}
-        extraTag="Letter from Department (15 Jan) (pp.29–30)"
-      />
-    </div>
-  );
-};
+            return (
+              <div
+                key={item.id || index}
+                className="border rounded-lg p-4 bg-gray-50"
+              >
+                <div className="flex justify-between items-start">
+                  <p className=" text-gray-800">
+                    {/* User ID: {item.added_by}  */}
+                    {user?.name}
+                  </p>
+                  <p className="text-xs text-gray-400 whitespace-nowrap">
+                    {new Date(item.created_at).toLocaleString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </div>
 
-/* ====================== CARD COMPONENT ===================== */
+                <div className="mt-2 whitespace-pre-wrap text-sm text-gray-700">
+                  {item.description}
+                </div>
 
-const NoteCard = ({ name, role, time, text, references, extraTag }) => {
-  return (
-    <div className="border border-gray-200 shadow-sm rounded-xl p-4 sm:p-5 space-y-3">
-
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-1 sm:gap-2">
-        <div>
-          <h3 className="text-[14px] sm:text-[15px] font-semibold text-gray-800">
-            {name}
-          </h3>
-          <p className="text-xs text-gray-600">{role}</p>
-        </div>
-
-        <p className="text-xs text-gray-500">{time}</p>
+                {/* Show Reference if document exists */}
+                {(referencedFile || (item.range_from && item.range_two)) && (
+                  <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500">
+                    <span className="font-semibold">References:</span>
+                    <div className="mt-1 pl-2 border-l-2 border-blue-200">
+                      {referencedFile && <p>Doc: {referencedFile}</p>}
+                      {item.range_from && item.range_two && (
+                        <p>
+                          Pages: {item.range_from} – {item.range_two}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
 
-      {/* Note Text */}
-      <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-        {text}
-      </div>
+      {/* MODAL */}
+      {open && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white w-11/12 h-5/6 shadow-xl relative flex rounded-md overflow-hidden">
+            <button
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
+              onClick={() => setOpen(false)}
+            >
+              <FaTimes className="w-5 h-5" />
+            </button>
 
-      <hr className="border-gray-300" />
+            {/* LEFT FORM */}
+            <div className="flex-1 p-6 overflow-y-auto">
+              <h2 className="text-lg font-semibold mb-6">Add Note / Noting</h2>
 
-      {/* References */}
-      <p className="text-xs text-gray-700 font-medium">References:</p>
+              <label className="block text-sm font-medium mb-2">
+                Note Content <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                className={`w-full border rounded-md p-3 h-32 resize-none ${
+                  errors.description ? "border-red-500" : "border-gray-300"
+                }`}
+                placeholder="Enter your note here..."
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+              />
+              {errors.description && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.description[0]}
+                </p>
+              )}
 
-      <div className="flex flex-wrap gap-2 mt-1">
-        {references.map((ref, idx) => (
-          <RefTag key={idx} title={ref} />
-        ))}
-      </div>
+              <div className="mt-6">
+                <label className="block text-sm font-medium mb-2">
+                  Reference by Document
+                </label>
+                <select
+                  className={`w-full border rounded-md p-2 ${
+                    errors.d_id ? "border-red-500" : "border-gray-300"
+                  }`}
+                  value={selectedDoc}
+                  onChange={(e) => handleSelectDoc(e.target.value)}
+                >
+                  <option value="">Select a document...</option>
+                  {documents.map((doc) => (
+                    <option key={doc.id} value={doc.file}>
+                      {doc.file}
+                    </option>
+                  ))}
+                </select>
+                {errors.d_id && (
+                  <p className="text-red-500 text-xs mt-1">{errors.d_id[0]}</p>
+                )}
+              </div>
 
-      {extraTag && (
-        <div className="mt-1">
-          <span className="inline-flex items-center gap-1 border border-green-500 bg-green-50 px-2 py-[3px] rounded-md text-green-700 text-[11px]">
-            {extraTag}
-          </span>
+              <div className="mt-6">
+                <label className="block text-sm font-medium mb-2">
+                  Combined Page Range
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    className={`w-20 border rounded-md p-2 ${
+                      errors.range_from ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="From"
+                    value={pageRanges[0].from}
+                    onChange={(e) =>
+                      handlePageRangeChange(0, "from", e.target.value)
+                    }
+                  />
+                  <input
+                    type="number"
+                    className={`w-20 border rounded-md p-2 ${
+                      errors.range_two ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="To"
+                    value={pageRanges[0].to}
+                    onChange={(e) =>
+                      handlePageRangeChange(0, "to", e.target.value)
+                    }
+                  />
+                </div>
+                {(errors.range_from || errors.range_two) && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.range_from?.[0] || errors.range_two?.[0]}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex justify-end mt-6 gap-3 border-t pt-4">
+                <button
+                  className="px-4 py-2 text-sm border rounded-md"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitNote}
+                  disabled={!isFormValid()}
+                  className={`px-4 py-2 text-sm rounded-md text-white ${
+                    isFormValid()
+                      ? "bg-blue-600 hover:bg-blue-700"
+                      : "bg-gray-300 cursor-not-allowed"
+                  }`}
+                >
+                  Add Note
+                </button>
+              </div>
+            </div>
+
+            {/* RIGHT PDF PREVIEW */}
+            <div className="flex-1 bg-gray-50 border-l flex">
+              <div className="w-full h-full flex items-center justify-center">
+                {loading ? (
+                  <div className="text-gray-500 flex items-center gap-2">
+                    <FaSpinner className="animate-spin" />
+                    Loading PDF...
+                  </div>
+                ) : pdfViewUrl ? (
+                  <iframe
+                    src={`${pdfViewUrl}#zoom=page-width`}
+                    className="w-full h-full border-0"
+                  />
+                ) : (
+                  <p className="text-gray-400 text-sm">
+                    Select a document to preview PDF
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
+
+      {/* SUCCESS POPUP WITH PDF DOWNLOAD & PRINT */}
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center px-4">
+          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden">
+            {/* Printable Area Ref */}
+            <div ref={popupRef} className="bg-white">
+              {/* HEADER (Contains Actions - Hidden in PDF/Print) */}
+              <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-100 pdf-hide-section">
+                <p className="text-sm font-semibold text-gray-800">
+                  {/* Blank title or can be "Preview" */}
+                </p>
+
+                <div className="flex items-center gap-2">
+                  {/* PRINT BUTTON (NEW) */}
+                  <button
+                    onClick={handlePrint}
+                    className="p-2 rounded hover:bg-gray-200 text-gray-700 flex items-center gap-1 text-xs font-medium"
+                    title="Print"
+                  >
+                    <FaPrint /> Print
+                  </button>
+
+                  {/* Download Button */}
+                  <button
+                    onClick={handleDownloadPdf}
+                    className="p-2 rounded hover:bg-gray-200 text-blue-600 flex items-center gap-1 text-xs font-medium"
+                    title="Download as PDF"
+                  >
+                    <FaDownload /> Download
+                  </button>
+
+                  <button
+                    onClick={() => setShowSuccess(false)}
+                    className="p-2 rounded hover:bg-gray-200 text-gray-600"
+                  >
+                    <FaTimes className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* BODY (This is what will be in the PDF/Print) */}
+              <div className="px-8 py-8 text-sm leading-relaxed text-gray-800 space-y-6">
+                <p className="text-sm text-center font-semibold text-gray-800">
+                  File No: {complaint?.file_number || complaint?.complain_no}
+                </p>
+
+                <p className="text-xs text-gray-500">
+                  Data: {new Date().toLocaleDateString()}
+                </p>
+
+                {/* SUBJECT / DESCRIPTION */}
+                <div className="rounded-md bg-white px-5 py-4 min-h-[260px] whitespace-pre-wrap">
+                  {note}
+                </div>
+
+                {/* DATE + AUTHORITY */}
+                <div className="flex justify-between pt-4">
+                  <p className="text-xs text-gray-500"></p>
+
+                  <div className="text-right text-xs text-gray-600">
+                    <p className="uppercase tracking-wide">Noting By</p>
+                    <p className="font-semibold mt-1 text-gray-800">
+                      Shri Sanjay Mishra
+                    </p>
+                    <p>PS Name...</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* FOOTER BUTTONS (Hidden in PDF/Print) */}
+              <div className="px-8 py-4 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
+                <button
+                  className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
+                  onClick={() => setShowSuccess(false)}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  className="px-6 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                  onClick={handleFinalSubmit}
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST */}
+      <ToastContainer />
     </div>
   );
 };
-
-const RefTag = ({ title }) => (
-  <div className="flex items-center gap-1 border border-blue-500 bg-blue-50 px-2 py-1 rounded-md text-blue-700 text-xs w-fit max-w-full">
-    <FiFileText className="text-xs flex-shrink-0" />
-    <p className="truncate">{title}</p>
-  </div>
-);
 
 export default Notes;

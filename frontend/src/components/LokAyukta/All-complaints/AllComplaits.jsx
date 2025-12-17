@@ -67,7 +67,7 @@ const handleSend = async () => {
     await api.post(
       `/lokayukt/forward-to-uplokayukt/${complaintToApprove.id}`,
       {
-        Uplokayukt_id: selectedUpload, 
+        forward_to: selectedUpload, 
       }
     );
 
@@ -272,7 +272,7 @@ const handleSend = async () => {
   };
 
   const isApprovedByRO = (complaint) => {
-    return complaint.approved_rejected_by_ro === 1;
+    return complaint.approved_rejected_by_lokayukt === 1;
   };
 
   const getStatistics = () => {
