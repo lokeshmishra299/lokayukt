@@ -669,7 +669,7 @@ const ViewAllComplaint = () => {
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
                 >
-                  <FaEye /> साक्षियों का विवरण
+                  <FaEye /> गवाह का विवरण
                 </button>
               </div>
             </div>
