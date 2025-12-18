@@ -1,14 +1,12 @@
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState, useRef } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import {
-  FaSearch,
-  FaPlus,
   FaFilePdf,
   FaTimes,
   FaCloudUploadAlt,
   FaCheckCircle,
-  FaEye,
-  FaDownload,
   FaTrash,
 } from "react-icons/fa";
 import { MdOutlineScanner } from "react-icons/md";
@@ -26,31 +24,62 @@ const api = axios.create({
 });
 
 const ScanLetter = () => {
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     complaint_id: "",
     letter_type: "",
     subject: "",
   });
 
+  const [errors, setErrors] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const fileInputRef = useRef(null);
+
+
+
+  // 1. Fetch Complaint IDs
+  const getAllComplainsID = async () => {
+    const res = await api.get("/lokayukt/all-complain-ids");
+    return res.data;
+  };
+
+  const { data: complainIdsData } = useQuery({
+    queryKey: ["all-complain-ids"],
+    queryFn: getAllComplainsID,
+  });
+
+
+  const complainList = complainIdsData?.data || [];
+
   const handleChange = (e) => {
- setFormData({
-  ...formData,
-  [e.target.name]: e.target.value
- })
-};
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: null });
+    }
+  };
 
-const getAllComplainsID = ()=>{
-  const res = api.get("/")
-}
+  // Handle File Change
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      if (errors.file) {
+        setErrors({ ...errors, file: null });
+      }
+    }
+  };
 
+  // Submit Logic
+  const submitScaneData = async (e) => {
+    e.preventDefault();
+    setErrors({}); 
 
-  const [errors, setErrors] = useState(null);
-
- const submitScaneData = async (e) => {
-  e.preventDefault();
-
-  try {
     const payload = new FormData();
+
     payload.append("complaint_id", formData.complaint_id);
     payload.append("letter_type", formData.letter_type);
     payload.append("subject", formData.subject);
@@ -59,31 +88,50 @@ const getAllComplainsID = ()=>{
       payload.append("file", selectedFile);
     }
 
-    const res = await api.post("/add-dispatch", payload, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    try {
+      const res = await api.post("/lokayukt/add-dispatch", payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-    console.log("Data Posted", res.data);
+      toast.success("Letter uploaded successfully!");
+      console.log("Data Posted", res.data);
 
-    setFormData({
-      complaint_id: "",
-      letter_type: "",
-      subject: "",
-    });
+      // Reset Form
+      setFormData({
+        complaint_id: "",
+        letter_type: "",
+        subject: "",
+      });
+      setSelectedFile(null);
+      setIsModalOpen(false);
+
+    } catch (error) {
+      console.error("Error submitting:", error);
+      
+      if (error.response && error.response.status === 422) {
+        setErrors(error.response.data.errors);
+        // toast.error("Please check the required fields.");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
+    }
+  };
+
+  const handleUploadAreaClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const removeFile = (e) => {
+    e.stopPropagation();
     setSelectedFile(null);
-    setIsModalOpen(false);
-  } catch (error) {
-    console.log("Error he", error);
-  }
-};
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const fileInputRef = useRef(null);
-
+  // Mock Data for Table
   const scannedLetters = [
     {
       id: 1,
@@ -105,39 +153,12 @@ const getAllComplainsID = ()=>{
       pages: 12,
       status: "Pending Attachment",
     },
-    {
-      id: 3,
-      scanDate: "3/6/2025",
-      letterNo: "LTR/2025/003",
-      caseNo: "LOK/2025/0015",
-      type: "Outgoing Copy",
-      subject: "Notice to department - office copy",
-      pages: 2,
-      status: "Attached to File",
-    },
   ];
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-    }
-  };
-
-  const handleUploadAreaClick = () => {
-    fileInputRef.current.click();
-  };
-
-  const removeFile = (e) => {
-    e.stopPropagation();
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Toaster position="top-right" reverseOrder={false} />
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -179,39 +200,21 @@ const getAllComplainsID = ()=>{
             <tbody>
               {scannedLetters.map((row) => (
                 <tr key={row.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {row.scanDate}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
-                    {row.letterNo}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-blue-600 hover:underline cursor-pointer">
-                    {row.caseNo}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{row.scanDate}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{row.letterNo}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-blue-600 hover:underline cursor-pointer">{row.caseNo}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{row.type}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">
-                    {row.subject}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">{row.subject}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{row.pages}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                        row.status === "Attached to File"
-                          ? "bg-blue-100 text-blue-800 border-blue-200"
-                          : "bg-gray-100 text-gray-600 border-gray-200"
-                      }`}
-                    >
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${row.status === "Attached to File" ? "bg-blue-100 text-blue-800 border-blue-200" : "bg-gray-100 text-gray-600 border-gray-200"}`}>
                       {row.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right flex justify-end items-center gap-3">
-                    <button className="text-gray-500 hover:text-gray-700 p-2">
-                      <FaFilePdf />
-                    </button>
+                    <button className="text-gray-500 hover:text-gray-700 p-2"><FaFilePdf /></button>
                     {row.status === "Pending Attachment" && (
-                      <button className="text-green-600 hover:text-green-700 p-2">
-                        <FaCheckCircle />
-                      </button>
+                      <button className="text-green-600 hover:text-green-700 p-2"><FaCheckCircle /></button>
                     )}
                   </td>
                 </tr>
@@ -222,24 +225,22 @@ const getAllComplainsID = ()=>{
       </div>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end md:items-center  justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4">
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4">
           <form
             onSubmit={submitScaneData}
             className="bg-white rounded-t-xl sm:mx-0 mx-5 md:rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn flex flex-col max-h-[90vh]"
           >
-            <div className="flex justify-between  items-start p-4 md:p-5 border-b border-gray-100 shrink-0">
+            <div className="flex justify-between items-start p-4 md:p-5 border-b border-gray-100 shrink-0">
               <div>
-                <h3 className="text-lg font-bold text-gray-800">
-                  Scan / Upload Letter
-                </h3>
-                <p className="text-xs text-gray-500 mt-1">
-                  Scan a new letter or upload a scanned document
-                </p>
+                <h3 className="text-lg font-bold text-gray-800">Scan / Upload Letter</h3>
+                <p className="text-xs text-gray-500 mt-1">Scan a new letter or upload a scanned document</p>
               </div>
               <button
+                type="button"
                 onClick={() => {
                   setIsModalOpen(false);
                   setSelectedFile(null);
+                  setErrors({});
                 }}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-1"
               >
@@ -248,56 +249,82 @@ const getAllComplainsID = ()=>{
             </div>
 
             <div className="p-4 md:p-6 space-y-4 overflow-y-auto">
+              
+              {/* ------------ UPDATED DROPDOWN START ------------ */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Case Number / प्रकरण संख्या
+                  Case Number / प्रकरण संख्या <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   name="complaint_id"
                   value={formData.complaint_id}
                   onChange={handleChange}
-                  placeholder="Enter case number or search..."
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                />
+                  className={`w-full px-3 py-2 bg-gray-50 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600 ${
+                    errors.complaint_id ? "" : "border-gray-200"
+                  }`}
+                >
+                  <option value="">Select Case Number</option>
+                  
+                  {/* Mapping the data: Value is ID, Display is compNo */}
+                  {complainList.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.compNo}
+                    </option>
+                  ))}
+
+                </select>
+                {/* Validation Error Message */}
+                {errors.complaint_id && (
+                  <p className="text-red-500 text-xs mt-1">{errors.complaint_id[0]}</p>
+                )}
               </div>
+              {/* ------------ UPDATED DROPDOWN END ------------ */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Letter Type / पत्र प्रकार
+                  Letter Type / पत्र प्रकार <span className="text-red-500">*</span>
                 </label>
                 <select
-                name="letter_type"
-                value={formData.letter_type}
-                onChange={handleChange}
-                 className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600">
-                  <option>Select type</option>
-                  <option>Incoming</option>
-                  <option>Outgoing</option>
-                  <option>Internal Note</option>
+                  name="letter_type"
+                  value={formData.letter_type}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 bg-gray-50 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600 ${
+                    errors.letter_type ? "" : "border-gray-200"
+                  }`}
+                >
+                  <option value="">Select type</option>
+                  <option value="Incoming">Incoming</option>
+                  <option value="Outgoing">Outgoing</option>
+                  <option value="Internal Note">Internal Note</option>
                 </select>
+                 {errors.letter_type && (
+                  <p className="text-red-500 text-xs mt-1">{errors.letter_type[0]}</p>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subject / विषय
+                  Subject / विषय <span className="text-red-500">*</span>
                 </label>
                 <textarea
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
                   rows={2}
                   placeholder="Enter letter subject..."
-                  className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none"
+                  className={`w-full px-3 py-2 bg-gray-50 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none ${
+                    errors.subject ? "" : "border-gray-200"
+                  }`}
                 ></textarea>
+                {errors.subject && (
+                  <p className="text-red-500 text-xs mt-1">{errors.subject[0]}</p>
+                )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Upload File / फाइल अपलोड करें
+                  Upload File / फाइल अपलोड करें <span className="text-red-500">*</span>
                 </label>
-
-                {/* Hidden File Input */}
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -309,16 +336,16 @@ const getAllComplainsID = ()=>{
                 {!selectedFile ? (
                   <div
                     onClick={handleUploadAreaClick}
-                    className="border-2 border-dashed border-blue-200 rounded-lg bg-blue-50/50 p-6 md:p-8 text-center cursor-pointer hover:bg-blue-50 transition-colors group"
+                    className={`border-2 border-dashed rounded-lg p-6 md:p-8 text-center cursor-pointer transition-colors group ${
+                      errors.file 
+                      ? "border-red-300 bg-red-50" 
+                      : "border-blue-200 bg-blue-50/50 hover:bg-blue-50"
+                    }`}
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <FaCloudUploadAlt className="text-3xl text-blue-400 group-hover:scale-110 transition-transform" />
-                      <span className="text-sm text-gray-600 font-medium">
-                        Click to upload or drag and drop
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        PDF, JPG, PNG (max 10MB)
-                      </span>
+                      <FaCloudUploadAlt className={`text-3xl transition-transform group-hover:scale-110 ${errors.file ? "text-red-400" : "text-blue-400"}`} />
+                      <span className="text-sm text-gray-600 font-medium">Click to upload or drag and drop</span>
+                      <span className="text-xs text-gray-400">PDF, JPG, PNG (max 10MB)</span>
                     </div>
                   </div>
                 ) : (
@@ -326,39 +353,41 @@ const getAllComplainsID = ()=>{
                     <div className="flex items-center gap-3 overflow-hidden">
                       <FaFilePdf className="text-red-500 text-2xl shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-700 truncate">
-                          {selectedFile.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {(selectedFile.size / 1024).toFixed(2)} KB
-                        </p>
+                        <p className="text-sm font-medium text-gray-700 truncate">{selectedFile.name}</p>
+                        <p className="text-xs text-gray-500">{(selectedFile.size / 1024).toFixed(2)} KB</p>
                       </div>
                     </div>
                     <button
+                      type="button"
                       onClick={removeFile}
                       className="text-gray-400 hover:text-red-500 transition-colors p-2 shrink-0"
-                      title="Remove file"
                     >
                       <FaTrash size={14} />
                     </button>
                   </div>
+                )}
+                {errors.file && (
+                  <p className="text-red-500 text-xs mt-1">{errors.file[0]}</p>
                 )}
               </div>
             </div>
 
             <div className="p-4 md:p-5 bg-gray-50 border-t border-gray-100 flex flex-col-reverse md:flex-row justify-end gap-3 shrink-0">
               <button
+                type="button"
                 onClick={() => {
                   setIsModalOpen(false);
                   setSelectedFile(null);
+                  setErrors({});
                 }}
                 className="w-full md:w-auto px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
               >
                 Cancel
               </button>
               <button
-              type="submit"
-               className="w-full md:w-auto px-4 py-2.5 text-sm font-medium text-white bg-blue-800 rounded-lg hover:bg-blue-900 transition-colors shadow-sm">
+                type="submit"
+                className="w-full md:w-auto px-4 py-2.5 text-sm font-medium text-white bg-blue-800 rounded-lg hover:bg-blue-900 transition-colors shadow-sm"
+              >
                 Upload & Attach
               </button>
             </div>
