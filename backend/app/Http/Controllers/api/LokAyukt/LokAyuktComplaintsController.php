@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\LokAyukt;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Complaint;
+use App\Models\Letter;
 use App\Models\ComplaintAction;
 use App\Models\ComplainDocuments;
 use App\Models\ComplaintNotes;
@@ -1280,5 +1281,56 @@ class LokAyuktComplaintsController extends Controller
             'status'  => true,
             'message' => 'Letter uploaded successfully'
         ]);
+    }
+
+     public function allComplainsId(){
+        $user = Auth::user()->id;
+        // dd($user);
+    $query = DB::table('complaints')
+        //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
+        ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+        // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
+        // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
+        // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
+        // ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id')
+        // ->leftJoin('complaint_actions as rep', 'complaints.id', '=', 'rep.complaint_id')
+        ->select(
+            'complaints.id as id',
+            'complaints.complain_no as compNo',
+           
+
+        );
+
+
+     $query->where('form_status', 1)
+                //   ->where('approved_rejected_by_ro', 1)
+                  ->where('approved_rejected_by_rk', 1);
+                    // ->where(function($q){
+                    //         $q->where('approved_rejected_by_so_us',1)
+                    //         ->Orwhere('approved_rejected_by_ds_js', 1);               
+                    //      })
+                    // ->where('approved_rejected_by_d_a', 1);
+                    // ->whereNotNull('forward_to_d_a');
+
+    $records = $query->get();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Records fetched successfully',
+        'data' => $records,
+    ]);
+
+}
+
+    public function allDispatchLetters(Request $request){
+           $records = DB::table('dispach_letters')->get();
+      
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Records fetched successfully',
+        'data' => $records,
+    ]);
+
     }
 }
