@@ -36,8 +36,6 @@ const ScanLetter = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
-
-
   // 1. Fetch Complaint IDs
   const getAllComplainsID = async () => {
     const res = await api.get("/lokayukt/all-complain-ids");
@@ -49,8 +47,20 @@ const ScanLetter = () => {
     queryFn: getAllComplainsID,
   });
 
-
   const complainList = complainIdsData?.data || [];
+
+  // 2. Fetch All Dispatch Letters (NEW API CALL)
+  const getAllDispatchLetters = async () => {
+    const res = await api.get("/lokayukt/all-dispatch-letters");
+    return res.data;
+  };
+
+  const { data: dispatchLettersData, isLoading: isLettersLoading } = useQuery({
+    queryKey: ["all-dispatch-letters"],
+    queryFn: getAllDispatchLetters,
+  });
+
+  const lettersList = dispatchLettersData?.data || [];
 
   const handleChange = (e) => {
     setFormData({
@@ -76,7 +86,7 @@ const ScanLetter = () => {
   // Submit Logic
   const submitScaneData = async (e) => {
     e.preventDefault();
-    setErrors({}); 
+    setErrors({});
 
     const payload = new FormData();
 
@@ -98,6 +108,9 @@ const ScanLetter = () => {
       toast.success("Letter uploaded successfully!");
       console.log("Data Posted", res.data);
 
+      // Refresh the list after success
+      queryClient.invalidateQueries(["all-dispatch-letters"]);
+
       // Reset Form
       setFormData({
         complaint_id: "",
@@ -106,10 +119,9 @@ const ScanLetter = () => {
       });
       setSelectedFile(null);
       setIsModalOpen(false);
-
     } catch (error) {
       console.error("Error submitting:", error);
-      
+
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
         // toast.error("Please check the required fields.");
@@ -131,29 +143,22 @@ const ScanLetter = () => {
     }
   };
 
-  // Mock Data for Table
-  const scannedLetters = [
-    {
-      id: 1,
-      scanDate: "5/6/2025",
-      letterNo: "LTR/2025/001",
-      caseNo: "LOK/2024/0001",
-      type: "Incoming",
-      subject: "Response to show cause notice",
-      pages: 3,
-      status: "Attached to File",
-    },
-    {
-      id: 2,
-      scanDate: "4/6/2025",
-      letterNo: "LTR/2025/002",
-      caseNo: "LOK/2024/0022",
-      type: "Incoming",
-      subject: "Investigation report from DM Agra",
-      pages: 12,
-      status: "Pending Attachment",
-    },
-  ];
+  // Helper function to format date
+  const formatDate = (dateString) => {
+    if (!dateString) return "NA";
+    return new Date(dateString).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric",
+    });
+  };
+
+  // Helper to find Complaint No from ID
+  const getComplaintNo = (id) => {
+    if (!id) return "NA";
+    const found = complainList.find((c) => c.id == id);
+    return found ? found.compNo : "NA";
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -198,27 +203,51 @@ const ScanLetter = () => {
               </tr>
             </thead>
             <tbody>
-              {scannedLetters.map((row) => (
-                <tr key={row.id} className="bg-white border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">{row.scanDate}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{row.letterNo}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-blue-600 hover:underline cursor-pointer">{row.caseNo}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{row.type}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">{row.subject}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{row.pages}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${row.status === "Attached to File" ? "bg-blue-100 text-blue-800 border-blue-200" : "bg-gray-100 text-gray-600 border-gray-200"}`}>
-                      {row.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right flex justify-end items-center gap-3">
-                    <button className="text-gray-500 hover:text-gray-700 p-2"><FaFilePdf /></button>
-                    {row.status === "Pending Attachment" && (
-                      <button className="text-green-600 hover:text-green-700 p-2"><FaCheckCircle /></button>
-                    )}
+              {isLettersLoading ? (
+                <tr>
+                  <td colSpan="8" className="px-6 py-4 text-center">
+                    Loading...
                   </td>
                 </tr>
-              ))}
+              ) : lettersList.length > 0 ? (
+                lettersList.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="bg-white border-b hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {formatDate(row.created_at)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
+                      {row.letter_no || "NA"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-blue-600 hover:underline cursor-pointer">
+                      {getComplaintNo(row.complaint_id)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {row.letter_type || "NA"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">
+                      {row.subject || "NA"}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">NA</td>
+                    <td className="px-6 py-4 whitespace-nowrap">NA</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right flex justify-end items-center gap-3">
+                      <button className="text-gray-500 hover:text-gray-700 p-2">
+                        <FaFilePdf />
+                      </button>
+                      {/* You can re-enable this check mark if you have status logic later */}
+                      {/* <button className="text-green-600 hover:text-green-700 p-2"><FaCheckCircle /></button> */}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="px-6 py-4 text-center">
+                    No records found
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -232,8 +261,12 @@ const ScanLetter = () => {
           >
             <div className="flex justify-between items-start p-4 md:p-5 border-b border-gray-100 shrink-0">
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Scan / Upload Letter</h3>
-                <p className="text-xs text-gray-500 mt-1">Scan a new letter or upload a scanned document</p>
+                <h3 className="text-lg font-bold text-gray-800">
+                  Scan / Upload Letter
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Scan a new letter or upload a scanned document
+                </p>
               </div>
               <button
                 type="button"
@@ -249,11 +282,11 @@ const ScanLetter = () => {
             </div>
 
             <div className="p-4 md:p-6 space-y-4 overflow-y-auto">
-              
               {/* ------------ UPDATED DROPDOWN START ------------ */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Case Number / प्रकरण संख्या <span className="text-red-500">*</span>
+                  Case Number / प्रकरण संख्या{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="complaint_id"
@@ -264,25 +297,27 @@ const ScanLetter = () => {
                   }`}
                 >
                   <option value="">Select Case Number</option>
-                  
+
                   {/* Mapping the data: Value is ID, Display is compNo */}
                   {complainList.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.compNo}
                     </option>
                   ))}
-
                 </select>
                 {/* Validation Error Message */}
                 {errors.complaint_id && (
-                  <p className="text-red-500 text-xs mt-1">{errors.complaint_id[0]}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.complaint_id[0]}
+                  </p>
                 )}
               </div>
               {/* ------------ UPDATED DROPDOWN END ------------ */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Letter Type / पत्र प्रकार <span className="text-red-500">*</span>
+                  Letter Type / पत्र प्रकार{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="letter_type"
@@ -297,8 +332,10 @@ const ScanLetter = () => {
                   <option value="Outgoing">Outgoing</option>
                   <option value="Internal Note">Internal Note</option>
                 </select>
-                 {errors.letter_type && (
-                  <p className="text-red-500 text-xs mt-1">{errors.letter_type[0]}</p>
+                {errors.letter_type && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.letter_type[0]}
+                  </p>
                 )}
               </div>
 
@@ -317,13 +354,16 @@ const ScanLetter = () => {
                   }`}
                 ></textarea>
                 {errors.subject && (
-                  <p className="text-red-500 text-xs mt-1">{errors.subject[0]}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.subject[0]}
+                  </p>
                 )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Upload File / फाइल अपलोड करें <span className="text-red-500">*</span>
+                  Upload File / फाइल अपलोड करें{" "}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="file"
@@ -337,15 +377,23 @@ const ScanLetter = () => {
                   <div
                     onClick={handleUploadAreaClick}
                     className={`border-2 border-dashed rounded-lg p-6 md:p-8 text-center cursor-pointer transition-colors group ${
-                      errors.file 
-                      ? "border-red-300 bg-red-50" 
-                      : "border-blue-200 bg-blue-50/50 hover:bg-blue-50"
+                      errors.file
+                        ? "border-red-300 bg-red-50"
+                        : "border-blue-200 bg-blue-50/50 hover:bg-blue-50"
                     }`}
                   >
                     <div className="flex flex-col items-center gap-2">
-                      <FaCloudUploadAlt className={`text-3xl transition-transform group-hover:scale-110 ${errors.file ? "text-red-400" : "text-blue-400"}`} />
-                      <span className="text-sm text-gray-600 font-medium">Click to upload or drag and drop</span>
-                      <span className="text-xs text-gray-400">PDF, JPG, PNG (max 10MB)</span>
+                      <FaCloudUploadAlt
+                        className={`text-3xl transition-transform group-hover:scale-110 ${
+                          errors.file ? "text-red-400" : "text-blue-400"
+                        }`}
+                      />
+                      <span className="text-sm text-gray-600 font-medium">
+                        Click to upload or drag and drop
+                      </span>
+                      <span className="text-xs text-gray-400">
+                        PDF, JPG, PNG (max 10MB)
+                      </span>
                     </div>
                   </div>
                 ) : (
@@ -353,8 +401,12 @@ const ScanLetter = () => {
                     <div className="flex items-center gap-3 overflow-hidden">
                       <FaFilePdf className="text-red-500 text-2xl shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-700 truncate">{selectedFile.name}</p>
-                        <p className="text-xs text-gray-500">{(selectedFile.size / 1024).toFixed(2)} KB</p>
+                        <p className="text-sm font-medium text-gray-700 truncate">
+                          {selectedFile.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {(selectedFile.size / 1024).toFixed(2)} KB
+                        </p>
                       </div>
                     </div>
                     <button

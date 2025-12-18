@@ -1,23 +1,23 @@
 // components/Sidebar.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { AiOutlineHome } from "react-icons/ai";
+import {FiInbox,FiSend,FiFileText,FiBarChart2,FiSearch}  from "react-icons/fi";
+import { HiMiniUsers } from "react-icons/hi2";
+import { FaDatabase } from "react-icons/fa";
+import { RiQrScanFill } from "react-icons/ri";
+import { TbReportSearch } from "react-icons/tb";
 import {
   FaHome,
   FaFileAlt,
   FaChartBar,
   FaSearch,
-  FaUsers,
-  FaDatabase,
   FaBell,
-  FaGlobe,
+  FaTimes,
+  FaSave,
   FaChevronLeft,
   FaChevronRight,
-  FaTimes,
-  FaClock,
-  FaCheckCircle,
 } from "react-icons/fa";
-
-const subrole = localStorage.getItem("subrole");
 
 const Sidebar = ({
   isMobileMenuOpen,
@@ -27,74 +27,13 @@ const Sidebar = ({
 }) => {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
-  const [isHindi, setIsHindi] = useState(false);
-  const sidebarRef = useRef(null); // ✅ Added ref for outside click detection
+  
+  const subrole = localStorage.getItem("subrole") || "Operator";
 
-  // Simple translation object with updated route names
-  const translations = {
-    english: {
-      title: "LokAyukta",
-      subtitle: "CRMS",
-      description: "Complaint Management",
-      supervisor: "Supervisor",
-      dashboard: "Dashboard",
-      allComplaints: "Complaints",
-      progressRegister: "Progress Register",
-      searchReports: "Search & Reports",
-      userManagement: "User Management",
-      masterData: "Master Data",
-    },
-    hindi: {
-      title: "लोकायुक्त",
-      subtitle: "CRMS",
-      description: "शिकायत प्रबंधन",
-      supervisor: "व्यवस्थापक",
-      dashboard: "डैशबोर्ड",
-      allComplaints: "शिकायतें", // ✅ Fixed: was "Complaints"
-      progressRegister: "प्रगति रजिस्टर",
-      searchReports: "खोज और रिपोर्ट",
-      userManagement: "उपयोगकर्ता प्रबंधन",
-      masterData: "मुख्य डेटा",
-    },
-  };
-
-  // Get current translations
-  const t = isHindi ? translations.hindi : translations.english;
-
-  // ✅ Outside click handler for mobile menu
-  useEffect(() => {
-    const handleOutsideClick = (event) => {
-      if (
-        isMobile &&
-        isMobileMenuOpen &&
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target)
-      ) {
-        toggleMobileMenu();
-      }
-    };
-
-    if (isMobile && isMobileMenuOpen) {
-      document.addEventListener("mousedown", handleOutsideClick);
-      document.addEventListener("touchstart", handleOutsideClick); // ✅ Added for mobile touch
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-      document.removeEventListener("touchstart", handleOutsideClick);
-    };
-  }, [isMobile, isMobileMenuOpen, toggleMobileMenu]);
-
-  // Check screen size and set mobile state
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-
-      // ✅ Auto-close mobile menu on desktop resize
-      if (!mobile && isMobileMenuOpen) {
-        toggleMobileMenu();
-      }
     };
 
     checkScreenSize();
@@ -103,45 +42,25 @@ const Sidebar = ({
     return () => {
       window.removeEventListener("resize", checkScreenSize);
     };
-  }, [isMobileMenuOpen, toggleMobileMenu]);
+  }, []);
 
-  // Toggle language function
-  const toggleLanguage = () => {
-    setIsHindi(!isHindi);
-  };
-
-  // Simple isActive function for supervisor routes
   const isActive = (href) => {
     const fullPath = `/supervisor${href}`;
 
+    // Make dashboard active for exact match OR when at base /supervisor route
     if (href === "/dashboard") {
-      return location.pathname === fullPath;
+      return location.pathname === fullPath || location.pathname === "/supervisor" || location.pathname === "/supervisor/";
     }
     return location.pathname.startsWith(fullPath);
   };
 
-  // Close mobile menu when clicking link
- const handleLinkClick = () => {
-  if (isMobile && isMobileMenuOpen) {
-    toggleMobileMenu();
-  }
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-  // ✅ Prevent body scroll when mobile menu is open
-  useEffect(() => {
+  const handleLinkClick = () => {
     if (isMobile && isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+      toggleMobileMenu();
     }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isMobile, isMobileMenuOpen]);
-
-  // Custom Scrollbar CSS
   const scrollbarStyles = `
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
@@ -150,272 +69,274 @@ const Sidebar = ({
       background: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: #475569;
+      background-color: #cbd5e1;
       border-radius: 10px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background-color: #64748b;
+      background-color: #94a3b8;
     }
-    /* For Firefox */
     .custom-scrollbar {
       scrollbar-width: thin;
-      scrollbar-color: #475569 transparent;
+      scrollbar-color: #cbd5e1 transparent;
     }
   `;
 
   return (
     <>
-      {/* Custom Scrollbar Styles */}
       <style>{scrollbarStyles}</style>
 
-      {/* ✅ Mobile Overlay with higher z-index */}
+      {/* Mobile Overlay */}
       {isMobile && isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={toggleMobileMenu}
-          aria-label="Close menu overlay"
         />
       )}
 
-      {/* ✅ Sidebar with proper z-index and ref */}
+      {/* Sidebar - Now starts below header */}
       <div
-        ref={sidebarRef}
-        className={`fixed left-0 top-0 h-full min-h-screen bg-gradient-to-b from-slate-800 to-slate-900 text-white shadow-xl transition-all duration-300 flex flex-col ${
+        className={`fixed left-0 bg-[#E7ECF5] text-gray-700 shadow-xl transition-all duration-300 flex flex-col ${
           isMobile
-            ? `w-72 z-50 ${
-                isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-              }`
-            : `${isCollapsed ? "w-16" : "w-72"} z-30`
+            ? `w-64 z-50 top-0 bottom-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`
+            : `${isCollapsed ? "w-16" : "w-64"} z-30 top-16 bottom-0`
         }`}
       >
         {/* Mobile Close Button */}
         {isMobile && isMobileMenuOpen && (
           <button
             onClick={toggleMobileMenu}
-            className="absolute top-4 right-4 p-2 text-white hover:bg-slate-700 rounded-lg transition-colors z-10"
+            className="absolute top-4 right-4 p-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors z-50"
             aria-label="Close menu"
           >
             <FaTimes className="w-5 h-5" />
           </button>
         )}
 
-        {/* Desktop Toggle Button */}
-        {!isMobile && (
-          <button
-            onClick={toggleSidebar}
-            className={`absolute bg-white text-slate-600 rounded-full shadow-lg hover:bg-gray-50 transition-all duration-300 z-10 ${
-              isCollapsed ? "-right-3 top-6 p-2" : "-right-4 top-6 p-3"
-            }`}
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {isCollapsed ? (
-              <FaChevronRight className="w-4 h-4" />
-            ) : (
-              <FaChevronLeft className="w-4 h-4" />
-            )}
-          </button>
-        )}
-
         {/* Header Section */}
-        <div
-          className={`border-b border-slate-700 transition-all duration-300 flex-shrink-0 ${
-            !isMobile && isCollapsed ? "p-3" : "p-6"
-          }`}
-        >
-          {/* Logo */}
-          <div
-            className={`flex items-center mb-4 transition-all duration-300 ${
-              !isMobile && isCollapsed ? "justify-center gap-0" : "gap-3"
-            }`}
-          >
-            <div
-              className={`transition-all duration-300 ${
-                !isMobile && isCollapsed ? "text-2xl" : "text-3xl"
-              }`}
-            >
-              ⚖️
-            </div>
-            {(isMobile || !isCollapsed) && (
-              <div className="transition-all duration-300">
-                <h3 className="text-xl font-bold text-white">{t.title}</h3>
-                <h4 className="text-lg font-semibold text-slate-200">
-                  {t.subtitle}
-                </h4>
-                <span className="text-xs text-slate-400">{t.description}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Supervisor Badge & Header Actions Layout */}
-          <div className="flex justify-between">
-            <div>
-              {/* Supervisor Badge */}
-              {(isMobile || !isCollapsed) && (
-                <div className="mb-3 transition-all duration-300">
-                  <span className="bg-[#133973] text-white px-3 py-1 rounded-full text-xs font-medium">
-                    {subrole == "cio-io" ? "CIO" : "CIO"}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div>
-              {/* Header Actions */}
-              {(isMobile || !isCollapsed) && (
-                <div className="flex gap-2 transition-all duration-300">
-                  <button
-                    onClick={toggleLanguage}
-                    className="flex items-center gap-1 px-2 py-1 border border-slate-600 rounded text-xs hover:bg-slate-700 transition-colors"
-                  >
-                    <FaGlobe className="w-3 h-3" />
-                    {isHindi ? "EN" : "हि"}
-                  </button>
-                  <button className="relative flex items-center px-2 py-1 border border-slate-600 rounded text-xs hover:bg-slate-700 transition-colors">
-                    <FaBell className="w-3 h-3" />
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
-                  </button>
-                </div>
-              )}
-
-              {/* Collapsed Header Actions */}
-              {!isMobile && isCollapsed && (
-                <div className="flex flex-col gap-2 items-center transition-all duration-300">
-                  <button
-                    onClick={toggleLanguage}
-                    className="p-1.5 border border-slate-600 rounded hover:bg-slate-700 transition-colors"
-                  >
-                    <FaGlobe className="w-3 h-3" />
-                  </button>
-                  <button className="relative p-1.5 border border-slate-600 rounded hover:bg-slate-700 transition-colors">
-                    <FaBell className="w-3 h-3" />
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+        <div className={`px-6 py-6 flex-shrink-0 ${!isMobile && isCollapsed ? "px-3" : ""}`}>
         </div>
 
-        {/* Navigation Menu - Updated with custom-scrollbar */}
-        <nav
-          className={`flex-1 transition-all duration-300 overflow-y-auto custom-scrollbar ${
-            !isMobile && isCollapsed ? "py-4" : "py-6"
-          }`}
-        >
-          <ul className="space-y-1">
+        {/* Navigation Menu with Sections */}
+        <nav className="flex-1 px-6 overflow-y-auto custom-scrollbar">
+          {/* Workbox Section */}
+          {(isMobile || !isCollapsed) && (
+            <p className="text-[13px]  text-gray-800 mb-2 ml-2">Workbox</p>
+          )}
+
+          <ul className="space-y-2 mb-6">
             {/* Dashboard */}
             <li>
               <Link
                 to="/supervisor/dashboard"
                 onClick={handleLinkClick}
-                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
                   isActive("/dashboard")
-                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
-                    : "text-slate-300 hover:text-white hover:bg-gray-700"
-                } ${
-                  !isMobile && isCollapsed
-                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
-                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
-                }`}
-                title={!isMobile && isCollapsed ? t.dashboard : ""}
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-200"
+                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                title={!isMobile && isCollapsed ? "Dashboard" : ""}
               >
-                <FaHome className="w-5 h-5 flex-shrink-0" />
-                {(isMobile || !isCollapsed) && (
-                  <span className="transition-all duration-300">
-                    {t.dashboard}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <AiOutlineHome className="w-[18px] h-[18px] flex-shrink-0" />
+                  {(isMobile || !isCollapsed) && <span>Dashboard</span>}
+                </div>
+                {isActive("/dashboard") && (isMobile ) && (
+                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
                 )}
               </Link>
             </li>
 
-            {/* All Complaints */}
+          {/* Inbox */}
             <li>
               <Link
                 to="/supervisor/all-complaints"
                 onClick={handleLinkClick}
-                className={`flex items-center text-sm font-medium transition-all duration-200 ${
-                  [
-                    "/all-complaints",
-                    "/pending-complaints",
-                    "/approved-complaints",
-                  ].some((path) => isActive(path))
-                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
-                    : "text-slate-300 hover:text-white hover:bg-gray-700"
-                } ${
-                  !isMobile && isCollapsed
-                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
-                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
-                }`}
-                title={!isMobile && isCollapsed ? t.allComplaints : ""}
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                  isActive("/all-complaints")
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-200"
+                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                title={!isMobile && isCollapsed ? "New Complaints" : ""}
               >
-                <FaFileAlt className="w-5 h-5 flex-shrink-0" />
-                {(isMobile || !isCollapsed) && (
-                  <span className="transition-all duration-300">
-                    {t.allComplaints}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <FiInbox size={20} className="w-[18px] h-[18px] flex-shrink-0" />
+                  {(isMobile || !isCollapsed) && <span>Inbox</span>}
+                </div>
+                {isActive("/all-complaints") && (isMobile) && (
+                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
                 )}
               </Link>
             </li>
 
+
+           
+            
+                        {/* Send */}
+                        <li>
+                          <Link
+                            to="/supervisor/approved-complaints"
+                            onClick={handleLinkClick}
+                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                              isActive("/approved-complaints")
+                                ? "bg-blue-600 text-white shadow-md"
+                                : "text-gray-700 hover:bg-gray-200"
+                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                            title={!isMobile && isCollapsed ? "Send" : ""}
+                          >
+                            <div className="flex items-center gap-3">
+                              <FiSend size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
+                              {(isMobile || !isCollapsed) && <span>Send</span>}
+                            </div>
+                            {isActive("/approved-complaints") && (isMobile) && (
+                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                                <div className="w-4 h-4 bg-white rounded-full"></div>
+                              </div>
+                            )}
+                          </Link>
+                        </li>
+
+
+                        {/* userMangment */}
+                      
+                   
+
+                        {/* <li>
+                          <Link
+                            to="/supervisor/user-management"
+                            onClick={handleLinkClick}
+                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                              isActive("/user-management")
+                                ? "bg-blue-600 text-white shadow-md"
+                                : "text-gray-700 hover:bg-gray-200"
+                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                            title={!isMobile && isCollapsed ? "Send" : ""}
+                          >
+                            <div className="flex items-center gap-3">
+                              <HiMiniUsers size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
+                              {(isMobile || !isCollapsed) && <span>User Management</span>}
+                            </div>
+                            {isActive("/user-management") && (isMobile) && (
+                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                                <div className="w-4 h-4 bg-white rounded-full"></div>
+                              </div>
+                            )}
+                          </Link>
+                        </li> */}
+
+
+                            {/* masterData */}
+                        {/* <li>
+                          <Link
+                            to="/supervisor/master-data"
+                            onClick={handleLinkClick}
+                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                              isActive("/master-data")
+                                ? "bg-blue-600 text-white shadow-md"
+                                : "text-gray-700 hover:bg-gray-200"
+                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                            title={!isMobile && isCollapsed ? "Send" : ""}
+                          >
+                            <div className="flex items-center gap-3">
+                              <FaDatabase size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
+                              {(isMobile || !isCollapsed) && <span>Master Data</span>}
+                            </div>
+                            {isActive("/master-data") && (isMobile) && (
+                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                                <div className="w-4 h-4 bg-white rounded-full"></div>
+                              </div>
+                            )}
+                          </Link>
+                        </li> */}
+
+
+
+
+
+
+                          {/* <li>
+                          <Link
+                            to="/supervisor/user-management"
+                            onClick={handleLinkClick}
+                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                              isActive("/user-management")
+                                ? "bg-blue-600 text-white shadow-md"
+                                : "text-gray-700 hover:bg-gray-200"
+                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                            title={!isMobile && isCollapsed ? "Send" : ""}
+                          >
+                            <div className="flex items-center gap-3">
+                              <HiMiniUsers size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
+                              {(isMobile || !isCollapsed) && <span>User Management</span>}
+                            </div>
+                            {isActive("/user-management") && (isMobile) && (
+                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                                <div className="w-4 h-4 bg-white rounded-full"></div>
+                              </div>
+                            )}
+                          </Link>
+                        </li> */}
+
+          </ul>
+
+          {/* Case & Administration Section */}
+          {/* {(isMobile || !isCollapsed) && (
+            <p className="text-[13px]  text-gray-800 mb-3 mt-6">Case & Administration</p>
+          )} */}
+
+          <ul className="space-y-2">
             {/* Progress Register */}
-            <li>
+            {/* <li>
               <Link
                 to="/supervisor/progress-register"
                 onClick={handleLinkClick}
-                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
                   isActive("/progress-register")
-                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
-                    : "text-slate-300 hover:text-white hover:bg-gray-700"
-                } ${
-                  !isMobile && isCollapsed
-                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
-                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
-                }`}
-                title={!isMobile && isCollapsed ? t.progressRegister : ""}
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-200"
+                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                title={!isMobile && isCollapsed ? "Progress Register" : ""}
               >
-                <FaChartBar className="w-5 h-5 flex-shrink-0" />
-                {(isMobile || !isCollapsed) && (
-                  <span className="transition-all duration-300">
-                    {t.progressRegister}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <FiBarChart2 size={20} className="w-[18px] h-[18px] flex-shrink-0" />
+                  {(isMobile || !isCollapsed) && <span>Progress Register</span>}
+                </div>
+                {isActive("/progress-register") && (isMobile) && (
+                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
                 )}
               </Link>
-            </li>
+            </li> */}
 
             {/* Search & Reports */}
-            <li>
+            {/* <li>
               <Link
                 to="/supervisor/search-reports"
                 onClick={handleLinkClick}
-                className={`flex items-center text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
                   isActive("/search-reports")
-                    ? "bg-[#133973] text-white shadow-lg hover:bg-[#F9A00D]"
-                    : "text-slate-300 hover:text-white hover:bg-gray-700"
-                } ${
-                  !isMobile && isCollapsed
-                    ? "justify-center px-2 py-3 mx-2 rounded-lg"
-                    : "gap-3 px-6 py-3 rounded-r-3xl mr-5"
-                }`}
-                title={!isMobile && isCollapsed ? t.searchReports : ""}
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-200"
+                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                title={!isMobile && isCollapsed ? "Search & Reports" : ""}
               >
-                <FaSearch className="w-5 h-5 flex-shrink-0" />
-                {(isMobile || !isCollapsed) && (
-                  <span className="transition-all duration-300">
-                    {t.searchReports}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <FiSearch size={20}  className="w-[18px] h-[18px] flex-shrink-0" />
+                  {(isMobile || !isCollapsed) && <span>Search & Reports</span>}
+                </div>
+                {isActive("/search-reports") && (isMobile ) && (
+                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
                 )}
               </Link>
-            </li>
+            </li> */}
           </ul>
         </nav>
-
-        {/* Footer */}
-        {(isMobile || !isCollapsed) && (
-          <div className="p-6 border-t border-slate-700 text-center transition-all duration-300 flex-shrink-0 mt-auto">
-            <p className="text-xs text-slate-400">{t.copyright}</p>
-            <p className="text-xs text-slate-500">{t.version}</p>
-          </div>
-        )}
       </div>
     </>
   );
