@@ -39,6 +39,10 @@ const ScanLetter = () => {
  })
 };
 
+const getAllComplainsID = ()=>{
+  const res = api.get("/")
+}
+
 
   const [errors, setErrors] = useState(null);
 
