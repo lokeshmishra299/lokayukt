@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\LokAyukt;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Complaint;
+use App\Models\Letter;
 use App\Models\ComplaintAction;
 use App\Models\ComplainDocuments;
 use App\Models\ComplaintNotes;
@@ -1320,4 +1321,16 @@ class LokAyuktComplaintsController extends Controller
     ]);
 
 }
+
+    public function allDispatchLetters(Request $request){
+           $records = DB::table('dispach_letters')->get();
+      
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Records fetched successfully',
+        'data' => $records,
+    ]);
+
+    }
 }
