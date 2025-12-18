@@ -23,13 +23,11 @@ const api = axios.create({
 });
 
 const Notes = ({ complaint }) => {
-  // ========================
-  // STATES
-  // ========================
+
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const popupRef = useRef(null); // Ref for PDF generation
+  const popupRef = useRef(null); 
 
   // Data States
   const [documents, setDocuments] = useState([]);
