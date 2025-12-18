@@ -8,8 +8,6 @@ class Letter extends Model
 {
      protected $table = 'dispach_letters';
 
-    // protected $primaryKey = 'district_code'; 
-
     public $timestamps = false; 
 
     protected $fillable = [
