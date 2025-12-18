@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState, useRef } from "react";
 import {
   FaSearch,
@@ -12,11 +13,72 @@ import {
 } from "react-icons/fa";
 import { MdOutlineScanner } from "react-icons/md";
 
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
+const token = localStorage.getItem("access_token");
+
+// Create axios instance
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  },
+});
+
 const ScanLetter = () => {
+  const [formData, setFormData] = useState({
+    complaint_id: "",
+    letter_type: "",
+    subject: "",
+  });
+
+  const handleChange = (e) => {
+ setFormData({
+  ...formData,
+  [e.target.name]: e.target.value
+ })
+};
+
+
+  const [errors, setErrors] = useState(null);
+
+ const submitScaneData = async (e) => {
+  e.preventDefault();
+
+  try {
+    const payload = new FormData();
+    payload.append("complaint_id", formData.complaint_id);
+    payload.append("letter_type", formData.letter_type);
+    payload.append("subject", formData.subject);
+
+    if (selectedFile) {
+      payload.append("file", selectedFile);
+    }
+
+    const res = await api.post("/add-dispatch", payload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    console.log("Data Posted", res.data);
+
+    setFormData({
+      complaint_id: "",
+      letter_type: "",
+      subject: "",
+    });
+    setSelectedFile(null);
+    setIsModalOpen(false);
+  } catch (error) {
+    console.log("Error he", error);
+  }
+};
+
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
-
 
   const scannedLetters = [
     {
@@ -51,7 +113,6 @@ const ScanLetter = () => {
     },
   ];
 
-
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -59,11 +120,9 @@ const ScanLetter = () => {
     }
   };
 
-
   const handleUploadAreaClick = () => {
     fileInputRef.current.click();
   };
-
 
   const removeFile = (e) => {
     e.stopPropagation();
@@ -74,7 +133,6 @@ const ScanLetter = () => {
   };
 
   return (
-   
     <div className="min-h-screen bg-gray-50">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
@@ -93,13 +151,11 @@ const ScanLetter = () => {
         </button>
       </div>
 
-   
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 min-h-[500px]">
         <h2 className="text-lg font-semibold text-gray-800 mb-4 md:mb-6">
           Scanned Letters / स्कैन किए गए पत्र
         </h2>
 
-     
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left text-gray-500 min-w-[800px]">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
@@ -118,10 +174,7 @@ const ScanLetter = () => {
             </thead>
             <tbody>
               {scannedLetters.map((row) => (
-                <tr
-                  key={row.id}
-                  className="bg-white border-b hover:bg-gray-50"
-                >
+                <tr key={row.id} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     {row.scanDate}
                   </td>
@@ -166,8 +219,10 @@ const ScanLetter = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center  justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4">
-          <div className="bg-white rounded-t-xl sm:mx-0 mx-5 md:rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn flex flex-col max-h-[90vh]">
-
+          <form
+            onSubmit={submitScaneData}
+            className="bg-white rounded-t-xl sm:mx-0 mx-5 md:rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn flex flex-col max-h-[90vh]"
+          >
             <div className="flex justify-between  items-start p-4 md:p-5 border-b border-gray-100 shrink-0">
               <div>
                 <h3 className="text-lg font-bold text-gray-800">
@@ -188,7 +243,6 @@ const ScanLetter = () => {
               </button>
             </div>
 
-
             <div className="p-4 md:p-6 space-y-4 overflow-y-auto">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -196,17 +250,23 @@ const ScanLetter = () => {
                 </label>
                 <input
                   type="text"
+                  name="complaint_id"
+                  value={formData.complaint_id}
+                  onChange={handleChange}
                   placeholder="Enter case number or search..."
                   className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
                 />
               </div>
 
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Letter Type / पत्र प्रकार
                 </label>
-                <select className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600">
+                <select
+                name="letter_type"
+                value={formData.letter_type}
+                onChange={handleChange}
+                 className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600">
                   <option>Select type</option>
                   <option>Incoming</option>
                   <option>Outgoing</option>
@@ -219,12 +279,14 @@ const ScanLetter = () => {
                   Subject / विषय
                 </label>
                 <textarea
+                name="subject"
+                value={formData.subject}
+                onChange={handleChange}
                   rows={2}
                   placeholder="Enter letter subject..."
                   className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none"
                 ></textarea>
               </div>
-
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -241,7 +303,6 @@ const ScanLetter = () => {
                 />
 
                 {!selectedFile ? (
-             
                   <div
                     onClick={handleUploadAreaClick}
                     className="border-2 border-dashed border-blue-200 rounded-lg bg-blue-50/50 p-6 md:p-8 text-center cursor-pointer hover:bg-blue-50 transition-colors group"
@@ -257,7 +318,6 @@ const ScanLetter = () => {
                     </div>
                   </div>
                 ) : (
-    
                   <div className="border border-blue-200 rounded-lg bg-blue-50 p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3 overflow-hidden">
                       <FaFilePdf className="text-red-500 text-2xl shrink-0" />
@@ -282,7 +342,6 @@ const ScanLetter = () => {
               </div>
             </div>
 
-
             <div className="p-4 md:p-5 bg-gray-50 border-t border-gray-100 flex flex-col-reverse md:flex-row justify-end gap-3 shrink-0">
               <button
                 onClick={() => {
@@ -293,11 +352,13 @@ const ScanLetter = () => {
               >
                 Cancel
               </button>
-              <button className="w-full md:w-auto px-4 py-2.5 text-sm font-medium text-white bg-blue-800 rounded-lg hover:bg-blue-900 transition-colors shadow-sm">
+              <button
+              type="submit"
+               className="w-full md:w-auto px-4 py-2.5 text-sm font-medium text-white bg-blue-800 rounded-lg hover:bg-blue-900 transition-colors shadow-sm">
                 Upload & Attach
               </button>
             </div>
-          </div>
+          </form>
         </div>
       )}
     </div>

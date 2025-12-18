@@ -5,11 +5,11 @@ import html2pdf from "html2pdf.js";
 const PreView = ({ complaintData }) => {
   const contentRef = useRef(null);
 
-  // Helper to handle null/undefined/empty
+
   const safeData = (data, fallback = "—") => 
     (data !== null && data !== undefined && data !== "null" && data !== "") ? data : fallback;
 
-  // Helper to format Date
+ 
   const formatDate = (dateString) => {
     if (!dateString) return "—";
     const date = new Date(dateString);
@@ -20,10 +20,10 @@ const PreView = ({ complaintData }) => {
     });
   };
 
-  // Extract data object safely
+
   const data = complaintData?.data || complaintData || {};
 
-  // --- ARRAY DATA PREPARATION ---
+
   const validComplainants = Array.isArray(data.complainants) 
     ? data.complainants 
     : [];
@@ -337,5 +337,5 @@ const PreView = ({ complaintData }) => {
     </div>
   );
 };
-
+    
 export default PreView;
