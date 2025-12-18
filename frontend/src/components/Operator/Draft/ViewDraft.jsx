@@ -28,7 +28,7 @@ const api = axios.create({
   },
 });
 
-const ViewAllComplaint = () => {
+const ViewDraft = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -1255,4 +1255,4 @@ district_name || 'N/A'}</p>
   );
 };
 
-export default ViewAllComplaint;
+export default ViewDraft;
