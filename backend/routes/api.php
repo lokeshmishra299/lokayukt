@@ -266,6 +266,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-to-uplokayukt/{complaint_id}',[LokAyuktComplaintsController::class,'approvedByLokayukt']);
         Route::post('/add-dispatch',[LokAyuktComplaintsController::class,'addDispachLeters']);
         Route::get('/all-complain-ids',[LokAyuktComplaintsController::class,'allComplainsId']);
+        Route::get('/all-dispatch-letters',[LokAyuktComplaintsController::class,'allDispatchLetters']);
         
        
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);
