@@ -295,6 +295,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/department-wise-complaint',[LokAyuktReportController::class,'complainDepartmentWise']);
         Route::get('/montly-trends',[LokAyuktReportController::class,'getMontlyTrends']);
         Route::get('/compliance-report',[LokAyuktReportController::class,'complianceReport']);
+        Route::get('/dist-wise-compliant',[LokAyuktReportController::class,'complaintDistWise']);
 
         // // Daishboard
         Route::get('/dashboard/{date}',[LokAyuktDashboardController::class,'index']);
