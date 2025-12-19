@@ -793,7 +793,10 @@ $complainDetails->details = DB::table('complaints_details as cd')
     public function complainDistrictWise()
     {
        
-        $complainCounts = Complaint::select('district_master.district_name', DB::raw('count(*) as complain_count'))
+        $complainCounts = Complaint::select('district_master.district_name',
+         DB::raw('count(*) as complain_count'
+        
+        ))
             ->join('district_master', 'complaints.district_id', '=', 'district_master.district_code')
             ->groupBy('district_master.district_code', 'district_master.district_name')
              ->where('approved_rejected_by_ro', '1')
@@ -808,6 +811,29 @@ $complainDetails->details = DB::table('complaints_details as cd')
                'status' => true,
                'message' => 'Records Fetch successfully',
                'data' => $complainCounts,
+           ]);
+    }
+
+    public function complaintDistWise(){
+  
+
+    $data = DB::table('district_master as d')
+    ->leftJoin('complaints as c', 'c.district_id', '=', 'd.district_code')
+    ->leftJoin('complainants as cm', 'cm.permanent_district', '=', 'd.district_code')
+        ->select(
+            'd.district_name as district',
+            'd.dist_name_hi as district_hindi',
+            DB::raw('COUNT(cm.id) as total'),
+            DB::raw("SUM(CASE WHEN c.status = 'In Progress' THEN 1 ELSE 0 END) as pending"),
+            DB::raw("SUM(CASE WHEN c.status = 'Rejected' THEN 1 ELSE 0 END) as disposed")
+        )
+        ->groupBy('d.id', 'district', 'district_hindi')
+        ->orderBy('district')
+        ->get();
+              return response()->json([
+               'status' => true,
+               'message' => 'Records Fetch successfully',
+               'data' => $data,
            ]);
     }
 

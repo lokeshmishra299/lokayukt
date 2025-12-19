@@ -1270,12 +1270,26 @@ class LokAyuktComplaintsController extends Controller
         );
 
         // Save DB
-        Letter::create([
+      $letter =  Letter::create([
             'complaint_id' => $request->complaint_id,
             'letter_type'  => $request->letter_type,
             'subject'      => $request->subject,
             'file'         => $filePath,
         ]);
+
+        $year = date('Y');
+
+        // id ke base par number (3 digit)
+        $sequence = str_pad($letter->id, 3, '0', STR_PAD_LEFT);
+        
+        $letterNo = 'LTR/' . $year . '/' . $sequence;
+        // dd($letter);
+
+            $letter->update([
+            'letter_no' => $letterNo
+        ]);
+
+
 
         return response()->json([
             'status'  => true,
