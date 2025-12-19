@@ -218,6 +218,29 @@ import ScaneLetter from './components/LokAyukta/ScaneLetter';
 
 
 
+//Lok-ayukt
+import DispatchLayout from './components/Dispatch/Layout';
+import DispatchDashboard from './components/Dispatch/Dashboard';
+import DispatchComplaints from './components/Dispatch/Complaints';
+import DispatchProgressRegister from './components/Dispatch/ProgressRegister';
+import DispatchSearchReports from './components/Dispatch/SearchReports';
+import DispatchViewComplait from './components/Dispatch/ViewComplaints';
+import DispatchAllComplaits from './components/Dispatch/All-complaints/AllComplaits';
+import DispatchViewAllComplaint from './components/Dispatch/All-complaints/ViewwAllComplaint';
+import DispatchPendingComplaints from './components/Dispatch/Pending-complaints/PendingComplaints';
+import DispatchViewPendingComplaints from './components/Dispatch/Pending-complaints/ViewPendingComplaints';
+import DispatchApprovedComplaints from './components/Dispatch/Approved-complaints/ApprovedComplaints';
+import DispatchViewApprovedComplaint from './components/Dispatch/Approved-complaints/ViewApprovedComplaints';
+import DispatchReporting from "./components/Dispatch/Reporting"
+import DispatchScaneLetter from "./components/Dispatch/ScaneLetter"
+
+// import LokayuktUserManagement from './components/LokAyukta/UserManagement';
+import DispatchUserManagement from './components/Dispatch/UserManagement';
+// import DispatchAddUserManagement from './components/Dispatch/AddUserManagement';
+// import LokayuktEditUserManagement from './components/LokAyukta/EditUserManagment';
+// import LokayuktMasterData from './components/LokAyukta/MasterData';
+
+
 
 // TanStack 
 const queryClient = new QueryClient();
@@ -435,6 +458,8 @@ function App() {
          
         </Route>
       )}
+
+      
       {role === 'ps' && (
         <Route path="/ps" element={<Layout />}>
            <Route path="dashboard" element={<Dashboard/>} />
@@ -486,6 +511,49 @@ function App() {
          
         </Route>
       )}
+
+
+
+
+      {/* Dispatch */}
+
+        {role === 'dispatch' && (
+        <Route path="/dispatch" element={<DispatchLayout />}>
+           <Route path="dashboard" element={<DispatchDashboard />} />
+          <Route path="complaints" element={<DispatchComplaints />} />
+          <Route path="progress-register" element={<DispatchProgressRegister />} />
+          <Route path="search-reports" element={<DispatchSearchReports />} />
+          <Route path="search-reports/view/:id" element={<DispatchViewComplait />} />
+
+          <Route path="all-complaints" element={<DispatchAllComplaits />} />
+          <Route path="all-complaints/view/:id" element={<DispatchViewAllComplaint />} />
+          {/* <Route path="all-complaints/edit/:id" element={<DispatchEditComplaints />} /> */}
+
+          <Route path="pending-complaints" element={<DispatchPendingComplaints />} />
+          <Route path="pending-complaints/view/:id" element={<DispatchViewPendingComplaints />} />
+          {/* <Route path="pending-complaints/edit/:id" element={<DispatchEditPendingComplaints />} /> */}
+
+          <Route path="approved-complaints" element={<DispatchApprovedComplaints />} />   
+          <Route path="approved-complaints/view/:id" element={<DispatchViewApprovedComplaint/>} />
+          {/* <Route path="approved-complaints/edit/:id" element={<DispatchEditApprovedComplaint />} /> */}
+
+
+                   {/* <Route path="user-management" element={<DispatchUserManagement />} /> */}
+                    {/* <Route path="user-management/add" element={<DispatchAddUserManagement />} /> */}
+                    {/* <Route path="user-management/edit/:id" element={<DispatchEditUserManagement />} /> */}
+                    {/* <Route path="master-data" element={<DispatchMasterData />} /> */}
+                    <Route path="reporting" element={<DispatchReporting />} />       
+                    <Route path="scane-letter" element={<DispatchScaneLetter />} />       
+
+
+         
+        </Route>
+      )}
+
+
+
+
+
 
     </Routes>
     </QueryClientProvider>

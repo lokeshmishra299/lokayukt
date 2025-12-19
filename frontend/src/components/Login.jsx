@@ -80,6 +80,10 @@ const Login = () => {
             window.open("/ps/dashboard", "_self");
             localStorage.setItem("UserID", response.data.data.user.id);
           }
+          else if (userRole === "dispatch") {
+            window.open("/dispatch/dashboard", "_self");
+            localStorage.setItem("UserID", response.data.data.user.id);
+          }
           else {
             toast.error("Unauthorized role.");
             navigate("/login");
