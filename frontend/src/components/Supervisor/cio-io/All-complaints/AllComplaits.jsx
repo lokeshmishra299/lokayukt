@@ -233,7 +233,7 @@ const handleSend = async () => {
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Send To Upsupervisor Successfully!", {
+        toast.success("Send To supervisor Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -552,7 +552,7 @@ const handleSend = async () => {
                               className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
                             >
                               
-                              Send To UPsupervisor
+                              Send To supervisor
                             </button>
                           )} 
                         </div>
@@ -596,7 +596,7 @@ const handleSend = async () => {
       {/* Header */}
       <div className="px-6 py-4 border-b">
         <h3 className="text-lg font-semibold text-gray-800">
-          Send to UPsupervisor?
+          Send to supervisor?
         </h3>
       </div>
 
@@ -604,7 +604,7 @@ const handleSend = async () => {
       <div className="px-6 py-5 space-y-5">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            UPsupervisor
+            supervisor
           </label>
           <select
             value={selectedUpload}
