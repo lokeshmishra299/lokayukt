@@ -31,7 +31,7 @@ const Notes = ({ complaint }) => {
 
   // Data States
   const [documents, setDocuments] = useState([]);
-  const [notesList, setNotesList] = useState([]); // State for API notes
+  const [notesList, setNotesList] = useState([]); 
 
   // Form States
   const [selectedDoc, setSelectedDoc] = useState("");
@@ -40,14 +40,12 @@ const Notes = ({ complaint }) => {
   const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
   const [errors, setErrors] = useState({});
 
-  // ========================
-  // 1. GET DOCUMENT LIST
-  // ========================
   useEffect(() => {
     const fetchDocs = async () => {
       try {
         const res = await api.get(`/lokayukt/get-document/${complaint?.id}`);
-        if (res.data.status) setDocuments(res.data.data);
+        if (res.data.status) 
+          setDocuments(res.data.data);
       } catch (err) {
         console.log("Document fetch error:", err);
       }
@@ -400,7 +398,7 @@ const Notes = ({ complaint }) => {
                   <option value="">Select a document...</option>
                   {documents.map((doc) => (
                     <option key={doc.id} value={doc.file}>
-                      {doc.file}
+                      {doc.title || "NA"}
                     </option>
                   ))}
                 </select>
