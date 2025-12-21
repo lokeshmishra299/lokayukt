@@ -295,7 +295,7 @@ const Notes = ({ complaint }) => {
                   <option value="">Select a document...</option>
                   {documents.map((doc) => (
                     <option key={doc.id} value={doc.file}>
-                      {doc.file}
+                       {doc.title || "NA"}
                     </option>
                   ))}
                 </select>

@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import React, { useState } from "react";
 import {
   FaCalendarAlt,
@@ -13,8 +15,34 @@ import {
   FaSearch,
 } from "react-icons/fa";
 
+
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
+const token = localStorage.getItem("access_token");
+
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    ...(token && { Authorization: `Bearer ${token}` }),
+  },
+});
+
+
 const Reporting = () => {
   const [activeTab, setActiveTab] = useState("enrollment");
+
+
+  const getDistirct = async ()=>{
+    const res = await api.get("/lokayukt/all-district")
+    console.log("All DIstirct", res.data.data)
+    return res.data.data
+  }
+
+
+  const {data: allDistrict } = useQuery({
+    queryKey: ["all-district"],
+    queryFn: getDistirct
+  })
 
   // Mock Data
   const enrollmentData = [
@@ -53,11 +81,20 @@ const Reporting = () => {
     },
   ];
 
-  const districtData = [
-    { name: "Agra", hindi: "आगरा", total: 6, pending: 5, disposed: 1 },
-    { name: "Aligarh", hindi: "अलीगढ़", total: 4, pending: 4, disposed: 0 },
-    { name: "Ambedkar Nagar", hindi: "अंबेडकर नगर", total: 2, pending: 2, disposed: 0 },
-  ];
+  // District Vise Data
+  const getDistictData = async ()=>{
+    const res = await api.get("/lokayukt/dist-wise-compliant")
+    // console.log("DIstict Data", res.data.data)
+    return res.data.data
+  }
+
+  const {data: districtViseData} = useQuery({
+    queryKey: ["dist-wise-compliant"],
+    queryFn: getDistictData
+  })
+
+
+
 
   const departmentData = [
     { name: "Food and Civil Supply", type: "State Dept", total: 9, pending: 9, disposed: 0 },
@@ -204,7 +241,16 @@ const Reporting = () => {
                <div className="w-full sm:flex-1 min-w-[200px]">
                 <label className="block text-xs font-medium text-gray-500 mb-1">District / जिला</label>
                 <select className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+
                   <option>All Districts</option>
+
+                  {
+                    allDistrict?.map((items, index)=>(
+                      <option key={index} value={items.district_code}>
+                        {items.district_name}
+                      </option>
+                    ))
+                  }
                 </select>
               </div>
               <div className="w-full sm:w-auto">
@@ -240,10 +286,10 @@ const Reporting = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {districtData.map((row, idx) => (
+                  {districtViseData.map((row, idx) => (
                     <tr key={idx} className="bg-white border-b hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{row.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">{row.hindi}</td>
+                      <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{row.district}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">{row.district_hindi}</td>
                       <td className="px-6 py-4 text-right font-semibold whitespace-nowrap">{row.total}</td>
                       <td className="px-6 py-4 text-right text-orange-600 font-medium whitespace-nowrap">{row.pending}</td>
                       <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">{row.disposed}</td>

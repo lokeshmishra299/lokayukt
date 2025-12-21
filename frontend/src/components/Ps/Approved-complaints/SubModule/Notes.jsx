@@ -139,21 +139,21 @@ const Notes = ({ complaint }) => {
     try {
       const res = await api.post("/ps/add-notes", payload);
 
-      // SUCCESS
+   
       if (res.data.status) {
         toast.success("Note Added Successfully!");
         setShowSuccess(false);
         
-        // Reset Form
+ 
         setNote("");
         setSelectedDoc("");
         setPageRanges([{ from: "", to: "" }]);
         setPdfViewUrl(null);
         
-        // Refresh the List
+      
         fetchNotes();
       }
-      // BACKEND ERRORS
+    
       else if (res.data.errors) {
         setErrors(res.data.errors);
         Object.values(res.data.errors).forEach((msgArr) => {
@@ -165,34 +165,25 @@ const Notes = ({ complaint }) => {
     }
   };
 
-  // ========================
-  // INPUT HANDLER
-  // ========================
   const handlePageRangeChange = (idx, field, value) => {
     const updated = [...pageRanges];
     updated[idx][field] = value;
     setPageRanges(updated);
   };
 
-  // ========================
-  // VALIDATION
-  // ========================
+
   const isFormValid = () => {
     return note.trim() !== "" && selectedDoc !== "" && pageRanges[0].from !== "" && pageRanges[0].to !== "";
   };
 
-  // ========================
-  // HELPER: Get Doc Name by ID
-  // ========================
+
   const getDocName = (dId) => {
     if (!documents.length || !dId) return null;
     const doc = documents.find(d => d.id === dId);
     return doc ? doc.file : null;
   };
 
-  // ========================
-  // RENDER
-  // ========================
+ 
   return (
     <div className="bg-white rounded-lg w-full p-4">
       {/* HEADER */}
@@ -212,17 +203,17 @@ const Notes = ({ complaint }) => {
            <p className="text-sm text-gray-500 text-center py-4">No notes available.</p>
         ) : (
           notesList.map((item, index) => {
-             // Find doc name for display
+            
              const referencedFile = getDocName(item.d_id);
              
              return (
               <div key={item.id || index} className="border rounded-lg p-4 bg-gray-50">
                 <div className="flex justify-between items-start">
                   <p className=" text-gray-800">
-                    {/* User ID: {item.added_by}  */}
+                
                     {user?.name}
 
-                    {/* Note: If API sends user name later, replace item.added_by with item.user_name */}
+              
                   </p>
                   <p className="text-xs text-gray-400 whitespace-nowrap">
                     {new Date(item.created_at).toLocaleString('en-IN', { 
@@ -235,7 +226,6 @@ const Notes = ({ complaint }) => {
                   {item.description}
                 </div>
 
-                {/* Show Reference if document exists */}
                 {(referencedFile || (item.range_from && item.range_two)) && (
                   <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500">
                     <span className="font-semibold">References:</span>
@@ -295,7 +285,7 @@ const Notes = ({ complaint }) => {
                   <option value="">Select a document...</option>
                   {documents.map((doc) => (
                     <option key={doc.id} value={doc.file}>
-                      {doc.file}
+                      {doc.title || "NA"}
                     </option>
                   ))}
                 </select>
