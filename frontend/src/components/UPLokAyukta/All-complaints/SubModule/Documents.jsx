@@ -27,6 +27,7 @@ const Documents = ({ complaint }) => {
     return fp;
   };
 
+
   const makeFileUrl = (filePath) => {
     const root = BASE_URL.replace("/api", "");
     const fixedPath = normalizePath(filePath);
@@ -45,7 +46,7 @@ const Documents = ({ complaint }) => {
       return res.data.status ? res.data.data : [];
     },
     enabled: !!complaint?.id,
-  });
+  });   
 
   const handleViewPdf = async (filename) => {
     try {
