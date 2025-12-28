@@ -152,13 +152,11 @@ const ViewApprovedComplaints = () => {
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
 
-  // Single config for Action modals (Receive, Forward, Pullback)
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
     type: null,
   });
 
-  // Config for Data View Modal (Correspondence / Respondent)
   const [viewModalConfig, setViewModalConfig] = useState({
     open: false,
     type: null,
@@ -491,7 +489,6 @@ const ViewApprovedComplaints = () => {
               {/* ===== DETAILS GRID (Hindi) ===== */}
                           <div className="space-y-3 mb-6">
   
-  {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य परिवादी का विवरण 
@@ -529,7 +526,6 @@ const ViewApprovedComplaints = () => {
     </div>
   </div>
 
-  {/* ----------------- मुख्य प्रतिवादी का विवरण ----------------- */}
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य प्रतिवादी का विवरण
@@ -567,7 +563,6 @@ const ViewApprovedComplaints = () => {
     </div>
   </div>
 
-  {/* ----------------- अन्य विवरण ----------------- */}
   <div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Relation */}
@@ -606,7 +601,7 @@ const ViewApprovedComplaints = () => {
 
 </div>
 
-              {/* Fee Status and Fee Type Section (Hindi) */}
+              {/* Fee Status and Fee Type Section  */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${
@@ -637,7 +632,6 @@ const ViewApprovedComplaints = () => {
                 )}
               </div>
 
-              {/* ===== NEW SECTION: Extra Details Tabs/Buttons (Hindi) ===== */}
               <div className="flex flex-wrap gap-3 mt-4 border-t pt-4">
                 <button
                   onClick={() =>
@@ -799,7 +793,6 @@ const ViewApprovedComplaints = () => {
         )}
       </div>
 
-      {/* Unified Confirmation Modal (Receive/Forward/Pullback) */}
      {confirmConfig.open && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
               <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
@@ -871,7 +864,6 @@ const ViewApprovedComplaints = () => {
                       </div>
                     </div>
     
-                    {/* SEARCHABLE DROPDOWN */}
                     <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
@@ -901,9 +893,7 @@ const ViewApprovedComplaints = () => {
                     </div>
                   </>
                 )}
-                {/* --- FORWARDING LOGIC END --- */}
     
-                {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
                     <>
@@ -965,7 +955,6 @@ const ViewApprovedComplaints = () => {
             </div>
           )}
 
-      {/* ===== VIEW DATA MODAL (Correspondence / Respondent / Support / Witness) ===== */}
       {viewModalConfig.open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
@@ -1041,7 +1030,6 @@ const ViewApprovedComplaints = () => {
      {viewModalConfig.type === "correspondence" && (
               <div className="w-full">
                 {" "}
-                {/* यहाँ w-full और overflow handling */}
                 {complaintData.complainants &&
                 complaintData.complainants.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
@@ -1084,7 +1072,6 @@ const ViewApprovedComplaints = () => {
                           >
                             लोक सेवक?
                           </th>
-                          {/* Address को थोड़ा ज़्यादा जगह दी है */}
                           <th
                             scope="col"
                             className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-[200px]"
@@ -1268,7 +1255,6 @@ const ViewApprovedComplaints = () => {
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.officer_category || "-"}
                             </td>
-                            {/* Address Column: whitespace-normal ensures text wrapping */}
                             <td className="px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {resp.current_address || "-"}
                             </td>
@@ -1287,7 +1273,6 @@ const ViewApprovedComplaints = () => {
               </div>
             )}
 
-            {/* Support Content (Added to match buttons) */}
      {viewModalConfig.type === "support" && (
               <div className="w-full">
                 {complaintData.support && complaintData.support.length > 0 ? (
@@ -1336,7 +1321,6 @@ const ViewApprovedComplaints = () => {
               </div>
             )}
 
-            {/* Witness Content (Added to match buttons) */}
   {viewModalConfig.type === "witness" && (
               <div className="w-full">
                 {complaintData.witness && complaintData.witness.length > 0 ? (

@@ -111,7 +111,7 @@ const handleSend = async () => {
   };
 
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["complaints", location.pathname],
+    queryKey: ["all-complaints", location.pathname],
     queryFn: getAllComplaints,
   });
 
@@ -427,11 +427,19 @@ const handleSend = async () => {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
-            {isLoading && !data ? (
+             {data?.length == 0 ? (
               <div className="flex items-center justify-center h-full">
-                <h1 className="text-gray-600">Loading...</h1>
+                <h1 className="text-gray-600">No Data Found.</h1>
               </div>
-            ) : isError ? (
+            )
+            :
+             isLoading ? (
+                 <div className="flex items-center justify-center h-full">
+                <h1 className="text-gray-600">Loading..</h1>
+              </div>
+            )
+            
+             : isError ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-red-500 text-sm">Error: {error.message}</p>
               </div>

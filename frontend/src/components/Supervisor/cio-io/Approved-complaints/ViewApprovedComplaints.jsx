@@ -33,7 +33,6 @@ const APP_URL = BASE_URL.replace("/api", "");
 const token = localStorage.getItem("access_token");
 const subRole = localStorage.getItem("subrole");
 
-// Create axios instance with token if it exists
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -65,7 +64,6 @@ const ViewAllComplaint = () => {
       try {
         setLoading(true);
 
-        // Fetch complaint data using edit endpoint for consistency
         const complaintResponse = await api.get(
           `/supervisor/view-complaint/${id}`
         );
@@ -74,7 +72,6 @@ const ViewAllComplaint = () => {
           setComplaintData(complaintResponse.data.data);
           console.log("Complaint Data:", complaintResponse.data.data);
 
-          // Fetch file preview data
           try {
             const fileResponse = await api.get(
               `/supervisor/get-file-preview/${id}`
@@ -159,7 +156,6 @@ const ViewAllComplaint = () => {
     }
   };
 
-  // Handle edit navigation
   const handleEditNavigation = () => {
     if (id && complaintData) {
       console.log("Navigating to edit with ID:", id);
@@ -242,7 +238,6 @@ const ViewAllComplaint = () => {
     );
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
@@ -253,7 +248,6 @@ const ViewAllComplaint = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="bg-gray-50 min-h-screen flex items-center justify-center">
@@ -275,7 +269,6 @@ const ViewAllComplaint = () => {
     <div className="p-3 sm:p-4 md:p-6 bg-gray-50 min-h-screen">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* Header - Same as edit form with Edit Button */}
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
@@ -283,7 +276,6 @@ const ViewAllComplaint = () => {
             <p className="text-xs sm:text-sm text-gray-600">शिकायत विवरण देखें</p>
           </div>
           <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-3">
-            {/* Edit Button - Show based on subRole */}
             {subRole === "review-operator" && (
               <button
                 onClick={handleEditNavigation}
@@ -307,13 +299,10 @@ const ViewAllComplaint = () => {
         </div>
       </div>
 
-      {/* Main Content - Same structure as edit form */}
       {complaintData && (
         <div className="space-y-4 sm:space-y-6">
-          {/* Top Row: Complainant Details + Security Fee */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
             
-            {/* Complainant Details */}
             <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center gap-3 mb-6">
                 <FaUser className="w-5 h-5 text-blue-600 flex-shrink-0" />
@@ -324,7 +313,6 @@ const ViewAllComplaint = () => {
               </div>
 
               <div className="space-y-4">
-                {/* Name and Mobile Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Name */}
                   <div>
@@ -357,7 +345,6 @@ const ViewAllComplaint = () => {
                   </div>
                 </div>
 
-                {/* District and Email Row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* District */}
                   <div>

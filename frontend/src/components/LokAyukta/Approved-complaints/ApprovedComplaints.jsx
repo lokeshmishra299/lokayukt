@@ -172,12 +172,11 @@ const AllComplaints = () => {
     };
   };
 
-   // **************************count days*******************************************************
   const getDaysDifference = (date) => {
   const created = new Date(date);
   const today = new Date();
 
-  const diffTime = today - created; // milliseconds difference
+  const diffTime = today - created; 
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
   return diffDays;
@@ -290,11 +289,25 @@ const AllComplaints = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {isLoading && !data ? (
-            <div className="flex items-center justify-center h-full">
-              <h1 className="text-gray-600">Loading...</h1>
-            </div>
-          ) : isError ? (
+         {data?.length == 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <h1 className="text-gray-600">No Data Found.</h1>
+              </div>
+            ) :
+
+             isLoading ? (
+                 <div className="flex items-center justify-center h-full">
+                <h1 className="text-gray-600">Loading..</h1>
+              </div>
+            )
+
+            :
+            
+            
+            
+            
+            
+             isError ? (
             <div className="flex items-center justify-center h-full">
               <p className="text-red-500 text-sm">Error: {error.message}</p>
             </div>

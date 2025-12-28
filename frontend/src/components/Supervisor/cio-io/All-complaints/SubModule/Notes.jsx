@@ -11,9 +11,7 @@ const token = localStorage.getItem("access_token");
 const storedUser = localStorage.getItem("user");
 const user = storedUser ? JSON.parse(storedUser) : null;
 
-// ========================
-// AXIOS INSTANCE
-// ========================
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -23,17 +21,15 @@ const api = axios.create({
 });
 
 const Notes = ({ complaint }) => {
-  // ========================
-  // STATES
-  // ========================
+
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const popupRef = useRef(null); // Ref for PDF generation
+  const popupRef = useRef(null); 
 
   // Data States
   const [documents, setDocuments] = useState([]);
-  const [notesList, setNotesList] = useState([]); // State for API notes
+  const [notesList, setNotesList] = useState([]); 
 
   // Form States
   const [selectedDoc, setSelectedDoc] = useState("");
@@ -42,9 +38,7 @@ const Notes = ({ complaint }) => {
   const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
   const [errors, setErrors] = useState({});
 
-  // ========================
-  // 1. GET DOCUMENT LIST
-  // ========================
+ 
   useEffect(() => {
     const fetchDocs = async () => {
       try {
@@ -58,9 +52,7 @@ const Notes = ({ complaint }) => {
     if (complaint?.id) fetchDocs();
   }, [complaint?.id]);
 
-  // ========================
-  // 2. GET NOTES LIST (New Added)
-  // ========================
+
   const fetchNotes = async () => {
     if (!complaint?.id) return;
     try {
@@ -77,9 +69,7 @@ const Notes = ({ complaint }) => {
     fetchNotes();
   }, [complaint?.id]);
 
-  // ========================
-  // URL FIX
-  // ========================
+
   const normalizePath = (filePath) => {
     if (!filePath) return "";
     return filePath.replace(/^\//, "").replace("storage/", "storage/Document/");
@@ -89,9 +79,7 @@ const Notes = ({ complaint }) => {
     return `${BASE_URL.replace("/api", "")}/${normalizePath(filePath)}`;
   };
 
-  // ========================
-  // SELECT DOCUMENT PREVIEW
-  // ========================
+ 
   const handleSelectDoc = async (fileName) => {
     setSelectedDoc(fileName);
     setPdfViewUrl(null);
@@ -114,34 +102,26 @@ const Notes = ({ complaint }) => {
     }
   };
 
-  // ========================
-  // SHOW FINAL PREVIEW POPUP
-  // ========================
+
   const handleSubmitNote = () => {
     setOpen(false);
     setShowSuccess(true);
   };
 
-  // ========================
-  // DOWNLOAD PDF FUNCTION
-  // ========================
   const handleDownloadPdf = async () => {
     if (!popupRef.current) return;
 
     try {
-      // 1. Hide Header & Footer Buttons
       const elementsToHide =
         popupRef.current.querySelectorAll(".pdf-hide-section");
       elementsToHide.forEach((el) => (el.style.display = "none"));
 
-      // 2. Generate Canvas
       const canvas = await html2canvas(popupRef.current, {
-        scale: 2, // Higher scale for better quality
+        scale: 2, 
         backgroundColor: "#ffffff",
-        useCORS: true, // if images are involved
+        useCORS: true, 
       });
 
-      // 3. Restore Header & Footer Buttons
       elementsToHide.forEach((el) => (el.style.display = "flex"));
 
       // 4. Create PDF
@@ -161,23 +141,18 @@ const Notes = ({ complaint }) => {
     }
   };
 
-  // ========================
-  // NEW: HANDLE PRINT FUNCTION
-  // ========================
+  
   const handlePrint = () => {
     if (!popupRef.current) return;
 
-    // Open a new window for printing
     const printWindow = window.open("", "_blank");
 
-    // Gather all styles from the current document (Tailwind, etc.)
     const styles = Array.from(
       document.querySelectorAll("link[rel='stylesheet'], style")
     )
       .map((node) => node.outerHTML)
       .join("");
 
-    // Write content to the new window
     printWindow.document.write(`
       <html>
         <head>
@@ -199,18 +174,15 @@ const Notes = ({ complaint }) => {
     printWindow.document.close();
     printWindow.focus();
 
-    // Small delay to ensure styles load before printing
     setTimeout(() => {
       printWindow.print();
       printWindow.close();
     }, 500);
   };
 
-  // ========================
-  // POST NOTE API
-  // ========================
+
   const handleFinalSubmit = async () => {
-    setErrors({}); // clear previous errors
+    setErrors({}); 
 
     const selectedDocObj = documents.find((doc) => doc.file === selectedDoc);
     const docId = selectedDocObj ? selectedDocObj.id : "";
@@ -226,21 +198,17 @@ const Notes = ({ complaint }) => {
     try {
       const res = await api.post("/supervisor/add-notes", payload);
 
-      // SUCCESS
       if (res.data.status) {
         toast.success("Note Added Successfully!");
         setShowSuccess(false);
 
-        // Reset Form
         setNote("");
         setSelectedDoc("");
         setPageRanges([{ from: "", to: "" }]);
         setPdfViewUrl(null);
 
-        // Refresh the List
         fetchNotes();
       }
-      // BACKEND ERRORS
       else if (res.data.errors) {
         setErrors(res.data.errors);
         Object.values(res.data.errors).forEach((msgArr) => {
@@ -252,18 +220,14 @@ const Notes = ({ complaint }) => {
     }
   };
 
-  // ========================
-  // INPUT HANDLER
-  // ========================
+
   const handlePageRangeChange = (idx, field, value) => {
     const updated = [...pageRanges];
     updated[idx][field] = value;
     setPageRanges(updated);
   };
 
-  // ========================
-  // VALIDATION
-  // ========================
+ 
   const isFormValid = () => {
     return (
       note.trim() !== "" &&
@@ -273,18 +237,14 @@ const Notes = ({ complaint }) => {
     );
   };
 
-  // ========================
-  // HELPER: Get Doc Name by ID
-  // ========================
+
   const getDocName = (dId) => {
     if (!documents.length || !dId) return null;
     const doc = documents.find((d) => d.id === dId);
     return doc ? doc.file : null;
   };
 
-  // ========================
-  // RENDER
-  // ========================
+ 
   return (
     <div className="bg-white rounded-lg w-full p-4">
       {/* HEADER */}
@@ -491,20 +451,16 @@ const Notes = ({ complaint }) => {
         </div>
       )}
 
-      {/* SUCCESS POPUP WITH PDF DOWNLOAD & PRINT */}
       {showSuccess && (
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center px-4">
           <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden">
             {/* Printable Area Ref */}
             <div ref={popupRef} className="bg-white">
-              {/* HEADER (Contains Actions - Hidden in PDF/Print) */}
               <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-100 pdf-hide-section">
                 <p className="text-sm font-semibold text-gray-800">
-                  {/* Blank title or can be "Preview" */}
                 </p>
 
                 <div className="flex items-center gap-2">
-                  {/* PRINT BUTTON (NEW) */}
                   <button
                     onClick={handlePrint}
                     className="p-2 rounded hover:bg-gray-200 text-gray-700 flex items-center gap-1 text-xs font-medium"
@@ -560,7 +516,6 @@ const Notes = ({ complaint }) => {
                 </div>
               </div>
 
-              {/* FOOTER BUTTONS (Hidden in PDF/Print) */}
               <div className="px-8 py-4 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
                 <button
                   className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
