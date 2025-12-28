@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api\LokAyukt;
+namespace App\Http\Controllers\api\Dispatch;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
-class LokAyuktReportController extends Controller
+class DispatchReportController extends Controller
 {
     public function complainReports()
     {
@@ -81,12 +81,12 @@ class LokAyuktReportController extends Controller
                         });
                     }
                       $records->where('form_status', 1)
-                  ->where('approved_rejected_by_rk', 1);
-                    // ->where(function($q){
-                    //         $q->where('approved_rejected_by_so_us',1)
-                    //         ->Orwhere('approved_rejected_by_ds_js', 1);               
-                    //      })
-                    // ->where('approved_rejected_by_d_a', 1);
+                  ->where('approved_rejected_by_ro', 1)
+                    ->where(function($q){
+                            $q->where('approved_rejected_by_so_us',1)
+                            ->Orwhere('approved_rejected_by_ds_js', 1);               
+                         })
+                    ->where('approved_rejected_by_d_a', 1);
                     // ->whereNotNull('forward_to_d_a');
                 //      $records->where('form_status', 1)
                 //   ->where('approved_rejected_by_ro', 1)
@@ -105,7 +105,7 @@ class LokAyuktReportController extends Controller
                     'dd.district_code',
                     'ds.name',
                 )
-                ->where('approved_rejected_by_rk', 1)
+                ->where('approved_rejected_by_ro', 1)
                         // ->toSql();
                     ->get();
                     // ->whereNotNull('forward_to_d_a');
@@ -1001,83 +1001,4 @@ $complainDetails->details = DB::table('complaints_details as cd')
     ]);
 
     }
-
-    public function enrolmentDateWise(){
-   
-
-    $query = DB::table('complaints')
-        //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-        ->leftJoin('complainants as cmp', 'complaints.id', '=', 'cmp.complaint_id')
-        ->leftJoin('respondents as rspd', 'rspd.complaint_id', '=', 'complaints.id')
-        ->leftJoin('district_master as dd', 'rspd.respondent_district', '=', 'dd.district_code')
-        // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
-        // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
-        // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
-        // ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id')
-        // ->leftJoin('complaint_actions as rep', 'complaints.id', '=', 'rep.complaint_id')
-        ->select(
-            'complaints.*',
-            'cmp.complainant_name',
-            'cmp.occupation',
-            'rspd.department_name',
-            'dd.district_name as district_name',
-
-        );
-
-
-     $query->where('form_status', 1)
-                //   ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_rk', 1);
-                    // ->where(function($q){
-                    //         $q->where('approved_rejected_by_so_us',1)
-                    //         ->Orwhere('approved_rejected_by_ds_js', 1);               
-                    //      })
-                    // ->where('approved_rejected_by_d_a', 1);
-                    // ->whereNotNull('forward_to_d_a');
-
-    $records = $query->get();
-
-          return response()->json([
-        'status' => true,
-        'message' => 'Records Fetch successfully',
-        'data' => $records,
-    ]);
-
-    }
-
-      public function allDispatchLettersReport(Request $request){
-           $records = DB::table('dispach_letters')->get();
-      
-
-    return response()->json([
-        'status' => true,
-        'message' => 'Records fetched successfully',
-        'data' => $records,
-    ]);
-
-    }
-
-    public function departmentwise(){
-  $data = DB::table('respondents as r')
-    ->leftJoin('complaints as c', 'c.id', '=', 'r.complaint_id')
-    ->leftJoin('complainants as cm', 'cm.complaint_id', '=', 'c.id')
-    ->leftJoin('district_master as dm', 'dm.district_code', '=', 'cm.permanent_district')
-    ->where('r.is_main', 1)   // ✅ ONLY MAIN DEPARTMENTS
-    ->select(
-        'r.department_name as department',
-        DB::raw('COUNT(DISTINCT c.id) as total'),
-        DB::raw("SUM(CASE WHEN c.status = 'In Progress' THEN 1 ELSE 0 END) as pending"),
-        DB::raw("SUM(CASE WHEN c.status = 'Rejected' THEN 1 ELSE 0 END) as disposed")
-    )
-    ->groupBy('r.department_name')
-    ->orderBy('r.department_name')
-    ->get();
-
-              return response()->json([
-               'status' => true,
-               'message' => 'Records Fetch successfully',
-               'data' => $data,
-           ]);
-    }
-    
 }
