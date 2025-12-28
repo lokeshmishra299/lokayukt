@@ -152,13 +152,13 @@ const ViewAllComplaint = () => {
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
 
-  // Single config for Action modals (Receive, Forward, Pullback)
+
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
     type: null,
   });
 
-  // Config for Data View Modal (Correspondence / Respondent)
+
   const [viewModalConfig, setViewModalConfig] = useState({
     open: false,
     type: null,
@@ -226,13 +226,13 @@ const ViewAllComplaint = () => {
       queryKey: ["lokayukt-options", forwardType], // 
       queryFn: async () => {
         try {
-          //  Send To My Pool  API: /lokayukt/get-users
+   
           if (forwardType === "self") {
             const res = await api.get("/lokayukt/get-users");
             return res.data?.data || res.data || [];
           }
   
-          //  Send To Other Pool  API: /lokayukt/get-lokayukt-uplokayukt
+       
           const res = await api.get("/lokayukt/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
@@ -465,7 +465,7 @@ const ViewAllComplaint = () => {
                 </div>
               </div>
 
-              {/* ===== DESCRIPTION (Hindi) ===== */}
+              {/*DESCRIPTION */}
             
               <p className="text-[14px] text-black font-semibold uppercase my-2">
                 {/* Description:{" "} */}
@@ -488,10 +488,10 @@ const ViewAllComplaint = () => {
 
               </p> */}
 
-              {/* ===== DETAILS GRID (Hindi) ===== */}
+              {/*  DETAILS GRID  */}
                           <div className="space-y-3 mb-6">
   
-  {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
+
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य परिवादी का विवरण 
@@ -529,7 +529,6 @@ const ViewAllComplaint = () => {
     </div>
   </div>
 
-  {/* ----------------- मुख्य प्रतिवादी का विवरण ----------------- */}
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य प्रतिवादी का विवरण
@@ -567,7 +566,7 @@ const ViewAllComplaint = () => {
     </div>
   </div>
 
-  {/* ----------------- अन्य विवरण ----------------- */}
+  {/*  अन्य विवरण  */}
   <div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Relation */}
@@ -606,7 +605,7 @@ const ViewAllComplaint = () => {
 
 </div>
 
-              {/* Fee Status and Fee Type Section (Hindi) */}
+              {/* Fee Status and Fee Type Section  */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${
@@ -637,7 +636,6 @@ const ViewAllComplaint = () => {
                 )}
               </div>
 
-              {/* ===== NEW SECTION: Extra Details Tabs/Buttons (Hindi) ===== */}
               <div className="flex flex-wrap gap-3 mt-4 border-t pt-4">
                 <button
                   onClick={() =>
@@ -799,11 +797,9 @@ const ViewAllComplaint = () => {
         )}
       </div>
 
-      {/* Unified Confirmation Modal (Receive/Forward/Pullback) */}
      {confirmConfig.open && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
               <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
-                {/* Close Button */}
                 <button
                   onClick={handleConfirmNo}
                   disabled={
@@ -827,10 +823,10 @@ const ViewAllComplaint = () => {
                     : "Assign to Yourself?"}
                 </h3>
     
-                {/* --- FORWARDING LOGIC START --- */}
+             
                 {confirmConfig.type === "forward" && (
                   <>
-                    {/* Radio Buttons Section */}
+                
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Forward Type <span className="text-red-500">*</span>
@@ -871,7 +867,7 @@ const ViewAllComplaint = () => {
                       </div>
                     </div>
     
-                    {/* SEARCHABLE DROPDOWN */}
+                 
                     <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
@@ -901,9 +897,8 @@ const ViewAllComplaint = () => {
                     </div>
                   </>
                 )}
-                {/* --- FORWARDING LOGIC END --- */}
+          
     
-                {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
                     <>
@@ -965,7 +960,6 @@ const ViewAllComplaint = () => {
             </div>
           )}
 
-      {/* ===== VIEW DATA MODAL (Correspondence / Respondent / Support / Witness) ===== */}
       {viewModalConfig.open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
@@ -1041,7 +1035,6 @@ const ViewAllComplaint = () => {
      {viewModalConfig.type === "correspondence" && (
               <div className="w-full">
                 {" "}
-                {/* यहाँ w-full और overflow handling */}
                 {complaintData.complainants &&
                 complaintData.complainants.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
@@ -1084,7 +1077,6 @@ const ViewAllComplaint = () => {
                           >
                             लोक सेवक?
                           </th>
-                          {/* Address को थोड़ा ज़्यादा जगह दी है */}
                           <th
                             scope="col"
                             className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-[200px]"
@@ -1287,7 +1279,6 @@ const ViewAllComplaint = () => {
               </div>
             )}
 
-            {/* Support Content (Added to match buttons) */}
      {viewModalConfig.type === "support" && (
               <div className="w-full">
                 {complaintData.support && complaintData.support.length > 0 ? (
@@ -1336,7 +1327,6 @@ const ViewAllComplaint = () => {
               </div>
             )}
 
-            {/* Witness Content (Added to match buttons) */}
   {viewModalConfig.type === "witness" && (
               <div className="w-full">
                 {complaintData.witness && complaintData.witness.length > 0 ? (
