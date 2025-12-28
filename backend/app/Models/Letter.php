@@ -15,7 +15,8 @@ class Letter extends Model
         'letter_type',
         'subject',
         'file',
-        'letter_no'
+        'letter_no',
+        'added_by'
       
     ];
 }

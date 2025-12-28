@@ -1252,6 +1252,8 @@ class LokAyuktComplaintsController extends Controller
 
     public function addDispachLeters(Request $request)
     {
+         $added_by = Auth::user()->id;
+        //  dd($added_by);
         $request->validate([
             'complaint_id' => 'required|integer',
             'letter_type'  => 'required|string|max:50',
@@ -1275,6 +1277,7 @@ class LokAyuktComplaintsController extends Controller
             'letter_type'  => $request->letter_type,
             'subject'      => $request->subject,
             'file'         => $filePath,
+            'added_by'     => $added_by
         ]);
 
         $year = date('Y');
