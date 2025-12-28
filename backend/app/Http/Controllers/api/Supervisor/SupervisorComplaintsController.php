@@ -7,6 +7,7 @@ use App\Models\Complaint;
 use App\Models\ComplaintAction;
 use App\Models\SubRole;
 use App\Models\User;
+use App\Models\ComplainDocuments;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -108,8 +109,7 @@ class SupervisorComplaintsController extends Controller
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
                 // $query->groupBy('rep.target_date');    
-                        $query->where('rep.type', 2)
-                                ->where('rep.status', 'Verified')
+                        $query->where('rep.status', 'Forwarded')
                                 ->whereNotNull('rep.forward_to_sec')
                                  ->where('rep.forward_to_sec',$user);
                 //  $query->where('rep.type', 2)
@@ -119,7 +119,8 @@ class SupervisorComplaintsController extends Controller
             break;
 
         case "cio-io":
-             $query->where('rep.type', 2)
+             $query
+            //  ->where('rep.type', 2)
                                 ->where('rep.status', 'Investigation Report')
                                 ->whereNotNull('rep.forward_to_cio_io')
                                  ->where('rep.forward_to_cio_io',$user);
@@ -736,14 +737,14 @@ $complainDetails->details = DB::table('complaints_details as cd')
 
         case "sec":
            $complainDetails->where('form_status', 1)
-                  ->where('approved_rejected_by_ro', 1);
+                  ->where('approved_rejected_by_rk', 1);
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
             break;
 
         case "cio-io":
            $complainDetails->where('form_status', 1)
-                  ->where('approved_rejected_by_ro', 1);
+                  ->where('approved_rejected_by_rk', 1);
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
             break;
@@ -785,4 +786,33 @@ $complainDetails->details = DB::table('complaints_details as cd')
            ]);
     }
 
+     public function getUploadDoc(Request $request,$id){
+        if($request->isMethod('get')){
+            $complain = ComplainDocuments::where('complain_id',$id)->get();
+
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Document Fetch successfully.',
+                    'data' => $complain
+                ], 200);
+        }
+       
+    }
+
+     public function getFilePreview($id){
+        $cmp = Complaint::findOrFail($id);
+        $cmpDetail = ComplainDocuments::where('complain_id',$cmp->id)->get();
+        foreach($cmpDetail as $c){
+
+            $path[] = Storage::url($c->file);
+
+            $cmp->filepath = $path;
+        }
+           return response()->json([
+               'status' => true,
+               'message' => 'File Fetch successfully',
+               'data' => $cmp->filepath,
+           ]);
+
+    }
 }

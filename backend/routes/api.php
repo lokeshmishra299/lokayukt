@@ -22,7 +22,7 @@ use App\Http\Controllers\api\Operator\OperatorCommonController;
 use App\Http\Controllers\api\Operator\OperatorComplaintsController;
 // use App\Http\Controllers\api\OperatorCommonController;
 // use App\Http\Controllers\api\OperatorComplaintsController;
-use App\Http\Controllers\api\Supervisor\LokAyuktDashboardController;
+use App\Http\Controllers\api\LokAyukt\LokAyuktDashboardController;
 use App\Http\Controllers\api\Supervisor\SupervisorCommonController;
 use App\Http\Controllers\api\Supervisor\SupervisorComplaintsController;
 use App\Http\Controllers\api\Supervisor\SupervisorDashboardController;
@@ -207,6 +207,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/all-pending-complaints',[SupervisorComplaintsController::class,'allComplainspending']);
         Route::get('/all-approved-complaints',[SupervisorComplaintsController::class,'allComplainsapproved']);
         Route::get('/view-complaint/{id}',[SupervisorComplaintsController::class,'viewComplaint']);
+        Route::get('/get-document/{id}',[SupervisorComplaintsController::class,'getUploadDoc']);
+         Route::get('/get-file-preview/{id}',[SupervisorComplaintsController::class,'getFilePreview']);
         Route::post('/forward-by-so/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySO']);
         Route::post('/forward-by-ds-js/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyds']);
         Route::post('/forward-by-da/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyda']);
@@ -275,6 +277,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/request-report/{complainId}',[LokAyuktReportController::class,'requestReport']);
         Route::get('/request-list/{complainId}',[LokAyuktReportController::class,'requestReportList']);
         Route::get('/request-list-cio/{complainId}',[LokAyuktReportController::class,'requestinvestigationReport']);
+      
         /*
          * Forward Report By Subroles
          */
@@ -296,7 +299,9 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/montly-trends',[LokAyuktReportController::class,'getMontlyTrends']);
         Route::get('/compliance-report',[LokAyuktReportController::class,'complianceReport']);
         Route::get('/dist-wise-compliant',[LokAyuktReportController::class,'complaintDistWise']);
-
+          Route::get('/department-wise-report',[LokAyuktReportController::class,'departmentwise']);
+        Route::get('/enrolment-date-wise',[LokAyuktReportController::class,'enrolmentDateWise']);
+        Route::get('/dispatch-report',[LokAyuktReportController::class,'allDispatchLettersReport']);
         // // Daishboard
         Route::get('/dashboard/{date}',[LokAyuktDashboardController::class,'index']);
         Route::get('/montly-complaint',[LokAyuktDashboardController::class,'getDistrictGraph']);
@@ -419,6 +424,64 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/montly-complaint',[PSDashboardController::class,'getDistrictGraph']);
         Route::get('/district-wise-company-type',[PSDashboardController::class,'getdistrictWiseCompanyTypeGraph']);
         Route::get('/status-distribution',[PSDashboardController::class,'gestatusDistribution']);
+        // Route::get('/status-distribution',action: [SupervisorDashboardController::class,'gestatusDistribution']);
+       
+    });
+
+      Route::middleware('role:dispatch')->prefix('dispatch')->group(function () {
+        
+        Route::get('/all-district',[DispatchCommonController::class,'fetch_district']);
+        Route::get('/all-complaints',[DispatchComplaintsController::class,'allComplains']);
+        Route::get('/all-pending-complaints',[DispatchComplaintsController::class,'allComplainspending']);
+        Route::get('/all-approved-complaints',[DispatchComplaintsController::class,'allComplainsapproved']);
+        Route::get('/view-complaint/{id}',[DispatchComplaintsController::class,'viewComplaint']);
+        Route::post('/forward-by-so/{complainId}',[DispatchComplaintsController::class,'forwardComplaintbySO']);
+        Route::post('/dispose-complain/{complainId}',[DispatchComplaintsController::class,'disposeComplaints']);
+         Route::get('/get-lokayukt-uplokayukt',[DispatchComplaintsController::class,'getUsers']);
+        Route::get('/get-users',[DispatchComplaintsController::class,'getSubROleUsers']);
+        Route::get('/get-document/{id}',[DispatchComplaintsController::class,'getUploadDoc']);
+        Route::get('/get-notes/{id}',[DispatchComplaintsController::class,'getNotes']);
+        Route::post('/add-notes',[DispatchComplaintsController::class,'addNotes']);
+        Route::get('/get-file-preview/{id}',[DispatchComplaintsController::class,'getFilePreview']);
+         Route::post('/return-complain-by-ps/{complainId}',[DispatchComplaintsController::class,'returnComplainByPs']);
+        Route::post('/pull-back-by-ps/{complainId}',[DispatchComplaintsController::class,'pullBackByPs']);
+        Route::post('forward-complain-by-ps/{complainId}',[DispatchComplaintsController::class,'forwardComplaintbyPS']);
+        Route::post('assign-by-ps/{complainId}',[DispatchComplaintsController::class,'assignToPs']);
+      
+      
+       
+        // Route::post('/forward-by-ds-js/{complainId}',[PSComplaintsController::class,'forwardComplaintbyds']);
+        // Route::post('/forward-by-da/{complainId}',[PSComplaintsController::class,'forwardComplaintbyda']);
+        Route::post('/forward-by-ps/{complainId}',[DispatchComplaintsController::class,'forwardComplaintbyPS']);
+        Route::post('/request-report/{complainId}',[DispatchReportController::class,'requestReport']);
+        Route::get('/request-list/{complainId}',[DispatchReportController::class,'requestReportList']);
+                Route::get('/request-list-cio/{complainId}',[DispatchReportController::class,'requestinvestigationReport']);
+        /*
+         * Forward Report By Subroles
+         */
+        Route::post('/forward-report-by-sec{complainId}',[DispatchReportController::class,'forwardReporttbysec']);
+        Route::post('/forward-report-by-cio/{complainId}',[DispatchReportController::class,'forwardReporttbycio']);
+        Route::post('/forward-report-by-da/{complainId}',[DispatchReportController::class,'forwardReporttbyda']);
+       
+        Route::get('/get-lokayukt',[DispatchComplaintsController::class,'getLokayuktUsers']);
+        Route::get('/get-uplokayukt',[DispatchComplaintsController::class,'getUpLokayuktUsers']);
+        Route::get('/get-dealing-assistant',[DispatchComplaintsController::class,'getDealingAssistantUsers']);
+        Route::get('/progress-register',[DispatchReportController::class,'progress_report']);
+        Route::get('/complain-report',[DispatchReportController::class,'complainReports']);
+        Route::get('/current-report',[DispatchReportController::class,'current_report']);
+        Route::get('/analytic-report',[DispatchReportController::class,'analytics']);
+        // Route::get('/detail-by-complaintype',[LokAyuktReportController::class,'complainComplaintypeWise']);
+         Route::get('/all-complains',[DispatchReportController::class,'allComplains']);
+        Route::get('/district-wise-complaint',[DispatchReportController::class,'complainDistrictWise']);
+        Route::get('/department-wise-complaint',[DispatchReportController::class,'complainDepartmentWise']);
+        Route::get('/montly-trends',[DispatchReportController::class,'getMontlyTrends']);
+        Route::get('/compliance-report',[DispatchReportController::class,'complianceReport']);
+
+        // // Daishboard
+        Route::get('/dashboard/{date}',[DispatchDashboardController::class,'index']);
+        Route::get('/montly-complaint',[DispatchDashboardController::class,'getDistrictGraph']);
+        Route::get('/district-wise-company-type',[DispatchDashboardController::class,'getdistrictWiseCompanyTypeGraph']);
+        Route::get('/status-distribution',[DispatchDashboardController::class,'gestatusDistribution']);
         // Route::get('/status-distribution',action: [SupervisorDashboardController::class,'gestatusDistribution']);
        
     });
