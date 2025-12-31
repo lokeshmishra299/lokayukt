@@ -28,6 +28,7 @@ const ScanLetter = () => {
   const [formData, setFormData] = useState({
     complaint_id: "",
     letter_type: "",
+     medium:"",
     subject: "",
   });
 
@@ -92,6 +93,7 @@ const ScanLetter = () => {
 
     payload.append("complaint_id", formData.complaint_id);
     payload.append("letter_type", formData.letter_type);
+    payload.append(" medium", formData.medium);
     payload.append("subject", formData.subject);
 
     if (selectedFile) {
@@ -115,6 +117,7 @@ const ScanLetter = () => {
       setFormData({
         complaint_id: "",
         letter_type: "",
+         medium:"",
         subject: "",
       });
       setSelectedFile(null);
@@ -322,7 +325,7 @@ const ScanLetter = () => {
                 <select
                   name="letter_type"
                   value={formData.letter_type}
-                  onChange={handleChange}
+                  onChange= {handleChange}
                   className={`w-full px-3 py-2 bg-gray-50 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600 ${
                     errors.letter_type ? "" : "border-gray-200"
                   }`}
@@ -335,6 +338,31 @@ const ScanLetter = () => {
                 {errors.letter_type && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.letter_type[0]}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Medium / माध्यम{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="medium"
+                  value={formData.medium}
+                  onChange={handleChange}
+                  className={`w-full px-3 py-2 bg-gray-50 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600 ${
+                    errors.medium ? "" : "border-gray-200"
+                  }`}
+                >
+                  <option value="">Select type</option>
+                  <option value="Mode">Mode</option>
+                  <option value="Post">Post</option>
+                  <option value="By Hand">By Hand</option>
+                </select>
+                {errors.medium && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.medium[0]}
                   </p>
                 )}
               </div>

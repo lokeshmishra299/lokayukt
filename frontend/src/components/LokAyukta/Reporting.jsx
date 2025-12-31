@@ -1,19 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   FaCalendarAlt,
   FaMapMarkerAlt,
   FaBuilding,
-  FaFileAlt,
   FaClock,
   FaPaperPlane,
   FaChartPie,
   FaFilePdf,
   FaFileExcel,
   FaPrint,
-  FaSearch,
+  FaSpinner,
 } from "react-icons/fa";
+import * as XLSX from "xlsx";
+import html2pdf from "html2pdf.js";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
@@ -27,10 +28,21 @@ const api = axios.create({
 
 const Reporting = () => {
   const [activeTab, setActiveTab] = useState("enrollment");
+  const [isExporting, setIsExporting] = useState(false);
+
+  const [enrollmentFilters, setEnrollmentFilters] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+  const [districtFilter, setDistrictFilter] = useState("All Districts");
+  const [departmentFilter, setDepartmentFilter] = useState("All Departments");
+  const [dispatchFilters, setDispatchFilters] = useState({
+    fromDate: "",
+    toDate: "",
+  });
 
   const getDistirct = async () => {
     const res = await api.get("/lokayukt/all-district");
-    console.log("All DIstirct", res.data.data);
     return res.data.data;
   };
 
@@ -39,111 +51,191 @@ const Reporting = () => {
     queryFn: getDistirct,
   });
 
-  // Enrolemet Wise
   const enrolmentDateWise = async () => {
     const res = await api.get("/lokayukt/enrolment-date-wise");
-    console.log("Envilmenet Distirc wise Data", res.data.data);
     return res.data.data;
   };
 
-  const { data: enrolmentDate, isLoading } = useQuery({
+  const { data: enrolmentDate, isLoading: enrollmentLoading } = useQuery({
     queryKey: ["enrolment-date-wise"],
     queryFn: enrolmentDateWise,
   });
 
-  // District Vise Data
   const getDistictData = async () => {
     const res = await api.get("/lokayukt/dist-wise-compliant");
-    // console.log("DIstict Data", res.data.data)
     return res.data.data;
   };
 
-  const { data: districtViseData } = useQuery({
+  const { data: districtViseData, isLoading: districtLoading } = useQuery({
     queryKey: ["dist-wise-compliant"],
     queryFn: getDistictData,
   });
 
-  // Depatment Wise
   const departmentReport = async () => {
     const res = await api.get("/lokayukt/department-wise-report");
-    console.log("Despatment Wise", res.data.data);
     return res.data.data;
   };
 
-  const { data: departmentData } = useQuery({
+  const { data: departmentData, isLoading: departmentLoading } = useQuery({
     queryKey: ["department-wise-report"],
     queryFn: departmentReport,
   });
 
-
-  // Dispatch Wise
   const dispatchReport = async () => {
     const res = await api.get("/lokayukt/dispatch-report");
-    console.log("Dispatch Wise", res.data.data);
     return res.data.data;
   };
 
-  const { data: dispatcheData } = useQuery({
+  const { data: dispatcheData, isLoading: dispatchLoading } = useQuery({
     queryKey: ["dispatch-report"],
     queryFn: dispatchReport,
   });
 
-  // Mock Data
-  const enrollmentData = [
-    {
-      id: 1,
-      complaintNo: "CMP/2024/01001",
-      caseNo: "LOK/2024/0001",
-      date: "10/11/2024",
-      district: "Meerut",
-      dept: "UPSRTC",
-      complainant: "Geeta Rawat",
-      nature: "Both",
-      status: "With Lokayukta",
-    },
-    {
-      id: 2,
-      complaintNo: "CMP/2025/01002",
-      caseNo: "LOK/2025/0002",
-      date: "10/02/2025",
-      district: "Kanpur Nagar",
-      dept: "Health Department",
-      complainant: "Vinod Chauhan",
-      nature: "Allegation",
-      status: "With Lokayukta",
-    },
-    {
-      id: 3,
-      complaintNo: "CMP/2024/01003",
-      caseNo: "LOK/2024/0003",
-      date: "04/09/2024",
-      district: "Bareilly",
-      dept: "Housing Department",
-      complainant: "Anita Srivastava",
-      nature: "Grievance",
-      status: "With Lokayukta",
-    },
-  ];
+  const filteredEnrollmentData = useMemo(() => {
+    if (!enrolmentDate) return [];
+    return enrolmentDate.filter((item) => {
+      if (!enrollmentFilters.fromDate && !enrollmentFilters.toDate) return true;
+      const itemDate = new Date(item.created_at);
+      const from = enrollmentFilters.fromDate
+        ? new Date(enrollmentFilters.fromDate)
+        : null;
+      const to = enrollmentFilters.toDate
+        ? new Date(enrollmentFilters.toDate)
+        : null;
 
-  // const departmentData = [
-  //   { name: "Food and Civil Supply", type: "State Dept", total: 9, pending: 9, disposed: 0 },
-  //   { name: "Health Department", type: "State Dept", total: 7, pending: 7, disposed: 0 },
-  //   { name: "Nagar Nigam", type: "Local Body", total: 7, pending: 5, disposed: 2 },
-  // ];
+      if (from && itemDate < from) return false;
+      if (to && itemDate > to) return false;
+      return true;
+    });
+  }, [enrolmentDate, enrollmentFilters]);
 
-  const natureData = [
-    { name: "Allegation", hindi: "आरोप", total: 67, pending: 63, disposed: 4 },
-    { name: "Grievance", hindi: "शिकायत", total: 79, pending: 72, disposed: 7 },
-    { name: "Both", hindi: "दोनों", total: 74, pending: 66, disposed: 8 },
-    {
-      name: "Grand Total",
-      hindi: "",
-      total: 220,
-      pending: 201,
-      disposed: 19,
-      isTotal: true,
-    },
-  ];
+  const filteredDistrictData = useMemo(() => {
+    if (!districtViseData) return [];
+    if (districtFilter === "All Districts") return districtViseData;
+    return districtViseData.filter(
+      (item) =>
+        item.district_name === districtFilter || item.district === districtFilter
+    );
+  }, [districtViseData, districtFilter]);
+
+  const filteredDepartmentData = useMemo(() => {
+    if (!departmentData) return [];
+    if (departmentFilter === "All Departments") return departmentData;
+    return departmentData.filter((item) => item.department === departmentFilter);
+  }, [departmentData, departmentFilter]);
+
+  const filteredDispatchData = useMemo(() => {
+    if (!dispatcheData) return [];
+    return dispatcheData.filter((item) => {
+      if (!dispatchFilters.fromDate && !dispatchFilters.toDate) return true;
+      const itemDate = new Date(item.created_at);
+      const from = dispatchFilters.fromDate
+        ? new Date(dispatchFilters.fromDate)
+        : null;
+      const to = dispatchFilters.toDate
+        ? new Date(dispatchFilters.toDate)
+        : null;
+
+      if (from && itemDate < from) return false;
+      if (to && itemDate > to) return false;
+      return true;
+    });
+  }, [dispatcheData, dispatchFilters]);
+
+  const prepareEnrollmentDataForExport = (data) => {
+    return data.map((item, index) => ({
+      "S.No": index + 1,
+      "Complaint No.": item.complain_no || "N/A",
+      "Case No.": item.caseNo || "N/A",
+      "Enrollment Date": item.created_at || "N/A",
+      "District": item.district_name || "N/A",
+      "Department": item.department_name || "N/A",
+      "Complainant": item.complainant_name || "N/A",
+      "Nature": item.category || "N/A",
+      "Status": item.status || "N/A"
+    }));
+  };
+
+  const handleEnrollmentExport = async (type) => {
+    const formattedData = prepareEnrollmentDataForExport(filteredEnrollmentData);
+    if (type === 'excel') {
+      await exportToExcel(formattedData, "Enrollment_Report");
+    } else {
+      await exportToPDF(formattedData, "Enrollment_Report");
+    }
+  };
+
+  const exportToExcel = async (data, fileName) => {
+    if (!data || data.length === 0) {
+      alert("No data to export");
+      return;
+    }
+    
+    setIsExporting(true);
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    try {
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+        XLSX.writeFile(wb, `${fileName}.xlsx`);
+    } catch (error) {
+        console.error("Excel export failed", error);
+    } finally {
+        setIsExporting(false);
+    }
+  };
+
+  const exportToPDF = async (data, fileName) => {
+    if (!data || data.length === 0) {
+      alert("No data to export");
+      return;
+    }
+
+    setIsExporting(true);
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    try {
+        let html = `<h2 style="text-align:center; font-family: sans-serif;">${fileName}</h2>
+          <table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; width:100%; font-size:10px; font-family: sans-serif;">
+            <thead style="background-color:#f0f0f0;">
+              <tr>`;
+
+        const keys = Object.keys(data[0]);
+        keys.forEach((key) => {
+          html += `<th style="padding:5px; text-align:left;">${key}</th>`;
+        });
+
+        html += `</tr></thead><tbody>`;
+
+        data.forEach((row) => {
+          html += `<tr>`;
+          keys.forEach((key) => {
+            html += `<td style="padding:5px;">${row[key]}</td>`;
+          });
+          html += `</tr>`;
+        });
+
+        html += `</tbody></table>`;
+
+        const element = document.createElement("div");
+        element.innerHTML = html;
+
+        const opt = {
+          margin: 10,
+          filename: `${fileName}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
+        };
+
+        await html2pdf().set(opt).from(element).save();
+    } catch (error) {
+         console.error("PDF export failed", error);
+    } finally {
+        setIsExporting(false);
+    }
+  };
 
   const overallStats = {
     total: 1250,
@@ -194,7 +286,6 @@ const Reporting = () => {
     },
     { id: "district", label: "District-wise", icon: <FaMapMarkerAlt /> },
     { id: "department", label: "Department-wise", icon: <FaBuilding /> },
-    { id: "nature", label: "Nature-wise", icon: <FaFileAlt /> },
     { id: "pendency", label: "Investigation Pendency", icon: <FaClock /> },
     { id: "dispatch", label: "Dispatch Register", icon: <FaPaperPlane /> },
     { id: "overall", label: "Overall Status", icon: <FaChartPie /> },
@@ -202,7 +293,6 @@ const Reporting = () => {
 
   return (
     <div className="min-h-screen bg-gray-50  pb-20 md:pb-6">
-      {/* Header Section */}
       <div className="mb-6">
         <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
           Reports
@@ -212,7 +302,6 @@ const Reporting = () => {
         </p>
       </div>
 
-      {/* Tabs Navigation - Scrollable on Mobile */}
       <div className="flex overflow-x-auto gap-2 border-b border-gray-200 mb-6 pb-1 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
         {tabs.map((tab) => (
           <button
@@ -237,7 +326,6 @@ const Reporting = () => {
               Enrollment Date-wise List / पंजीकरण तिथि अनुसार सूची
             </h2>
 
-            {/* Filters - Stack on mobile, Row on desktop */}
             <div className="flex flex-col sm:flex-row flex-wrap items-end gap-3 md:gap-4 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
               <div className="w-full sm:w-auto">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
@@ -245,8 +333,14 @@ const Reporting = () => {
                 </label>
                 <input
                   type="date"
+                  value={enrollmentFilters.fromDate}
+                  onChange={(e) =>
+                    setEnrollmentFilters({
+                      ...enrollmentFilters,
+                      fromDate: e.target.value,
+                    })
+                  }
                   className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                  defaultValue="2024-01-01"
                 />
               </div>
               <div className="w-full sm:w-auto">
@@ -255,22 +349,53 @@ const Reporting = () => {
                 </label>
                 <input
                   type="date"
+                  value={enrollmentFilters.toDate}
+                  onChange={(e) =>
+                    setEnrollmentFilters({
+                      ...enrollmentFilters,
+                      toDate: e.target.value,
+                    })
+                  }
                   className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                  defaultValue="2025-06-12"
                 />
               </div>
               <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <FaFilePdf className="text-red-500" /> PDF
+                <button
+                  onClick={() => handleEnrollmentExport('pdf')}
+                  disabled={isExporting || enrollmentLoading}
+                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isExporting ? (
+                    <>
+                      <FaSpinner className="animate-spin text-red-500" /> Loading...
+                    </>
+                  ) : (
+                    <>
+                      <FaFilePdf className="text-red-500" /> PDF
+                    </>
+                  )}
                 </button>
-                <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <FaFileExcel className="text-green-600" /> Excel
+                <button
+                  onClick={() => handleEnrollmentExport('excel')}
+                  disabled={isExporting || enrollmentLoading}
+                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isExporting ? (
+                    <>
+                      <FaSpinner className="animate-spin text-green-600" /> Loading...
+                    </>
+                  ) : (
+                    <>
+                      <FaFileExcel className="text-green-600" /> Excel
+                    </>
+                  )}
                 </button>
               </div>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4">78 case(s) found</p>
-
+            <p className="text-sm text-gray-500 mb-4">
+              {filteredEnrollmentData.length} case(s) found
+            </p>
             <div className="overflow-x-auto -mx-4 md:mx-0">
               <div className="inline-block min-w-full align-middle">
                 <table className="min-w-full text-sm text-left text-gray-500">
@@ -296,7 +421,16 @@ const Reporting = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {enrolmentDate?.length == 0 ? (
+                    {enrollmentLoading ? (
+                      <tr>
+                        <td colSpan={9} className="py-20 text-center">
+                          <div className="flex flex-col items-center justify-center text-gray-600">
+                            {/* <FaSpinner className="animate-spin text-3xl mb-3 text-blue-600" /> */}
+                            <span className="">Loading...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredEnrollmentData.length === 0 ? (
                       <tr>
                         <td colSpan={9} className="py-10">
                           <div className="flex justify-center items-center text-gray-500">
@@ -304,18 +438,10 @@ const Reporting = () => {
                           </div>
                         </td>
                       </tr>
-                    ) : isLoading ? (
-                      <tr>
-                        <td colSpan={9} className="py-10">
-                          <div className="flex justify-center items-center text-gray-600">
-                            Loading...
-                          </div>
-                        </td>
-                      </tr>
                     ) : (
-                      enrolmentDate?.map((row, index) => (
+                      filteredEnrollmentData?.map((row, index) => (
                         <tr
-                          key={row.id}
+                          key={row.id || index}
                           className="bg-white border-b hover:bg-gray-50"
                         >
                           <td className="px-6 py-4">{index + 1}</td>
@@ -357,7 +483,6 @@ const Reporting = () => {
           </div>
         )}
 
-        {/* 2. District-wise View */}
         {activeTab === "district" && (
           <div>
             <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-6">
@@ -369,42 +494,37 @@ const Reporting = () => {
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   District / जिला
                 </label>
-                <select className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                <select
+                  value={districtFilter}
+                  onChange={(e) => setDistrictFilter(e.target.value)}
+                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                >
                   <option>All Districts</option>
-
                   {allDistrict?.map((items, index) => (
-                    <option key={index} value={items.district_code}>
+                    <option key={index} value={items.district_name}>
                       {items.district_name}
                     </option>
                   ))}
                 </select>
               </div>
-              <div className="w-full sm:w-auto">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  From Date
-                </label>
-                <input
-                  type="date"
-                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                  defaultValue="2024-01-01"
-                />
-              </div>
-              <div className="w-full sm:w-auto">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  To Date
-                </label>
-                <input
-                  type="date"
-                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                  defaultValue="2025-06-12"
-                />
-              </div>
               <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <FaFilePdf className="text-red-500" /> PDF
+                <button
+                  onClick={() =>
+                    exportToPDF(filteredDistrictData, "District_Report")
+                  }
+                  disabled={isExporting}
+                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isExporting ? <FaSpinner className="animate-spin text-red-500" /> : <FaFilePdf className="text-red-500" />} PDF
                 </button>
-                <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <FaFileExcel className="text-green-600" /> Excel
+                <button
+                  onClick={() =>
+                    exportToExcel(filteredDistrictData, "District_Report")
+                  }
+                  disabled={isExporting}
+                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isExporting ? <FaSpinner className="animate-spin text-green-600" /> : <FaFileExcel className="text-green-600" />} Excel
                 </button>
               </div>
             </div>
@@ -434,24 +554,25 @@ const Reporting = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {districtViseData?.length == 0 ? (
+                  {districtLoading ? (
+                      <tr>
+                        <td colSpan={5} className="py-20 text-center">
+                          <div className="flex flex-col items-center justify-center text-gray-600">
+                            {/* <FaSpinner className="animate-spin text-3xl mb-3 text-blue-600" /> */}
+                            <span className="">Loading...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredDistrictData.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="py-10">
+                      <td colSpan={5} className="py-10">
                         <div className="flex justify-center items-center text-gray-500">
                           No Data Found.
                         </div>
                       </td>
                     </tr>
-                  ) : isLoading ? (
-                    <tr>
-                      <td colSpan={9} className="py-10">
-                        <div className="flex justify-center items-center text-gray-600">
-                          Loading..
-                        </div>
-                      </td>
-                    </tr>
                   ) : (
-                    districtViseData?.map((row, idx) => (
+                    filteredDistrictData?.map((row, idx) => (
                       <tr
                         key={idx}
                         className="bg-white border-b hover:bg-gray-50"
@@ -480,7 +601,6 @@ const Reporting = () => {
           </div>
         )}
 
-        {/* 3. Department-wise View */}
         {activeTab === "department" && (
           <div>
             <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-6">
@@ -491,36 +611,37 @@ const Reporting = () => {
                 <label className="block text-xs font-medium text-gray-500 mb-1">
                   Department / विभाग
                 </label>
-                <select className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                <select
+                  value={departmentFilter}
+                  onChange={(e) => setDepartmentFilter(e.target.value)}
+                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                >
                   <option>All Departments</option>
+                  {departmentData?.map((item, index) => (
+                    <option key={index} value={item.department}>
+                      {item.department}
+                    </option>
+                  ))}
                 </select>
               </div>
-              <div className="w-full sm:w-auto">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  From Date
-                </label>
-                <input
-                  type="date"
-                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                  defaultValue="2024-01-01"
-                />
-              </div>
-              <div className="w-full sm:w-auto">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  To Date
-                </label>
-                <input
-                  type="date"
-                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                  defaultValue="2025-06-12"
-                />
-              </div>
               <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <FaFilePdf className="text-red-500" /> PDF
+                <button
+                  onClick={() =>
+                    exportToPDF(filteredDepartmentData, "Department_Report")
+                  }
+                  disabled={isExporting}
+                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isExporting ? <FaSpinner className="animate-spin text-red-500" /> : <FaFilePdf className="text-red-500" />} PDF
                 </button>
-                <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <FaFileExcel className="text-green-600" /> Excel
+                <button
+                  onClick={() =>
+                    exportToExcel(filteredDepartmentData, "Department_Report")
+                  }
+                  disabled={isExporting}
+                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isExporting ? <FaSpinner className="animate-spin text-green-600" /> : <FaFileExcel className="text-green-600" />} Excel
                 </button>
               </div>
             </div>
@@ -543,110 +664,53 @@ const Reporting = () => {
                   </tr>
                 </thead>
                 <tbody>
-
-                
-                  {departmentData?.map((row, idx) => (
-                    <tr
-                      key={idx}
-                      className="bg-white border-b hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                        {row?.department || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
-                        {row.type || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-right font-semibold whitespace-nowrap">
-                        {row?.total || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-right text-orange-600 font-medium whitespace-nowrap">
-                        {row?.pending || "N/A"}
-                      </td>
-                      <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">
-                        {row?.disposed || "N/A"}
+                  {departmentLoading ? (
+                      <tr>
+                        <td colSpan={5} className="py-20 text-center">
+                          <div className="flex flex-col items-center justify-center text-gray-600">
+                            {/* <FaSpinner className="animate-spin text-3xl mb-3 text-blue-600" /> */}
+                            <span className="">Loading...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredDepartmentData?.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-10">
+                        <div className="flex justify-center items-center text-gray-500">
+                          No Data Found.
+                        </div>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredDepartmentData?.map((row, idx) => (
+                      <tr
+                        key={idx}
+                        className="bg-white border-b hover:bg-gray-50"
+                      >
+                        <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                          {row?.department || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
+                          {row.type || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-right font-semibold whitespace-nowrap">
+                          {row?.total || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-right text-orange-600 font-medium whitespace-nowrap">
+                          {row?.pending || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">
+                          {row?.disposed || "N/A"}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
           </div>
         )}
 
-        {/* 4. Nature-wise View */}
-        {activeTab === "nature" && (
-          <div>
-            <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-6">
-              Nature-wise List / प्रकृति अनुसार सूची
-            </h2>
-            <div className="flex justify-end gap-2 md:gap-4 mb-6">
-              <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                <FaFilePdf className="text-red-500" /> PDF
-              </button>
-              <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                <FaFileExcel className="text-green-600" /> Excel
-              </button>
-            </div>
-
-            <div className="overflow-x-auto -mx-4 md:mx-0">
-              <table className="w-full text-sm text-left text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
-                  <tr>
-                    <th className="px-6 py-3 whitespace-nowrap">Nature</th>
-                    <th className="px-6 py-3 whitespace-nowrap">प्रकृति</th>
-                    <th className="px-6 py-3 text-right whitespace-nowrap">
-                      Total Cases
-                    </th>
-                    <th className="px-6 py-3 text-right text-orange-600 whitespace-nowrap">
-                      Pending
-                    </th>
-                    <th className="px-6 py-3 text-right text-green-600 whitespace-nowrap">
-                      Disposed
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {natureData.map((row, idx) => (
-                    <tr
-                      key={idx}
-                      className={`border-b ${
-                        row.isTotal
-                          ? "bg-gray-50 font-bold text-gray-900"
-                          : "bg-white hover:bg-gray-50"
-                      }`}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {row.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {row.hindi}
-                      </td>
-                      <td className="px-6 py-4 text-right whitespace-nowrap">
-                        {row.total}
-                      </td>
-                      <td
-                        className={`px-6 py-4 text-right whitespace-nowrap ${
-                          !row.isTotal && "text-orange-600"
-                        }`}
-                      >
-                        {row.pending}
-                      </td>
-                      <td
-                        className={`px-6 py-4 text-right whitespace-nowrap ${
-                          !row.isTotal && "text-green-600"
-                        }`}
-                      >
-                        {row.disposed}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* 5. Investigation Pendency View */}
         {activeTab === "pendency" && (
           <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -654,11 +718,15 @@ const Reporting = () => {
                 Investigation Pendency Report / जांच लंबितता रिपोर्ट
               </h2>
               <div className="flex gap-2 w-full sm:w-auto">
-                <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <FaFilePdf className="text-red-500" /> PDF
+                <button 
+                  disabled={true} 
+                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-lg cursor-not-allowed">
+                  <FaFilePdf /> PDF
                 </button>
-                <button className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <FaFileExcel className="text-green-600" /> Excel
+                <button 
+                  disabled={true}
+                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-400 bg-gray-50 border border-gray-200 rounded-lg cursor-not-allowed">
+                  <FaFileExcel /> Excel
                 </button>
               </div>
             </div>
@@ -668,7 +736,6 @@ const Reporting = () => {
           </div>
         )}
 
-        {/* 6. Dispatch Register View */}
         {activeTab === "dispatch" && (
           <div>
             <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
@@ -683,8 +750,14 @@ const Reporting = () => {
                 </label>
                 <input
                   type="date"
+                  value={dispatchFilters.fromDate}
+                  onChange={(e) =>
+                    setDispatchFilters({
+                      ...dispatchFilters,
+                      fromDate: e.target.value,
+                    })
+                  }
                   className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                  defaultValue="2024-01-01"
                 />
               </div>
               <div className="w-full sm:w-auto">
@@ -693,20 +766,38 @@ const Reporting = () => {
                 </label>
                 <input
                   type="date"
+                  value={dispatchFilters.toDate}
+                  onChange={(e) =>
+                    setDispatchFilters({
+                      ...dispatchFilters,
+                      toDate: e.target.value,
+                    })
+                  }
                   className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                  defaultValue="2025-06-30"
                 />
               </div>
-              <button className="w-full sm:w-auto flex justify-center items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm">
-                <FaSearch /> Generate
-              </button>
 
               <div className="w-full sm:w-auto sm:flex-1 flex flex-col sm:flex-row justify-end gap-2 mt-2 sm:mt-0">
                 <button className="justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                   <FaPrint className="text-gray-600" /> Print
                 </button>
-                <button className="justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-800 border border-blue-800 rounded-lg hover:bg-blue-900">
-                  <FaFileExcel /> Export Excel
+                <button
+                  onClick={() =>
+                    exportToPDF(filteredDispatchData, "Dispatch_Report")
+                  }
+                  disabled={isExporting}
+                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isExporting ? <FaSpinner className="animate-spin text-red-500" /> : <FaFilePdf className="text-red-500" />} PDF
+                </button>
+                <button
+                  onClick={() =>
+                    exportToExcel(filteredDispatchData, "Dispatch_Report")
+                  }
+                  disabled={isExporting}
+                  className="justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-800 border border-blue-800 rounded-lg hover:bg-blue-900 disabled:opacity-50"
+                >
+                   {isExporting ? <FaSpinner className="animate-spin" /> : <FaFileExcel />} Export Excel
                 </button>
               </div>
             </div>
@@ -731,25 +822,26 @@ const Reporting = () => {
                     </th>
                   </tr>
                 </thead>
-               <tbody>
-                  {dispatcheData?.length == 0 ? (
+                <tbody>
+                  {dispatchLoading ? (
+                      <tr>
+                        <td colSpan={8} className="py-20 text-center">
+                          <div className="flex flex-col items-center justify-center text-gray-600">
+                            {/* <FaSpinner className="animate-spin text-3xl mb-3 text-blue-600" /> */}
+                            <span className="">Loading...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredDispatchData.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="py-10">
+                      <td colSpan={8} className="py-10">
                         <div className="flex justify-center items-center text-gray-500">
                           No Data Found.
                         </div>
                       </td>
                     </tr>
-                  ) : isLoading ? (
-                    <tr>
-                      <td colSpan={9} className="py-10">
-                        <div className="flex justify-center items-center text-gray-600">
-                          Loading..
-                        </div>
-                      </td>
-                    </tr>
                   ) : (
-                    dispatcheData?.map((row, idx) => (
+                    filteredDispatchData?.map((row, idx) => (
                       <tr
                         key={idx}
                         className="bg-white border-b hover:bg-gray-50"
@@ -787,7 +879,6 @@ const Reporting = () => {
           </div>
         )}
 
-        {/* 7. Overall Status View */}
         {activeTab === "overall" && (
           <div>
             <div className="flex justify-between items-center mb-6">
@@ -800,7 +891,6 @@ const Reporting = () => {
               </button>
             </div>
 
-            {/* Status Summary Cards - 1 col mobile, 2 col tablet, 4 col desktop */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex flex-col items-center justify-center">
                 <h3 className="text-gray-600 text-sm font-medium mb-1">

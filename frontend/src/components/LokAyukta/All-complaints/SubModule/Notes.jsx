@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaTimes, FaSpinner, FaDownload, FaPrint } from "react-icons/fa";
+import { FaTimes, FaSpinner, FaDownload, FaPrint, FaEye } from "react-icons/fa";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-
 
 import { EditorState, convertToRaw, ContentState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
@@ -17,7 +16,6 @@ const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
 const storedUser = localStorage.getItem("user");
 const user = storedUser ? JSON.parse(storedUser) : null;
-
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -33,17 +31,15 @@ const Notes = ({ complaint }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const popupRef = useRef(null);
 
-
   const [documents, setDocuments] = useState([]);
   const [notesList, setNotesList] = useState([]);
 
- 
   const [selectedDoc, setSelectedDoc] = useState("");
-  const [pdfViewUrl, setPdfViewUrl] = useState(null);
+  const [pdfViewUrl, setPdfViewUrl] = useState(null); // Used for Add Note Preview
+  const [viewDocUrl, setViewDocUrl] = useState(null); // Used for List View Modal
   const [loading, setLoading] = useState(false);
   const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
   const [errors, setErrors] = useState({});
-
 
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
@@ -62,7 +58,6 @@ const Notes = ({ complaint }) => {
     if (complaint?.id) fetchDocs();
   }, [complaint?.id]);
 
-
   const fetchNotes = async () => {
     if (!complaint?.id) return;
     try {
@@ -79,17 +74,37 @@ const Notes = ({ complaint }) => {
     fetchNotes();
   }, [complaint?.id]);
 
-  
+  // --- PATH LOGIC ---
   const normalizePath = (filePath) => {
     if (!filePath) return "";
-    return filePath.replace(/^\//, "").replace("storage/", "storage/Document/");
+    let fp = filePath.replace(/^\//, "");
+    fp = fp.replace("storage/", "storage/Document/");
+    return fp;
   };
 
   const makeFileUrl = (filePath) => {
-    return `${BASE_URL.replace("/api", "")}/${normalizePath(filePath)}`;
+    const root = BASE_URL.replace("/api", "");
+    const fixedPath = normalizePath(filePath);
+    return `${root}/${fixedPath}`;
   };
 
+  // Helper to fetch PDF URL from API
+  const fetchPdfPath = async (filename) => {
+    try {
+      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+      if (res.data.status && res.data.data.length > 0) {
+        const match = res.data.data.find((p) => p.includes(filename));
+        if (match) {
+          return makeFileUrl(match);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching PDF path", err);
+    }
+    return null;
+  };
 
+  // --- HANDLER FOR ADD NOTE PREVIEW ---
   const handleSelectDoc = async (fileName) => {
     setSelectedDoc(fileName);
     setPdfViewUrl(null);
@@ -98,13 +113,9 @@ const Notes = ({ complaint }) => {
 
     try {
       setLoading(true);
-      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
-      if (res.data.status && res.data.data.length > 0) {
-        const match = res.data.data.find((p) => p.includes(fileName));
-        if (match) {
-          setPdfViewUrl(makeFileUrl(match));
-        }
-      }
+      const url = await fetchPdfPath(fileName);
+      if (url) setPdfViewUrl(url);
+      else toast.error("PDF path not found");
     } catch {
       toast.error("PDF नहीं खुल पाया");
     } finally {
@@ -112,13 +123,22 @@ const Notes = ({ complaint }) => {
     }
   };
 
+  // --- HANDLER FOR LIST VIEW BUTTON ---
+  const handleViewDocFromNote = async (fileName) => {
+    if (!fileName) return;
+    const url = await fetchPdfPath(fileName);
+    if (url) {
+      setViewDocUrl(url);
+    } else {
+      toast.error("Document not found");
+    }
+  };
 
   const onEditorStateChange = (editorState) => {
     setEditorState(editorState);
     const content = draftToHtml(convertToRaw(editorState.getCurrentContent()));
     setNote(content);
   };
-
 
   const handleSubmitNote = () => {
     const contentState = editorState.getCurrentContent();
@@ -132,7 +152,6 @@ const Notes = ({ complaint }) => {
     setOpen(false);
     setShowSuccess(true);
   };
-
 
   const handleDownloadPdf = async () => {
     if (!popupRef.current) return;
@@ -165,7 +184,6 @@ const Notes = ({ complaint }) => {
       toast.error("Failed to generate PDF");
     }
   };
-
 
   const handlePrint = () => {
     if (!popupRef.current) return;
@@ -203,7 +221,6 @@ const Notes = ({ complaint }) => {
     }, 500);
   };
 
-
   const handleFinalSubmit = async () => {
     setErrors({});
     const selectedDocObj = documents.find((doc) => doc.file === selectedDoc);
@@ -240,13 +257,11 @@ const Notes = ({ complaint }) => {
     }
   };
 
-
   const handlePageRangeChange = (idx, field, value) => {
     const updated = [...pageRanges];
     updated[idx][field] = value;
     setPageRanges(updated);
   };
-
 
   const isFormValid = () => {
     const contentState = editorState.getCurrentContent();
@@ -263,9 +278,14 @@ const Notes = ({ complaint }) => {
   const getDocName = (dId) => {
     if (!documents.length || !dId) return null;
     const doc = documents.find((d) => d.id === dId);
-    return doc ? doc.file : null;
+    return doc ? (doc.title || doc.file) : null;
   };
 
+  const getDocFilename = (dId) => {
+    if (!documents.length || !dId) return null;
+    const doc = documents.find((d) => d.id === dId);
+    return doc ? doc.file : null;
+  };
 
   return (
     <div className="bg-white rounded-lg w-full p-3 md:p-4">
@@ -290,7 +310,8 @@ const Notes = ({ complaint }) => {
           </p>
         ) : (
           notesList.map((item, index) => {
-            const referencedFile = getDocName(item.d_id);
+            const referencedTitle = getDocName(item.d_id);
+            const referencedFile = getDocFilename(item.d_id);
 
             return (
               <div
@@ -317,11 +338,22 @@ const Notes = ({ complaint }) => {
                   dangerouslySetInnerHTML={{ __html: item.description }}
                 />
 
-                {(referencedFile || (item.range_from && item.range_two)) && (
+                {(referencedTitle || (item.range_from && item.range_two)) && (
                   <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500">
                     <span className="font-semibold">References:</span>
-                    <div className="mt-1 pl-2 border-l-2 border-blue-200">
-                      {referencedFile && <p>Doc: {referencedFile}</p>}
+                    <div className="mt-1 pl-2 border-l-2 border-blue-200 flex flex-col gap-1">
+                      {referencedTitle && (
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {/* <span>Doc: {referencedTitle}</span> */}
+                          <button
+                            onClick={() => handleViewDocFromNote(referencedFile)}
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-blue-200 transition-colors"
+                          >
+                            <FaEye className="w-3 h-3" />
+                            <span className="font-medium">View</span>
+                          </button>
+                        </div>
+                      )}
                       {item.range_from && item.range_two && (
                         <p>
                           Pages: {item.range_from} – {item.range_two}
@@ -336,13 +368,35 @@ const Notes = ({ complaint }) => {
         )}
       </div>
 
-      {/* MODAL */}
+      {/* STANDALONE VIEW MODAL (FOR LIST VIEW) */}
+      {viewDocUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col relative">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">Document Viewer</h3>
+              <button
+                onClick={() => setViewDocUrl(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <FaTimes className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 bg-gray-100 p-2 overflow-hidden">
+              <iframe
+                src={`${viewDocUrl}#zoom=page-width`}
+                className="w-full h-full border-0 rounded bg-white shadow-sm"
+                title="PDF Viewer"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD NOTE MODAL (UNCHANGED) */}
       {open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 md:p-0">
-          {/* RESPONSIVE MODAL CONTAINER */}
           <div className="bg-white w-full md:w-11/12 h-full md:h-5/6 shadow-xl relative flex flex-col md:flex-row rounded-md overflow-hidden">
             
-            {/* CLOSE BUTTON */}
             <button
               className="absolute top-2 right-2 md:top-4 md:right-4 p-2 bg-white/80 hover:bg-gray-100 rounded-full z-10"
               onClick={() => setOpen(false)}
@@ -350,7 +404,6 @@ const Notes = ({ complaint }) => {
               <FaTimes className="w-5 h-5 text-gray-600" />
             </button>
 
-            {/* LEFT FORM SECTION */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
               <h2 className="text-lg font-semibold mb-4 md:mb-6">Add Note / Noting</h2>
 
@@ -358,7 +411,6 @@ const Notes = ({ complaint }) => {
                 Note Content <span className="text-red-500">*</span>
               </label>
 
-              {/* CKEDITOR */}
               <div
                 className={`border rounded-md ${
                   errors.description ? "border-red-500" : "border-gray-300"
@@ -394,7 +446,6 @@ const Notes = ({ complaint }) => {
                 </p>
               )}
 
-              {/* DROPDOWN & PAGE RANGE */}
               <div className="flex flex-col md:flex-row gap-4 mt-6">
                 <div className="flex-1">
                   <label className="block text-sm font-medium mb-2">
@@ -410,7 +461,7 @@ const Notes = ({ complaint }) => {
                     <option value="">Select a document...</option>
                     {documents.map((doc) => (
                       <option key={doc.id} value={doc.file}>
-                        {doc.title || "NA"}
+                        {doc.title ||  "NA"}
                       </option>
                     ))}
                   </select>
@@ -455,7 +506,6 @@ const Notes = ({ complaint }) => {
                 </div>
               </div>
 
-              {/* ACTION BUTTONS */}
               <div className="flex justify-end mt-6 gap-3 border-t pt-4">
                 <button
                   className="px-4 py-2 text-sm border rounded-md"
@@ -477,7 +527,6 @@ const Notes = ({ complaint }) => {
               </div>
             </div>
 
-            {/* RIGHT PDF PREVIEW SECTION */}
             <div className="flex-1 bg-gray-50 border-t md:border-t-0 md:border-l flex flex-col min-h-[300px] md:min-h-0">
               <div className="w-full h-full flex items-center justify-center p-2">
                 {loading ? (
@@ -503,13 +552,11 @@ const Notes = ({ complaint }) => {
         </div>
       )}
 
-      {/* SUCCESS POPUP WITH PDF DOWNLOAD & PRINT */}
+      {/* SUCCESS POPUP */}
       {showSuccess && (
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl my-auto">
-            {/* Printable Area Ref */}
             <div ref={popupRef} className="bg-white rounded-lg overflow-hidden">
-              {/* HEADER */}
               <div className="px-4 py-3 md:px-6 md:py-4 border-b flex flex-wrap justify-between items-center bg-gray-100 pdf-hide-section gap-2">
                 <p className="text-sm font-semibold text-gray-800">
                   Preview Note
@@ -541,7 +588,6 @@ const Notes = ({ complaint }) => {
                 </div>
               </div>
 
-              {/* BODY */}
               <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
                 <p className="text-sm text-center font-semibold text-gray-800">
                   File No: {complaint?.file_number || complaint?.complain_no}
@@ -568,7 +614,6 @@ const Notes = ({ complaint }) => {
                 </div>
               </div>
 
-              {/* FOOTER BUTTONS */}
               <div className="px-6 py-4 md:px-8 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
                 <button
                   className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
