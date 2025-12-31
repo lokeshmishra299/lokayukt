@@ -160,6 +160,7 @@ const ViewAllComplaint = () => {
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
   const [showDispatch, setshowDispatch] = useState(false);
+  const [sent_through_rk, setThroughRC] = useState(false);
 
   function diposeShow (){
     setshowDispatch(true)
@@ -264,12 +265,15 @@ const ViewAllComplaint = () => {
       const res = await api.post("/lokayukt/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
+        sent_through_rk: sent_through_rk ? 1 : 0
+
       });
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data.message || "Marked as received successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+       setThroughRC(false);
       setRemark("");
       setConfirmConfig({ open: false, type: null });
     },
@@ -327,6 +331,7 @@ const ViewAllComplaint = () => {
         const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
+          sent_through_rk: sent_through_rk ? 1 : 0
         });
         return res.data;
       },
@@ -334,6 +339,7 @@ const ViewAllComplaint = () => {
         toast.success(data.message || "Forwarded successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
         setRemark("");
+        setThroughRC(false)
         setSelectedForwardTo("");
         setConfirmConfig({ open: false, type: null });
       },
@@ -957,11 +963,15 @@ const ViewAllComplaint = () => {
                   </>
                 )}
 
-             <label className="flex items-center gap-2 cursor-pointer">
-  <input type="checkbox" className="w-4 h-4" />
-  <span className="text-sm">Checkbox If Send throgh Rc </span>
+ <label className="flex items-center gap-2 cursor-pointer mt-2">
+  <input
+    type="checkbox"
+    checked={sent_through_rk}
+    onChange={(e) => setThroughRC(e.target.checked)}
+    className="w-4 h-4"
+  />
+  <span className="text-sm">Checkbox If Send through RC</span>
 </label>
-       
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
                     <>
