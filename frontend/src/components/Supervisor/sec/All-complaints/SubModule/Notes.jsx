@@ -1,16 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaTimes, FaSpinner, FaDownload, FaPrint } from "react-icons/fa"; // Added FaPrint
+import { FaTimes, FaSpinner, FaDownload, FaPrint, FaEye } from "react-icons/fa";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+import { EditorState, convertToRaw, ContentState } from "draft-js";
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import draftToHtml from "draftjs-to-html";
+import htmlToDraft from "html-to-draftjs";
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
 const storedUser = localStorage.getItem("user");
 const user = storedUser ? JSON.parse(storedUser) : null;
-
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -21,24 +26,25 @@ const api = axios.create({
 });
 
 const Notes = ({ complaint }) => {
-
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
-  const popupRef = useRef(null); 
+  const popupRef = useRef(null);
 
-  // Data States
   const [documents, setDocuments] = useState([]);
-  const [notesList, setNotesList] = useState([]); 
+  const [notesList, setNotesList] = useState([]);
 
-  // Form States
   const [selectedDoc, setSelectedDoc] = useState("");
-  const [pdfViewUrl, setPdfViewUrl] = useState(null);
+  const [pdfViewUrl, setPdfViewUrl] = useState(null); // Used for Add Note Preview
+  const [viewDocUrl, setViewDocUrl] = useState(null); // Used for List View Modal
   const [loading, setLoading] = useState(false);
   const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
   const [errors, setErrors] = useState({});
 
- 
+  const [editorState, setEditorState] = useState(() =>
+    EditorState.createEmpty()
+  );
+
   useEffect(() => {
     const fetchDocs = async () => {
       try {
@@ -51,7 +57,6 @@ const Notes = ({ complaint }) => {
 
     if (complaint?.id) fetchDocs();
   }, [complaint?.id]);
-
 
   const fetchNotes = async () => {
     if (!complaint?.id) return;
@@ -69,17 +74,37 @@ const Notes = ({ complaint }) => {
     fetchNotes();
   }, [complaint?.id]);
 
-
+  // --- PATH LOGIC ---
   const normalizePath = (filePath) => {
     if (!filePath) return "";
-    return filePath.replace(/^\//, "").replace("storage/", "storage/Document/");
+    let fp = filePath.replace(/^\//, "");
+    fp = fp.replace("storage/", "storage/Document/");
+    return fp;
   };
 
   const makeFileUrl = (filePath) => {
-    return `${BASE_URL.replace("/api", "")}/${normalizePath(filePath)}`;
+    const root = BASE_URL.replace("/api", "");
+    const fixedPath = normalizePath(filePath);
+    return `${root}/${fixedPath}`;
   };
 
- 
+  // Helper to fetch PDF URL from API
+  const fetchPdfPath = async (filename) => {
+    try {
+      const res = await api.get(`/supervisor/get-file-preview/${complaint.id}`);
+      if (res.data.status && res.data.data.length > 0) {
+        const match = res.data.data.find((p) => p.includes(filename));
+        if (match) {
+          return makeFileUrl(match);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching PDF path", err);
+    }
+    return null;
+  };
+
+  // --- HANDLER FOR ADD NOTE PREVIEW ---
   const handleSelectDoc = async (fileName) => {
     setSelectedDoc(fileName);
     setPdfViewUrl(null);
@@ -88,13 +113,9 @@ const Notes = ({ complaint }) => {
 
     try {
       setLoading(true);
-      const res = await api.get(`/supervisor/get-file-preview/${complaint.id}`);
-      if (res.data.status && res.data.data.length > 0) {
-        const match = res.data.data.find((p) => p.includes(fileName));
-        if (match) {
-          setPdfViewUrl(makeFileUrl(match));
-        }
-      }
+      const url = await fetchPdfPath(fileName);
+      if (url) setPdfViewUrl(url);
+      else toast.error("PDF path not found");
     } catch {
       toast.error("PDF नहीं खुल पाया");
     } finally {
@@ -102,8 +123,32 @@ const Notes = ({ complaint }) => {
     }
   };
 
+  // --- HANDLER FOR LIST VIEW BUTTON ---
+  const handleViewDocFromNote = async (fileName) => {
+    if (!fileName) return;
+    const url = await fetchPdfPath(fileName);
+    if (url) {
+      setViewDocUrl(url);
+    } else {
+      toast.error("Document not found");
+    }
+  };
+
+  const onEditorStateChange = (editorState) => {
+    setEditorState(editorState);
+    const content = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+    setNote(content);
+  };
 
   const handleSubmitNote = () => {
+    const contentState = editorState.getCurrentContent();
+    const hasText = contentState.hasText();
+
+    if (!hasText) {
+      toast.error("Please add some note content");
+      return;
+    }
+
     setOpen(false);
     setShowSuccess(true);
   };
@@ -117,14 +162,13 @@ const Notes = ({ complaint }) => {
       elementsToHide.forEach((el) => (el.style.display = "none"));
 
       const canvas = await html2canvas(popupRef.current, {
-        scale: 2, 
+        scale: 2,
         backgroundColor: "#ffffff",
-        useCORS: true, 
+        useCORS: true,
       });
 
       elementsToHide.forEach((el) => (el.style.display = "flex"));
 
-      // 4. Create PDF
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
 
@@ -141,12 +185,10 @@ const Notes = ({ complaint }) => {
     }
   };
 
-  
   const handlePrint = () => {
     if (!popupRef.current) return;
 
     const printWindow = window.open("", "_blank");
-
     const styles = Array.from(
       document.querySelectorAll("link[rel='stylesheet'], style")
     )
@@ -160,7 +202,6 @@ const Notes = ({ complaint }) => {
           ${styles}
           <style>
             body { background-color: white; -webkit-print-color-adjust: exact; }
-            /* Explicitly hide the header/footer buttons in print view */
             .pdf-hide-section { display: none !important; } 
             .print-container { padding: 20px; }
           </style>
@@ -180,10 +221,8 @@ const Notes = ({ complaint }) => {
     }, 500);
   };
 
-
   const handleFinalSubmit = async () => {
-    setErrors({}); 
-
+    setErrors({});
     const selectedDocObj = documents.find((doc) => doc.file === selectedDoc);
     const docId = selectedDocObj ? selectedDocObj.id : "";
 
@@ -201,15 +240,13 @@ const Notes = ({ complaint }) => {
       if (res.data.status) {
         toast.success("Note Added Successfully!");
         setShowSuccess(false);
-
         setNote("");
+        setEditorState(EditorState.createEmpty());
         setSelectedDoc("");
         setPageRanges([{ from: "", to: "" }]);
         setPdfViewUrl(null);
-
         fetchNotes();
-      }
-      else if (res.data.errors) {
+      } else if (res.data.errors) {
         setErrors(res.data.errors);
         Object.values(res.data.errors).forEach((msgArr) => {
           toast.error(msgArr[0]);
@@ -220,40 +257,45 @@ const Notes = ({ complaint }) => {
     }
   };
 
-
   const handlePageRangeChange = (idx, field, value) => {
     const updated = [...pageRanges];
     updated[idx][field] = value;
     setPageRanges(updated);
   };
 
- 
   const isFormValid = () => {
+    const contentState = editorState.getCurrentContent();
+    const hasText = contentState.hasText();
+
     return (
-      note.trim() !== "" &&
+      hasText &&
       selectedDoc !== "" &&
       pageRanges[0].from !== "" &&
       pageRanges[0].to !== ""
     );
   };
 
-
   const getDocName = (dId) => {
+    if (!documents.length || !dId) return null;
+    const doc = documents.find((d) => d.id === dId);
+    return doc ? (doc.title || doc.file) : null;
+  };
+
+  const getDocFilename = (dId) => {
     if (!documents.length || !dId) return null;
     const doc = documents.find((d) => d.id === dId);
     return doc ? doc.file : null;
   };
 
- 
   return (
-    <div className="bg-white rounded-lg w-full p-4">
+    <div className="bg-white rounded-lg w-full p-3 md:p-4">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-3">
         <p className="text-[16px] font-medium text-gray-800">
           Notes & Notings
         </p>
         <button
-          className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700"
+          className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
           onClick={() => setOpen(true)}
         >
           Add Note / Noting
@@ -268,17 +310,16 @@ const Notes = ({ complaint }) => {
           </p>
         ) : (
           notesList.map((item, index) => {
-            // Find doc name for display
-            const referencedFile = getDocName(item.d_id);
+            const referencedTitle = getDocName(item.d_id);
+            const referencedFile = getDocFilename(item.d_id);
 
             return (
               <div
                 key={item.id || index}
-                className="border rounded-lg p-4 bg-gray-50"
+                className="border rounded-lg p-3 md:p-4 bg-gray-50"
               >
-                <div className="flex justify-between items-start">
-                  <p className=" text-gray-800">
-                    {/* User ID: {item.added_by}  */}
+                <div className="flex flex-col md:flex-row justify-between md:items-start gap-2 md:gap-0">
+                  <p className="text-gray-800 font-medium">
                     {user?.name}
                   </p>
                   <p className="text-xs text-gray-400 whitespace-nowrap">
@@ -292,16 +333,29 @@ const Notes = ({ complaint }) => {
                   </p>
                 </div>
 
-                <div className="mt-2 whitespace-pre-wrap text-sm text-gray-700">
-                  {item.description}
-                </div>
+                <div
+                  className="mt-2 whitespace-pre-wrap text-sm text-gray-700 overflow-x-auto"
+                  dangerouslySetInnerHTML={{ __html: item.description }}
+                />
 
-                {/* Show Reference if document exists */}
-                {(referencedFile || (item.range_from && item.range_two)) && (
+                {(referencedTitle || (item.range_from && item.range_two)) && (
                   <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500">
                     <span className="font-semibold">References:</span>
-                    <div className="mt-1 pl-2 border-l-2 border-blue-200">
-                      {referencedFile && <p>Doc: {referencedFile}</p>}
+                    <div className="mt-1 pl-2 border-l-2 border-blue-200 flex flex-col gap-1">
+                      {referencedTitle && (
+
+                        
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {/* <span>Doc: {referencedTitle}</span> */}
+                          <button
+                            onClick={() => handleViewDocFromNote(referencedFile)}
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-blue-200 transition-colors"
+                          >
+                            <FaEye className="w-3 h-3" />
+                            <span className="font-medium">{referencedTitle}</span>
+                          </button>
+                        </div>
+                      )}
                       {item.range_from && item.range_two && (
                         <p>
                           Pages: {item.range_from} – {item.range_two}
@@ -316,94 +370,142 @@ const Notes = ({ complaint }) => {
         )}
       </div>
 
-      {/* MODAL */}
+      {/* STANDALONE VIEW MODAL (FOR LIST VIEW) */}
+      {viewDocUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col relative">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">Document Viewer</h3>
+              <button
+                onClick={() => setViewDocUrl(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <FaTimes className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 bg-gray-100 p-2 overflow-hidden">
+              <iframe
+                src={`${viewDocUrl}#zoom=page-width`}
+                className="w-full h-full border-0 rounded bg-white shadow-sm"
+                title="PDF Viewer"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD NOTE MODAL (UNCHANGED) */}
       {open && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white w-11/12 h-5/6 shadow-xl relative flex rounded-md overflow-hidden">
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 md:p-0">
+          <div className="bg-white w-full md:w-11/12 h-full md:h-5/6 shadow-xl relative flex flex-col md:flex-row rounded-md overflow-hidden">
+            
             <button
-              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
+              className="absolute top-2 right-2 md:top-4 md:right-4 p-2 bg-white/80 hover:bg-gray-100 rounded-full z-10"
               onClick={() => setOpen(false)}
             >
-              <FaTimes className="w-5 h-5" />
+              <FaTimes className="w-5 h-5 text-gray-600" />
             </button>
 
-            {/* LEFT FORM */}
-            <div className="flex-1 p-6 overflow-y-auto">
-              <h2 className="text-lg font-semibold mb-6">Add Note / Noting</h2>
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+              <h2 className="text-lg font-semibold mb-4 md:mb-6">Add Note / Noting</h2>
 
               <label className="block text-sm font-medium mb-2">
                 Note Content <span className="text-red-500">*</span>
               </label>
-              <textarea
-                className={`w-full border rounded-md p-3 h-32 resize-none ${
+
+              <div
+                className={`border rounded-md ${
                   errors.description ? "border-red-500" : "border-gray-300"
                 }`}
-                placeholder="Enter your note here..."
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-              />
+              >
+                <Editor
+                  editorState={editorState}
+                  onEditorStateChange={onEditorStateChange}
+                  toolbarClassName="toolbarClassName"
+                  wrapperClassName="wrapperClassName"
+                  editorClassName="editorClassName px-3 min-h-[120px] md:min-h-[150px]"
+                  placeholder="Enter your note here..."
+                  toolbar={{
+                    options: [
+                      "inline",
+                      "blockType",
+                      "fontSize",
+                      "list",
+                      "textAlign",
+                      "colorPicker",
+                      "link",
+                      "emoji",
+                      "remove",
+                      "history",
+                    ],
+                    inline: { options: ["bold", "italic", "underline"] },
+                  }}
+                />
+              </div>
               {errors.description && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.description[0]}
                 </p>
               )}
 
-              <div className="mt-6">
-                <label className="block text-sm font-medium mb-2">
-                  Reference by Document
-                </label>
-                <select
-                  className={`w-full border rounded-md p-2 ${
-                    errors.d_id ? "border-red-500" : "border-gray-300"
-                  }`}
-                  value={selectedDoc}
-                  onChange={(e) => handleSelectDoc(e.target.value)}
-                >
-                  <option value="">Select a document...</option>
-                  {documents.map((doc) => (
-                    <option key={doc.id} value={doc.file}>
-                      {doc.file}
-                    </option>
-                  ))}
-                </select>
-                {errors.d_id && (
-                  <p className="text-red-500 text-xs mt-1">{errors.d_id[0]}</p>
-                )}
-              </div>
-
-              <div className="mt-6">
-                <label className="block text-sm font-medium mb-2">
-                  Combined Page Range
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    className={`w-20 border rounded-md p-2 ${
-                      errors.range_from ? "border-red-500" : "border-gray-300"
+              <div className="flex flex-col md:flex-row gap-4 mt-6">
+                <div className="flex-1">
+                  <label className="block text-sm font-medium mb-2">
+                    Reference by Document
+                  </label>
+                  <select
+                    className={`w-full border rounded-md p-2 ${
+                      errors.d_id ? "border-red-500" : "border-gray-300"
                     }`}
-                    placeholder="From"
-                    value={pageRanges[0].from}
-                    onChange={(e) =>
-                      handlePageRangeChange(0, "from", e.target.value)
-                    }
-                  />
-                  <input
-                    type="number"
-                    className={`w-20 border rounded-md p-2 ${
-                      errors.range_two ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="To"
-                    value={pageRanges[0].to}
-                    onChange={(e) =>
-                      handlePageRangeChange(0, "to", e.target.value)
-                    }
-                  />
+                    value={selectedDoc}
+                    onChange={(e) => handleSelectDoc(e.target.value)}
+                  >
+                    <option value="">Select a document...</option>
+                    {documents.map((doc) => (
+                      <option key={doc.id} value={doc.file}>
+                        {doc.title ||  "NA"}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.d_id && (
+                    <p className="text-red-500 text-xs mt-1">{errors.d_id[0]}</p>
+                  )}
                 </div>
-                {(errors.range_from || errors.range_two) && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.range_from?.[0] || errors.range_two?.[0]}
-                  </p>
-                )}
+
+                <div className="w-full md:w-auto">
+                  <label className="block text-sm font-medium mb-2">
+                    Pages
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      className={`w-20 md:w-20 border rounded-md p-2 ${
+                        errors.range_from ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="From"
+                      value={pageRanges[0].from}
+                      onChange={(e) =>
+                        handlePageRangeChange(0, "from", e.target.value)
+                      }
+                    />
+                    <input
+                      type="number"
+                      className={`w-20 md:w-20 border rounded-md p-2 ${
+                        errors.range_two ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="To"
+                      value={pageRanges[0].to}
+                      onChange={(e) =>
+                        handlePageRangeChange(0, "to", e.target.value)
+                      }
+                    />
+                  </div>
+                  {(errors.range_from || errors.range_two) && (
+                    <p className="text-red-500 text-xs mt-1">
+                      Required
+                    </p>
+                  )}
+                </div>
               </div>
 
               <div className="flex justify-end mt-6 gap-3 border-t pt-4">
@@ -427,9 +529,8 @@ const Notes = ({ complaint }) => {
               </div>
             </div>
 
-            {/* RIGHT PDF PREVIEW */}
-            <div className="flex-1 bg-gray-50 border-l flex">
-              <div className="w-full h-full flex items-center justify-center">
+            <div className="flex-1 bg-gray-50 border-t md:border-t-0 md:border-l flex flex-col min-h-[300px] md:min-h-0">
+              <div className="w-full h-full flex items-center justify-center p-2">
                 {loading ? (
                   <div className="text-gray-500 flex items-center gap-2">
                     <FaSpinner className="animate-spin" />
@@ -438,11 +539,13 @@ const Notes = ({ complaint }) => {
                 ) : pdfViewUrl ? (
                   <iframe
                     src={`${pdfViewUrl}#zoom=page-width`}
-                    className="w-full h-full border-0"
+                    className="w-full h-full border-0 rounded"
+                    title="PDF Preview"
                   />
                 ) : (
-                  <p className="text-gray-400 text-sm">
-                    Select a document to preview PDF
+                  <p className="text-gray-400 text-sm text-center px-4">
+                    Select a document to preview PDF <br/>
+                    (Preview appears here)
                   </p>
                 )}
               </div>
@@ -451,31 +554,31 @@ const Notes = ({ complaint }) => {
         </div>
       )}
 
+      {/* SUCCESS POPUP */}
       {showSuccess && (
-        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center px-4">
-          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl overflow-hidden">
-            {/* Printable Area Ref */}
-            <div ref={popupRef} className="bg-white">
-              <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-100 pdf-hide-section">
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl my-auto">
+            <div ref={popupRef} className="bg-white rounded-lg overflow-hidden">
+              <div className="px-4 py-3 md:px-6 md:py-4 border-b flex flex-wrap justify-between items-center bg-gray-100 pdf-hide-section gap-2">
                 <p className="text-sm font-semibold text-gray-800">
+                  Preview Note
                 </p>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 ml-auto">
                   <button
                     onClick={handlePrint}
                     className="p-2 rounded hover:bg-gray-200 text-gray-700 flex items-center gap-1 text-xs font-medium"
                     title="Print"
                   >
-                    <FaPrint /> Print
+                    <FaPrint /> <span className="hidden sm:inline">Print</span>
                   </button>
 
-                  {/* Download Button */}
                   <button
                     onClick={handleDownloadPdf}
                     className="p-2 rounded hover:bg-gray-200 text-blue-600 flex items-center gap-1 text-xs font-medium"
                     title="Download as PDF"
                   >
-                    <FaDownload /> Download
+                    <FaDownload /> <span className="hidden sm:inline">Download</span>
                   </button>
 
                   <button
@@ -487,25 +590,22 @@ const Notes = ({ complaint }) => {
                 </div>
               </div>
 
-              {/* BODY (This is what will be in the PDF/Print) */}
-              <div className="px-8 py-8 text-sm leading-relaxed text-gray-800 space-y-6">
+              <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
                 <p className="text-sm text-center font-semibold text-gray-800">
                   File No: {complaint?.file_number || complaint?.complain_no}
                 </p>
 
                 <p className="text-xs text-gray-500">
-                  Data: {new Date().toLocaleDateString()}
+                  Date: {new Date().toLocaleDateString()}
                 </p>
 
-                {/* SUBJECT / DESCRIPTION */}
-                <div className="rounded-md bg-white px-5 py-4 min-h-[260px] whitespace-pre-wrap">
-                  {note}
-                </div>
+                <div
+                  className="rounded-md bg-white px-2 py-2 md:px-5 md:py-4 min-h-[200px] md:min-h-[260px] whitespace-pre-wrap"
+                  dangerouslySetInnerHTML={{ __html: note }}
+                />
 
-                {/* DATE + AUTHORITY */}
                 <div className="flex justify-between pt-4">
-                  <p className="text-xs text-gray-500"></p>
-
+                  <div />
                   <div className="text-right text-xs text-gray-600">
                     <p className="uppercase tracking-wide">Noting By</p>
                     <p className="font-semibold mt-1 text-gray-800">
@@ -516,7 +616,7 @@ const Notes = ({ complaint }) => {
                 </div>
               </div>
 
-              <div className="px-8 py-4 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
+              <div className="px-6 py-4 md:px-8 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
                 <button
                   className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
                   onClick={() => setShowSuccess(false)}
