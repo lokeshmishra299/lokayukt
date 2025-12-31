@@ -65,6 +65,7 @@ const SearchableDropdown = ({
     setSearchTerm("");
   };
 
+  
   return (
     <div className="relative" ref={wrapperRef}>
       <div
@@ -140,6 +141,17 @@ const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
+  
+const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
+    open: false,
+    type: null,
+  });
+ const handleAssignToSelf = () =>
+    setTakeFileConfirmConfig({ open: true, type: "assign" });
+
+  
+
+
     const capitalizeFirstLetter = (text = "") => {
   if (!text) return "N/A";
   return text.charAt(0).toUpperCase() + text.slice(1);
@@ -151,14 +163,21 @@ const ViewAllComplaint = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
+  const [showDispatch, setshowDispatch] = useState(false);
+  const [sent_through_rk, setThroughRC] = useState(false);
 
-  // Single config for Action modals (Receive, Forward, Pullback)
+  function diposeShow (){
+    setshowDispatch(true)
+  }
+  function closePoup (){
+    setshowDispatch(false)
+  }
+
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
     type: null,
   });
 
-  // Config for Data View Modal (Correspondence / Respondent)
   const [viewModalConfig, setViewModalConfig] = useState({
     open: false,
     type: null,
@@ -190,10 +209,10 @@ const ViewAllComplaint = () => {
   //   isFetching: isFetchingOptions,
   //   error: forwardOptionsError,
   // } = useQuery({
-  //   queryKey: ["supervisor-options"],
+  //   queryKey: ["lokayukt-options"],
   //   queryFn: async () => {
   //     try {
-  //       const res = await api.get("/supervisor/get-supervisor");
+  //       const res = await api.get("/lokayukt/get-lokayukt");
   //       if (Array.isArray(res.data)) {
   //         return res.data;
   //       } else if (res.data && Array.isArray(res.data.data)) {
@@ -223,16 +242,15 @@ const ViewAllComplaint = () => {
       isFetching: isFetchingOptions,
       error: forwardOptionsError,
     } = useQuery({
-      queryKey: ["supervisor-options", forwardType], // 
+      queryKey: ["lokayukt-options", forwardType], // 
       queryFn: async () => {
         try {
-          //  Send To My Pool  API: /supervisor/get-users
+          //  Send To My Pool  API: /lokayukt/get-users
           if (forwardType === "self") {
             const res = await api.get("/supervisor/get-users");
             return res.data?.data || res.data || [];
           }
   
-          //  Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
           const res = await api.get("/supervisor/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
@@ -248,14 +266,38 @@ const ViewAllComplaint = () => {
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post("/supervisor/received-physical", {
+      const res = await api.post("/lokayukt/received-physical", {
+        complaint_id: complaintId,
+        remark: remarkData,
+        sent_through_rk: sent_through_rk ? 1 : 0
+
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Marked as received successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+       setThroughRC(false);
+      setRemark("");
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to mark as received"
+      );
+    },
+  });
+
+  const dispose = useMutation({
+    mutationFn: async ({ complaintId, remarkData }) => {
+      const res = await api.post(`/lokayukt/dispose-complain/${id}`, {
         complaint_id: complaintId,
         remark: remarkData,
       });
       return res.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message || "Marked as received successfully");
+      toast.success( "Dispose successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setRemark("");
       setConfirmConfig({ open: false, type: null });
@@ -269,7 +311,7 @@ const ViewAllComplaint = () => {
 
   // const forwardComplaintMutation = useMutation({
   //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-  //     const res = await api.post(`/supervisor/forward-by-supervisor/${complaintId}`, {
+  //     const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
   //       forward_to: forwardTo,
   //       remark: remarkData,
   //     });
@@ -290,9 +332,10 @@ const ViewAllComplaint = () => {
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-supervisor/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-lokayukt/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
+          sent_through_rk: sent_through_rk ? 1 : 0
         });
         return res.data;
       },
@@ -300,6 +343,7 @@ const ViewAllComplaint = () => {
         toast.success(data.message || "Forwarded successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
         setRemark("");
+        setThroughRC(false)
         setSelectedForwardTo("");
         setConfirmConfig({ open: false, type: null });
       },
@@ -345,6 +389,10 @@ const ViewAllComplaint = () => {
     setRemark("");
     setSelectedForwardTo("");
   };
+
+
+
+  
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -429,8 +477,8 @@ const ViewAllComplaint = () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
+                    {complaintData.approved_rejected_by_lokayukt == 1
+                      ? "In Motion – With Lokayukta"
                       : "Received - Record Section" }
                   </span>
                 </div>
@@ -450,8 +498,8 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
+                       {complaintData.approved_rejected_by_lokayukt == 1
+                      ? "In Motion – With Lokayukta"
                       : "Received - Record Section" }
                     </span>
 
@@ -465,7 +513,6 @@ const ViewAllComplaint = () => {
                 </div>
               </div>
 
-              {/* ===== DESCRIPTION (Hindi) ===== */}
             
               <p className="text-[14px] text-black font-semibold uppercase my-2">
                 {/* Description:{" "} */}
@@ -488,10 +535,8 @@ const ViewAllComplaint = () => {
 
               </p> */}
 
-              {/* ===== DETAILS GRID (Hindi) ===== */}
                           <div className="space-y-3 mb-6">
   
-  {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य परिवादी का विवरण 
@@ -529,7 +574,6 @@ const ViewAllComplaint = () => {
     </div>
   </div>
 
-  {/* ----------------- मुख्य प्रतिवादी का विवरण ----------------- */}
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य प्रतिवादी का विवरण
@@ -567,7 +611,6 @@ const ViewAllComplaint = () => {
     </div>
   </div>
 
-  {/* ----------------- अन्य विवरण ----------------- */}
   <div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Relation */}
@@ -606,7 +649,7 @@ const ViewAllComplaint = () => {
 
 </div>
 
-              {/* Fee Status and Fee Type Section (Hindi) */}
+              {/* Fee Status and Fee Type Section */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${
@@ -627,7 +670,7 @@ const ViewAllComplaint = () => {
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  स्थिति: {complaintData.fee_approved_by_supervisor == 1 ? "Approved" : "Awaiting approval"}
+                  स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -637,7 +680,6 @@ const ViewAllComplaint = () => {
                 )}
               </div>
 
-              {/* ===== NEW SECTION: Extra Details Tabs/Buttons (Hindi) ===== */}
               <div className="flex flex-wrap gap-3 mt-4 border-t pt-4">
                 <button
                   onClick={() =>
@@ -754,7 +796,7 @@ const ViewAllComplaint = () => {
             {/* Footer Buttons */}
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
-                <div className="ml-3">
+                <div>
                   <button
                     onClick={() => {
                       setConfirmConfig({ open: true, type: "pullback" });
@@ -763,16 +805,38 @@ const ViewAllComplaint = () => {
                   >
                     Pull Back
                   </button>
+                  
+                    {complaintData.assign_to_ps ? (
+                    <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                    Take File In Hand
+                    </span>
+                  ) : (
+                    <button
+                      onClick={handleAssignToSelf}
+                      className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
+                    >
+                      Assigned To My Self
+                    </button>
+                  )}
 
-                  <button
-                   
-                    className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-3"
-                  >
-                   Take File In Hand
-                  </button>
                 </div>
 
+
+                
+
                 <div className="flex gap-2">
+
+
+                    {/* <button
+  onClick={diposeShow}
+  disabled={dispose.isPending}
+  className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {dispose.isPending ? "Processing..." : "Dispose"}
+</button> */}
+
+                   
+
                   <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
@@ -806,7 +870,15 @@ const ViewAllComplaint = () => {
         )}
       </div>
 
-      {/* Unified Confirmation Modal (Receive/Forward/Pullback) */}
+
+      {/* {
+        showDispatch && (
+          <div>
+            <h1>djudjdjj</h1>
+          </div>
+        )
+      } */}
+
      {confirmConfig.open && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
               <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
@@ -834,10 +906,8 @@ const ViewAllComplaint = () => {
                     : "Assign to Yourself?"}
                 </h3>
     
-                {/* --- FORWARDING LOGIC START --- */}
                 {confirmConfig.type === "forward" && (
                   <>
-                    {/* Radio Buttons Section */}
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Forward Type <span className="text-red-500">*</span>
@@ -856,15 +926,15 @@ const ViewAllComplaint = () => {
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
                           <span className="ml-2 text-sm text-gray-700 font-medium">
-                            Send To My Pool
+                            Send Direct
                           </span>
                         </label>
                         <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
                           <input
                             type="radio"
                             name="forwardType"
-                            value="upsupervisor"
-                            checked={forwardType === "upsupervisor"}
+                            value="uplokayukt"
+                            checked={forwardType === "uplokayukt"}
                             onChange={(e) => {
                               setForwardType(e.target.value);
                               setSelectedForwardTo("");
@@ -878,7 +948,6 @@ const ViewAllComplaint = () => {
                       </div>
                     </div>
     
-                    {/* SEARCHABLE DROPDOWN */}
                     <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
@@ -905,16 +974,26 @@ const ViewAllComplaint = () => {
                           placeholder="Select Officer..."
                         />
                       )}
+
+                          
+                 
                     </div>
                   </>
                 )}
-                {/* --- FORWARDING LOGIC END --- */}
-    
-                {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
+
+ <label className="flex items-center gap-2 cursor-pointer mt-2">
+  <input
+    type="checkbox"
+    checked={sent_through_rk}
+    onChange={(e) => setThroughRC(e.target.checked)}
+    className="w-4 h-4"
+  />
+  <span className="text-sm">Checkbox If Send through RC</span>
+</label>
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
                     <>
-                      <div className="mb-5">
+                      <div className="mb-5 mt-3">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Remark <span className="text-red-500">*</span>
                         </label>
@@ -972,7 +1051,73 @@ const ViewAllComplaint = () => {
             </div>
           )}
 
-      {/* ===== VIEW DATA MODAL (Correspondence / Respondent / Support / Witness) ===== */}
+
+          {showDispatch && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+      
+      {/* Close Button */}
+      <button
+        onClick={closePoup}
+        disabled={markAsReceivedMutation.isPending}
+        className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <FaTimes className="w-5 h-5 text-gray-600" />
+      </button>
+
+      {/* Title */}
+      <h3 className="text-lg font-semibold mb-4 pr-8">
+        Dispose Complaint
+      </h3>
+
+      {/* Remark */}
+      <div className="mb-5">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Disposal Remark <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          rows={4}
+          placeholder="Enter disposal remark..."
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={closePoup}
+          className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            if (!remark.trim()) {
+              toast.error("Please enter disposal remark");
+              return;
+            }
+
+            dispose.mutate({
+              complaintId: id,
+              remarkData: remark,
+            });
+
+            setshowDispatch(false);
+          }}
+          disabled={dispose.isPending || !remark.trim()}
+          className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {dispose.isPending ? "Disposing..." : "Dispose Now"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
       {viewModalConfig.open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
@@ -1048,7 +1193,6 @@ const ViewAllComplaint = () => {
      {viewModalConfig.type === "correspondence" && (
               <div className="w-full">
                 {" "}
-                {/* यहाँ w-full और overflow handling */}
                 {complaintData.complainants &&
                 complaintData.complainants.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
@@ -1091,7 +1235,6 @@ const ViewAllComplaint = () => {
                           >
                             लोक सेवक?
                           </th>
-                          {/* Address को थोड़ा ज़्यादा जगह दी है */}
                           <th
                             scope="col"
                             className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-[200px]"
@@ -1275,7 +1418,6 @@ const ViewAllComplaint = () => {
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.officer_category || "-"}
                             </td>
-                            {/* Address Column: whitespace-normal ensures text wrapping */}
                             <td className="px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {resp.current_address || "-"}
                             </td>
@@ -1294,7 +1436,6 @@ const ViewAllComplaint = () => {
               </div>
             )}
 
-            {/* Support Content (Added to match buttons) */}
      {viewModalConfig.type === "support" && (
               <div className="w-full">
                 {complaintData.support && complaintData.support.length > 0 ? (
@@ -1343,7 +1484,6 @@ const ViewAllComplaint = () => {
               </div>
             )}
 
-            {/* Witness Content (Added to match buttons) */}
   {viewModalConfig.type === "witness" && (
               <div className="w-full">
                 {complaintData.witness && complaintData.witness.length > 0 ? (
