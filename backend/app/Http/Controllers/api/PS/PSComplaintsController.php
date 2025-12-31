@@ -568,6 +568,10 @@ $records = $query->get();
 
                                     $apcAction->forward_to_so_us = $request->forward_to;
                                     
+                            }elseif($subroleFwd ==="ro-aro"){
+
+                                    $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    
                             }
                             }
                           
