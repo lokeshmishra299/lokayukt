@@ -10,6 +10,7 @@ import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
+import DraftLetter from "./SubModule/DraftLetter";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -151,8 +152,8 @@ function takefile(){
 }
 
 
- const handleTakeFile = () =>
-    setTakeFileConfirmConfig({ open: true, type: "assign" });
+//  const handleTakeFile = () =>
+//     setTakeFileConfirmConfig({ open: true, type: "assign" });
 
   
 
@@ -740,7 +741,7 @@ function takefile(){
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {[ "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement", "draft"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -758,6 +759,8 @@ function takefile(){
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
+                    {tab === "draft" && "Draft"}
+
                   </button>
                 ))}
               </div>
@@ -766,7 +769,7 @@ function takefile(){
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {[ "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement", "draft"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -780,6 +783,8 @@ function takefile(){
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
+                    {tab === "draft" && "Draft Letter"}
+
                     {activeTab === tab && (
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
                     )}
@@ -810,6 +815,8 @@ function takefile(){
               {activeTab === "movement" && (
                 <MovementHistory complaint={complaintData} />
               )}
+              {activeTab === "draft" && <DraftLetter complaint={complaintData} />}
+
 
               
             </div>
