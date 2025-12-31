@@ -754,7 +754,7 @@ const ViewAllComplaint = () => {
             {/* Footer Buttons */}
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
-                <div>
+                <div className="ml-3">
                   <button
                     onClick={() => {
                       setConfirmConfig({ open: true, type: "pullback" });
@@ -762,6 +762,13 @@ const ViewAllComplaint = () => {
                     className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                   >
                     Pull Back
+                  </button>
+
+                  <button
+                   
+                    className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-3"
+                  >
+                   Take File In Hand
                   </button>
                 </div>
 
