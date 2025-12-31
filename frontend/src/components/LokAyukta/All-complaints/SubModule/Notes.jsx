@@ -343,6 +343,8 @@ const Notes = ({ complaint }) => {
                     <span className="font-semibold">References:</span>
                     <div className="mt-1 pl-2 border-l-2 border-blue-200 flex flex-col gap-1">
                       {referencedTitle && (
+
+                        
                         <div className="flex items-center gap-2 flex-wrap">
                           {/* <span>Doc: {referencedTitle}</span> */}
                           <button
@@ -350,7 +352,7 @@ const Notes = ({ complaint }) => {
                             className="flex items-center gap-1 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-blue-200 transition-colors"
                           >
                             <FaEye className="w-3 h-3" />
-                            <span className="font-medium">View</span>
+                            <span className="font-medium">{referencedTitle}</span>
                           </button>
                         </div>
                       )}
