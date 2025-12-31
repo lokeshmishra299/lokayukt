@@ -130,8 +130,8 @@ class SupervisorComplaintsController extends Controller
         case "cio-io":
              $query
             //  ->where('rep.type', 2)
-                                ->where('rep.status', 'Investigation Report')
-                                ->whereNotNull('rep.forward_to_cio_io')
+                                // ->where('rep.status', 'Investigation Report')
+                                // ->whereNotNull('rep.forward_to_cio_io')
                                  ->where('rep.forward_to_cio_io',$user);
         //    $query->where('form_status', 1)
         //           ->where('approved_rejected_by_ro', 1);
@@ -157,7 +157,7 @@ class SupervisorComplaintsController extends Controller
             ], 400);
     }
 
-    $records = $query->get();
+    $records = $query->distinct('complaints.id')->get();
 
     return response()->json([
         'status' => true,
