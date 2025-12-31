@@ -287,6 +287,7 @@ const Notes = ({ complaint }) => {
     return doc ? doc.file : null;
   };
 
+
   return (
     <div className="bg-white rounded-lg w-full p-3 md:p-4">
       {/* HEADER */}
@@ -352,15 +353,15 @@ const Notes = ({ complaint }) => {
                             className="flex items-center gap-1 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-blue-200 transition-colors"
                           >
                             <FaEye className="w-3 h-3" />
-                            <span className="font-medium">{referencedTitle}</span>
-                          </button>
-                        </div>
-                      )}
-                      {item.range_from && item.range_two && (
+                            <span className="font-medium">{referencedTitle}</span> {item.range_from && item.range_two && (
                         <p>
                           Pages: {item.range_from} – {item.range_two}
                         </p>
                       )}
+                          </button>
+                        </div>
+                      )}
+                     
                     </div>
                   </div>
                 )}
