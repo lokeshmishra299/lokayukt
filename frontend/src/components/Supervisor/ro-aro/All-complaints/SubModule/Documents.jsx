@@ -3,7 +3,7 @@ import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt } from "react-ic
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "react-toastify"; // Assuming you use toastify based on previous context
+import { toast } from "react-toastify";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -25,7 +25,7 @@ const Documents = ({ complaint }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newDoc, setNewDoc] = useState({
     title: "",
-    type: "", // e.g., Report, Evidence, etc.
+    type: "Letter", // Default to first option
     file: null,
   });
 
@@ -46,7 +46,6 @@ const Documents = ({ complaint }) => {
     return `${root}/${fixedPath}`;
   };
 
-  // Added 'refetch' to update list after adding a doc
   const {
     data: documents = [],
     isLoading,
@@ -93,27 +92,32 @@ const Documents = ({ complaint }) => {
       return;
     }
 
+    if (!complaint?.id) {
+      alert("Complaint ID is missing.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const formData = new FormData();
-      formData.append("complaint_id", complaint.id);
-      formData.append("title", newDoc.title);
-      formData.append("doc_type", newDoc.type); // Adjust key name as per your API
+      
       formData.append("file", newDoc.file);
+      formData.append("type", newDoc.type);
+      formData.append("title", newDoc.title);
+      formData.append("complain_id", complaint.id);
 
-      // Example API call - Replace URL with your actual endpoint
-      await api.post("/supervisor/add-document", formData, {
+      await api.post("/supervisor/upload-document", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // Success actions
-      // toast.success("Document added successfully!"); // Uncomment if using toast
+      toast.success("Document uploaded successfully!");
       setopenAddDocuments(false);
-      setNewDoc({ title: "", type: "", file: null });
-      refetch(); // Refresh list
+      setNewDoc({ title: "", type: "Letter", file: null }); 
+      refetch(); 
     } catch (error) {
       console.error("Upload failed", error);
-      alert("Failed to upload document.");
+      const msg = error.response?.data?.message || "Failed to upload document.";
+      toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -168,7 +172,6 @@ const Documents = ({ complaint }) => {
                   <span className="text-sm font-medium text-gray-800">
                     {doc.title || "NA"}
                   </span>
-                  {/* Optional: Show Type if available */}
                   {doc.type && (
                     <span className="text-xs text-gray-500">{doc.type}</span>
                   )}
@@ -230,20 +233,23 @@ const Documents = ({ complaint }) => {
                 />
               </div>
 
-              {/* Document Type */}
+              {/* Document Type (UPDATED TO DROPDOWN) */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
-                  Document Type <span className="text-red-500">*</span>
+                  Correspondence Type <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  placeholder="Enter Document Type"
+                <select
                   value={newDoc.type}
                   onChange={(e) =>
                     setNewDoc({ ...newDoc, type: e.target.value })
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                />
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+                >
+                  <option value="Letter">Letter</option>
+                  <option value="Reminder">Reminder</option>
+                  <option value="RTI Reply">RTI Reply</option>
+                  <option value="Counter Order">Counter Order</option>
+                </select>
               </div>
 
               {/* File Upload Area */}
