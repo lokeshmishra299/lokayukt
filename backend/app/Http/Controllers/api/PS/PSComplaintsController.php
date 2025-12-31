@@ -543,6 +543,10 @@ $records = $query->get();
                          $apcAction = new ComplaintAction();
                             $apcAction->complaint_id = $complainId;
                             $apcAction->forward_by_ps = $userId;
+                           
+                            if($request->sent_through_rk == 1){
+                                $apcAction->sent_through_rk = 1;
+                            }
 
                              
 
