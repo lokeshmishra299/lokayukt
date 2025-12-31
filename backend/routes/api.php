@@ -200,7 +200,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/categories',[CommonController::class,'fetch_Category']);
     });
 
-    Route::middleware('role:supervisor:so-us|ds-js|sec|cio-io|dea-assis')->prefix('supervisor')->group(function () {
+    Route::middleware('role:supervisor:so-us|ro-aro|sec|cio-io|dea-assis')->prefix('supervisor')->group(function () {
         
         Route::get('/all-district',[SupervisorCommonController::class,'fetch_district']);
         Route::get('/all-complaints',[SupervisorComplaintsController::class,'allComplains']);
@@ -209,7 +209,9 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/view-complaint/{id}',[SupervisorComplaintsController::class,'viewComplaint']);
         Route::get('/get-document/{id}',[SupervisorComplaintsController::class,'getUploadDoc']);
          Route::get('/get-file-preview/{id}',[SupervisorComplaintsController::class,'getFilePreview']);
-        Route::post('/forward-by-so/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySO']);
+         Route::post('/add-notes',[SupervisorComplaintsController::class,'addNotes']);
+         Route::get('/get-notes/{id}',[SupervisorComplaintsController::class,'getNotes']);
+         Route::post('/forward-by-so/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySO']);
         Route::post('/forward-by-ds-js/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyds']);
         Route::post('/forward-by-da/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-lokayukt/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbylokayukt']);
@@ -218,6 +220,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-report-by-sec/{complainId}',[SupervisorReportController::class,'forwardReporttbysec']);
         Route::post('/forward-report-by-cio/{complainId}',[SupervisorReportController::class,'forwardReporttbycio']);
         Route::post('/forward-report-by-da/{complainId}',[SupervisorReportController::class,'forwardReporttbyda']);
+        
+        
         /**
          * Forward Report By Subroles
          */
@@ -226,6 +230,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-report-by-da/{complainId}',[SupervisorReportController::class,'forwardReporttbyda']);
        
         Route::get('/get-lokayukt',[SupervisorComplaintsController::class,'getLokayuktUsers']);
+        Route::get('/get-users',[SupervisorComplaintsController::class,'getUsers']);
         Route::get('/get-uplokayukt',[SupervisorComplaintsController::class,'getUpLokayuktUsers']);
         Route::get('/get-dealing-assistant',[SupervisorComplaintsController::class,'getDealingAssistantUsers']);
         Route::get('/progress-register',[SupervisorReportController::class,'progress_report']);
