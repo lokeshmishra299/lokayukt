@@ -301,7 +301,7 @@ const ApprovedComplaints = () => {
             ) :
              isLoading ? (
                  <div className="flex items-center justify-center h-full">
-                <h1 className="text-gray-600">Loading..</h1>
+                <h1 className="text-gray-600">Loading...</h1>
               </div>
             ) : 
 
