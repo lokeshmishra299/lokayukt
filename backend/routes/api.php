@@ -211,10 +211,12 @@ Route::middleware('auth:sanctum')->group(function(){
          Route::get('/get-file-preview/{id}',[SupervisorComplaintsController::class,'getFilePreview']);
          Route::post('/add-notes',[SupervisorComplaintsController::class,'addNotes']);
          Route::get('/get-notes/{id}',[SupervisorComplaintsController::class,'getNotes']);
+          Route::post('assign-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'assignToRoAro']);
+
          Route::post('/forward-by-so/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySO']);
         Route::post('/forward-by-ds-js/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyds']);
         Route::post('/forward-by-da/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyda']);
-        Route::post('/forward-by-lokayukt/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbylokayukt']);
+        Route::post('/forward-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyRoAro']);
         Route::post('/forward-report-by-so/{complainId}',[SupervisorReportController::class,'forwardReporttbySo']);
         Route::post('/forward-report-by-ds/{complainId}',[SupervisorReportController::class,'forwardReporttbyds']);
         Route::post('/forward-report-by-sec/{complainId}',[SupervisorReportController::class,'forwardReporttbysec']);
@@ -230,7 +232,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-report-by-da/{complainId}',[SupervisorReportController::class,'forwardReporttbyda']);
        
         Route::get('/get-lokayukt',[SupervisorComplaintsController::class,'getLokayuktUsers']);
-        Route::get('/get-users',[SupervisorComplaintsController::class,'getUsers']);
+        Route::get('/get-users',[SupervisorComplaintsController::class,'getSubROleUsers']);
         Route::get('/get-uplokayukt',[SupervisorComplaintsController::class,'getUpLokayuktUsers']);
         Route::get('/get-dealing-assistant',[SupervisorComplaintsController::class,'getDealingAssistantUsers']);
         Route::get('/progress-register',[SupervisorReportController::class,'progress_report']);
