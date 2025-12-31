@@ -18,12 +18,14 @@
     "draftjs-to-html": "^0.9.1",
     "file-saver": "^2.0.5",
     "firebase": "^10.8.0",
+    "framer-motion": "^12.23.26",
     "html-to-draftjs": "^1.5.0",
     "html2canvas": "^1.4.1",
     "html2pdf": "^0.0.11",
     "html2pdf.js": "^0.12.1",
     "install": "^0.13.0",
     "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
     "npm": "^11.7.0",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
@@ -39,6 +41,7 @@
     "react-typed": "^2.0.12",
     "recharts": "^3.1.2",
     "styled-components": "^6.1.8",
+    "xlsx": "^0.18.5",
     "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {

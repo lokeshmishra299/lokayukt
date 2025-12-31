@@ -65,6 +65,7 @@ const SearchableDropdown = ({
     setSearchTerm("");
   };
 
+  
   return (
     <div className="relative" ref={wrapperRef}>
       <div
@@ -140,6 +141,13 @@ const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
+  
+
+
+
+  
+
+
     const capitalizeFirstLetter = (text = "") => {
   if (!text) return "N/A";
   return text.charAt(0).toUpperCase() + text.slice(1);
@@ -151,6 +159,14 @@ const ViewAllComplaint = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
+  const [showDispatch, setshowDispatch] = useState(false);
+
+  function diposeShow (){
+    setshowDispatch(true)
+  }
+  function closePoup (){
+    setshowDispatch(false)
+  }
 
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
@@ -264,6 +280,27 @@ const ViewAllComplaint = () => {
     },
   });
 
+  const dispose = useMutation({
+    mutationFn: async ({ complaintId, remarkData }) => {
+      const res = await api.post(`/lokayukt/dispose-complain/${id}`, {
+        complaint_id: complaintId,
+        remark: remarkData,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success( "Dispose successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+      setRemark("");
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to mark as received"
+      );
+    },
+  });
+
   // const forwardComplaintMutation = useMutation({
   //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
   //     const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
@@ -342,6 +379,10 @@ const ViewAllComplaint = () => {
     setRemark("");
     setSelectedForwardTo("");
   };
+
+
+
+  
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -756,7 +797,22 @@ const ViewAllComplaint = () => {
                   </button>
                 </div>
 
+
+                
+
                 <div className="flex gap-2">
+
+
+                    <button
+  onClick={diposeShow}
+  disabled={dispose.isPending}
+  className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {dispose.isPending ? "Processing..." : "Dispose"}
+</button>
+
+                   
+
                   <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
@@ -789,6 +845,15 @@ const ViewAllComplaint = () => {
           </div>
         )}
       </div>
+
+
+      {/* {
+        showDispatch && (
+          <div>
+            <h1>djudjdjj</h1>
+          </div>
+        )
+      } */}
 
      {confirmConfig.open && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -837,7 +902,7 @@ const ViewAllComplaint = () => {
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
                           <span className="ml-2 text-sm text-gray-700 font-medium">
-                            Send To My Pool
+                            Send Direct
                           </span>
                         </label>
                         <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
@@ -885,14 +950,22 @@ const ViewAllComplaint = () => {
                           placeholder="Select Officer..."
                         />
                       )}
+
+                          
+                 
                     </div>
                   </>
                 )}
-    
+
+             <label className="flex items-center gap-2 cursor-pointer">
+  <input type="checkbox" className="w-4 h-4" />
+  <span className="text-sm">Checkbox If Send throgh Rc </span>
+</label>
+       
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
                     <>
-                      <div className="mb-5">
+                      <div className="mb-5 mt-3">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Remark <span className="text-red-500">*</span>
                         </label>
@@ -949,6 +1022,73 @@ const ViewAllComplaint = () => {
               </div>
             </div>
           )}
+
+
+          {showDispatch && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+      
+      {/* Close Button */}
+      <button
+        onClick={closePoup}
+        disabled={markAsReceivedMutation.isPending}
+        className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <FaTimes className="w-5 h-5 text-gray-600" />
+      </button>
+
+      {/* Title */}
+      <h3 className="text-lg font-semibold mb-4 pr-8">
+        Dispose Complaint
+      </h3>
+
+      {/* Remark */}
+      <div className="mb-5">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Disposal Remark <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          rows={4}
+          placeholder="Enter disposal remark..."
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={closePoup}
+          className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            if (!remark.trim()) {
+              toast.error("Please enter disposal remark");
+              return;
+            }
+
+            dispose.mutate({
+              complaintId: id,
+              remarkData: remark,
+            });
+
+            setshowDispatch(false);
+          }}
+          disabled={dispose.isPending || !remark.trim()}
+          className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {dispose.isPending ? "Disposing..." : "Dispose Now"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {viewModalConfig.open && (
         <div
