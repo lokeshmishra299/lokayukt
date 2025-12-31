@@ -7,11 +7,13 @@ use App\Models\Complaint;
 use App\Models\ComplaintAction;
 use App\Models\SubRole;
 use App\Models\User;
+use App\Models\ComplaintNotes;
 use App\Models\ComplainDocuments;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class SupervisorComplaintsController extends Controller
 {
@@ -95,10 +97,17 @@ class SupervisorComplaintsController extends Controller
             // $query->where('complaints.added_by', $user);
             break;
 
-        case "ds-js":
+        // case "ds-js":
+        //   $query->where('form_status', 1)
+        //           ->where('approved_rejected_by_ro', 1)
+        //           ->where('approved_rejected_by_so_us', 0);
+        //         //   ->where('forward_so', 1)
+        //         //   ->whereOr('forward_to_uplokayukt', 1);
+        //     break;
+        case "ro-aro":
           $query->where('form_status', 1)
-                  ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_so_us', 0);
+                  ->where('approved_rejected_by_rk', 1)
+                  ->where('rep.forward_to_ro_aro', $user);
                 //   ->where('forward_so', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
             break;
@@ -228,20 +237,20 @@ $complainDetails->details = DB::table('complaints_details as cd')
         }
         // dd($usersByRole['lok-ayukt']);
    }
-   public function getUpLokayuktUsers(){
-    $usersByRole = User::with('role')
-     ->whereNotNull('role_id')
-        ->get()
-        ->groupBy(fn ($user) => $user->role->name);
-        if(!empty($usersByRole['up-lok-ayukt'])){
+//    public function getUpLokayuktUsers(){
+//     $usersByRole = User::with('role')
+//      ->whereNotNull('role_id')
+//         ->get()
+//         ->groupBy(fn ($user) => $user->role->name);
+//         if(!empty($usersByRole['up-lok-ayukt'])){
 
-            return response()->json($usersByRole['up-lok-ayukt']);
-        }else{
+//             return response()->json($usersByRole['up-lok-ayukt']);
+//         }else{
 
-            return response()->json(["message"=>"Data Not Found"]);
-        }
+//             return response()->json(["message"=>"Data Not Found"]);
+//         }
        
-   }
+//    }
    public function getDealingAssistantUsers(){
     // $usersBySubRole = User::with('role','subrole')
     //     ->get()
@@ -815,4 +824,112 @@ $complainDetails->details = DB::table('complaints_details as cd')
            ]);
 
     }
+
+     public function getUsers(){
+     
+        $usersByRole = User::with('role')
+         ->whereNotNull('role_id')
+        ->get()
+        ->groupBy(fn ($user) => $user->role->name);
+        
+
+         if(!empty($usersByRole['lok-ayukt'])){
+            $data[] =  $usersByRole['lok-ayukt'];
+            $data[] =  $usersByRole['up-lok-ayukt'];
+
+           return response()->json($data);
+        }else{
+
+            return response()->json(["message"=>"Data Not Found"]);
+        }
+        // dd($usersByRole['lok-ayukt']);
+   }
+
+
+   public function getUpLokayuktUsers(){
+    $usersByRole = User::with('role')
+     ->whereNotNull('role_id')
+        ->get()
+        ->groupBy(fn ($user) => $user->role->name);
+        if(!empty($usersByRole['up-lok-ayukt'])){
+
+            return response()->json($usersByRole['up-lok-ayukt']);
+        }else{
+
+            return response()->json(["message"=>"Data Not Found"]);
+        }
+       
+   }
+
+    public function addNotes(Request $request)
+    {
+       
+        // $user = $request->user()->id;
+        $added_by = Auth::user()->id;
+    
+        $validation = Validator::make($request->all(), [
+            
+            'complaint_id' => 'required|numeric',
+            // 'type' => 'required|string',
+            // 'title' => 'required|string',
+            'description' => 'required|string',
+            'd_id' => 'required',
+            // 'forward_by' => 'required',
+            // 'forward_to' => 'required',
+            'range_from' => 'required',
+            'range_two' => 'required',
+            
+        ], [
+            'complaint_id.required' => 'Complaint Id is required.',
+            // 'type.required' => 'Complaint description is required.',
+            // 'title.required' => 'Letter Subject is Required',
+            'description.required' => 'Description is Required',
+            'd_id.required' => 'Document is Required',
+            'range_from.required' => 'Range From is Required',
+            'range_two.required' => 'Range too is Required',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        if(isset($request->complaint_id)){    
+                $compDoc = new ComplaintNotes();
+                $compDoc->complaint_id = $request->complaint_id;
+                $compDoc->added_by = $added_by;
+                // $compDoc->type = $request->type;
+                // $compDoc->title = $request->title;
+                $compDoc->description = $request->description;
+                $compDoc->forward_by = $added_by;
+                $compDoc->forward_to = $request->forward_to;
+                $compDoc->d_id = $request->d_id;
+                $compDoc->range_from = $request->range_from;
+                $compDoc->range_two = $request->range_two;
+                $compDoc->save();
+              
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Document Added successfully.',
+                    'data' => $compDoc
+                ], 201);
+        }
+
+    }
+
+       public function getNotes(Request $request,$id){
+        if($request->isMethod('get')){
+            $Notes = ComplaintNotes::where('complaint_id',$id)->get();
+
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Notes Fetch successfully.',
+                    'data' => $Notes
+                ], 200);
+        }
+       
+    }
+
 }
