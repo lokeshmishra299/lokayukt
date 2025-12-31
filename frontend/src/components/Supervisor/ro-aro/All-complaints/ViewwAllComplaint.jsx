@@ -35,6 +35,8 @@ const SearchableDropdown = ({
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
 
+
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -142,11 +144,14 @@ const ViewAllComplaint = () => {
   const { id } = useParams();
 
   
-const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
-    open: false,
-    type: null,
-  });
- const handleAssignToSelf = () =>
+const [Takefile,setTakefile]= useState(false)
+
+function takefile(){
+  setTakefile(true)
+}
+
+
+ const handleTakeFile = () =>
     setTakeFileConfirmConfig({ open: true, type: "assign" });
 
   
@@ -159,7 +164,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
 
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("fee");
+  const [activeTab, setActiveTab] = useState("documents");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
@@ -236,6 +241,22 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
   // });
 
 
+    const assignToSelfMutation = useMutation({
+      mutationFn: async ({ complaintId }) => {
+        const res = await api.post(`/supervisor/assign-by-ro-aro/${complaintId}`);
+        return res.data;
+      },
+      onSuccess: (data) => {
+        toast.success(data.message || "Assigned to yourself successfully");
+        setTakefile(false)
+        queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+        setConfirmConfig({ open: false, type: null });
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || "Failed to assign");
+      },
+    });
+
    const {
       data: forwardOptionsData,
       isLoading: isLoadingOptions,
@@ -266,7 +287,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post("/lokayukt/received-physical", {
+      const res = await api.post("/supervisor/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
         sent_through_rk: sent_through_rk ? 1 : 0
@@ -290,7 +311,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
 
   const dispose = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post(`/lokayukt/dispose-complain/${id}`, {
+      const res = await api.post(`/supervisor/dispose-complain/${id}`, {
         complaint_id: complaintId,
         remark: remarkData,
       });
@@ -332,7 +353,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-lokayukt/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-ro-aro/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
           sent_through_rk: sent_through_rk ? 1 : 0
@@ -719,7 +740,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -732,7 +753,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
-                  {tab === "fee" && "Fee Verification"}
+                  {/* {tab === "fee" && "Fee Verification"} */}
                       
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
@@ -745,7 +766,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -755,7 +776,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
                         : "text-gray-600 hover:text-gray-800"
                     }`}
                   >
-                    {tab === "fee" && "Fee Verification"}
+                    {/* {tab === "fee" && "Fee Verification"} */}
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
@@ -770,7 +791,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
 
-  {activeTab === "fee" && (
+  {/* {activeTab === "fee" && (
   <Fees
     complaint={complaintData}
     onFeeApproved={() => {
@@ -779,7 +800,7 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
       });
     }}
   />
-)}
+)} */}
 
 
               {activeTab === "documents" && (
@@ -806,18 +827,14 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
                     Pull Back
                   </button>
                   
-                    {complaintData.assign_to_ps ? (
-                    <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
-                    Take File In Hand
-                    </span>
-                  ) : (
+                 
                     <button
-                      onClick={handleAssignToSelf}
+                      onClick={takefile}
                       className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
                     >
-                      Assigned To My Self
+                       Take File In Hand
                     </button>
-                  )}
+              
 
                 </div>
 
@@ -878,6 +895,51 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
           </div>
         )
       } */}
+
+{Takefile && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="bg-white w-[420px] rounded-lg shadow-lg relative">
+
+      <div className="flex items-center justify-between px-6 pt-2 ">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Take your file in hand?
+        </h2>
+        <button
+          onClick={() => setTakefile(false)}
+          className="text-gray-500 hover:text-gray-700 text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="px-6 py-6 text-sm text-gray-700">
+        Are you sure you want to take this file in hand?
+      </div>
+
+      <div className="flex justify-end gap-3 px-6 pb-2 ">
+        <button
+          onClick={() => setTakefile(false)}
+          className="px-5 py-2 rounded-md border text-gray-700 hover:bg-gray-100"
+        >
+          No
+        </button>
+
+       <button
+  onClick={() =>
+    assignToSelfMutation.mutate({ complaintId: id })
+  }
+  className="px-5 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+  disabled={assignToSelfMutation.isLoading}
+>
+  {assignToSelfMutation.isLoading ? "Processing..." : "Yes"}
+</button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
 
      {confirmConfig.open && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -981,7 +1043,13 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
                   </>
                 )}
 
- <label className="flex items-center gap-2 cursor-pointer mt-2">
+
+                {confirmConfig.type !== "assign" &&
+                  confirmConfig.type !== "pullback" && (
+                    <>
+                      <div className="mb-5 mt-3">
+
+                       <label className="flex items-center gap-2 cursor-pointer mt-2">
   <input
     type="checkbox"
     checked={sent_through_rk}
@@ -990,10 +1058,6 @@ const [TakefileconfirmConfig, setTakeFileConfirmConfig] = useState({
   />
   <span className="text-sm">Checkbox If Send through RC</span>
 </label>
-                {confirmConfig.type !== "assign" &&
-                  confirmConfig.type !== "pullback" && (
-                    <>
-                      <div className="mb-5 mt-3">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Remark <span className="text-red-500">*</span>
                         </label>
