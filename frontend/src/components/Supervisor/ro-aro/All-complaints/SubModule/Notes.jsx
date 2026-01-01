@@ -48,7 +48,7 @@ const Notes = ({ complaint }) => {
   useEffect(() => {
     const fetchDocs = async () => {
       try {
-        const res = await api.get(`/supervisor/get-document/${complaint?.id}`);
+        const res = await api.get(`/supervisor/get-documentdraft/${complaint?.id}`);
         if (res.data.status) setDocuments(res.data.data);
       } catch (err) {
         console.log("Document fetch error:", err);
