@@ -9,6 +9,7 @@ use App\Models\SubRole;
 use App\Models\User;
 use App\Models\ComplaintNotes;
 use App\Models\ComplainDocuments;
+use App\Models\Drafts;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1148,6 +1149,18 @@ class SupervisorComplaintsController extends Controller
         }
        
     }
+     public function getUploadDocAndDraft(Request $request,$id){
+        if($request->isMethod('get')){
+            $complain = ComplainDocuments::where('complain_id',$id)->get();
+
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Document Fetch successfully.',
+                    'data' => $complain
+                ], 200);
+        }
+       
+    }
 
       public function getDraftLetter(Request $request,$id){
         if($request->isMethod('get')){
@@ -1267,6 +1280,47 @@ class SupervisorComplaintsController extends Controller
                 return response()->json([
                     'status' => true,
                     'message' => 'Document Added successfully.',
+                    'data' => $compDoc
+                ], 201);
+        }
+
+    }
+
+     public function createDraft(Request $request)
+    {
+       
+        // $user = $request->user()->id;
+        $added_by = Auth::user()->id;
+    
+        $validation = Validator::make($request->all(), [
+            
+            'complaint_id' => 'required|numeric',
+            'draft_note' => 'required|string',
+            
+        ], [
+            'complaint_id.required' => 'Complaint Id is required.',
+            'draft_note.required' => 'Description is Required',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        if(isset($request->complaint_id)){    
+                $compDoc = new Drafts();
+                $compDoc->complaint_id = $request->complaint_id;
+                $compDoc->draft_note = $request->draft_note;
+                $compDoc->status = '1';
+
+             
+                $compDoc->save();
+              
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Draft Added successfully.',
                     'data' => $compDoc
                 ], 201);
         }
@@ -1402,7 +1456,7 @@ class SupervisorComplaintsController extends Controller
             'complain_id' => 'required|numeric',
             'type' => 'required|string',
             'title' => 'required|string',
-            'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:5048',
         ], [
             'complain_id.required' => 'Complaint Id is required.',
             'type.required' => 'Complaint description is required.',

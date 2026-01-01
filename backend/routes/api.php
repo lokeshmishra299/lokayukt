@@ -208,9 +208,12 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/all-approved-complaints',[SupervisorComplaintsController::class,'allComplainsapproved']);
         Route::get('/view-complaint/{id}',[SupervisorComplaintsController::class,'viewComplaint']);
         Route::get('/get-document/{id}',[SupervisorComplaintsController::class,'getUploadDoc']);
+        Route::get('/get-documentdraft/{id}',[SupervisorComplaintsController::class,'getUploadDocAndDraft']);
         Route::get('/get-draft-letter/{id}',[SupervisorComplaintsController::class,'getDraftLetter']);
          Route::get('/get-file-preview/{id}',[SupervisorComplaintsController::class,'getFilePreview']);
          Route::post('/add-notes',[SupervisorComplaintsController::class,'addNotes']);
+         Route::post('/create-draft',[SupervisorComplaintsController::class,'createDraft']);
+         
          Route::get('/get-notes/{id}',[SupervisorComplaintsController::class,'getNotes']);
           Route::post('assign-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'assignToRoAro']);
          Route::post('/upload-document',[SupervisorComplaintsController::class,'uploadDocument']);
