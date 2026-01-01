@@ -24,6 +24,8 @@ class OperatorComplaintsController extends Controller
 
     public function store(StoreComplaintRequest $request)
 {
+     $added_by = Auth::user()->id;
+
     DB::beginTransaction();
 
     try {
@@ -61,6 +63,7 @@ class OperatorComplaintsController extends Controller
             'challan_number'              => $request->challan_number,
             'challan_date'                => $request->challan_date,
             'challan_file'                => $challanFile,
+            'added_by'                    => $added_by,
             'attached_documents_description' => $request->attached_documents_description,
             'attached_documents'          => $attached_documents,
             'complaint_description'       => $request->complaint_description,

@@ -797,7 +797,7 @@ class SupervisorComplaintsController extends Controller
             
             $subroleFwd = $user[0]->subrole->name ?? null;
 
-        
+       
  
 
         $userId = Auth::user()->id;
@@ -835,7 +835,7 @@ class SupervisorComplaintsController extends Controller
             // dd($cmp);
 
                if($cmp){
-                $cmp->approved_rejected_by_lokayukt = 1;
+                $cmp->approved_rejected_by_ro_aro = 1;
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Deputy Secretary / Joint Secretary';
                 // $remark.='\n';
@@ -886,7 +886,8 @@ class SupervisorComplaintsController extends Controller
 
                         $apcAction = new ComplaintAction();
                         $apcAction->complaint_id = $complainId;
-                        $apcAction->approved_rejected_by_ro_aro = $userId;
+                        
+                        // $apcAction->approved_rejected_by_ro_aro = $userId;
 
                         if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt'])) {
 
@@ -914,11 +915,20 @@ class SupervisorComplaintsController extends Controller
                                 case 'so-us':
                                     $apcAction->forward_to_so_us = $request->forward_to;
                                     break;
+                               
+                                    case 'ro-aro':
+                                    $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    break;
                             }
                         }
 
+                        if($request->sent_through_rk == 1){
+                             $apcAction->sent_through_rk = 1;
+                             $apcAction->sent_through_rk_id = $cmp->added_by;
+                        }
+
                         $apcAction->status = 'Forwarded';
-                        $apcAction->type = '1';
+                        // $apcAction->type = '1';
                         $apcAction->remarks = $request->remark;
                         $apcAction->save();
 
@@ -1128,7 +1138,20 @@ class SupervisorComplaintsController extends Controller
 
      public function getUploadDoc(Request $request,$id){
         if($request->isMethod('get')){
-            $complain = ComplainDocuments::where('complain_id',$id)->get();
+            $complain = ComplainDocuments::where('complain_id',$id)->where('type','<>','Draft Letter')->get();
+
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Document Fetch successfully.',
+                    'data' => $complain
+                ], 200);
+        }
+       
+    }
+
+      public function getDraftLetter(Request $request,$id){
+        if($request->isMethod('get')){
+            $complain = ComplainDocuments::where('complain_id',$id)->where('type','Draft Letter')->get();
 
            return response()->json([
                     'status' => true,
@@ -1303,7 +1326,7 @@ class SupervisorComplaintsController extends Controller
              $cmp =  Complaint::findOrFail($complainId);
              
             if($cmp){
-                $cmp->assign_to_ro_aro = $user;
+                $cmp->assign_to_ro_aro = $user; 
                 $cmp->save(); 
             }
           
@@ -1318,6 +1341,99 @@ class SupervisorComplaintsController extends Controller
                     'status' => false,
                     'message' => 'Please check Id'
                 ], 401);
+        }
+
+    }
+
+     public function uploadDocument(Request $request)
+    {
+        // dd($request->complain_id);
+        // $user = $request->user()->id;
+        $added_by = Auth::user()->id;
+    
+        $validation = Validator::make($request->all(), [
+            
+            'complain_id' => 'required|numeric',
+            'type' => 'required|string',
+            'title' => 'required|string',
+            'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ], [
+            'complain_id.required' => 'Complaint Id is required.',
+            'type.required' => 'Complaint description is required.',
+            'title.required' => 'Letter Subject is Required',
+            'file.required' => 'File is Required',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        if(isset($request->complain_id)){    
+                $compDoc = new ComplainDocuments();
+                $compDoc->complain_id = $request->complain_id;
+                $compDoc->added_by = $added_by;
+                $compDoc->type = $request->type;
+                $compDoc->title = $request->title;     
+                $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
+                $filePath = $request->file('file')->storeAs('Document', $file, 'public');
+                $compDoc->file = $file;
+                
+                $compDoc->save();
+              
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Document Added successfully.',
+                    'data' => $compDoc
+                ], 201);
+        }
+
+    }
+     public function uploadDraftLetter(Request $request)
+    {
+        // dd($request->complain_id);
+        // $user = $request->user()->id;
+        $added_by = Auth::user()->id;
+    
+        $validation = Validator::make($request->all(), [
+            
+            'complain_id' => 'required|numeric',
+            'type' => 'required|string',
+            'title' => 'required|string',
+            'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ], [
+            'complain_id.required' => 'Complaint Id is required.',
+            'type.required' => 'Complaint description is required.',
+            'title.required' => 'Letter Subject is Required',
+            'file.required' => 'File is Required',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        if(isset($request->complain_id)){    
+                $compDoc = new ComplainDocuments();
+                $compDoc->complain_id = $request->complain_id;
+                $compDoc->added_by = $added_by;
+                $compDoc->type = $request->type;
+                $compDoc->title = $request->title;     
+                $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
+                $filePath = $request->file('file')->storeAs('Document', $file, 'public');
+                $compDoc->file = $file;
+                
+                $compDoc->save();
+              
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Document Added successfully.',
+                    'data' => $compDoc
+                ], 201);
         }
 
     }
