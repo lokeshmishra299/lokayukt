@@ -1,9 +1,17 @@
-import React, { useState } from "react";
-import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt } from "react-icons/fa";
+import React, { useState, useRef } from "react";
+import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt, FaPrint, FaDownload } from "react-icons/fa";
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+
+// Import Editor components
+import { EditorState, convertToRaw } from "draft-js";
+import { Editor } from "react-draft-wysiwyg";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import draftToHtml from "draftjs-to-html";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -20,7 +28,8 @@ const DraftLetter = ({ complaint }) => {
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
-
+  const [showSuccess, setShowSuccess] = useState(false);
+  
   // -- Add Document State --
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newDoc, setNewDoc] = useState({
@@ -29,8 +38,140 @@ const DraftLetter = ({ complaint }) => {
     file: null,
   });
 
+  // -- Add Note/Noting State --
+  const [openNoteModal, setOpenNoteModal] = useState(false);
+  const [note, setNote] = useState("");
+  const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+  const [selectedDoc, setSelectedDoc] = useState("");
+  const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [loadingPdf, setLoadingPdf] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  // Refs for Print/Preview
+  const popupRef = useRef(null);
+
   const handleAddDocuments = () => {
     setopenAddDocuments(true);
+  };
+
+  // -- Note Modal Functions --
+  const onEditorStateChange = (editorState) => {
+    setEditorState(editorState);
+    const content = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+    setNote(content);
+  };
+
+  const handleSelectDoc = async (fileName) => {
+    setSelectedDoc(fileName);
+    setPdfPreviewUrl(null);
+
+    if (!fileName) return;
+
+    try {
+      setLoadingPdf(true);
+      const res = await api.get(`/supervisor/get-file-preview/${complaint.id}`);
+      if (res.data.status && res.data.data.length > 0) {
+        const match = res.data.data.find((p) => p.includes(fileName));
+        if (match) {
+          const url = makeFileUrl(match);
+          setPdfPreviewUrl(url);
+        } else {
+          toast.error("PDF path not found");
+        }
+      }
+    } catch {
+      toast.error("PDF नहीं खुल पाया");
+    } finally {
+      setLoadingPdf(false);
+    }
+  };
+
+  // 1. Updated: Just opens the Preview Popup
+  const handleSubmitNote = () => {
+    setErrors({});
+    
+    // Simple Validation
+    const contentState = editorState.getCurrentContent();
+    if (!contentState.hasText()) {
+      toast.error("Please enter some content.");
+      return;
+    }
+
+    // Close Editor, Open Preview
+    setOpenNoteModal(false);
+    setShowSuccess(true);
+  };
+
+  // 2. New: Handles the actual API call from the Preview Popup
+  const handleFinalSubmit = async () => {
+    const payload = {
+      complaint_id: complaint.id,
+      draft_note: note,
+    };
+
+    try {
+      // Using the requested API
+      const res = await api.post("/supervisor/create-draft", payload);
+
+      if (res.data.status) {
+        toast.success("Draft Added Successfully!");
+        setShowSuccess(false); // Close Preview
+        setNote("");
+        setEditorState(EditorState.createEmpty());
+        setSelectedDoc("");
+        setPageRanges([{ from: "", to: "" }]);
+        setPdfPreviewUrl(null);
+      } else if (res.data.errors) {
+        // If error, reopen editor to fix
+        setShowSuccess(false);
+        setOpenNoteModal(true);
+        setErrors(res.data.errors);
+        Object.values(res.data.errors).forEach((msgArr) => {
+          toast.error(msgArr[0]);
+        });
+      }
+    } catch (err) {
+      toast.error("Server Error!");
+      console.error(err);
+    }
+  };
+
+  // Print/Download Placeholders
+  const handlePrint = () => {
+    window.print();
+  };
+  
+  const handleDownloadPdf = async () => {
+    if (!popupRef.current) return;
+
+    try {
+      const elementsToHide =
+        popupRef.current.querySelectorAll(".pdf-hide-section");
+      elementsToHide.forEach((el) => (el.style.display = "none"));
+
+      const canvas = await html2canvas(popupRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+      });
+
+      elementsToHide.forEach((el) => (el.style.display = "flex"));
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Noting_${complaint?.file_number || "File"}.pdf`);
+
+      toast.success("PDF Downloaded successfully!");
+    } catch (err) {
+      console.error("PDF Generation Error:", err);
+      toast.error("Failed to generate PDF");
+    }
   };
 
   const normalizePath = (filePath) => {
@@ -85,7 +226,7 @@ const DraftLetter = ({ complaint }) => {
     }
   };
 
-  // -- Handle Form Submit --
+  // -- Handle Form Submit (File Upload) --
   const handleSubmitDocument = async () => {
     if (!newDoc.title || !newDoc.type || !newDoc.file) {
       alert("Please fill all fields and select a file.");
@@ -142,15 +283,24 @@ const DraftLetter = ({ complaint }) => {
   return (
     <div className="">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+      <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Draft</h2>
-        <button
-          onClick={handleAddDocuments}
-          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          <FaCloudUploadAlt className="w-4 h-4" />
-          Add Draft
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
+            onClick={() => setOpenNoteModal(true)}
+          >
+            Create Draft
+          </button>
+
+          <button
+            onClick={handleAddDocuments}
+            className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <FaCloudUploadAlt className="w-4 h-4" />
+            Add Draft
+          </button>
+        </div>
       </div>
 
       {/* Docs List */}
@@ -165,7 +315,6 @@ const DraftLetter = ({ complaint }) => {
               key={doc.id}
               className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
             >
-              {/* Icon + Filename */}
               <div className="flex items-center gap-3">
                 <BsFileEarmarkPdf className="w-6 h-6 text-blue-600" />
                 <div className="flex flex-col">
@@ -177,8 +326,6 @@ const DraftLetter = ({ complaint }) => {
                   )}
                 </div>
               </div>
-
-              {/* Actions */}
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleViewPdf(doc.file)}
@@ -202,7 +349,6 @@ const DraftLetter = ({ complaint }) => {
       {openAddDocuments && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
           <div className="bg-white rounded-xl w-full max-w-lg flex flex-col shadow-2xl animate-fade-in-up">
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
               <h3 className="text-lg font-bold text-gray-800">
                 Add New Draft
@@ -214,10 +360,7 @@ const DraftLetter = ({ complaint }) => {
                 <FaTimes className="w-5 h-5" />
               </button>
             </div>
-
-            {/* Modal Body */}
             <div className="p-6 space-y-5">
-              {/* Document Title */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Draft Title <span className="text-red-500">*</span>
@@ -232,8 +375,6 @@ const DraftLetter = ({ complaint }) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
-
-              {/* Document Type (UPDATED TO DROPDOWN) */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Correspondence Type <span className="text-red-500">*</span>
@@ -246,13 +387,8 @@ const DraftLetter = ({ complaint }) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
                 >
                   <option value="Letter">Draft Letter</option>
-                  {/* <option value="Reminder">Reminder</option>
-                  <option value="RTI Reply">RTI Reply</option>
-                  <option value="Counter Order">Counter Order</option> */}
                 </select>
               </div>
-
-              {/* File Upload Area */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Upload File <span className="text-red-500">*</span>
@@ -290,8 +426,6 @@ const DraftLetter = ({ complaint }) => {
                 </div>
               </div>
             </div>
-
-            {/* Modal Footer */}
             <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
               <button
                 onClick={() => setopenAddDocuments(false)}
@@ -313,7 +447,142 @@ const DraftLetter = ({ complaint }) => {
         </div>
       )}
 
-      {/* PDF View Modal (Existing) */}
+      {/* Add Note/Noting Modal (EDITOR) */}
+      {openNoteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 md:p-0">
+          <div className="bg-white w-full md:w-11/12 h-full md:h-[70vh] shadow-xl relative flex flex-col md:flex-row rounded-md overflow-hidden">
+            <button
+              className="absolute top-2 right-2 md:top-4 md:right-4 p-2 bg-white/80 hover:bg-gray-100 rounded-full z-10"
+              onClick={() => setOpenNoteModal(false)}
+            >
+              <FaTimes className="w-5 h-5 text-gray-600" />
+            </button>
+            <div className="flex-1 px-4 md:p-6 overflow-y-auto">
+              <h2 className="text-lg font-semibold mb-4 md:mb-6">Create Draft</h2>
+              <label className="block text-sm font-medium mb-2">
+                Draft Content <span className="text-red-500">*</span>
+              </label>
+              <div
+                className={`border rounded-md ${
+                  errors.draft_note ? "border-red-500" : "border-gray-300"
+                }`}
+              >
+                <Editor
+                  editorState={editorState}
+                  onEditorStateChange={onEditorStateChange}
+                  toolbarClassName="toolbarClassName"
+                  wrapperClassName="wrapperClassName"
+                  editorClassName="editorClassName px-3 min-h-[120px] md:min-h-[150px]"
+                  placeholder="Enter your note here..."
+                  toolbar={{
+                    options: [
+                      "inline",
+                      "blockType",
+                      "fontSize",
+                      "list",
+                      "textAlign",
+                      "colorPicker",
+                      "link",
+                      "emoji",
+                      "remove",
+                      "history",
+                    ],
+                    inline: { options: ["bold", "italic", "underline"] },
+                  }}
+                />
+              </div>
+              {errors.draft_note && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.draft_note[0]}
+                </p>
+              )}
+              <div className="flex justify-end mt-24"> 
+                <button
+                  className="bg-blue-600 text-white px-3 py-3 rounded-lg hover:bg-blue-700 transition text-md"
+                  onClick={handleSubmitNote} // THIS OPENS THE POPUP
+                >
+                 Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUCCESS / PREVIEW POPUP */}
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl my-auto">
+            <div ref={popupRef} className="bg-white rounded-lg overflow-hidden">
+              <div className="px-4 py-3 md:px-6 md:py-4 border-b flex flex-wrap justify-between items-center bg-gray-100 pdf-hide-section gap-2">
+                <p className="text-sm font-semibold text-gray-800">
+                  Preview Note
+                </p>
+                <div className="flex items-center gap-2 ml-auto">
+                  <button
+                    onClick={handlePrint}
+                    className="p-2 rounded hover:bg-gray-200 text-gray-700 flex items-center gap-1 text-xs font-medium"
+                    title="Print"
+                  >
+                    <FaPrint /> <span className="hidden sm:inline">Print</span>
+                  </button>
+                  <button
+                    onClick={handleDownloadPdf}
+                    className="p-2 rounded hover:bg-gray-200 text-blue-600 flex items-center gap-1 text-xs font-medium"
+                    title="Download as PDF"
+                  >
+                    <FaDownload /> <span className="hidden sm:inline">Download</span>
+                  </button>
+                  <button
+                    onClick={() => setShowSuccess(false)}
+                    className="p-2 rounded hover:bg-gray-200 text-gray-600"
+                  >
+                    <FaTimes className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
+                <p className="text-sm text-center font-semibold text-gray-800">
+                  File No: {complaint?.file_number || complaint?.complain_no}
+                </p>
+                <p className="text-xs text-gray-500">
+                  Date: {new Date().toLocaleDateString()}
+                </p>
+                <div
+                  className="rounded-md bg-white px-2 py-2 md:px-5 md:py-4 min-h-[200px] md:min-h-[260px] whitespace-pre-wrap"
+                  dangerouslySetInnerHTML={{ __html: note }}
+                />
+                <div className="flex justify-between pt-4">
+                  <div />
+                  <div className="text-right text-xs text-gray-600">
+                    <p className="uppercase tracking-wide">Noting By</p>
+                    <p className="font-semibold mt-1 text-gray-800">
+                      Shri Sanjay Mishra
+                    </p>
+                    <p>PS Name...</p>
+                  </div>
+                </div>
+              </div>
+              <div className="px-6 py-4 md:px-8 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
+                <button
+                  className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
+                  onClick={() => setShowSuccess(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="px-6 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+                  onClick={handleFinalSubmit} // THIS CALLS THE API
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PDF View Modal */}
       {pdfViewUrl && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">
@@ -326,7 +595,6 @@ const DraftLetter = ({ complaint }) => {
                 <FaTimes className="w-5 h-5" />
               </button>
             </div>
-
             <iframe
               src={`${pdfViewUrl}#zoom=page-width`}
               className="w-full h-full border-0"
