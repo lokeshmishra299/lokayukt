@@ -34,7 +34,7 @@ const DraftLetter = ({ complaint }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newDoc, setNewDoc] = useState({
     title: "",
-    type: "Letter", // Default to first option
+    type: "", 
     file: null,
   });
 
@@ -133,6 +133,7 @@ const DraftLetter = ({ complaint }) => {
       }
     } catch (err) {
       toast.error("Server Error!");
+       setErrors(err.response.data);
       console.error(err);
     }
   };
@@ -195,7 +196,7 @@ const DraftLetter = ({ complaint }) => {
   } = useQuery({
     queryKey: ["documents", complaint?.id],
     queryFn: async () => {
-      const res = await api.get(`/supervisor/get-draft-letter/id/${complaint.id}`);
+      const res = await api.get(`/supervisor/get-draft-letter/${complaint.id}`);
       return res.data.status ? res.data.data : [];
     },
     enabled: !!complaint?.id,
@@ -227,43 +228,58 @@ const DraftLetter = ({ complaint }) => {
   };
 
   // -- Handle Form Submit (File Upload) --
-  const handleSubmitDocument = async () => {
-    if (!newDoc.title || !newDoc.type || !newDoc.file) {
-      alert("Please fill all fields and select a file.");
+const handleSubmitDocument = async () => {
+  setErrors({}); // Reset errors
+  
+  if (!newDoc.title || !newDoc.type || !newDoc.file) {
+    toast.error("Please fill all fields and select a file.");
+    return;
+  }
+
+  if (!complaint?.id) {
+    toast.error("Complaint ID is missing.");
+    return;
+  }
+
+  setIsSubmitting(true);
+  try {
+    const formData = new FormData();
+    
+    formData.append("file", newDoc.file);
+    formData.append("type", newDoc.type);
+    formData.append("title", newDoc.title);
+    formData.append("complain_id", complaint.id);
+
+    const response = await api.post("/supervisor/upload-draft-letter", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    // Check if response has errors
+    if (response.data.status === false) {
+      setErrors(response.data.errors || {});
+      toast.error("Upload failed!");
       return;
     }
 
-    if (!complaint?.id) {
-      alert("Complaint ID is missing.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const formData = new FormData();
-      
-      formData.append("file", newDoc.file);
-      formData.append("type", newDoc.type);
-      formData.append("title", newDoc.title);
-      formData.append("complain_id", complaint.id);
-
-      await api.post("/supervisor/upload-draft-letter", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      toast.success("Document uploaded successfully!");
-      setopenAddDocuments(false);
-      setNewDoc({ title: "", type: "Letter", file: null }); 
-      refetch(); 
-    } catch (error) {
-      console.error("Upload failed", error);
+    toast.success("Document uploaded successfully!");
+    setopenAddDocuments(false);
+    setNewDoc({ title: "", type: "", file: null }); 
+    refetch(); 
+  } catch (error) {
+    console.error("Upload failed", error);
+    
+    // Handle backend validation errors
+    if (error.response?.data?.errors) {
+      setErrors(error.response.data.errors);
+      toast.error("Validation error!");
+    } else {
       const msg = error.response?.data?.message || "Failed to upload document.";
       toast.error(msg);
-    } finally {
-      setIsSubmitting(false);
     }
-  };
-
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -375,56 +391,76 @@ const DraftLetter = ({ complaint }) => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">
-                  Correspondence Type <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={newDoc.type}
-                  onChange={(e) =>
-                    setNewDoc({ ...newDoc, type: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
-                >
-                  <option value="Letter">Draft Letter</option>
-                </select>
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">
-                  Upload File <span className="text-red-500">*</span>
-                </label>
-                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group">
-                  <input
-                    type="file"
-                    onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                  />
-                  <div className="flex flex-col items-center justify-center gap-2">
-                    {newDoc.file ? (
-                      <>
-                        <FaFileAlt className="w-8 h-8 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
-                          {newDoc.file.name}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {(newDoc.file.size / 1024 / 1024).toFixed(2)} MB
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <FaCloudUploadAlt className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                        <span className="text-sm text-gray-500">
-                          Click to browse or drag file here
-                        </span>
-                        <span className="text-xs text-gray-400">
-                          PDF, JPG, PNG (Max 5MB)
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
+           <div className="space-y-1.5">
+  <label className="text-sm font-medium text-gray-700">
+    Correspondence Type <span className="text-red-500">*</span>
+  </label>
+  <select
+    value={newDoc.type}
+    onChange={(e) =>
+      setNewDoc({ ...newDoc, type: e.target.value })
+    }
+    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+  >
+    <option value="">Select Type</option>
+    <option value="Draft Letter">Draft Letter</option>
+  </select>
+</div>
+             <div className="space-y-1.5">
+  <label className="text-sm font-medium text-gray-700">
+    Upload File <span className="text-red-500">*</span>
+    <span className="text-xs text-red-500 ml-2"></span>
+  </label>
+  <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group">
+    <input
+      type="file"
+      onChange={handleFileChange}
+      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      accept=".pdf,.jpg,.jpeg,.png"
+    />
+    <div className="flex flex-col items-center justify-center gap-2">
+      {newDoc.file ? (
+        <>
+          <FaFileAlt className="w-8 h-8 text-blue-500" />
+          <span className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+            {newDoc.file.name}
+          </span>
+          <span className={`text-xs ${
+            newDoc.file.size > 2 * 1024 * 1024 
+              ? 'text-red-500 font-semibold' 
+              : 'text-green-500'
+          }`}>
+            Size: {(newDoc.file.size / 1024).toFixed(0)} KB
+            {newDoc.file.size > 2 * 1024 * 1024 && ' (Too large!)'}
+          </span>
+        </>
+      ) : (
+        <>
+          <FaCloudUploadAlt className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
+          <span className="text-sm text-gray-500">
+            Click to browse or drag file here
+          </span>
+          <span className="text-xs text-gray-400">
+            PDF, JPG, PNG (Max 2MB)
+          </span>
+        </>
+      )}
+    </div>
+  </div>
+  
+  {errors && errors.file && errors.file[0] && (
+    <div className="text-red-500 text-xs mt-1 p-2 bg-red-50 border border-red-200 rounded">
+       {errors.file[0]}
+    </div>
+  )}
+  
+  {/* Frontend file size warning */}
+  {/* {newDoc.file && newDoc.file.size > 2 * 1024 * 1024 && (
+    <div className="text-red-500 text-xs mt-1 p-2 bg-red-50 border border-red-200 rounded">
+       File size exceeds 2MB limit. Please choose a smaller file.
+    </div>
+  )} */}
+</div>
             </div>
             <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
               <button
