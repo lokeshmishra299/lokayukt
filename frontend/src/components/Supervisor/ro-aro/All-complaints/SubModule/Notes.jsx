@@ -269,9 +269,9 @@ const Notes = ({ complaint }) => {
 
     return (
       hasText &&
-      selectedDoc !== "" &&
-      pageRanges[0].from !== "" &&
-      pageRanges[0].to !== ""
+      selectedDoc !== "" 
+      // pageRanges[0].from !== "" &&
+      // pageRanges[0].to !== ""
     );
   };
 

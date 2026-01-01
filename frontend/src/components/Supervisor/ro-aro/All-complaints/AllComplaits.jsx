@@ -553,15 +553,17 @@ const handleSend = async () => {
                             Send 
                           </span>
                           ) : (
-                            <button
-                              onClick={(e) =>
-                                handleApproveClick(e, complaint)
-                              }
-                              className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
-                            >
+                            // <button
+                            //   onClick={(e) =>
+                            //     handleApproveClick(e, complaint)
+                            //   }
+                            //   className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
+                            // >
                               
-                              Send To supervisor
-                            </button>
+                            //   Send To supervisor
+                            // </button>
+                            <>
+                            </>
                           )} 
                         </div>
                       </div>
