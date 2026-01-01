@@ -195,7 +195,7 @@ const DraftLetter = ({ complaint }) => {
   } = useQuery({
     queryKey: ["documents", complaint?.id],
     queryFn: async () => {
-      const res = await api.get(`/supervisor/get-document/${complaint.id}`);
+      const res = await api.get(`/supervisor/get-draft-letter/id/${complaint.id}`);
       return res.data.status ? res.data.data : [];
     },
     enabled: !!complaint?.id,
@@ -247,7 +247,7 @@ const DraftLetter = ({ complaint }) => {
       formData.append("title", newDoc.title);
       formData.append("complain_id", complaint.id);
 
-      await api.post("/supervisor/upload-document", formData, {
+      await api.post("/supervisor/upload-draft-letter", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
