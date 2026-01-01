@@ -147,7 +147,7 @@ const ViewAllComplaint = () => {
 
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("fee");
+  const [activeTab, setActiveTab] = useState("documents");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
@@ -687,7 +687,7 @@ const ViewAllComplaint = () => {
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
-                  {tab === "fee" && "Fee Verification"}
+                  {/* {tab === "fee" && "Fee Verification"} */}
                       
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
@@ -710,7 +710,7 @@ const ViewAllComplaint = () => {
                         : "text-gray-600 hover:text-gray-800"
                     }`}
                   >
-                    {tab === "fee" && "Fee Verification"}
+                    {/* {tab === "fee" && "Fee Verification"} */}
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
@@ -725,7 +725,7 @@ const ViewAllComplaint = () => {
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
 
-  {activeTab === "fee" && (
+  {/* {activeTab === "fee" && (
   <Fees
     complaint={complaintData}
     onFeeApproved={() => {
@@ -734,7 +734,7 @@ const ViewAllComplaint = () => {
       });
     }}
   />
-)}
+)} */}
 
 
               {activeTab === "documents" && (
