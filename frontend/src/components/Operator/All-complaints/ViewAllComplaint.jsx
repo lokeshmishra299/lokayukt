@@ -74,7 +74,7 @@ const ViewAllComplaint = () => {
     queryKey: ["operator-options"],
     queryFn: async () => {
       try {
-        const res = await api.get("/operator/get-lokayukt");
+        const res = await api.get("/operator/get-users");
         if (Array.isArray(res.data)) {
           return res.data;
         } else if (res.data && Array.isArray(res.data.data)) {
