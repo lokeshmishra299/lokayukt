@@ -42,6 +42,12 @@ const [selectedUpload, setSelectedUpload] = useState("");
 const [isSending, setIsSending] = useState(false);
 
 
+const feeMap = {
+  Exempted: 0,
+  Paid: 1,
+  Partial: 2
+};
+
 
 useEffect(() => {
   if (isConfirmModalOpen) {
@@ -183,11 +189,12 @@ const handleSend = async () => {
       });
     }
 
-    if (selectedFeeStatus !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.fee_status === selectedFeeStatus;
-      });
-    }
+   if (selectedFeeStatus !== "") {
+  filtered = filtered.filter(
+    (complaint) => complaint.fee_exempted === feeMap[selectedFeeStatus]
+  );
+}
+
 
     if (selectedCaseType !== "") {
       filtered = filtered.filter((complaint) => {
@@ -390,15 +397,17 @@ const handleSend = async () => {
                     </option>
                   ))}
                 </select>
-                <select className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
-                  value={selectedFeeStatus}
-                  onChange={(e) => setSelectedFeeStatus(e.target.value)}
-                >
-                  <option value="">Fee Status: All</option>
-                  <option value="paid">Paid</option>
-                  <option value="pending">Pending</option>
-                  <option value="exempted">Exempted</option>
-                </select>
+              <select
+  className="border border-gray-300 px-2 py-1 rounded-md"
+  value={selectedFeeStatus}
+  onChange={(e) => setSelectedFeeStatus(e.target.value)}
+>
+  <option value="">Fee Status: All</option>
+  <option value="Paid">Paid</option>
+  <option value="Partial">Partial</option>
+  <option value="Exempted">Exempted</option>
+</select>
+
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   disabled={typesLoading}
