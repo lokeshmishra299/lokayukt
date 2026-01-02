@@ -1707,6 +1707,36 @@ class OperatorComplaintsController extends Controller
         // dd($usersBySubRole);
    }
 
+    public function getSubROleUsers(){
+     
+        $users = User::with('subrole')
+         ->whereNotNull('sub_role_id')
+        ->get();
+        $users = $users->map(function ($item) {
+        if($item->subrole){
+          return [
+                'id' => $item->id,
+                'name' => ucfirst($item->name),
+                'subrole_name' => $item->subrole->label,
+               
+            ];
+        }
+         
+        })->toArray();
+        // dd($users);
+        // ->groupBy(fn ($user) => $user->role->name);
+        
+
+         if($users){
+
+           return response()->json($users);
+        }else{
+
+            return response()->json(["message"=>"Data Not Found"]);
+        }
+        // dd($usersByRole['lok-ayukt']);
+   }
+
     //  public function forwardbyRo(Request $request,$complainId){
     //     $userrole = Auth::user();
     //     dd($userrole);

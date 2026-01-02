@@ -178,6 +178,7 @@ Route::middleware('auth:sanctum')->group(function(){
         // Route::post('/check-duplicate-store',[OperatorComplaintsController::class,'checkduplicateStoreComplain']);
         Route::post('/approved-by-ro/{complainId}',[OperatorComplaintsController::class,'approvedByRo']);
         Route::get('get-section-officers',[OperatorComplaintsController::class,'getSectionOfficers']);
+        Route::get('/get-users',[OperatorComplaintsController::class,'getSubROleUsers']);
 
         Route::get('/progress-register',[OperatorReportController::class,'progress_report']);
         Route::get('/current-report',[OperatorReportController::class,'current_report']);
@@ -401,7 +402,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/pull-back-by-ps/{complainId}',[PSComplaintsController::class,'pullBackByPs']);
         Route::post('forward-complain-by-ps/{complainId}',[PSComplaintsController::class,'forwardComplaintbyPS']);
         Route::post('assign-by-ps/{complainId}',[PSComplaintsController::class,'assignToPs']);
-      
+        Route::post('/fee-exempted/{complaint_id}',[PSComplaintsController::class,'approvedFeeByPS']);
       
        
         // Route::post('/forward-by-ds-js/{complainId}',[PSComplaintsController::class,'forwardComplaintbyds']);
