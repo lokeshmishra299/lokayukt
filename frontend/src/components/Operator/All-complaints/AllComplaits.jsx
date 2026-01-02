@@ -53,11 +53,11 @@ const AllComplaints = () => {
   };
 
 
-  const getAllComplaints = async () => {
-    const res = await api.get("/operator/all-complaints");
-    console.log("Data he", res)
-    return res.data.data;
-  };
+ const getAllComplaints = async () => {
+  const res = await api.get("/operator/all-complaints");
+  return res.data;
+};
+
 
 
 
@@ -67,10 +67,11 @@ const AllComplaints = () => {
   });
 
 
-  const stats = {
-    overdue: data?.older7DaysCount || 0,
-    receivedToday: data?.todayCount || 0,
-  };
+const stats = {
+  overdue: data?.older7DaysCount ?? 0,
+  receivedToday: data?.todayCount ?? 0,
+};
+
 
 
   const getDistrict = async () => {
@@ -95,13 +96,14 @@ const AllComplaints = () => {
 
   });
 
-  useEffect(() => {
-    if (data) {
-      setAllComplaints(data);
-      const sorted = sortComplaintsByDate(data, sortOrder);
-      setFilteredComplaints(sorted);
-    }
-  }, [data, sortOrder]);
+useEffect(() => {
+  if (data?.data && Array.isArray(data.data)) {
+    setAllComplaints(data.data);
+    const sorted = sortComplaintsByDate(data.data, sortOrder);
+    setFilteredComplaints(sorted);
+  }
+}, [data, sortOrder]);
+
 
   useEffect(() => {
     if (allComplaints.length === 0) return;
@@ -299,7 +301,7 @@ const AllComplaints = () => {
                   <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
                 </button></div>
               <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
-                ₹ Fee Pending (0)
+                ₹ Fee Pending {data.feePending}
               </button>
             </div>
 
