@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Complaint;
 use App\Models\ComplaintAction;
 use App\Models\SubRole;
+use App\Models\ComplaintNotes;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

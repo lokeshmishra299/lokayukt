@@ -509,6 +509,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-by-so/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbySO']);
          Route::post('/dispose-complain/{complainId}',[UpLokAyuktComplaintsController::class,'disposeComplaints']);
         Route::get('/get-users',[UpLokAyuktComplaintsController::class,'getSubROleUsers']);
+         Route::get('/get-notes/{id}',[UpLokAyuktComplaintsController::class,'getNotes']);
+          Route::get('/get-document/{id}',[UpLokAyuktComplaintsController::class,'getUploadDoc']);
         // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/request-report/{complainId}',[UpLokAyuktReportController::class,'requestReport']);
