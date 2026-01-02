@@ -621,7 +621,7 @@ const ViewAllComplaint = () => {
                     >
                       {markAsReceivedMutation.isPending
                         ? "Processing..."
-                        : "Mark As Received"}
+                        : "Received Physically"}
                     </button>
                   )}
                 </div>
@@ -642,7 +642,7 @@ const ViewAllComplaint = () => {
                     >
                       {forwardPhysicallyMutation.isPending
                         ? "Processing..."
-                        : "Forward File Physically Electronically"}
+                        : "Send"}
                     </button>
                   )}
                 </div>
