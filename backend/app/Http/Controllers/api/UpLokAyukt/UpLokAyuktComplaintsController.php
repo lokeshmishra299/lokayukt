@@ -197,6 +197,26 @@ $complainDetails->actions = DB::table('complaint_actions')
            ]);
     }
 
+        public function getNotes(Request $request,$id){
+        if($request->isMethod('get')){
+            // $Notes = ComplaintNotes::where('complaint_id',$id)
+            // ->get();
+
+            $Notes = ComplaintNotes::where('complaint_id', $id)
+            ->leftJoin('users', 'complaints_notes.forward_by', '=', 'users.id') // Left Join with users table
+            ->select('complaints_notes.*', 'users.name as forwarded_by_name', 'users.email as forwarded_by_email') // You can select any fields you want
+            ->get();
+
+   
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Notes Fetch successfully.',
+                    'data' => $Notes
+                ], 200);
+        }
+       
+    }
+
    public function getLokayuktUsers(){
      
         $usersByRole = User::with('role')
