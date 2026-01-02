@@ -965,7 +965,7 @@ class LokAyuktComplaintsController extends Controller
             ->select('complaints_notes.*', 'users.name as forwarded_by_name', 'users.email as forwarded_by_email') // You can select any fields you want
             ->get();
 
-
+   
            return response()->json([
                     'status' => true,
                     'message' => 'Notes Fetch successfully.',
