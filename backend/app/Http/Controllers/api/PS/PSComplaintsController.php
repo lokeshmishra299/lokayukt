@@ -84,6 +84,7 @@ $query = DB::table('complaints')
     ->groupBy('complaints.id','complaints.complaint_description','complaints.complain_no','complaints.cause_date','complaints.category','complaints.fee_exempted','created_at','complaints.updated_at','dd.district_name');   // 🔥 distinct complaints
 
 $records = $query->get();
+
        
         // dd(Auth::user());
     // $query = DB::table('complaints')
@@ -1255,5 +1256,56 @@ $records = $query->get();
                 ], 401);
         }
 
+    }
+
+      public function approvedFeeByPS(Request $request, $complaint_id){
+        $parent_user_id = Auth::user()->parent_user_id;
+        // dd($complaint_id);
+         $validation = Validator::make($request->all(), [
+            'fee_exempted' => 'required|string',
+            'remarks' => 'required|string',
+        
+        ], [
+            'fee_exempted.required' => 'Fees is required.',
+            'remarks.required' => 'Remarks is Required',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        
+
+        if(isset($complaint_id)){
+            
+             $cmp = Complaint::find($complaint_id);
+             if($cmp == null){
+                return response()->json([
+                'status' => false,
+                'errors' => 'Please Check Complaint Id'
+            ], 422);
+             }
+           $cmp->fee_exempted  = $request->fee_exempted;
+           $cmp->fee_approved_by_lokayukt  = 1;
+     
+            if($cmp->save()){
+            
+                    
+                $apcAction = new ComplaintAction();
+                                $apcAction->complaint_id = $complaint_id;
+                                $apcAction->status = 'Fees Approved';
+                                $apcAction->remarks = $request->remarks;
+                                $apcAction->save();
+            }
+            return response()->json([
+                    'status' => true,
+                    'message' => 'Fee Added successfully.'
+                ], 201);
+
+        }
+   
+    
     }
 }

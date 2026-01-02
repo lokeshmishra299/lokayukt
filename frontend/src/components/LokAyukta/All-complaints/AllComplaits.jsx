@@ -23,6 +23,8 @@ const AllComplaints = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  
+
   const [allComplaints, setAllComplaints] = useState([]);
   const [filteredComplaints, setFilteredComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
