@@ -320,7 +320,7 @@ const Notes = ({ complaint }) => {
               >
                 <div className="flex flex-col md:flex-row justify-between md:items-start gap-2 md:gap-0">
                   <p className="text-gray-800 font-medium">
-                    {user?.name}
+                    {item?.forwarded_by_name}
                   </p>
                   <p className="text-xs text-gray-400 whitespace-nowrap">
                     {new Date(item.created_at).toLocaleString("en-IN", {
