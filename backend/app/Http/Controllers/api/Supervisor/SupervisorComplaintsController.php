@@ -1243,8 +1243,8 @@ class SupervisorComplaintsController extends Controller
             'd_id' => 'required',
             // 'forward_by' => 'required',
             // 'forward_to' => 'required',
-            'range_from' => 'required',
-            'range_two' => 'required',
+            // 'range_from' => 'required',
+            // 'range_two' => 'required',
             
         ], [
             'complaint_id.required' => 'Complaint Id is required.',

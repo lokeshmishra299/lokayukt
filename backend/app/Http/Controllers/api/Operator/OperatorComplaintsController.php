@@ -1554,7 +1554,13 @@ class OperatorComplaintsController extends Controller
              
                 $older7DaysCount = DB::table('complaints')
                     ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
                     ->where('created_at', '<', now()->subDays(7))
+                    ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('fee_exempted', 0)
                     ->count();
 
 
@@ -1565,7 +1571,8 @@ class OperatorComplaintsController extends Controller
                'message' => 'Records Fetch successfully',
                'data' => $complainDetails,
                 'todayCount' => $todayCount,
-                'older7DaysCount' => $older7DaysCount
+                'older7DaysCount' => $older7DaysCount,
+                'feePending' => $feePending
            ]);
    
     }
