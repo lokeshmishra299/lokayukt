@@ -48,20 +48,30 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_ps && item.forward_to_sec) {
       return `PS  → Secratory`;
     }
-    if (item.forward_by_ps && item.forward_to_cio_io) {
+    if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_cio_io) {
+      return `PS → RC → CIO`;
+    }else if (item.forward_by_ps && item.forward_to_cio_io) {
       return `PS  → CIO`;
     }
     if (item.forward_by_ps && item.forward_to_ro_aro) {
       return `PS  → RO/ARO`;
     }
-    if (item.forward_by_ro_aro && item.forward_to_sec) {
-      return `RO/ARO  → Secratory`;
+    if (item.forward_by_ps && item.forward_to_ro_aro) {
+      return `PS  → RO/ARO`;
+    }
+    if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_sec) {
+      return `RO/ARO → RO → Secratory`;
+    }else if (item.forward_by_ro_aro && item.forward_to_sec) {
+      return `RO/ARO → Secratory`;
     }
     if (item.forward_by_cio && item.forward_to_ps) {
       return `CIO  → PS`;
     }
     if (item.forward_by_sec && item.forward_to_ro_aro) {
       return `Secratory  → RO/ARO`;
+    }
+    if (item.forward_by_sec && item.sent_through_rk === 1 && item.forward_to_ro_aro) {
+      return `Secratory → RO → RO/ARO`;
     }
 
    

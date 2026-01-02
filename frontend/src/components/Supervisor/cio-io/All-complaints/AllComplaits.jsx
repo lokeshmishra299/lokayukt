@@ -105,10 +105,9 @@ const handleSend = async () => {
 
 
   const getAllComplaints = async () => {
-    const res = await api.get("/supervisor/all-complaints");
-    console.log("Data he", res.data)
-    return res.data.data;
-  };
+  const res = await api.get("/operator/all-complaints");
+  return res.data;
+};
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["all-complaints", location.pathname],
@@ -117,8 +116,8 @@ const handleSend = async () => {
 
   
   const stats = {
-  overdue: data?.older7DaysCount || 0,
-  receivedToday: data?.todayCount || 0,
+  overdue: data?.older7DaysCount ?? 0,
+  receivedToday: data?.todayCount ?? 0,
 };
 
   const getDistrict = async () => {
@@ -499,7 +498,10 @@ const handleSend = async () => {
                           </span>
                           {complaint.fee_exempted === 1 && (
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                              With supervisora
+                             {
+                              complaint.approved_rejected_by_uplokayukt == 1 ? "With UPLokayukta" : "With Lokayukta"
+
+                             } 
                             </span>
                           )}
                         </div>
