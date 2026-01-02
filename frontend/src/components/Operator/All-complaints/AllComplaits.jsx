@@ -300,9 +300,10 @@ useEffect(() => {
                 <button className=" flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
                   <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
                 </button></div>
-              <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
-                ₹ Fee Pending {data.feePending}
-              </button>
+             <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
+  ₹ Fee Pending {data?.feePending ?? 0}
+</button>
+
             </div>
 
             <div className="relative mb-3">
