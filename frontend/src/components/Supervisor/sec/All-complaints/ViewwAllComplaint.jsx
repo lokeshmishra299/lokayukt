@@ -24,6 +24,7 @@ const api = axios.create({
 });
 
 
+
 const SearchableDropdown = ({
   options,
   value,
@@ -34,6 +35,7 @@ const SearchableDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
+  
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -139,6 +141,8 @@ const SearchableDropdown = ({
 const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+    const [sent_through_rk, setThroughRC] = useState(false);
+
 
     const capitalizeFirstLetter = (text = "") => {
   if (!text) return "N/A";
@@ -251,6 +255,7 @@ const ViewAllComplaint = () => {
       const res = await api.post("/supervisor/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
+
       });
       return res.data;
     },
@@ -293,6 +298,8 @@ const ViewAllComplaint = () => {
         const res = await api.post(`/supervisor/forward-by-supervisor/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
+        sent_through_rk: sent_through_rk ? 1 : 0
+
         });
         return res.data;
       },
@@ -898,7 +905,20 @@ const ViewAllComplaint = () => {
                           placeholder="Select Officer..."
                         />
                       )}
+                     
+
                     </div>
+
+                   <label className="flex items-center gap-2 cursor-pointer mt-2">
+  <input
+    type="checkbox"
+    checked={sent_through_rk}
+    onChange={(e) => setThroughRC(e.target.checked)}
+    className="w-4 h-4"
+  />
+  <span className="text-sm">Checkbox If Send through RC</span>
+</label>
+
                   </>
                 )}
                 {/* --- FORWARDING LOGIC END --- */}
