@@ -139,6 +139,102 @@ const SearchableDropdown = ({
 };
 
 const ViewAllComplaint = () => {
+
+
+
+// Dsc Import 
+const signWithDSC = () => {
+  try {
+    //  if (!window.ActiveXObject) {
+    //   alert("Please use Internet Explorer for Digital Signature");
+    //   return false;
+    // }
+
+    const CAPICOM_CURRENT_USER_STORE = 2;
+    const CAPICOM_STORE_OPEN_READ_ONLY = 0;
+    const CAPICOM_CERTIFICATE_FIND_KEY_USAGE = 12;
+    const CAPICOM_DIGITAL_SIGNATURE_KEY_USAGE = 0x00000080;
+    const CAPICOM_CERTIFICATE_FIND_TIME_VALID = 9;
+    const CAPICOM_CERTIFICATE_FIND_EXTENDED_PROPERTY = 6;
+    const CERT_KEY_SPEC_PROP_ID = 6;
+    const CAPICOM_AUTHENTICATED_ATTRIBUTE_SIGNING_TIME = 0;
+    const CAPICOM_ENCODE_BASE64 = 0;
+    const CAPICOM_INFO_SUBJECT_SIMPLE_NAME = 0;
+
+    const store = new window.ActiveXObject("CAPICOM.Store");
+    store.Open(
+      CAPICOM_CURRENT_USER_STORE,
+      "My",
+      CAPICOM_STORE_OPEN_READ_ONLY
+    );
+
+    let certificates = store.Certificates
+      .Find(CAPICOM_CERTIFICATE_FIND_KEY_USAGE, CAPICOM_DIGITAL_SIGNATURE_KEY_USAGE)
+      .Find(CAPICOM_CERTIFICATE_FIND_TIME_VALID)
+      .Find(CAPICOM_CERTIFICATE_FIND_EXTENDED_PROPERTY, CERT_KEY_SPEC_PROP_ID);
+
+    if (certificates.Count < 1) {
+      alert("No valid Digital Signature Certificate found");
+      return false;
+    }
+
+    const selectedCerts = certificates.Select();
+    const cert = selectedCerts.Item(1);
+
+    const today = new Date();
+    const validTo = new Date(cert.ValidToDate);
+    if (validTo < today) {
+      alert("Digital Signature Certificate expired");
+      return false;
+    }
+
+    setCertSubject(cert.GetInfo(CAPICOM_INFO_SUBJECT_SIMPLE_NAME));
+    setCertThumbprint(cert.Thumbprint);
+    setCertSerialNo(cert.SerialNumber);
+    setDigitalId(cert.GetInfo(CAPICOM_INFO_SUBJECT_SIMPLE_NAME));
+    setCstInfo(cert.SubjectName);
+
+    const from = new Date(cert.ValidFromDate);
+    const to = new Date(cert.ValidToDate);
+
+    const formatDate = (d) =>
+      `${String(d.getMonth() + 1).padStart(2, "0")}/${String(
+        d.getDate()
+      ).padStart(2, "0")}/${d.getFullYear()}`;
+
+    setValidFrom(formatDate(from));
+    setValidTo(formatDate(to));
+
+    const contentToSign = "00"; 
+    setPlainText(contentToSign);
+
+    const signedData = new window.ActiveXObject("CAPICOM.SignedData");
+    const signer = new window.ActiveXObject("CAPICOM.Signer");
+    const timeAttr = new window.ActiveXObject("CAPICOM.Attribute");
+
+    signedData.Content = contentToSign;
+    signer.Certificate = cert;
+
+    timeAttr.Name = CAPICOM_AUTHENTICATED_ATTRIBUTE_SIGNING_TIME;
+    timeAttr.Value = new Date().getVarDate();
+    signer.AuthenticatedAttributes.Add(timeAttr);
+
+    const signature = signedData.Sign(signer, true, CAPICOM_ENCODE_BASE64);
+
+    setSignatureData(signature);
+
+    return true; 
+  } catch (err) {
+    console.error("DSC Error:", err);
+    alert("Error while signing using Digital Signature");
+    return false;
+  }
+};
+
+
+
+
+  
   const navigate = useNavigate();
   const { id } = useParams();
     const [sent_through_rk, setThroughRC] = useState(false);
@@ -155,6 +251,29 @@ const ViewAllComplaint = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
+
+
+  const [currentDate, setCurrentDate] = useState("");
+  const [signatureData, setSignatureData] = useState("");
+const [plainText, setPlainText] = useState("");
+const [certSubject, setCertSubject] = useState("");
+const [certThumbprint, setCertThumbprint] = useState("");
+const [certSerialNo, setCertSerialNo] = useState("");
+const [validFrom, setValidFrom] = useState("");
+const [validTo, setValidTo] = useState("");
+const [digitalId, setDigitalId] = useState("");
+const [cstInfo, setCstInfo] = useState("");
+
+
+useEffect(() => {
+  const now = new Date();
+setCurrentDate(
+  `${String(now.getMonth() + 1).padStart(2, "0")}/${String(
+    now.getDate()
+  ).padStart(2, "0")}/${now.getFullYear()}`
+);
+})
+
 
   // Single config for Action modals (Receive, Forward, Pullback)
   const [confirmConfig, setConfirmConfig] = useState({
@@ -292,28 +411,33 @@ const ViewAllComplaint = () => {
   //   },
   // });
 
-  
-  const forwardComplaintMutation = useMutation({
-      mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-supervisor/${complaintId}`, {
-          forward_to: forwardTo,
-          remark: remarkData,
-        sent_through_rk: sent_through_rk ? 1 : 0
+const forwardComplaintMutation = useMutation({
+  mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+    const res = await api.post(
+      `/supervisor/forward-by-supervisor/${complaintId}`,
+      {
+        forward_to: forwardTo,
+        remark: remarkData,
+        sent_through_rk: sent_through_rk ? 1 : 0,
 
-        });
-        return res.data;
-      },
-      onSuccess: (data) => {
-        toast.success(data.message || "Forwarded successfully");
-        queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-        setRemark("");
-        setSelectedForwardTo("");
-        setConfirmConfig({ open: false, type: null });
-      },
-      onError: (error) => {
-        toast.error(error?.response?.data?.message || "Failed to forward");
-      },
-    });
+         txtsigndata: signatureData,        
+        txtPlainText: plainText,              
+        HF1: certThumbprint,                  
+        HF3: certSubject,                     
+        HF2: certSerialNo,                    
+        serialno: certSerialNo,              
+        hdnValidityEnd: validTo,             
+        hdnValidityfrom: validFrom,          
+        digitalID: digitalId,                
+        cstinfo: cstInfo,                    
+        currdate: currentDate,           
+      }
+    );
+
+    return res.data;
+  },
+});
+
 
   const handleMarkAsReceived = () =>
     setConfirmConfig({ open: true, type: "receive" });
@@ -336,6 +460,15 @@ const ViewAllComplaint = () => {
         toast.error("Please select forward to and enter a remark");
         return;
       }
+
+
+        const isSigned = signWithDSC();   
+
+  if (!isSigned) {
+    toast.error("Digital Signature failed");
+    return;
+  }
+
       forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
@@ -413,6 +546,16 @@ const ViewAllComplaint = () => {
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <ToastContainer position="top-right" autoClose={3000} />
+      <input type="hidden" value={signatureData} />
+<input type="hidden" value={plainText} />
+<input type="hidden" value={certSubject} />
+<input type="hidden" value={certThumbprint} />
+<input type="hidden" value={certSerialNo} />
+<input type="hidden" value={validFrom} />
+<input type="hidden" value={validTo} />
+<input type="hidden" value={digitalId} />
+<input type="hidden" value={cstInfo} />
+
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
