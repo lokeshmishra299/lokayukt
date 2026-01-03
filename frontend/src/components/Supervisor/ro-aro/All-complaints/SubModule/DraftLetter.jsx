@@ -12,6 +12,7 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import EditDraft from "./EditDraft";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -103,16 +104,51 @@ const DraftLetter = ({ complaint }) => {
     setShowSuccess(true);
   };
 
-  // 2. New: Handles the actual API call from the Preview Popup
+  // 2. Updated: Generate PDF Blob and Send as Binary
   const handleFinalSubmit = async () => {
-    const payload = {
-      complaint_id: complaint.id,
-      draft_note: note,
-    };
+    if (!popupRef.current) return;
 
+    // A. Generate PDF Blob from Preview
     try {
-      // Using the requested API
-      const res = await api.post("/supervisor/create-draft", payload);
+      // Hide buttons for screenshot
+      const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
+      elementsToHide.forEach((el) => (el.style.display = "none"));
+
+      // Capture Screenshot
+      const canvas = await html2canvas(popupRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+      });
+
+      // Show buttons back
+      elementsToHide.forEach((el) => (el.style.display = "flex"));
+
+      // Create PDF
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+      // Get Binary Blob
+      const pdfBlob = pdf.output("blob");
+
+      // B. Create FormData Payload
+      const formData = new FormData();
+      formData.append("complaint_id", complaint.id);
+      formData.append("draft_note", note);
+      // Append generated PDF as 'file'
+      formData.append("file", pdfBlob, `Draft_${complaint?.file_number || "File"}.pdf`);
+
+      // C. Send API Request
+      const res = await api.post("/supervisor/create-draft", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Important for file upload
+        },
+      });
 
       if (res.data.status) {
         toast.success("Draft Added Successfully!");
@@ -132,8 +168,14 @@ const DraftLetter = ({ complaint }) => {
         });
       }
     } catch (err) {
+      // Restore buttons if something crashed mid-way
+      const elementsToHide = popupRef.current?.querySelectorAll(".pdf-hide-section");
+      if(elementsToHide) elementsToHide.forEach((el) => (el.style.display = "flex"));
+
       toast.error("Server Error!");
-       setErrors(err.response.data);
+      if (err.response && err.response.data) {
+         setErrors(err.response.data);
+      }
       console.error(err);
     }
   };
@@ -280,6 +322,15 @@ const handleSubmitDocument = async () => {
     setIsSubmitting(false);
   }
 };
+
+
+const [EditDraftPopup,setEditDraftPopup]=useState(false)
+const handleEditDraft =()=>{
+ setEditDraftPopup(true)
+
+
+}
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -355,11 +406,28 @@ const handleSubmitDocument = async () => {
                   )}
                   View
                 </button>
+                  <button
+                  onClick={handleEditDraft}
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 disabled:opacity-50"
+                >
+                  {loadingDoc === doc.file ? (
+                    <FaSpinner className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <FaEye className="w-4 h-4" />
+                  )}
+                  Edit
+                </button>
               </div>
             </div>
           ))
         )}
       </div>
+
+      {
+        EditDraftPopup  && (
+          <EditDraft />
+        )
+      }
 
       {/* Add Document Modal */}
       {openAddDocuments && (
@@ -453,13 +521,6 @@ const handleSubmitDocument = async () => {
        {errors.file[0]}
     </div>
   )}
-  
-  {/* Frontend file size warning */}
-  {/* {newDoc.file && newDoc.file.size > 2 * 1024 * 1024 && (
-    <div className="text-red-500 text-xs mt-1 p-2 bg-red-50 border border-red-200 rounded">
-       File size exceeds 2MB limit. Please choose a smaller file.
-    </div>
-  )} */}
 </div>
             </div>
             <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
@@ -608,7 +669,7 @@ const handleSubmitDocument = async () => {
                 </button>
                 <button
                   className="px-6 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
-                  onClick={handleFinalSubmit} // THIS CALLS THE API
+                  onClick={handleFinalSubmit} // THIS CALLS THE API WITH PDF BINARY
                 >
                   Submit
                 </button>
