@@ -116,10 +116,38 @@ $records = $query->get();
 
     // $records = $query->get();
 
+      $todayCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->whereDate('created_at', today())
+                    ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('created_at', '<', now()->subDays(7))
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 0)
+                    ->where('created_at', '<', now()->subDays(7))
+                    ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('fee_exempted', 0)
+                    ->count();
+
+
     return response()->json([
         'status' => true,
         'message' => 'Records fetched successfully',
         'data' => $records,
+         'todayCount' => $todayCount,
+        'older7DaysCount' => $older7DaysCount,
+        'older7DaysDueCount' => $older7DaysDueCount,
+        'feePending' => $feePending,
     ]);
 
 }
@@ -486,11 +514,12 @@ $records = $query->get();
 
         
             $roleFwd = $userRole[0]->role->name;
-      
+
+            // dd($roleFwd);
             
           $user = User::with('role','subrole')->where('id',$request->forward_to)->get();
 
-            $subroleFwd = $user[0]->subrole->name;
+            $subroleFwd = $user[0]->subrole->name ?? '';
 
         
         // dd($roleFwd,$subroleFwd);
@@ -558,26 +587,29 @@ $records = $query->get();
                                 }elseif($roleFwd === "up-lok-ayukt"){
                                     $apcAction->forward_to_uplokayukt = $request->forward_to;
                                 }
-                            }else if($roleFwd === "supervisor"){
-                                    if($subroleFwd === "ds-js"){
+                            }elseif($roleFwd === "supervisor"){
+                                if($subroleFwd !=null){
+                                     if($subroleFwd === "ds-js"){
                                     $apcAction->forward_to_ds_js = $request->forward_to;
                                 
-                            }elseif($subroleFwd ==="sec"){
-                                    $apcAction->forward_to_sec = $request->forward_to;
-                    
-                            }elseif($subroleFwd ==="cio-io"){
+                                    }elseif($subroleFwd ==="sec"){
+                                            $apcAction->forward_to_sec = $request->forward_to;
+                            
+                                    }elseif($subroleFwd ==="cio-io"){
 
-                                    $apcAction->forward_to_cio_io = $request->forward_to;
-                                    
-                            }elseif($subroleFwd ==="so-us"){
+                                            $apcAction->forward_to_cio_io = $request->forward_to;
+                                            
+                                    }elseif($subroleFwd ==="so-us"){
 
-                                    $apcAction->forward_to_so_us = $request->forward_to;
-                                    
-                            }elseif($subroleFwd ==="ro-aro"){
+                                            $apcAction->forward_to_so_us = $request->forward_to;
+                                            
+                                    }elseif($subroleFwd ==="ro-aro"){
 
-                                    $apcAction->forward_to_ro_aro = $request->forward_to;
-                                    
-                            }
+                                            $apcAction->forward_to_ro_aro = $request->forward_to;
+                                            
+                                    }
+                                }
+                                   
                             }
                           
   
@@ -931,8 +963,30 @@ $records = $query->get();
 
      public function allComplainsapproved(){
     //    $userSubrole = Auth::user()->subrole->name; 
+       $parentId = null;
+        $parentId = Auth::user()->parent_user_id;
+        // dd($parentId);
+        $userParentData = User::with('role')->where('id',$parentId)->get();
+        $roleParent = $userParentData[0]->role->name;
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
+        $join->on('complaints.id', '=', 'rep.complaint_id')
+             ->where(function ($q) use ($parentId, $roleParent) {
+
+                 if ($roleParent === 'lok-ayukt') {
+                    //  $q->where('rep.forward_to_lokayukt', $parentId);      
+                 } elseif ($roleParent === 'up-lok-ayukt') {
+                     $q->where('rep.forward_to_uplokayukt', $parentId);
+                 } else {
+                     // 🔥 fallback (safe)
+                     $q->where('rep.forward_to_lokayukt', $parentId)
+                       ->orWhere('rep.forward_to_uplokayukt', $parentId);
+                 }
+
+             });
+    })
+                // ->join('complaint_actions as rep', 'rep.complaint_id', '=', 'cm.id')
                 // ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')
@@ -959,6 +1013,8 @@ $records = $query->get();
     $complainDetails = $complainDetails
                       
                         // ->toSql();
+                        ->where('approved_rejected_by_ps',1)
+                        ->distinct('cm.id')
                       ->get();
 
                 // ->where('form_status',1)

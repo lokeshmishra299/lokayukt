@@ -23,7 +23,7 @@ class LokAyuktDashboardController extends Controller
         $query = DB::table('complaints as cmp');
             // ->leftJoin('users as u', 'cmp.added_by', '=', 'u.id')
             // ->select('cmp.*', 'u.name as lekhpal_name', 'u.email')
-            // ->where('cmp.approved_rejected_by_ro', 1)
+            // ->where('cmp.approved_rejected_by_rk', 1)
             // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
             // ->where('cmp.form_status', 1)
             // ->where('cmp.district_id', $user_district_code)
@@ -75,14 +75,14 @@ class LokAyuktDashboardController extends Controller
     // switch ($userSubrole) {
     //     case "so-us":
     //         $query->where('form_status', 1)
-    //               ->where('approved_rejected_by_ro', 1)
+    //               ->where('approved_rejected_by_rk', 1)
     //               ->where('approved_rejected_by_ds_js', 0);
     //         $query1->where('form_status', 1)
-    //               ->where('approved_rejected_by_ro', 1)
+    //               ->where('approved_rejected_by_rk', 1)
     //               ->where('approved_rejected_by_so_us', 0)
     //               ->whereNot('approved_rejected_by_ds_js', 1);
     //          $query2->where('cmp.form_status', 1)
-    //         ->where('cmp.approved_rejected_by_ro', 1)
+    //         ->where('cmp.approved_rejected_by_rk', 1)
     //         ->where('cmp.approved_rejected_by_so_us', 1);
     //         // ->where('cmp.approved_rejected_by_ds_js', 0)
     //         // ->where('cmp.approved_rejected_by_d_a', 0);
@@ -96,21 +96,21 @@ class LokAyuktDashboardController extends Controller
     //         // $queryDay->where('');
     //         // $query3->where('');
     //         $query4 =  $query4->where('cmp.form_status', 1)
-    //                  ->where('cmp.approved_rejected_by_ro', 1);
+    //                  ->where('cmp.approved_rejected_by_rk', 1);
     //                     // ->where('approved_rejected_by_d_a',0)
     //                     //  ->where(function($q){
     //                     //     $q->where('cmp.approved_rejected_by_so_us',1)
     //                     //     ->Orwhere('cmp.approved_rejected_by_ds_js', 1);               
     //                     //  });
     //         $avgPendingDays = $avgPendingDays->where('cmp.form_status', 1)
-    //         ->where('cmp.approved_rejected_by_ro', 1)
+    //         ->where('cmp.approved_rejected_by_rk', 1)
     //                     ->where('approved_rejected_by_so_us',0);
     //                     //  ->where(function($q){
     //                     //     $q->where('cmp.approved_rejected_by_so_us',1)
     //                     //     ->Orwhere('cmp.approved_rejected_by_ds_js', 1);               
     //                     //  });
     //         $queryDay = $queryDay->where('cmp.form_status', 1)
-    //                  ->where('cmp.approved_rejected_by_ro', 1)
+    //                  ->where('cmp.approved_rejected_by_rk', 1)
     //                  ->where('cmp.approved_rejected_by_so_us', 1);
     //                     // ->where('approved_rejected_by_d_a',0)
     //                     //  ->where(function($q){
@@ -127,18 +127,18 @@ class LokAyuktDashboardController extends Controller
 
     //     case "ds-js":
     //     //   $query->where('cmp.form_status', 1)
-    //     //           ->where('cmp.approved_rejected_by_ro', 1)
+    //     //           ->where('cmp.approved_rejected_by_rk', 1)
     //     //           ->where('cmp.approved_rejected_by_ds_js', 0);
 
     //                $query->where('form_status', 1)
-    //               ->where('approved_rejected_by_ro', 1)
+    //               ->where('approved_rejected_by_rk', 1)
     //               ->where('approved_rejected_by_ds_js', 0);
     //         $query1->where('form_status', 1)
-    //               ->where('approved_rejected_by_ro', 1)
+    //               ->where('approved_rejected_by_rk', 1)
     //               ->where('approved_rejected_by_ds_js', 0)
     //               ->whereNot('approved_rejected_by_so_us', 1);
     //          $query2->where('cmp.form_status', 1)
-    //         ->where('cmp.approved_rejected_by_ro', 1)
+    //         ->where('cmp.approved_rejected_by_rk', 1)
     //         ->where('cmp.approved_rejected_by_so_us', 0)
     //         ->where('cmp.approved_rejected_by_ds_js', 1)
     //         ->where('cmp.approved_rejected_by_d_a', 0);
@@ -152,21 +152,21 @@ class LokAyuktDashboardController extends Controller
     //         // $queryDay->where('');
     //         // $query3->where('');
     //         $query4 =  $query4->where('cmp.form_status', 1)
-    //                  ->where('cmp.approved_rejected_by_ro', 1);
+    //                  ->where('cmp.approved_rejected_by_rk', 1);
     //                     // ->where('approved_rejected_by_d_a',0)
     //                     //  ->where(function($q){
     //                     //     $q->where('cmp.approved_rejected_by_so_us',1)
     //                     //     ->Orwhere('cmp.approved_rejected_by_ds_js', 1);               
     //                     //  });
     //         $avgPendingDays = $avgPendingDays->where('cmp.form_status', 1)
-    //         ->where('cmp.approved_rejected_by_ro', 1)
+    //         ->where('cmp.approved_rejected_by_rk', 1)
     //                     ->where('approved_rejected_by_so_us',0);
     //                     //  ->where(function($q){
     //                     //     $q->where('cmp.approved_rejected_by_so_us',1)
     //                     //     ->Orwhere('cmp.approved_rejected_by_ds_js', 1);               
     //                     //  });
     //         $queryDay = $queryDay->where('cmp.form_status', 1)
-    //                  ->where('cmp.approved_rejected_by_ro', 1)
+    //                  ->where('cmp.approved_rejected_by_rk', 1)
     //                  ->where('cmp.approved_rejected_by_so_us', 1);
     //         // $query1->where('');
     //         // $query2->where('');
@@ -180,7 +180,7 @@ class LokAyuktDashboardController extends Controller
 
     //     case "sec":
     //        $query->where('cmp.form_status', 1)
-    //               ->where('cmp.approved_rejected_by_ro', 1);
+    //               ->where('cmp.approved_rejected_by_rk', 1);
     //             //    ->where('forward_to_lokayukt', 1)
     //             //   ->whereOr('forward_to_uplokayukt', 1);
     //           // $query1->where('');
@@ -193,7 +193,7 @@ class LokAyuktDashboardController extends Controller
 
     //     case "cio-io":
     //        $query->where('cmp.form_status', 1)
-    //               ->where('cmp.approved_rejected_by_ro', 1);
+    //               ->where('cmp.approved_rejected_by_rk', 1);
     //             //    ->where('forward_to_lokayukt', 1)
     //             //   ->whereOr('forward_to_uplokayukt', 1);
     //        // $query1->where('');
@@ -206,19 +206,19 @@ class LokAyuktDashboardController extends Controller
 
     //     case "dea-assis":
     //       $query->where('cmp.form_status', 1)
-    //               ->where('cmp.approved_rejected_by_ro', 1)
+    //               ->where('cmp.approved_rejected_by_rk', 1)
     //                ->where('cmp.approved_rejected_by_so_us', 1)
     //                 ->orWhere('cmp.approved_rejected_by_ds_js', 1)
     //                 ->whereNotNull('cmp.forward_to_d_a');
     //         $query1->where('cmp.form_status', 1)
-    //         ->where('cmp.approved_rejected_by_ro', 1)
+    //         ->where('cmp.approved_rejected_by_rk', 1)
     //                     ->where('approved_rejected_by_d_a',0)
     //                      ->where(function($q){
     //                         $q->where('cmp.approved_rejected_by_so_us',1)
     //                         ->Orwhere('cmp.approved_rejected_by_ds_js', 1);               
     //                      });
     //         $query2->where('cmp.form_status', 1)
-    //         ->where('cmp.approved_rejected_by_ro', 1)
+    //         ->where('cmp.approved_rejected_by_rk', 1)
     //                     ->where('approved_rejected_by_d_a',1)
     //                      ->where(function($q){
     //                         $q->where('cmp.approved_rejected_by_so_us',1)
@@ -228,21 +228,21 @@ class LokAyuktDashboardController extends Controller
     //         // $queryDay->where('');
     //         // $query3->where('');
     //         $query4 =  $query4->where('cmp.form_status', 1)
-    //                  ->where('cmp.approved_rejected_by_ro', 1)
+    //                  ->where('cmp.approved_rejected_by_rk', 1)
     //                     ->where('approved_rejected_by_d_a',0)
     //                      ->where(function($q){
     //                         $q->where('cmp.approved_rejected_by_so_us',1)
     //                         ->Orwhere('cmp.approved_rejected_by_ds_js', 1);               
     //                      });
     //         $avgPendingDays = $avgPendingDays->where('cmp.form_status', 1)
-    //         ->where('cmp.approved_rejected_by_ro', 1)
+    //         ->where('cmp.approved_rejected_by_rk', 1)
     //                     ->where('approved_rejected_by_d_a',0)
     //                      ->where(function($q){
     //                         $q->where('cmp.approved_rejected_by_so_us',1)
     //                         ->Orwhere('cmp.approved_rejected_by_ds_js', 1);               
     //                      });
     //         $queryDay = $queryDay->where('cmp.form_status', 1)
-    //                  ->where('cmp.approved_rejected_by_ro', 1)
+    //                  ->where('cmp.approved_rejected_by_rk', 1)
     //                     ->where('approved_rejected_by_d_a',0)
     //                      ->where(function($q){
     //                         $q->where('cmp.approved_rejected_by_so_us',1)

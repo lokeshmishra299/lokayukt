@@ -214,6 +214,8 @@ Route::middleware('auth:sanctum')->group(function(){
          Route::get('/get-file-preview/{id}',[SupervisorComplaintsController::class,'getFilePreview']);
          Route::post('/add-notes',[SupervisorComplaintsController::class,'addNotes']);
          Route::post('/create-draft',[SupervisorComplaintsController::class,'createDraft']);
+         Route::get('/edit-draft-letter/{id}',[SupervisorComplaintsController::class,'editDraftLetter']);
+         Route::get('/update-draft-letter/{id}',[SupervisorComplaintsController::class,'updateDraftLetter']);
          
          Route::get('/get-notes/{id}',[SupervisorComplaintsController::class,'getNotes']);
           Route::post('assign-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'assignToRoAro']);

@@ -108,7 +108,8 @@ class SupervisorComplaintsController extends Controller
         case "ro-aro":
           $query->where('form_status', 1)
                   ->where('approved_rejected_by_rk', 1)
-                  ->where('rep.forward_to_ro_aro', $user);
+                  ->where('rep.forward_to_ro_aro', $user)
+                  ->whereOr('rep.forward_to_uplokayukt','<>',0);
                 //   ->where('forward_so', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
             break;
@@ -160,10 +161,38 @@ class SupervisorComplaintsController extends Controller
 
     $records = $query->distinct('complaints.id')->get();
 
+      $todayCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->whereDate('created_at', today())
+                    ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('created_at', '<', now()->subDays(7))
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 0)
+                    ->where('created_at', '<', now()->subDays(7))
+                    ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('fee_exempted', 0)
+                    ->count();
+
+
     return response()->json([
         'status' => true,
         'message' => 'Records fetched successfully',
         'data' => $records,
+         'todayCount' => $todayCount,
+        'older7DaysCount' => $older7DaysCount,
+        'older7DaysDueCount' => $older7DaysDueCount,
+        'feePending' => $feePending,
     ]);
 }
 
@@ -961,6 +990,185 @@ class SupervisorComplaintsController extends Controller
         }
 
     }
+     public function forwardComplaintbySec(Request $request,$complainId){
+        //    dd($request->all());
+        // $user = Auth::user()->id;
+        // dd($usersubrole);
+
+        $userRole = User::with('role')->where('id',$request->forward_to)->get();
+
+        
+            $roleFwd = $userRole[0]->role->name ?? null;
+        // dd($roleFwd);
+        
+          $user = User::with('role','subrole')->where('id',$request->forward_to)->get();
+            $subroleFwd = '';
+            
+            $subroleFwd = $user[0]->subrole->name ?? null;
+
+       
+ 
+
+        $userId = Auth::user()->id;
+   
+
+        $validation = Validator::make($request->all(), [
+            // 'forward_by_ds_js' => 'required|exists:users,id',
+            'forward_to' => 'required|exists:users,id',
+            'remark' => 'required',
+         
+          
+        ], [
+            // 'forward_by_ds_js.required' => 'Forward by Supervisor is required.',
+            // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
+            'forward_to.required' => 'Forward to user is required.',
+            'forward_to.exists' => 'Forward to user does not exist.',
+            'remark.required' => 'Remark is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        if(isset($complainId) && $request->isMethod('post')){
+
+            //  $userRole = User::with('role')->where('id',$request->forward_to)->get();
+            // dd($user[0]->role->name);
+            // $roleFwd = $userRole[0]->role->name;
+
+              
+            $cmp =  Complaint::findOrFail($complainId);
+            // dd($cmp);
+
+               if($cmp){
+                $cmp->approved_rejected_by_sec= 1;
+                // $cmp->forward_to_d_a = $request->forward_to_d_a;
+                // $remark ='Remark By Deputy Secretary / Joint Secretary';
+                // $remark.='\n';
+                // $remark.= $request->remarks;
+                // $remark.='\n';
+                // $cmp->remark = $remark;
+                
+                    if($cmp->save()){
+
+                         $apcAction = new ComplaintAction();
+                        //     $apcAction->complaint_id = $complainId;
+                        //     $apcAction->forward_by_lokayukt = $userId;
+
+                             
+
+                        
+                        //     if($roleFwd === "lok-ayukt" || $roleFwd === "up-lok-ayukt"){
+                        //             if($roleFwd === "lok-ayukt"){
+                        //             $apcAction->forward_to_lokayukt = $request->forward_to;
+                        //         }elseif($roleFwd === "up-lok-ayukt"){
+                        //             $apcAction->forward_to_uplokayukt = $request->forward_to;
+                        //         }
+                        //     }else if($roleFwd === "supervisor"){
+                        //             if($subroleFwd === "ds-js"){
+                        //             $apcAction->forward_to_ds_js = $request->forward_to;
+                                
+                        //     }elseif($subroleFwd ==="sec"){
+                        //             $apcAction->forward_to_sec = $request->forward_to;
+                    
+                        //     }elseif($subroleFwd ==="cio-io"){
+
+                        //             $apcAction->forward_to_cio_io = $request->forward_to;
+                                    
+                        //     }elseif($subroleFwd ==="so-us"){
+
+                        //             $apcAction->forward_to_so_us = $request->forward_to;
+                                    
+                        //     }
+                        //     }
+                          
+  
+                        // // $apcAction->forward_to_uplokayukt = $request->forward_to;
+                    
+                        // $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        // $apcAction->remarks = $request->remark;
+                        // $apcAction->save();
+
+                        $apcAction = new ComplaintAction();
+                        $apcAction->complaint_id = $complainId;
+                        
+                        // $apcAction->approved_rejected_by_ro_aro = $userId;
+
+                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt'])) {
+
+                            if ($roleFwd === 'lok-ayukt') {
+                                $apcAction->forward_to_lokayukt = $request->forward_to;
+                            } else {
+                                $apcAction->forward_to_uplokayukt = $request->forward_to;
+                            }
+
+                        } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
+
+                            switch ($subroleFwd) {
+                                case 'ds-js':
+                                    $apcAction->forward_to_ds_js = $request->forward_to;
+                                    break;
+
+                                case 'sec':
+                                    $apcAction->forward_to_sec = $request->forward_to;
+                                    break;
+
+                                case 'cio-io':
+                                    $apcAction->forward_to_cio_io = $request->forward_to;
+                                    break;
+
+                                case 'so-us':
+                                    $apcAction->forward_to_so_us = $request->forward_to;
+                                    break;
+                               
+                                    case 'ro-aro':
+                                    $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    break;
+                            }
+                        }
+
+                        if($request->sent_through_rk == 1){
+                             $apcAction->sent_through_rk = 1;
+                             $apcAction->sent_through_rk_id = $cmp->added_by;
+                        }
+
+                        $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        $apcAction->remarks = $request->remark;
+                        $apcAction->save();
+
+
+                        // $apcAction = new ComplaintAction();
+                        // $apcAction->complaint_id = $complainId;
+                        // $apcAction->forward_by_ps = $userId;
+
+                        // $apcAction->forward_to_lokayukt = $request->forward_to;
+                       
+                        // $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        // $apcAction->remarks = $request->remark;
+                        // $apcAction->save();
+                    }
+                
+                }
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Forwarded Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
     
 
     public function allComplainspending(){
@@ -1048,9 +1256,11 @@ class SupervisorComplaintsController extends Controller
     }
 
      public function allComplainsapproved(){
+          $user = Auth::user()->id;
        $userSubrole = Auth::user()->subrole->name; 
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('complaint_actions as rep', 'cm.id', '=', 'rep.complaint_id')
                 // ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')
@@ -1090,6 +1300,14 @@ class SupervisorComplaintsController extends Controller
            $complainDetails->where('form_status', 1)
                   ->where('approved_rejected_by_rk', 1);
                 //    ->where('forward_to_lokayukt', 1)
+                //   ->whereOr('forward_to_uplokayukt', 1);
+            break;
+       case "ro-aro":
+          $complainDetails->where('form_status', 1)
+                  ->where('approved_rejected_by_rk', 1)
+                  ->where('rep.forward_to_ro_aro', $user)
+                  ->whereOr('rep.forward_to_uplokayukt','<>',0);
+                //   ->where('forward_so', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
             break;
 
@@ -1288,6 +1506,7 @@ class SupervisorComplaintsController extends Controller
 
      public function createDraft(Request $request)
     {
+        // dd($request->file);
        
         // $user = $request->user()->id;
         $added_by = Auth::user()->id;
@@ -1295,11 +1514,14 @@ class SupervisorComplaintsController extends Controller
         $validation = Validator::make($request->all(), [
             
             'complaint_id' => 'required|numeric',
+            'title' => 'required|string',
             'draft_note' => 'required|string',
+             'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:5000',
             
         ], [
             'complaint_id.required' => 'Complaint Id is required.',
-            'draft_note.required' => 'Description is Required',
+            'title.required' => 'Title is required',
+            'draft_note.required' => 'Description is required',
         ]);
 
         if ($validation->fails()) {
@@ -1313,10 +1535,24 @@ class SupervisorComplaintsController extends Controller
                 $compDoc = new Drafts();
                 $compDoc->complaint_id = $request->complaint_id;
                 $compDoc->draft_note = $request->draft_note;
+                // $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
+                // $filePath = $request->file('file')->storeAs('Document', $file, 'public');
+                // $compDoc->file = $file;
+                
                 $compDoc->status = '1';
 
              
                 $compDoc->save();
+                $compDocument = new ComplainDocuments(); 
+                $compDocument->complain_id = $request->complaint_id;
+                $compDocument->added_by = $added_by;
+                $compDocument->type = "Draft Letter";
+                // $compDocument->title = $request->title;     
+                $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
+                $filePath = $request->file('file')->storeAs('Document', $file, 'public');
+                $compDocument->file = $file;
+                
+                $compDocument->save();
               
                 return response()->json([
                     'status' => true,
@@ -1393,7 +1629,7 @@ class SupervisorComplaintsController extends Controller
           
              return response()->json([
                     'status' => true,
-                    'message' => "Assign.' '$userName' '.successfully",
+                    'message' => "Assign".' '.$userName.' '."successfully",
                     'data' => $cmp
                 ], 200);
         }else{
@@ -1493,6 +1729,71 @@ class SupervisorComplaintsController extends Controller
                 return response()->json([
                     'status' => true,
                     'message' => 'Document Added successfully.',
+                    'data' => $compDoc
+                ], 201);
+        }
+
+    }
+     public function editDraftLetter(Request $request,$id)
+    {
+        // dd($request->complain_id);
+        // $user = $request->user()->id;
+        $added_by = Auth::user()->id;
+    
+ 
+
+        if(isset($id)){    
+                $compDoc =ComplainDocuments::find($id);
+             
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Document Update successfully.',
+                    'data' => $compDoc
+                ], 200);
+        }
+
+    }
+     public function updateDraftLetter(Request $request,$id)
+    {
+        // dd($request->complain_id);
+        // $user = $request->user()->id;
+        $added_by = Auth::user()->id;
+    
+        $validation = Validator::make($request->all(), [
+            
+            'complain_id' => 'required|numeric',
+            'type' => 'required|string',
+            'title' => 'required|string',
+            'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:5048',
+        ], [
+            'complain_id.required' => 'Complaint Id is required.',
+            'type.required' => 'Complaint description is required.',
+            'title.required' => 'Letter Subject is Required',
+            'file.required' => 'File is Required',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        if(isset($id)){    
+                $compDoc =ComplainDocuments::find($id);
+                $compDoc->complain_id = $request->complain_id;
+                $compDoc->added_by = $added_by;
+                $compDoc->type = $request->type;
+                $compDoc->title = $request->title;     
+                $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
+                $filePath = $request->file('file')->storeAs('Document', $file, 'public');
+                $compDoc->file = $file;
+                
+                $compDoc->save();
+              
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Document Update successfully.',
                     'data' => $compDoc
                 ], 201);
         }
