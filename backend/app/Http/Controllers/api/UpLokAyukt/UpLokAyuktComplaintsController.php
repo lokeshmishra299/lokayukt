@@ -8,6 +8,7 @@ use App\Models\Complaint;
 use App\Models\ComplaintAction;
 use App\Models\SubRole;
 use App\Models\ComplaintNotes;
+use App\Models\ComplainDocuments;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -47,11 +48,38 @@ class UpLokAyuktComplaintsController extends Controller
                     // ->whereNotNull('forward_to_d_a');
 
     $records = $query->get();
+      $todayCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->whereDate('created_at', today())
+                    ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('created_at', '<', now()->subDays(7))
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 0)
+                    ->where('created_at', '<', now()->subDays(7))
+                    ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->where('in_draft', 0)
+                    ->where('fee_exempted', 0)
+                    ->count();
+
 
     return response()->json([
         'status' => true,
         'message' => 'Records fetched successfully',
         'data' => $records,
+         'todayCount' => $todayCount,
+        'older7DaysCount' => $older7DaysCount,
+        'older7DaysDueCount' => $older7DaysDueCount,
+        'feePending' => $feePending,
     ]);
 
 }
@@ -235,6 +263,20 @@ $complainDetails->actions = DB::table('complaint_actions')
         }
         // dd($usersByRole['lok-ayukt']);
    }
+
+    public function getUploadDoc(Request $request,$id){
+        if($request->isMethod('get')){
+            $complain = ComplainDocuments::where('complain_id',$id)->get();
+
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Document Fetch successfully.',
+                    'data' => $complain
+                ], 200);
+        }
+       
+    }
+
    public function getUpLokayuktUsers(){
     $usersByRole = User::with('role')
      ->whereNotNull('role_id')
