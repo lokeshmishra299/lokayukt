@@ -485,7 +485,7 @@ const AllComplaints = () => {
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
                             New Case
                           </span>
-                          {complaint.fee_exempted === 1 && (
+                          {/* {complaint.fee_exempted === 1 && ( */}
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
                              {
   complaint.approved_rejected_by_rk === 1 &&
@@ -496,7 +496,9 @@ const AllComplaints = () => {
     : ""
 }
                             </span>
-                          )}
+                          {/* ) */}
+                          
+                          {/* } */}
                         </div>
                         <div className="flex gap-1.5">
                           <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
