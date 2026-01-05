@@ -439,7 +439,7 @@ const EditDraft = () => {
         }
       });
 
-      // Add all fields as arrays - FIXED: Send officer_name as simple string
+      // Add all fields as arrays - FIXED:Send officer_name as simple string
       complaintDetails.forEach((detail, index) => {
         formDataToSend.append(`title[${index}]`, detail.title || '');
         formDataToSend.append(`department[${index}]`, detail.department || '');

@@ -224,13 +224,13 @@ const ViewApprovedComplaints = () => {
       queryKey: ["supervisor-options", forwardType], // 
       queryFn: async () => {
         try {
-          //  Send To My Pool  API: /supervisor/get-users
+          // Send To My Pool  API: /supervisor/get-users
           if (forwardType === "self") {
             const res = await api.get("/supervisor/get-users");
             return res.data?.data || res.data || [];
           }
   
-          //  Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
+          // Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
           const res = await api.get("/supervisor/get-upsupervisor");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
@@ -777,7 +777,7 @@ const ViewApprovedComplaints = () => {
                   >
                     {forwardComplaintMutation.isPending
                       ? "Processing..."
-                      : "Send / Mark"}
+                      : "Sent / Mark"}
                   </button>
                 </div>
               </div>
@@ -814,7 +814,7 @@ const ViewApprovedComplaints = () => {
                   {confirmConfig.type === "receive"
                     ? "Mark as Received?"
                     : confirmConfig.type === "forward"
-                    ? "Send"
+                    ? "Sent"
                     : confirmConfig.type === "pullback"
                     ? "Pull Back Complaint?"
                     : "Assign to Yourself?"}
@@ -842,7 +842,7 @@ const ViewApprovedComplaints = () => {
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
                           <span className="ml-2 text-sm text-gray-700 font-medium">
-                            Send To My Pool
+                           Send To My Pool
                           </span>
                         </label>
                         <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
@@ -858,7 +858,7 @@ const ViewApprovedComplaints = () => {
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
                           <span className="ml-2 text-sm text-gray-700 font-medium">
-                            Send To Other Pool
+                           Send To Other Pool
                           </span>
                         </label>
                       </div>
@@ -948,7 +948,7 @@ const ViewApprovedComplaints = () => {
                       : confirmConfig.type === "assign" ||
                         confirmConfig.type === "pullback"
                       ? "Yes"
-                      : "Send"}
+                      : "Sent"}
                   </button>
                 </div>
               </div>

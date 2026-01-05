@@ -205,7 +205,7 @@ const AllComplaints = () => {
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Send To UpLokayukt Successfully!", {
+        toast.success("Sent To UpLokayukt Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -529,7 +529,7 @@ const AllComplaints = () => {
                                 clipRule="evenodd"
                               />
                             </svg>
-                            Send 
+                           Send 
                           </span>
                           ) : (
                             <button
@@ -539,7 +539,7 @@ const AllComplaints = () => {
                               className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
                             >
                               
-                              Send To Lokayukt
+                             Send To Lokayukt
                             </button>
                           )} */}
                         </div>

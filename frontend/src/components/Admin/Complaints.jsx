@@ -340,7 +340,7 @@ const [isCompareClicked, setIsCompareClicked] = useState(false);
       // ✅ Action ko '1' set karo for draft save
       submitFormData.set('action', '1');
 
-      console.log('Draft FormData being sent:');
+      console.log('Draft FormData beingSend:');
       for (let [key, value] of submitFormData.entries()) {
         console.log(`${key}:`, value);
       }
