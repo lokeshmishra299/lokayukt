@@ -792,9 +792,18 @@ const ViewAllComplaint = () => {
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
 
-              {activeTab === "fee" && (
+{
+  complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ? 
+
+  activeTab === "fee" && (
     <Fees complaint={complaintData} />
-  )}
+  )
+  :
+  <div>
+
+  </div>
+}
+
 
 
               {activeTab === "documents" && (
