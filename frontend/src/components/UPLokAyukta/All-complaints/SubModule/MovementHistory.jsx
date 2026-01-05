@@ -26,7 +26,7 @@ const MovementHistory = ({ complaint }) => {
   //   return `${recordSection} → Record Section`;
   // };
 const getMovementTitle = (item) => {
-    const record = "Recived ";
+    const record = "Received ";
     const recordSection = "Record Section";
 
     // forward_by_rk && forward_to_lokayukt is 0 or null

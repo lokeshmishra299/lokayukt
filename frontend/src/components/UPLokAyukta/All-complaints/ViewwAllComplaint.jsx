@@ -151,6 +151,8 @@ const ViewAllComplaint = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
+    const [sent_through_rk, setThroughRC] = useState(false);
+
 
   // Single config for Action modals (Receive, Forward, Pullback)
   const [confirmConfig, setConfirmConfig] = useState({
@@ -251,6 +253,7 @@ const ViewAllComplaint = () => {
       const res = await api.post("/uplokayukt/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
+         sent_through_rk: sent_through_rk ? 1 : 0
       });
       return res.data;
     },
@@ -812,11 +815,11 @@ const ViewAllComplaint = () => {
                 {/* Title */}
                 <h3 className="text-lg font-semibold mb-4 pr-8">
                   {confirmConfig.type === "receive"
-                    ? "Mark as Received?"
+                    ? "Return with Remarks?"
                     : confirmConfig.type === "forward"
                     ? "Sent"
                     : confirmConfig.type === "pullback"
-                    ? "Pull Back Complaint?"
+                    ? "Are you sure you want to pull back?"
                     : "Assign to Yourself?"}
                 </h3>
     
@@ -894,6 +897,21 @@ const ViewAllComplaint = () => {
                     </div>
                   </>
                 )}
+
+
+              {confirmConfig.type === "forward" && (
+  <label className="flex items-center gap-2 cursor-pointer mt-2">
+    <input
+      type="checkbox"
+      checked={sent_through_rk}
+      onChange={(e) => setThroughRC(e.target.checked)}
+      className="w-4 h-4"
+    />
+    <span className="text-sm">Checkbox If Send through RC</span>
+  </label>
+)}
+
+
                 {/* --- FORWARDING LOGIC END --- */}
     
                 {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}

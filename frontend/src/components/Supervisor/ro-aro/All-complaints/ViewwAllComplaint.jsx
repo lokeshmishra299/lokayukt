@@ -983,11 +983,11 @@ function takefile(){
                 {/* Title */}
                 <h3 className="text-lg font-semibold mb-4 pr-8">
                   {confirmConfig.type === "receive"
-                    ? "Mark as Received?"
+                    ? "Return with Remarks?"
                     : confirmConfig.type === "forward"
                     ? "Send"
                     : confirmConfig.type === "pullback"
-                    ? "Pull Back Complaint?"
+                    ? "Are you sure you want to pull back?"
                     : "Assign to Yourself?"}
                 </h3>
     
@@ -1066,13 +1066,25 @@ function takefile(){
                   </>
                 )}
 
+                {confirmConfig.type === "forward" && (
+  <label className="flex items-center gap-2 cursor-pointer mt-2">
+    <input
+      type="checkbox"
+      checked={sent_through_rk}
+      onChange={(e) => setThroughRC(e.target.checked)}
+      className="w-4 h-4"
+    />
+    <span className="text-sm">Checkbox If Send through RC</span>
+  </label>
+)}
+
 
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
                     <>
                       <div className="mb-5 mt-3">
 
-                       <label className="flex items-center gap-2 cursor-pointer mt-2">
+                       {/* <label className="flex items-center gap-2 cursor-pointer mt-2">
   <input
     type="checkbox"
     checked={sent_through_rk}
@@ -1080,7 +1092,7 @@ function takefile(){
     className="w-4 h-4"
   />
   <span className="text-sm">Checkbox If Send through RC</span>
-</label>
+</label> */}
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Remark <span className="text-red-500">*</span>
                         </label>
@@ -1137,6 +1149,8 @@ function takefile(){
               </div>
             </div>
           )}
+
+          
 
 
           {showDispatch && (

@@ -909,11 +909,11 @@ const ViewAllComplaint = () => {
             {/* Title */}
             <h3 className="text-lg font-semibold mb-4 pr-8">
               {confirmConfig.type === "receive"
-                ? "Mark as Received?"
+                ? "Return with Remarks?"
                 : confirmConfig.type === "forward"
                 ? "Send"
                 : confirmConfig.type === "pullback"
-                ? "Pull Back Complaint?"
+                ? "Are you sure you want to pull back?"
                 : "Assign to Yourself?"}
             </h3>
 

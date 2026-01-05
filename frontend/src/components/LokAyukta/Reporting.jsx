@@ -146,7 +146,7 @@ const Reporting = () => {
     return data.map((item, index) => ({
       "S.No": index + 1,
       "Complaint No.": item.complain_no || "N/A",
-      "Case No.": item.caseNo || "N/A",
+      // "Case No.": item.caseNo || "N/A",
       "Enrollment Date": item.created_at || "N/A",
       "District": item.district_name || "N/A",
       "Department": item.department_name || "N/A",
@@ -286,9 +286,9 @@ const Reporting = () => {
     },
     { id: "district", label: "District-wise", icon: <FaMapMarkerAlt /> },
     { id: "department", label: "Department-wise", icon: <FaBuilding /> },
-    { id: "pendency", label: "Investigation Pendency", icon: <FaClock /> },
+    // { id: "pendency", label: "Investigation Pendency", icon: <FaClock /> },
     { id: "dispatch", label: "Dispatch Register", icon: <FaPaperPlane /> },
-    { id: "overall", label: "Overall Status", icon: <FaChartPie /> },
+    // { id: "overall", label: "Overall Status", icon: <FaChartPie /> },
   ];
 
   return (
@@ -405,7 +405,7 @@ const Reporting = () => {
                       <th className="px-6 py-3 whitespace-nowrap">
                         Complaint No.
                       </th>
-                      <th className="px-6 py-3 whitespace-nowrap">Case No.</th>
+                      {/* <th className="px-6 py-3 whitespace-nowrap">Case No.</th> */}
                       <th className="px-6 py-3 whitespace-nowrap">
                         Enrollment Date
                       </th>
@@ -448,9 +448,9 @@ const Reporting = () => {
                           <td className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap hover:underline cursor-pointer">
                             {row?.complain_no}
                           </td>
-                          <td className="px-6 py-4 text-blue-600 whitespace-nowrap hover:underline cursor-pointer">
+                          {/* <td className="px-6 py-4 text-blue-600 whitespace-nowrap hover:underline cursor-pointer">
                             {row.caseNo || "N/A"}
-                          </td>
+                          </td> */}
                           <td className="px-6 py-4 whitespace-nowrap">
                             {row?.created_at}
                           </td>
@@ -711,7 +711,7 @@ const Reporting = () => {
           </div>
         )}
 
-        {activeTab === "pendency" && (
+        {/* {activeTab === "pendency" && (
           <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <h2 className="text-base md:text-lg font-semibold text-gray-800">
@@ -734,7 +734,7 @@ const Reporting = () => {
               <p>Report Preview Area</p>
             </div>
           </div>
-        )}
+        )} */}
 
         {activeTab === "dispatch" && (
           <div>
@@ -879,7 +879,7 @@ const Reporting = () => {
           </div>
         )}
 
-        {activeTab === "overall" && (
+        {/* {activeTab === "overall" && (
           <div>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-base md:text-lg font-semibold text-gray-800">
@@ -984,7 +984,7 @@ const Reporting = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
