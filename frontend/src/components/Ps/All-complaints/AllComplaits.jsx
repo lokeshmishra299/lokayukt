@@ -561,7 +561,7 @@ const handleSendToUPLokayukt = async () => {
                             {roleParent !== "lok-ayukt" && (
   complaint.approved_rejected_by_lokayukt === 1 ? (
     <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center">
-      Sent
+     Send
     </span>
   ) : (
     <button

@@ -51,11 +51,15 @@ const DraftLetter = ({ complaint }) => {
   const [errors, setErrors] = useState({});
   const [draftTitle, setDraftTitle] = useState(""); 
 
+  const [selectedDraftId, setSelectedDraftId] = useState(null);
+const [editDraftPopup, setEditDraftPopup] = useState(false);
+
+
   // Refs for Print/Preview
   const popupRef = useRef(null);
 
   // -- EDIT DRAFT POPUP STATE --
-  const [editDraftPopup, setEditDraftPopup] = useState(false);
+  // const [editDraftPopup, setEditDraftPopup] = useState(false);
   // OPTIONAL: Agar aapko specific ID edit karni hai to state bhi rakho
   // const [selectedDraftId, setSelectedDraftId] = useState(null);
 
@@ -64,10 +68,10 @@ const DraftLetter = ({ complaint }) => {
   };
 
   // ✅ Updated Handle Edit: Opens popup correctly
-  const handleEditDraft = () => {
-    // Agar id pass karni hai: setSelectedDraftId(id);
-    setEditDraftPopup(true);
-  };
+const handleEditDraft = (draftId) => {
+  setSelectedDraftId(draftId);
+  setEditDraftPopup(true);
+};
 
   // ✅ New Function to Close Popup properly
   const closeEditDraft = () => {
@@ -430,13 +434,13 @@ const DraftLetter = ({ complaint }) => {
                 </button>
 
                 {/* Edit Button (Opens Popup) */}
-                <button
-                  onClick={() => handleEditDraft()} // Agar id pass karni hai: handleEditDraft(doc.id)
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50"
-                >
-                  <RiEditBoxLine className="w-4 h-4" />
-                  Edit
-                </button>
+            <button
+  onClick={() => handleEditDraft(doc.id)}   
+  className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50"
+>
+  <RiEditBoxLine className="w-4 h-4" />
+  Edit
+</button>
               </div>
             </div>
           ))
@@ -444,11 +448,15 @@ const DraftLetter = ({ complaint }) => {
       </div>
 
       {/* ✅ Edit Draft Popup (Pass closeModal) */}
-      {editDraftPopup && (
-        <EditDraft 
-           closeModal={closeEditDraft}  // Prop passed to handle closing
-        />
-      )}
+     {editDraftPopup && (
+  <EditDraft
+    draftId={selectedDraftId}
+    closeModal={() => {
+      setEditDraftPopup(false);
+      setSelectedDraftId(null);
+    }}
+  />
+)}
 
       {/* Add Document Modal */}
       {openAddDocuments && (
