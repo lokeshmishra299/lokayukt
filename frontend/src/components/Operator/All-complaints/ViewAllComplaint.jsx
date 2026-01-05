@@ -700,7 +700,7 @@ const ViewAllComplaint = () => {
               {confirmConfig.type === "receive"
                 ? "Return with Remarks?"
                 : confirmConfig.type === "pullback"
-                ? "Pull Back Complaint?"
+                ? "Are you sure you want to pull back?"
                 : "Forward File Physically Electronically?"}
             </h3>
 
