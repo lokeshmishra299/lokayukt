@@ -1583,6 +1583,23 @@ class SupervisorComplaintsController extends Controller
         }
        
     }
+    public function editNotes(Request $request,$id){
+        if($request->isMethod('post')){
+            // $Notes = ComplaintNotes::where('complaint_id',$id)
+            // ->get();
+
+            $Notes = ComplaintNotes::find($id);
+            
+            
+   
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Notes Fetch successfully.',
+                    'data' => $Notes
+                ], 200);
+        }
+       
+    }
 
       public function getSubROleUsers(){
      

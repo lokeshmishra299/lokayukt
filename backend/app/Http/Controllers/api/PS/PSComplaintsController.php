@@ -1373,4 +1373,55 @@ $records = $query->get();
    
     
     }
+
+          public function approvedByupLokayukt(Request $request,$id){
+         $userId = Auth::user()->id;
+
+           $validation = Validator::make($request->all(), [
+            'forward_to' => 'required',
+        
+        ], [
+            'forward_to.required' => 'Uplokayukt is required.',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        
+        if(isset($id) && $request->isMethod('post')){
+
+                $apc = Complaint::findOrFail($id);
+                $apc->form_status = 1;
+                $apc->approved_rejected_by_lokayukt = 1;
+                // $apc->approved_by_ro_id =  $userId;
+                
+                if($apc->save()){
+                     $apcAction = new ComplaintAction();
+                    $apcAction->complaint_id = $id;
+                    // $apcAction->status = 'Forwarded';
+                    // $apcAction->remarks = "Sent complain to Uplokayukt";
+                    $apcAction->forward_by_lokayukt = $userId;
+                    $apcAction->forward_to_uplokayukt = $request->forward_to;
+                    $apcAction->save();
+                }
+           
+    
+              return response()->json([
+                'status' => 'success',
+                'message' => 'Approved Successfully',
+                'data' => $apc
+                
+            ]);
+        }else{
+             return response()->json([
+                'status' => 'failed',
+                'message' => 'Please Check Id'
+                
+            ]);
+        }
+        
+    }
 }
