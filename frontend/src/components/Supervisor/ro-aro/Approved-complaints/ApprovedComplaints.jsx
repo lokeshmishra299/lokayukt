@@ -326,7 +326,7 @@ const handleSend = async () => {
         <div className="w-full bg-white flex flex-col overflow-hidden">
           <div className="px-3 sm:px-4 py-3 border-b flex-shrink-0 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900">Inbox</h2>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">Sent</h2>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                 <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
                   Inbox: {filteredComplaints.length}
@@ -537,7 +537,7 @@ const handleSend = async () => {
                             className="flex-1 sm:flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap">
                             View Details
                           </button>
-                        {isApprovedByRO(complaint) ? (
+                        {/* {isApprovedByRO(complaint) ? (
                             <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
                             <svg
                               className="w-3 h-3"
@@ -562,7 +562,7 @@ const handleSend = async () => {
                               
                               Send To UPsupervisor
                             </button>
-                          )} 
+                          )}  */}
                         </div>
                       </div>
                     </div>
