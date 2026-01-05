@@ -179,6 +179,8 @@ const ViewAllComplaint = () => {
   const [forwardType, setForwardType] = useState("self");
   const [assinedMyself, setassinedMyself] = useState(false);
 
+    const [sent_through_rk, setSentThroughRK] = useState(false);
+
   const {
     data: complaintData,
     isLoading,
@@ -258,6 +260,7 @@ const ViewAllComplaint = () => {
     mutationFn: async ({ complaintId, remarkData }) => {
       const res = await api.post(`/ps/return-complain-by-ps/${complaintId}`, {
         remark: remarkData,
+
       });
       return res.data;
     },
@@ -279,6 +282,8 @@ const ViewAllComplaint = () => {
       const res = await api.post(`/ps/forward-complain-by-ps/${complaintId}`, {
         forward_to: forwardTo,
         remark: remarkData,
+        sent_through_rk: sent_through_rk ? 1 : 0
+
       });
       return res.data;
     },
@@ -957,6 +962,18 @@ const ViewAllComplaint = () => {
                     Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
                     Officer <span className="text-red-500">*</span>
                   </label>
+
+                   {confirmConfig.type === "forward" && (
+  <label className="flex items-center gap-2 cursor-pointer mt-2">
+    <input
+      type="checkbox"
+      checked={sent_through_rk}
+      onChange={(e) => setSentThroughRK(e.target.checked)} // ✅ CORRECT
+      className="w-4 h-4"
+    />
+    <span className="text-sm">Checkbox If Send through RC</span>
+  </label>
+)}
 
                   {isLoadingOptions || isFetchingOptions ? (
                     <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50 text-sm">

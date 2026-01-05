@@ -186,7 +186,7 @@ const ScanLetter = () => {
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 min-h-[500px]">
         <h2 className="text-lg font-semibold text-gray-800 mb-4 md:mb-6">
-          Scanned Letters / स्कैन किए गए पत्र
+          Scane Letters / स्कैन किए गए पत्र
         </h2>
 
         <div className="overflow-x-auto">

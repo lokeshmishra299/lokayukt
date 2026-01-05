@@ -37,6 +37,15 @@ const AllComplaints = () => {
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
 
+  const [uploadList, setUploadList] = useState([]);
+const [selectedUpload, setSelectedUpload] = useState("");
+const [isSending, setIsSending] = useState(false);
+
+ const roleParent = localStorage.getItem("roleParent");
+
+  // const navigate = useNavigate();
+
+
 
 
   const sortComplaintsByDate = (complaints, order) => {
@@ -59,6 +68,33 @@ const AllComplaints = () => {
     return res.data.data;
   };
 
+const handleSendToUPLokayukt = async () => {
+  if (!selectedUpload || !complaintToApprove) return;
+
+  try {
+    setIsSending(true);
+
+    await api.post(
+      `/ps/forward-to-uplokayukt/${complaintToApprove.id}`,
+      {
+        forward_to: selectedUpload,
+      }
+    );
+
+    toast.success("Send To UPLokayukt Successfully!");
+
+    setIsConfirmModalOpen(false);
+    setSelectedUpload("");
+    setComplaintToApprove(null);
+
+    refetch();
+  } catch (error) {
+    console.error("Send error:", error);
+    toast.error("Send failed");
+  } finally {
+    setIsSending(false);
+  }
+};
 
 
   const { data, isLoading, isError, error, refetch } = useQuery({
@@ -88,6 +124,8 @@ const AllComplaints = () => {
     const res = await api.get("/ps/complainstype");
     return res.data.data;
   };
+
+  
 
   const { data: complaintTypesData, isLoading: typesLoading } = useQuery({
     queryKey: ["complaint-types"],
@@ -157,6 +195,21 @@ const AllComplaints = () => {
     selectedFeeStatus,
     selectedCaseType,
   ]);
+
+
+  useEffect(() => {
+  if (isConfirmModalOpen) {
+    api
+      .get("/ps/get-uplokayukt")
+      .then((res) => {
+        setUploadList(res.data);
+      })
+      .catch((err) => {
+        console.error("UPLokayukt API error:", err);
+      });
+  }
+}, [isConfirmModalOpen]);
+
 
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
@@ -504,6 +557,26 @@ const AllComplaints = () => {
                           >
                             View Details
                           </button>
+                          
+                            {roleParent !== "lok-ayukt" && (
+  complaint.approved_rejected_by_lokayukt === 1 ? (
+    <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center">
+      Sent
+    </span>
+  ) : (
+    <button
+      onClick={(e) => handleApproveClick(e, complaint)}
+      className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 
+                 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 
+                 text-xs font-medium whitespace-nowrap"
+    >
+      Send To UPLokayukt
+    </button>
+  )
+)}
+
+
+
 
                           {/* {isApprovedByRO(complaint) ? (
                             <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
@@ -550,7 +623,7 @@ const AllComplaints = () => {
         </div>
       </div>
 
-      {isConfirmModalOpen && (
+      {/* {isConfirmModalOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-center p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="p-4 sm:p-6">
@@ -605,7 +678,60 @@ const AllComplaints = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
+
+
+      {isConfirmModalOpen && roleParent !== "lok-ayukt" && (
+  <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center">
+    <div className="bg-white rounded-xl shadow-2xl w-[440px] relative">
+
+      <button
+        onClick={() => {
+          setIsConfirmModalOpen(false);
+          setSelectedUpload("");
+          setComplaintToApprove(null);
+        }}
+        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full 
+                   bg-gray-100 hover:bg-gray-200"
+      >
+        ✕
+      </button>
+
+      <div className="px-6 py-4 border-b">
+        <h3 className="text-lg font-semibold">Send to UPLokayukt</h3>
+      </div>
+
+      <div className="px-6 py-5">
+        <label className="block text-sm font-medium mb-2">
+          Select UPLokayukt
+        </label>
+        <select
+          value={selectedUpload}
+          onChange={(e) => setSelectedUpload(e.target.value)}
+          className="w-full border rounded-lg px-3 py-2"
+        >
+          <option value="">Select</option>
+          {uploadList.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="flex justify-end px-6 py-4 bg-gray-50 rounded-b-xl">
+        <button
+          onClick={handleSendToUPLokayukt}
+          disabled={isSending || !selectedUpload}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg disabled:opacity-50"
+        >
+          {isSending ? "Sending..." : "Send"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </>
   );
 };
