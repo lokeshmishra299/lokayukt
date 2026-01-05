@@ -226,13 +226,13 @@ const ViewAllComplaint = () => {
       queryKey: ["lokayukt-options", forwardType], // <-- NOTE: forwardType added
       queryFn: async () => {
         try {
-          // 1️ Send To My Pool → API: /lokayukt/get-users
+          // 1️Send To My Pool → API: /lokayukt/get-users
           if (forwardType === "self") {
             const res = await api.get("/uplokayukt/get-users");
             return res.data?.data || res.data || [];
           }
   
-          // 2️ Send To Other Pool → API: /lokayukt/get-lokayukt-uplokayukt
+          // 2️Send To Other Pool → API: /lokayukt/get-lokayukt-uplokayukt
           const res = await api.get("/uplokayukt/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
@@ -776,7 +776,7 @@ const ViewAllComplaint = () => {
                   >
                     {forwardComplaintMutation.isPending
                       ? "Processing..."
-                      : "Send / Mark"}
+                      : "Sent / Mark"}
                   </button>
                 </div>
               </div>
@@ -814,7 +814,7 @@ const ViewAllComplaint = () => {
                   {confirmConfig.type === "receive"
                     ? "Mark as Received?"
                     : confirmConfig.type === "forward"
-                    ? "Send"
+                    ? "Sent"
                     : confirmConfig.type === "pullback"
                     ? "Pull Back Complaint?"
                     : "Assign to Yourself?"}
@@ -842,7 +842,7 @@ const ViewAllComplaint = () => {
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
                           <span className="ml-2 text-sm text-gray-700 font-medium">
-                            Send To My Pool
+                           Send To My Pool
                           </span>
                         </label>
                         <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
@@ -858,7 +858,7 @@ const ViewAllComplaint = () => {
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
                           <span className="ml-2 text-sm text-gray-700 font-medium">
-                            Send To Other Pool
+                           Send To Other Pool
                           </span>
                         </label>
                       </div>
@@ -951,7 +951,7 @@ const ViewAllComplaint = () => {
                       : confirmConfig.type === "assign" ||
                         confirmConfig.type === "pullback"
                       ? "Yes"
-                      : "Send"}
+                      : "Sent"}
                   </button>
                 </div>
               </div>

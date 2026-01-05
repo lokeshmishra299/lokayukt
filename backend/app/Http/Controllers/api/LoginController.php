@@ -149,7 +149,7 @@ public function sendOtp(Request $request)
     $user->otp = '12345'; 
     $user->save();
 
-    return ApiResponse::generateResponse('success', 'OTP sent successfully.');
+    return ApiResponse::generateResponse('success', 'OTPSend successfully.');
 }
 
 

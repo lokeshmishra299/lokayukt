@@ -273,7 +273,7 @@ const EditUserManagement = () => {
         updatePayload.password_confirmation = formData.password_confirmation;
       }
 
-      console.log('Update payload being sent:', updatePayload); // Debug log
+      console.log('Update payload beingSend:', updatePayload); // Debug log
 
       const response = await api.post(`/lokayukt/update-users/${id}`, updatePayload);
 

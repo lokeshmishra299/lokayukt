@@ -175,7 +175,7 @@ const Sidebar = ({
 
            
             
-                        {/* Send */}
+                        {/*Send */}
                         <li>
                           <Link
                             to="/dispatch/approved-complaints"
@@ -185,11 +185,11 @@ const Sidebar = ({
                                 ? "bg-blue-600 text-white shadow-md"
                                 : "text-gray-700 hover:bg-gray-200"
                             } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
+                            title={!isMobile && isCollapsed ? "Sent" : ""}
                           >
                             <div className="flex items-center gap-3">
                               <FiSend size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
-                              {(isMobile || !isCollapsed) && <span>Send</span>}
+                              {(isMobile || !isCollapsed) && <span>Sent</span>}
                             </div>
                             {isActive("/approved-complaints") && (isMobile) && (
                               <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
@@ -213,7 +213,7 @@ const Sidebar = ({
                                 ? "bg-blue-600 text-white shadow-md"
                                 : "text-gray-700 hover:bg-gray-200"
                             } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
+                            title={!isMobile && isCollapsed ? "Sent" : ""}
                           >
                             <div className="flex items-center gap-3">
                               <HiMiniUsers size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
@@ -238,7 +238,7 @@ const Sidebar = ({
                                 ? "bg-blue-600 text-white shadow-md"
                                 : "text-gray-700 hover:bg-gray-200"
                             } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
+                            title={!isMobile && isCollapsed ? "Sent" : ""}
                           >
                             <div className="flex items-center gap-3">
                               <FaDatabase size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
@@ -264,7 +264,7 @@ const Sidebar = ({
                                 ? "bg-blue-600 text-white shadow-md"
                                 : "text-gray-700 hover:bg-gray-200"
                             } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
+                            title={!isMobile && isCollapsed ? "Sent" : ""}
                           >
                             <div className="flex items-center gap-3">
                               <TbReportSearch size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
@@ -289,7 +289,7 @@ const Sidebar = ({
                                 ? "bg-blue-600 text-white shadow-md"
                                 : "text-gray-700 hover:bg-gray-200"
                             } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
+                            title={!isMobile && isCollapsed ? "Sent" : ""}
                           >
                             <div className="flex items-center gap-3">
                               <RiQrScanFill size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
@@ -315,7 +315,7 @@ const Sidebar = ({
                                 ? "bg-blue-600 text-white shadow-md"
                                 : "text-gray-700 hover:bg-gray-200"
                             } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
+                            title={!isMobile && isCollapsed ? "Sent" : ""}
                           >
                             <div className="flex items-center gap-3">
                               <HiMiniUsers size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
