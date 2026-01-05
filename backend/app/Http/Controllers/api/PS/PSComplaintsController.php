@@ -144,10 +144,11 @@ $records = $query->get();
         'status' => true,
         'message' => 'Records fetched successfully',
         'data' => $records,
-         'todayCount' => $todayCount,
+        'todayCount' => $todayCount,
         'older7DaysCount' => $older7DaysCount,
         'older7DaysDueCount' => $older7DaysDueCount,
         'feePending' => $feePending,
+        'roleParent' => $roleParent,
     ]);
 
 }
@@ -971,7 +972,7 @@ $records = $query->get();
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
-        $join->on('complaints.id', '=', 'rep.complaint_id')
+        $join->on('cm.id', '=', 'rep.complaint_id')
              ->where(function ($q) use ($parentId, $roleParent) {
 
                  if ($roleParent === 'lok-ayukt') {
