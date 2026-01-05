@@ -3,7 +3,7 @@ import { FaInfoCircle } from "react-icons/fa";
 
 const HideModule = () => {
   return (
-    <div className="p-6 bg-gray-100 border border-gray-300 rounded-lg text-center shadow-sm">
+    <div className="p-6 mx-6 mt-2 bg-gray-100 border border-gray-300 rounded-lg text-center shadow-sm">
       <div className="flex flex-col items-center gap-2">
         <FaInfoCircle className="text-blue-600 text-3xl" />
         <h1 className="text-lg font-semibold text-gray-800">
