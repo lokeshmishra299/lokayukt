@@ -1,4 +1,4 @@
- import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
@@ -40,13 +40,13 @@ const AllComplaints = () => {
   const [uploadList, setUploadList] = useState([]);
   const [selectedUpload, setSelectedUpload] = useState("");
   const [isSending, setIsSending] = useState(false);
-  
+
   // API statistics state
   const [apiStats, setApiStats] = useState({
     older7DaysCount: 0,
     todayCount: 0,
     feePending: 0,
-    older7DaysDueCount: 0
+    older7DaysDueCount: 0,
   });
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const AllComplaints = () => {
       await api.post(
         `/lokayukt/forward-to-uplokayukt/${complaintToApprove.id}`,
         {
-          forward_to: selectedUpload, 
+          forward_to: selectedUpload,
         }
       );
 
@@ -106,17 +106,17 @@ const AllComplaints = () => {
   const getAllComplaints = async () => {
     const res = await api.get("/lokayukt/all-complaints");
     console.log("API Response:", res.data);
-    
+
     // Set API statistics from response
     if (res.data) {
       setApiStats({
         older7DaysCount: res.data.older7DaysCount || 0,
         todayCount: res.data.todayCount || 0,
         feePending: res.data.feePending || 0,
-        older7DaysDueCount: res.data.older7DaysDueCount || 0
+        older7DaysDueCount: res.data.older7DaysDueCount || 0,
       });
     }
-    
+
     return res.data.data || [];
   };
 
@@ -175,7 +175,10 @@ const AllComplaints = () => {
 
     if (selectedDistrict !== "") {
       filtered = filtered.filter((complaint) => {
-        return complaint.district_name?.toLowerCase() === selectedDistrict.toLowerCase();
+        return (
+          complaint.district_name?.toLowerCase() ===
+          selectedDistrict.toLowerCase()
+        );
       });
     }
 
@@ -281,7 +284,7 @@ const AllComplaints = () => {
     const created = new Date(date);
     const today = new Date();
 
-    const diffTime = today - created; 
+    const diffTime = today - created;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays;
@@ -307,7 +310,9 @@ const AllComplaints = () => {
         <div className="w-full bg-white flex flex-col overflow-hidden">
           <div className="px-3 sm:px-4 py-3 border-b flex-shrink-0 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900">Inbox</h2>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">
+                Inbox
+              </h2>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                 <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
                   Inbox: {filteredComplaints.length}
@@ -324,7 +329,8 @@ const AllComplaints = () => {
             <div className="flex gap-2 mb-3">
               <div className="flex flex-col">
                 <button className="flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
-                  <IoMdTime className="text-rose-500 text-sm" /> Overdue &gt; 7 days ({apiStats.older7DaysDueCount})
+                  <IoMdTime className="text-rose-500 text-sm" /> Overdue &gt; 7
+                  days ({apiStats.older7DaysDueCount})
                 </button>
               </div>
               <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
@@ -372,7 +378,7 @@ const AllComplaints = () => {
                     </option>
                   ))}
                 </select>
-                <select 
+                <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedFeeStatus}
                   onChange={(e) => setSelectedFeeStatus(e.target.value)}
@@ -397,14 +403,16 @@ const AllComplaints = () => {
                 </select>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-gray-600 text-xs whitespace-nowrap">Sort by:</span>
+                <span className="text-gray-600 text-xs whitespace-nowrap">
+                  Sort by:
+                </span>
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={sortOrder}
                   onChange={handleSortChange}
                 >
-                  <option value="desc">Received Date</option> 
-                  <option value="asc">Ascending Order</option> 
+                  <option value="desc">Received Date</option>
+                  <option value="asc">Ascending Order</option>
                   <option value="desc">Decending Order</option>
                 </select>
               </div>
@@ -436,18 +444,17 @@ const AllComplaints = () => {
                           File No. {complaint.complain_no}
                         </p>
                         <p className="text-xs text-gray-700 mb-1">
-                          Description: {complaint.complaint_description ||
+                          Description:{" "}
+                          {complaint.complaint_description ||
                             "No description available"}
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
-                          <span className="text-gray-500">
-                            Cause Date:
+                          <span className="text-gray-500">Cause Date:</span>
+                          <span className="ml-1">
+                            {complaint.cause_date || "NA"}
                           </span>
-                          <span className="ml-1">{complaint.cause_date || "NA"}</span>
                           <span className="mx-1 text-gray-400">•</span>
-                          <span className="text-gray-500">
-                            Category:
-                          </span>
+                          <span className="text-gray-500">Category:</span>
                           <span className="ml-1">
                             {complaint.category || "NA"}
                           </span>
@@ -480,7 +487,12 @@ const AllComplaints = () => {
                           </span>
                           {complaint.fee_exempted === 1 && (
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                              {complaint.approved_rejected_by_uplokayukt == 1 ? "With UPLokayukta" : "With Lokayukta"}
+                              {complaint.approved_rejected_by_rk == 1
+                                ? "With Lokayukta"
+                                : complaint.approved_rejected_by_rk == 1 &&
+                                  complaint.approved_rejected_by_lokayukt == 1
+                                ? "With UpLokayukta"
+                                : ""}
                             </span>
                           )}
                         </div>
@@ -493,11 +505,11 @@ const AllComplaints = () => {
                               px-2 py-0.5 rounded text-[11px] font-medium
                               ${
                                 complaint.fee_exempted === 0
-                                  ? "bg-green-50 text-blue-600"    
+                                  ? "bg-green-50 text-blue-600"
                                   : complaint.fee_exempted === 1
-                                  ? "bg-orange-50 text-orange-600"     
+                                  ? "bg-orange-50 text-orange-600"
                                   : complaint.fee_exempted === 2
-                                  ? "bg-blue-50 text-orange-400" 
+                                  ? "bg-blue-50 text-orange-400"
                                   : ""
                               }
                             `}
@@ -531,7 +543,7 @@ const AllComplaints = () => {
                                   clipRule="evenodd"
                                 />
                               </svg>
-                              Send 
+                              Send
                             </span>
                           ) : (
                             <button
@@ -550,7 +562,11 @@ const AllComplaints = () => {
             ) : (
               <div className="flex items-center justify-center h-full">
                 <p className="text-gray-500 text-sm">
-                  {searchQuery || selectedDistrict || selectedStatus || selectedFeeStatus || selectedCaseType
+                  {searchQuery ||
+                  selectedDistrict ||
+                  selectedStatus ||
+                  selectedFeeStatus ||
+                  selectedCaseType
                     ? "No results found"
                     : ""}
                 </p>
