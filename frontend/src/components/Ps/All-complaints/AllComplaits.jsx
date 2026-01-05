@@ -41,6 +41,13 @@ const AllComplaints = () => {
 const [selectedUpload, setSelectedUpload] = useState("");
 const [isSending, setIsSending] = useState(false);
 
+const [apiStats, setApiStats] = useState({
+  feePending: 0,
+  older7DaysCount: 0,
+  older7DaysDueCount: 0,
+  todayCount: 0,
+});
+
  const roleParent = localStorage.getItem("roleParent");
 
   // const navigate = useNavigate();
@@ -65,7 +72,7 @@ const [isSending, setIsSending] = useState(false);
   const getAllComplaints = async () => {
     const res = await api.get("/ps/all-complaints");
     console.log("Data he", res)
-    return res.data.data;
+    return res.data;
   };
 
 const handleSendToUPLokayukt = async () => {
@@ -133,13 +140,26 @@ const handleSendToUPLokayukt = async () => {
 
   });
 
-  useEffect(() => {
-    if (data) {
-      setAllComplaints(data);
-      const sorted = sortComplaintsByDate(data, sortOrder);
-      setFilteredComplaints(sorted);
-    }
-  }, [data, sortOrder]);
+ useEffect(() => {
+  if (!data) return;
+
+  // 👇 complaint list (niche wali UI)
+  const complaints = data.data || [];
+  setAllComplaints(complaints);
+
+  const sorted = sortComplaintsByDate(complaints, sortOrder);
+  setFilteredComplaints(sorted);
+
+  // 👇 top stats (badges)
+  setApiStats({
+    feePending: data.feePending || 0,
+    older7DaysCount: data.older7DaysCount || 0,
+    older7DaysDueCount: data.older7DaysDueCount || 0,
+    todayCount: data.todayCount || 0,
+  });
+
+}, [data, sortOrder]);
+
 
   useEffect(() => {
     if (allComplaints.length === 0) return;
@@ -337,10 +357,10 @@ const handleSendToUPLokayukt = async () => {
                   Inbox: {filteredComplaints.length}
                 </span>
                 <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded-full font-medium whitespace-nowrap">
-                  Over 7 days: {stats.overdue}
+                  Over 7 days: {apiStats.older7DaysCount}
                 </span>
                 <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium whitespace-nowrap">
-                  Received today: {stats.receivedToday}
+                  Received today: {apiStats.todayCount}
                 </span>
               </div>
             </div>
@@ -351,7 +371,7 @@ const handleSendToUPLokayukt = async () => {
                 <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
               </button></div>
               <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
-                ₹ Fee Pending (0)
+                ₹ Fee Pending ({apiStats.feePending})
               </button>
             </div>
 
@@ -439,7 +459,7 @@ const handleSendToUPLokayukt = async () => {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-          {data?.length == 0 ? (
+          {allComplaints.length == 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
