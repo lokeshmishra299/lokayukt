@@ -48,6 +48,8 @@ const DraftLetter = ({ complaint }) => {
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
   const [loadingPdf, setLoadingPdf] = useState(false);
   const [errors, setErrors] = useState({});
+  const [draftTitle, setDraftTitle] = useState(""); // NEW
+
 
   // Refs for Print/Preview
   const popupRef = useRef(null);
@@ -140,6 +142,7 @@ const DraftLetter = ({ complaint }) => {
       const formData = new FormData();
       formData.append("complaint_id", complaint.id);
       formData.append("draft_note", note);
+      formData.append("title", draftTitle);
       // Append generated PDF as 'file'
       formData.append("file", pdfBlob, `Draft_${complaint?.file_number || "File"}.pdf`);
 
@@ -153,6 +156,10 @@ const DraftLetter = ({ complaint }) => {
       if (res.data.status) {
         toast.success("Draft Added Successfully!");
         setShowSuccess(false); // Close Preview
+        setDraftTitle(""); 
+       setNote("");
+      setEditorState(EditorState.createEmpty());
+
         setNote("");
         setEditorState(EditorState.createEmpty());
         setSelectedDoc("");
@@ -178,6 +185,14 @@ const DraftLetter = ({ complaint }) => {
       }
       console.error(err);
     }
+ 
+
+    if (!draftTitle.trim()) {
+  toast.error("Title is required.");
+  return; // exit if empty
+}
+
+ 
   };
 
   // Print/Download Placeholders
@@ -555,6 +570,19 @@ const handleEditDraft =()=>{
               <FaTimes className="w-5 h-5 text-gray-600" />
             </button>
             <div className="flex-1 px-4 md:p-6 overflow-y-auto">
+             <label className="block text-md font-medium mb-2">
+  Title <span className="text-red-500">*</span>
+</label>
+<input
+  type="text"
+  name="title"
+  id="title"
+  value={draftTitle}   // bind karo state
+  onChange={(e) => setDraftTitle(e.target.value)} // update state on change
+  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+/>
+
+
               <h2 className="text-lg font-semibold mb-4 md:mb-6">Create Draft</h2>
               <label className="block text-sm font-medium mb-2">
                 Draft Content <span className="text-red-500">*</span>
