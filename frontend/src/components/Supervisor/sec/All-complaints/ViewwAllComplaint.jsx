@@ -10,6 +10,7 @@ import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
+import DraftLetter from "./SubModule/DraftLetter";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -24,7 +25,6 @@ const api = axios.create({
 });
 
 
-
 const SearchableDropdown = ({
   options,
   value,
@@ -35,7 +35,8 @@ const SearchableDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
-  
+
+
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -67,6 +68,7 @@ const SearchableDropdown = ({
     setSearchTerm("");
   };
 
+  
   return (
     <div className="relative" ref={wrapperRef}>
       <div
@@ -139,105 +141,21 @@ const SearchableDropdown = ({
 };
 
 const ViewAllComplaint = () => {
-
-
-
-// Dsc Import 
-const signWithDSC = () => {
-  try {
-    //  if (!window.ActiveXObject) {
-    //   alert("Please use Internet Explorer for Digital Signature");
-    //   return false;
-    // }
-
-    const CAPICOM_CURRENT_USER_STORE = 2;
-    const CAPICOM_STORE_OPEN_READ_ONLY = 0;
-    const CAPICOM_CERTIFICATE_FIND_KEY_USAGE = 12;
-    const CAPICOM_DIGITAL_SIGNATURE_KEY_USAGE = 0x00000080;
-    const CAPICOM_CERTIFICATE_FIND_TIME_VALID = 9;
-    const CAPICOM_CERTIFICATE_FIND_EXTENDED_PROPERTY = 6;
-    const CERT_KEY_SPEC_PROP_ID = 6;
-    const CAPICOM_AUTHENTICATED_ATTRIBUTE_SIGNING_TIME = 0;
-    const CAPICOM_ENCODE_BASE64 = 0;
-    const CAPICOM_INFO_SUBJECT_SIMPLE_NAME = 0;
-
-    const store = new window.ActiveXObject("CAPICOM.Store");
-    store.Open(
-      CAPICOM_CURRENT_USER_STORE,
-      "My",
-      CAPICOM_STORE_OPEN_READ_ONLY
-    );
-
-    let certificates = store.Certificates
-      .Find(CAPICOM_CERTIFICATE_FIND_KEY_USAGE, CAPICOM_DIGITAL_SIGNATURE_KEY_USAGE)
-      .Find(CAPICOM_CERTIFICATE_FIND_TIME_VALID)
-      .Find(CAPICOM_CERTIFICATE_FIND_EXTENDED_PROPERTY, CERT_KEY_SPEC_PROP_ID);
-
-    if (certificates.Count < 1) {
-      alert("No valid Digital Signature Certificate found");
-      return false;
-    }
-
-    const selectedCerts = certificates.Select();
-    const cert = selectedCerts.Item(1);
-
-    const today = new Date();
-    const validTo = new Date(cert.ValidToDate);
-    if (validTo < today) {
-      alert("Digital Signature Certificate expired");
-      return false;
-    }
-
-    setCertSubject(cert.GetInfo(CAPICOM_INFO_SUBJECT_SIMPLE_NAME));
-    setCertThumbprint(cert.Thumbprint);
-    setCertSerialNo(cert.SerialNumber);
-    setDigitalId(cert.GetInfo(CAPICOM_INFO_SUBJECT_SIMPLE_NAME));
-    setCstInfo(cert.SubjectName);
-
-    const from = new Date(cert.ValidFromDate);
-    const to = new Date(cert.ValidToDate);
-
-    const formatDate = (d) =>
-      `${String(d.getMonth() + 1).padStart(2, "0")}/${String(
-        d.getDate()
-      ).padStart(2, "0")}/${d.getFullYear()}`;
-
-    setValidFrom(formatDate(from));
-    setValidTo(formatDate(to));
-
-    const contentToSign = "00"; 
-    setPlainText(contentToSign);
-
-    const signedData = new window.ActiveXObject("CAPICOM.SignedData");
-    const signer = new window.ActiveXObject("CAPICOM.Signer");
-    const timeAttr = new window.ActiveXObject("CAPICOM.Attribute");
-
-    signedData.Content = contentToSign;
-    signer.Certificate = cert;
-
-    timeAttr.Name = CAPICOM_AUTHENTICATED_ATTRIBUTE_SIGNING_TIME;
-    timeAttr.Value = new Date().getVarDate();
-    signer.AuthenticatedAttributes.Add(timeAttr);
-
-    const signature = signedData.Sign(signer, true, CAPICOM_ENCODE_BASE64);
-
-    setSignatureData(signature);
-
-    return true; 
-  } catch (err) {
-    console.error("DSC Error:", err);
-    alert("Error while signing using Digital Signature");
-    return false;
-  }
-};
-
-
-
-
-  
   const navigate = useNavigate();
   const { id } = useParams();
-    const [sent_through_rk, setThroughRC] = useState(false);
+
+  
+const [Takefile,setTakefile]= useState(false)
+
+function takefile(){
+  setTakefile(true)
+}
+
+
+//  const handleTakeFile = () =>
+//     setTakeFileConfirmConfig({ open: true, type: "assign" });
+
+  
 
 
     const capitalizeFirstLetter = (text = "") => {
@@ -251,37 +169,21 @@ const signWithDSC = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
+  const [showDispatch, setshowDispatch] = useState(false);
+  const [sent_through_rk, setThroughRC] = useState(false);
 
+  function diposeShow (){
+    setshowDispatch(true)
+  }
+  function closePoup (){
+    setshowDispatch(false)
+  }
 
-  const [currentDate, setCurrentDate] = useState("");
-  const [signatureData, setSignatureData] = useState("");
-const [plainText, setPlainText] = useState("");
-const [certSubject, setCertSubject] = useState("");
-const [certThumbprint, setCertThumbprint] = useState("");
-const [certSerialNo, setCertSerialNo] = useState("");
-const [validFrom, setValidFrom] = useState("");
-const [validTo, setValidTo] = useState("");
-const [digitalId, setDigitalId] = useState("");
-const [cstInfo, setCstInfo] = useState("");
-
-
-useEffect(() => {
-  const now = new Date();
-setCurrentDate(
-  `${String(now.getMonth() + 1).padStart(2, "0")}/${String(
-    now.getDate()
-  ).padStart(2, "0")}/${now.getFullYear()}`
-);
-})
-
-
-  // Single config for Action modals (Receive, Forward, Pullback)
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
     type: null,
   });
 
-  // Config for Data View Modal (Correspondence / Respondent)
   const [viewModalConfig, setViewModalConfig] = useState({
     open: false,
     type: null,
@@ -313,10 +215,10 @@ setCurrentDate(
   //   isFetching: isFetchingOptions,
   //   error: forwardOptionsError,
   // } = useQuery({
-  //   queryKey: ["supervisor-options"],
+  //   queryKey: ["lokayukt-options"],
   //   queryFn: async () => {
   //     try {
-  //       const res = await api.get("/supervisor/get-supervisor");
+  //       const res = await api.get("/lokayukt/get-lokayukt");
   //       if (Array.isArray(res.data)) {
   //         return res.data;
   //       } else if (res.data && Array.isArray(res.data.data)) {
@@ -340,23 +242,38 @@ setCurrentDate(
   // });
 
 
+    const assignToSelfMutation = useMutation({
+      mutationFn: async ({ complaintId }) => {
+        const res = await api.post(`/supervisor/assign-by-ro-aro/${complaintId}`);
+        return res.data;
+      },
+      onSuccess: (data) => {
+        toast.success(data.message || "Assigned to yourself successfully");
+        setTakefile(false)
+        queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+        setConfirmConfig({ open: false, type: null });
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || "Failed to assign");
+      },
+    });
+
    const {
       data: forwardOptionsData,
       isLoading: isLoadingOptions,
       isFetching: isFetchingOptions,
       error: forwardOptionsError,
     } = useQuery({
-      queryKey: ["supervisor-options", forwardType], // 
+      queryKey: ["lokayukt-options", forwardType], // 
       queryFn: async () => {
         try {
-          //  Send To My Pool  API: /supervisor/get-users
+          //  Send To My Pool  API: /lokayukt/get-users
           if (forwardType === "self") {
             const res = await api.get("/supervisor/get-users");
             return res.data?.data || res.data || [];
           }
   
-          //  Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
-          const res = await api.get("/supervisor/get-upsupervisor");
+          const res = await api.get("/supervisor/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
   
@@ -374,12 +291,35 @@ setCurrentDate(
       const res = await api.post("/supervisor/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
+        sent_through_rk: sent_through_rk ? 1 : 0
 
       });
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data.message || "Marked as received successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+       setThroughRC(false);
+      setRemark("");
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to mark as received"
+      );
+    },
+  });
+
+  const dispose = useMutation({
+    mutationFn: async ({ complaintId, remarkData }) => {
+      const res = await api.post(`/supervisor/dispose-complain/${id}`, {
+        complaint_id: complaintId,
+        remark: remarkData,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success( "Dispose successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setRemark("");
       setConfirmConfig({ open: false, type: null });
@@ -393,7 +333,7 @@ setCurrentDate(
 
   // const forwardComplaintMutation = useMutation({
   //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-  //     const res = await api.post(`/supervisor/forward-by-supervisor/${complaintId}`, {
+  //     const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
   //       forward_to: forwardTo,
   //       remark: remarkData,
   //     });
@@ -411,33 +351,28 @@ setCurrentDate(
   //   },
   // });
 
-const forwardComplaintMutation = useMutation({
-  mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-    const res = await api.post(
-      `/supervisor/forward-by-supervisor/${complaintId}`,
-      {
-        forward_to: forwardTo,
-        remark: remarkData,
-        sent_through_rk: sent_through_rk ? 1 : 0,
-
-         txtsigndata: signatureData,        
-        txtPlainText: plainText,              
-        HF1: certThumbprint,                  
-        HF3: certSubject,                     
-        HF2: certSerialNo,                    
-        serialno: certSerialNo,              
-        hdnValidityEnd: validTo,             
-        hdnValidityfrom: validFrom,          
-        digitalID: digitalId,                
-        cstinfo: cstInfo,                    
-        currdate: currentDate,           
-      }
-    );
-
-    return res.data;
-  },
-});
-
+  
+  const forwardComplaintMutation = useMutation({
+      mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+        const res = await api.post(`/supervisor/forward-by-ro-aro/${complaintId}`, {
+          forward_to: forwardTo,
+          remark: remarkData,
+          sent_through_rk: sent_through_rk ? 1 : 0
+        });
+        return res.data;
+      },
+      onSuccess: (data) => {
+        toast.success(data.message || "Forwarded successfully");
+        queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+        setRemark("");
+        setThroughRC(false)
+        setSelectedForwardTo("");
+        setConfirmConfig({ open: false, type: null });
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || "Failed to forward");
+      },
+    });
 
   const handleMarkAsReceived = () =>
     setConfirmConfig({ open: true, type: "receive" });
@@ -460,15 +395,6 @@ const forwardComplaintMutation = useMutation({
         toast.error("Please select forward to and enter a remark");
         return;
       }
-
-
-        const isSigned = signWithDSC();   
-
-  if (!isSigned) {
-    toast.error("Digital Signature failed");
-    return;
-  }
-
       forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
@@ -485,6 +411,10 @@ const forwardComplaintMutation = useMutation({
     setRemark("");
     setSelectedForwardTo("");
   };
+
+
+
+  
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -546,16 +476,6 @@ const forwardComplaintMutation = useMutation({
   return (
     <div className="w-full min-h-screen bg-gray-50">
       <ToastContainer position="top-right" autoClose={3000} />
-      <input type="hidden" value={signatureData} />
-<input type="hidden" value={plainText} />
-<input type="hidden" value={certSubject} />
-<input type="hidden" value={certThumbprint} />
-<input type="hidden" value={certSerialNo} />
-<input type="hidden" value={validFrom} />
-<input type="hidden" value={validTo} />
-<input type="hidden" value={digitalId} />
-<input type="hidden" value={cstInfo} />
-
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
@@ -579,8 +499,8 @@ const forwardComplaintMutation = useMutation({
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
+                    {complaintData.approved_rejected_by_lokayukt == 1
+                      ? "In Motion – With Lokayukta"
                       : "Received - Record Section" }
                   </span>
                 </div>
@@ -600,8 +520,8 @@ const forwardComplaintMutation = useMutation({
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
+                       {complaintData.approved_rejected_by_lokayukt == 1
+                      ? "In Motion – With Lokayukta"
                       : "Received - Record Section" }
                     </span>
 
@@ -615,7 +535,6 @@ const forwardComplaintMutation = useMutation({
                 </div>
               </div>
 
-              {/* ===== DESCRIPTION (Hindi) ===== */}
             
               <p className="text-[14px] text-black font-semibold uppercase my-2">
                 {/* Description:{" "} */}
@@ -638,10 +557,8 @@ const forwardComplaintMutation = useMutation({
 
               </p> */}
 
-              {/* ===== DETAILS GRID (Hindi) ===== */}
                           <div className="space-y-3 mb-6">
   
-  {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य परिवादी का विवरण 
@@ -679,7 +596,6 @@ const forwardComplaintMutation = useMutation({
     </div>
   </div>
 
-  {/* ----------------- मुख्य प्रतिवादी का विवरण ----------------- */}
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य प्रतिवादी का विवरण
@@ -717,7 +633,6 @@ const forwardComplaintMutation = useMutation({
     </div>
   </div>
 
-  {/* ----------------- अन्य विवरण ----------------- */}
   <div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Relation */}
@@ -756,7 +671,7 @@ const forwardComplaintMutation = useMutation({
 
 </div>
 
-              {/* Fee Status and Fee Type Section (Hindi) */}
+              {/* Fee Status and Fee Type Section */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${
@@ -777,7 +692,7 @@ const forwardComplaintMutation = useMutation({
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  स्थिति: {complaintData.fee_approved_by_supervisor == 1 ? "Approved" : "Awaiting approval"}
+                  स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -787,7 +702,6 @@ const forwardComplaintMutation = useMutation({
                 )}
               </div>
 
-              {/* ===== NEW SECTION: Extra Details Tabs/Buttons (Hindi) ===== */}
               <div className="flex flex-wrap gap-3 mt-4 border-t pt-4">
                 <button
                   onClick={() =>
@@ -827,7 +741,7 @@ const forwardComplaintMutation = useMutation({
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement", "draft"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -845,6 +759,8 @@ const forwardComplaintMutation = useMutation({
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
+                    {tab === "draft" && "Draft"}
+
                   </button>
                 ))}
               </div>
@@ -853,7 +769,7 @@ const forwardComplaintMutation = useMutation({
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement", "draft"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -867,6 +783,8 @@ const forwardComplaintMutation = useMutation({
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
+                    {tab === "draft" && "Draft Letter"}
+
                     {activeTab === tab && (
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
                     )}
@@ -897,6 +815,8 @@ const forwardComplaintMutation = useMutation({
               {activeTab === "movement" && (
                 <MovementHistory complaint={complaintData} />
               )}
+              {activeTab === "draft" && <DraftLetter complaint={complaintData} />}
+
 
               
             </div>
@@ -913,9 +833,34 @@ const forwardComplaintMutation = useMutation({
                   >
                     Pull Back
                   </button>
+                  
+                 
+                    <button
+                      onClick={takefile}
+                      className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
+                    >
+                       Take File In Hand
+                    </button>
+              
+
                 </div>
 
+
+                
+
                 <div className="flex gap-2">
+
+
+                    {/* <button
+  onClick={diposeShow}
+  disabled={dispose.isPending}
+  className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {dispose.isPending ? "Processing..." : "Dispose"}
+</button> */}
+
+                   
+
                   <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
@@ -926,6 +871,22 @@ const forwardComplaintMutation = useMutation({
                       : "Return with Remarks"}
                   </button>
 
+                    {complaintData.approved_rejected_by_ro_aro == "1" ? (
+                    <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                      Forwarded
+                    </span>
+                  ) : (
+                    <button
+                      onClick={handleforwardphysical}
+                      disabled={forwardComplaintMutation.isPending}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {forwardComplaintMutation.isPending
+                        ? "Processing..."
+                        : "Send / Mark"}
+                    </button>
+                  )}
+{/* 
                   <button
                     onClick={handleforwardphysical}
                     disabled={forwardComplaintMutation.isPending}
@@ -934,7 +895,7 @@ const forwardComplaintMutation = useMutation({
                     {forwardComplaintMutation.isPending
                       ? "Processing..."
                       : "Send / Mark"}
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
@@ -949,7 +910,60 @@ const forwardComplaintMutation = useMutation({
         )}
       </div>
 
-      {/* Unified Confirmation Modal (Receive/Forward/Pullback) */}
+
+      {/* {
+        showDispatch && (
+          <div>
+            <h1>djudjdjj</h1>
+          </div>
+        )
+      } */}
+
+{Takefile && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="bg-white w-[420px] rounded-lg shadow-lg relative">
+
+      <div className="flex items-center justify-between px-6 pt-2 ">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Take your file in hand?
+        </h2>
+        <button
+          onClick={() => setTakefile(false)}
+          className="text-gray-500 hover:text-gray-700 text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div className="px-6 py-6 text-sm text-gray-700">
+        Are you sure you want to take this file in hand?
+      </div>
+
+      <div className="flex justify-end gap-3 px-6 pb-2 ">
+        <button
+          onClick={() => setTakefile(false)}
+          className="px-5 py-2 rounded-md border text-gray-700 hover:bg-gray-100"
+        >
+          No
+        </button>
+
+       <button
+  onClick={() =>
+    assignToSelfMutation.mutate({ complaintId: id })
+  }
+  className="px-5 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+  disabled={assignToSelfMutation.isLoading}
+>
+  {assignToSelfMutation.isLoading ? "Processing..." : "Yes"}
+</button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
+
      {confirmConfig.open && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
               <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
@@ -977,10 +991,8 @@ const forwardComplaintMutation = useMutation({
                     : "Assign to Yourself?"}
                 </h3>
     
-                {/* --- FORWARDING LOGIC START --- */}
                 {confirmConfig.type === "forward" && (
                   <>
-                    {/* Radio Buttons Section */}
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Forward Type <span className="text-red-500">*</span>
@@ -999,15 +1011,15 @@ const forwardComplaintMutation = useMutation({
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
                           <span className="ml-2 text-sm text-gray-700 font-medium">
-                            Send To My Pool
+                            Send Direct
                           </span>
                         </label>
                         <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
                           <input
                             type="radio"
                             name="forwardType"
-                            value="upsupervisor"
-                            checked={forwardType === "upsupervisor"}
+                            value="uplokayukt"
+                            checked={forwardType === "uplokayukt"}
                             onChange={(e) => {
                               setForwardType(e.target.value);
                               setSelectedForwardTo("");
@@ -1021,7 +1033,6 @@ const forwardComplaintMutation = useMutation({
                       </div>
                     </div>
     
-                    {/* SEARCHABLE DROPDOWN */}
                     <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
@@ -1048,11 +1059,20 @@ const forwardComplaintMutation = useMutation({
                           placeholder="Select Officer..."
                         />
                       )}
-                     
 
+                          
+                 
                     </div>
+                  </>
+                )}
 
-                   <label className="flex items-center gap-2 cursor-pointer mt-2">
+
+                {confirmConfig.type !== "assign" &&
+                  confirmConfig.type !== "pullback" && (
+                    <>
+                      <div className="mb-5 mt-3">
+
+                       <label className="flex items-center gap-2 cursor-pointer mt-2">
   <input
     type="checkbox"
     checked={sent_through_rk}
@@ -1061,16 +1081,6 @@ const forwardComplaintMutation = useMutation({
   />
   <span className="text-sm">Checkbox If Send through RC</span>
 </label>
-
-                  </>
-                )}
-                {/* --- FORWARDING LOGIC END --- */}
-    
-                {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
-                {confirmConfig.type !== "assign" &&
-                  confirmConfig.type !== "pullback" && (
-                    <>
-                      <div className="mb-5">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Remark <span className="text-red-500">*</span>
                         </label>
@@ -1128,7 +1138,73 @@ const forwardComplaintMutation = useMutation({
             </div>
           )}
 
-      {/* ===== VIEW DATA MODAL (Correspondence / Respondent / Support / Witness) ===== */}
+
+          {showDispatch && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+      
+      {/* Close Button */}
+      <button
+        onClick={closePoup}
+        disabled={markAsReceivedMutation.isPending}
+        className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <FaTimes className="w-5 h-5 text-gray-600" />
+      </button>
+
+      {/* Title */}
+      <h3 className="text-lg font-semibold mb-4 pr-8">
+        Dispose Complaint
+      </h3>
+
+      {/* Remark */}
+      <div className="mb-5">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Disposal Remark <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          rows={4}
+          placeholder="Enter disposal remark..."
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={closePoup}
+          className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            if (!remark.trim()) {
+              toast.error("Please enter disposal remark");
+              return;
+            }
+
+            dispose.mutate({
+              complaintId: id,
+              remarkData: remark,
+            });
+
+            setshowDispatch(false);
+          }}
+          disabled={dispose.isPending || !remark.trim()}
+          className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {dispose.isPending ? "Disposing..." : "Dispose Now"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
       {viewModalConfig.open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
@@ -1204,7 +1280,6 @@ const forwardComplaintMutation = useMutation({
      {viewModalConfig.type === "correspondence" && (
               <div className="w-full">
                 {" "}
-                {/* यहाँ w-full और overflow handling */}
                 {complaintData.complainants &&
                 complaintData.complainants.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
@@ -1247,7 +1322,6 @@ const forwardComplaintMutation = useMutation({
                           >
                             लोक सेवक?
                           </th>
-                          {/* Address को थोड़ा ज़्यादा जगह दी है */}
                           <th
                             scope="col"
                             className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-[200px]"
@@ -1431,7 +1505,6 @@ const forwardComplaintMutation = useMutation({
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.officer_category || "-"}
                             </td>
-                            {/* Address Column: whitespace-normal ensures text wrapping */}
                             <td className="px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {resp.current_address || "-"}
                             </td>
@@ -1450,7 +1523,6 @@ const forwardComplaintMutation = useMutation({
               </div>
             )}
 
-            {/* Support Content (Added to match buttons) */}
      {viewModalConfig.type === "support" && (
               <div className="w-full">
                 {complaintData.support && complaintData.support.length > 0 ? (
@@ -1499,7 +1571,6 @@ const forwardComplaintMutation = useMutation({
               </div>
             )}
 
-            {/* Witness Content (Added to match buttons) */}
   {viewModalConfig.type === "witness" && (
               <div className="w-full">
                 {complaintData.witness && complaintData.witness.length > 0 ? (
