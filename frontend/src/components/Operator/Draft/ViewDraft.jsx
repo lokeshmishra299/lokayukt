@@ -796,7 +796,7 @@ const ViewDraft = () => {
                   ? "Processing..."
                   : confirmConfig.type === "pullback"
                   ? "Yes"
-                  : "Send"}
+                  : "Sent"}
               </button>
             </div>
           </div>

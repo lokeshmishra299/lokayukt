@@ -93,7 +93,7 @@ const Documents = ({complaint}) => {
 
         <p className="text-sm text-blue-800 mb-5">
           You can attach new external correspondence (letters, reminders, RTI replies) 
-          that arrive after the file has been sent.
+          that arrive after the file has beenSend.
         </p>
 
        

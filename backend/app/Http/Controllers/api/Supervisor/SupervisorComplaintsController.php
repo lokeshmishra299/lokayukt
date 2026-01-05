@@ -1386,7 +1386,7 @@ class SupervisorComplaintsController extends Controller
 
            return response()->json([
                     'status' => true,
-                    'message' => 'Document Fetch successfully.',
+                    'message' => 'Draft Fetch successfully.',
                     'data' => $complain
                 ], 200);
         }
@@ -1590,7 +1590,7 @@ class SupervisorComplaintsController extends Controller
 
             $Notes = ComplaintNotes::find($id);
             
-            
+
    
            return response()->json([
                     'status' => true,

@@ -38,8 +38,8 @@ const EditUserManagement = () => {
     number: '',
     role_id: '',
     sub_role_id: '',
-    designation: '', // Store designation ID but send as 'designation'
-    department: '',   // Store department ID but send as 'department'
+    designation: '', // Store designation ID butSend as 'designation'
+    department: '',   // Store department ID butSend as 'department'
     district_id: '', 
     password: '',
     password_confirmation: ''
@@ -255,15 +255,15 @@ const EditUserManagement = () => {
     setErrors({});
 
     try {
-      // FIXED: Send designation and department IDs as strings (backend expects these field names)
+      // FIXED:Send designation and department IDs as strings (backend expects these field names)
       const updatePayload = {
         name: formData.name,
         email: formData.email,
         number: formData.number,
         role_id: parseInt(formData.role_id) || '',
         sub_role_id: formData.sub_role_id || '',  
-        designation: formData.designation.toString(), // Send designation ID as string
-        department: formData.department.toString(),   // Send department ID as string
+        designation: formData.designation.toString(), //Send designation ID as string
+        department: formData.department.toString(),   //Send department ID as string
         district_id: formData.district_id || ''
       };
 
@@ -273,7 +273,7 @@ const EditUserManagement = () => {
         updatePayload.password_confirmation = formData.password_confirmation;
       }
 
-      console.log('Update payload being sent:', updatePayload); // Debug log
+      console.log('Update payload beingSend:', updatePayload); // Debug log
 
       const response = await api.post(`/lokayukt/update-users/${id}`, updatePayload);
 
@@ -528,7 +528,7 @@ const EditUserManagement = () => {
                 )}
               </div>
 
-              {/* Designation - FIXED: Store ID but send correctly */}
+              {/* Designation - FIXED: Store ID butSend correctly */}
               <div>
                 <label htmlFor="designation" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Designation *
@@ -557,7 +557,7 @@ const EditUserManagement = () => {
                 )}
               </div>
 
-              {/* Department - FIXED: Store ID but send correctly */}
+              {/* Department - FIXED: Store ID butSend correctly */}
               <div>
                 <label htmlFor="department" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Department *

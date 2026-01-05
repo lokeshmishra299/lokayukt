@@ -349,13 +349,13 @@ setCurrentDate(
       queryKey: ["supervisor-options", forwardType], // 
       queryFn: async () => {
         try {
-          //  Send To My Pool  API: /supervisor/get-users
+          // Send To My Pool  API: /supervisor/get-users
           if (forwardType === "self") {
             const res = await api.get("/supervisor/get-users");
             return res.data?.data || res.data || [];
           }
   
-          //  Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
+          // Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
           const res = await api.get("/supervisor/get-upsupervisor");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
@@ -933,7 +933,7 @@ const forwardComplaintMutation = useMutation({
                   >
                     {forwardComplaintMutation.isPending
                       ? "Processing..."
-                      : "Send / Mark"}
+                      : "Sent / Mark"}
                   </button>
                 </div>
               </div>
@@ -971,7 +971,7 @@ const forwardComplaintMutation = useMutation({
                   {confirmConfig.type === "receive"
                     ? "Mark as Received?"
                     : confirmConfig.type === "forward"
-                    ? "Send"
+                    ? "Sent"
                     : confirmConfig.type === "pullback"
                     ? "Pull Back Complaint?"
                     : "Assign to Yourself?"}

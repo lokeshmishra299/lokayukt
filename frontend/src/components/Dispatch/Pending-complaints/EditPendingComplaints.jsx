@@ -286,7 +286,7 @@ const AllComplaintsEdit = () => {
       });
 
       // Debug: Log what we're sending
-      console.log('FormData being sent:');
+      console.log('FormData beingSend:');
       for (let [key, value] of submitFormData.entries()) {
         console.log(key, ':', value, typeof value);
       }

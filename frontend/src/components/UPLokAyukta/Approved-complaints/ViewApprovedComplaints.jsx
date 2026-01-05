@@ -524,7 +524,7 @@ const ViewComplaintDetails = () => {
       </button>
 
       <button className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
-        Send / Mark
+       Send / Mark
       </button>
 
     </div>
