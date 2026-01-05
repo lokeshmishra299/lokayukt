@@ -406,7 +406,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('forward-complain-by-ps/{complainId}',[PSComplaintsController::class,'forwardComplaintbyPS']);
         Route::post('assign-by-ps/{complainId}',[PSComplaintsController::class,'assignToPs']);
         Route::post('/fee-exempted/{complaint_id}',[PSComplaintsController::class,'approvedFeeByPS']);
-      
+        Route::post('/forward-to-uplokayukt/{complaint_id}',[PSComplaintsControllerr::class,'approvedByupLokayukt']);
        
         // Route::post('/forward-by-ds-js/{complainId}',[PSComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[PSComplaintsController::class,'forwardComplaintbyda']);
