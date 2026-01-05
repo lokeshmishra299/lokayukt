@@ -180,7 +180,7 @@ const Documents = ({ complaint }) => {
       </div>
     ) : (
       <div>
-        <HideModule/>
+        {/* <HideModule/> */}
       </div>
     )}
   </div>
