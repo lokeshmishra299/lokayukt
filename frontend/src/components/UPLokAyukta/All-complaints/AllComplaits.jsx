@@ -53,11 +53,11 @@ const AllComplaints = () => {
   };
 
 
-  const getAllComplaints = async () => {
-    const res = await api.get("/uplokayukt/all-complaints");
-    console.log("Data he", res.data.data)
-    return res.data.data;
-  };
+ const getAllComplaints = async () => {
+  const res = await api.get("/uplokayukt/all-complaints");
+  return res.data; 
+};
+
 
 
     const [apiStats, setApiStats] = useState({
@@ -115,13 +115,24 @@ const AllComplaints = () => {
 
   });
 
-  useEffect(() => {
-    if (data) {
-      setAllComplaints(data);
-      const sorted = sortComplaintsByDate(data, sortOrder);
-      setFilteredComplaints(sorted);
-    }
-  }, [data, sortOrder]);
+useEffect(() => {
+  if (!data) return;
+
+  // 👇 LIST ke liye (niche wali UI)
+  const complaints = data.data || [];
+  setAllComplaints(complaints);
+
+  const sorted = sortComplaintsByDate(complaints, sortOrder);
+  setFilteredComplaints(sorted);
+
+  // 👇 STATS ke liye (top badges)
+  setApiStats({
+    feePending: data.feePending || 0,
+    older7DaysCount: data.older7DaysCount || 0,
+    older7DaysDueCount: data.older7DaysDueCount || 0,
+    todayCount: data.todayCount || 0,
+  });
+}, [data, sortOrder]);
 
   useEffect(() => {
     if (allComplaints.length === 0) return;
@@ -407,7 +418,7 @@ const AllComplaints = () => {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
-              {data?.length == 0 ? (
+              {allComplaints.length == 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>

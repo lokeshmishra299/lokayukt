@@ -65,13 +65,13 @@ const handleSend = async () => {
     setIsSending(true);
 
     await api.post(
-      `/supervisor/forward-to-upsupervisor/${complaintToApprove.id}`,
+      `/supervisor/forward-to-supervisor/${complaintToApprove.id}`,
       {
         forward_to: selectedUpload, 
       }
     );
 
-    toast.success("Send To Upsupervisor Successfully!");
+    toast.success("Send To supervisor Successfully!");
 
     setIsConfirmModalOpen(false);
     setSelectedUpload("");
@@ -105,9 +105,10 @@ const handleSend = async () => {
 
 
   const getAllComplaints = async () => {
-  const res = await api.get("/operator/all-complaints");
-  return res.data;
-};
+    const res = await api.get("/supervisor/all-complaints");
+    console.log("Data he", res.data.data)
+    return res.data.data;
+  };
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["all-complaints", location.pathname],
@@ -116,8 +117,8 @@ const handleSend = async () => {
 
   
   const stats = {
-  overdue: data?.older7DaysCount ?? 0,
-  receivedToday: data?.todayCount ?? 0,
+  overdue: data?.older7DaysCount || 0,
+  receivedToday: data?.todayCount || 0,
 };
 
   const getDistrict = async () => {
@@ -304,6 +305,7 @@ const handleSend = async () => {
 
 
 
+
   return (
     <>
       <ToastContainer
@@ -425,19 +427,19 @@ const handleSend = async () => {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
-            {data?.length == 0 ? (
+             {data?.length == 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
-            ) : 
-            
-            isLoading ? (
+            )
+            :
+             isLoading ? (
                  <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">Loading...</h1>
               </div>
             )
-            :
-            isError ? (
+            
+             : isError ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-red-500 text-sm">Error: {error.message}</p>
               </div>
@@ -498,10 +500,7 @@ const handleSend = async () => {
                           </span>
                           {complaint.fee_exempted === 1 && (
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                             {
-                              complaint.approved_rejected_by_uplokayukt == 1 ? "With UPLokayukta" : "With Lokayukta"
-
-                             } 
+                              With supervisora
                             </span>
                           )}
                         </div>
