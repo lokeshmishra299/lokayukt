@@ -59,6 +59,18 @@ const AllComplaints = () => {
     return res.data.data;
   };
 
+
+    const [apiStats, setApiStats] = useState({
+      older7DaysCount: 0,
+      todayCount: 0,
+      feePending: 0,
+      older7DaysDueCount: 0
+    });
+
+
+    
+
+
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["complaints", location.pathname],
     queryFn: getAllComplaints,
@@ -73,6 +85,17 @@ const AllComplaints = () => {
   const getDistrict = async () => {
     const res = await api.get("/uplokayukt/all-district");
     return res.data.data;
+
+
+      if (res.data) {
+      setApiStats({
+        older7DaysCount: res.data.older7DaysCount || 0,
+        todayCount: res.data.todayCount || 0,
+        feePending: res.data.feePending || 0,
+        older7DaysDueCount: res.data.older7DaysDueCount || 0
+      });
+    }
+    
   };
 
   const { data: districtData, isLoading: districtLoading } = useQuery({
@@ -289,10 +312,10 @@ const AllComplaints = () => {
                   Inbox: {filteredComplaints.length}
                 </span>
                 <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded-full font-medium whitespace-nowrap">
-                  Over 7 days: {stats.overdue}
+                  Over 7 days: {apiStats.older7DaysCount}
                 </span>
                 <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium whitespace-nowrap">
-                  Received today: {stats.receivedToday}
+                  Received today: {apiStats.todayCount}
                 </span>
               </div>
             </div>
@@ -300,10 +323,10 @@ const AllComplaints = () => {
           <div className="flex gap-2 mb-3">
               <div className="flex flex-col ">
               <button className=" flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
-                <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
+                <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({apiStats.older7DaysDueCount})
               </button></div>
               <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
-                ₹ Fee Pending (0)
+                ₹ Fee Pending ({apiStats.feePending})
               </button>
             </div>
 
