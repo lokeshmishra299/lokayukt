@@ -15,6 +15,7 @@ use App\Http\Controllers\api\Operator\OperatorReportController;
 use App\Http\Controllers\api\PS\PSComplaintsController;
 use App\Http\Controllers\api\PS\PSReportController;
 use App\Http\Controllers\api\PS\PSCommonController;
+use App\Http\Controllers\api\PS\PSDashboardController;
 use App\Http\Controllers\api\CommonController;
 use App\Http\Controllers\api\ComplaintsController;
 use App\Http\Controllers\api\LoginController;
