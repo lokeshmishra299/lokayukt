@@ -748,7 +748,7 @@ const ViewAllComplaint = () => {
             </div>
             :
             <div>
-                <HideModule/>
+                {/* <HideModule/> */}
             </div>
             }
 
@@ -780,7 +780,7 @@ const ViewAllComplaint = () => {
             </div>
             :
             <div>
-                <HideModule/>
+                {/* <HideModule/> */}
             </div>
 
    }
