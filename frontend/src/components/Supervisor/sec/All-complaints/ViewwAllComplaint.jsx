@@ -267,22 +267,13 @@ function takefile(){
       queryKey: ["lokayukt-options", forwardType], // 
       queryFn: async () => {
         try {
-<<<<<<< HEAD
-          // Send To My Pool  API: /supervisor/get-users
-=======
           //  Send To My Pool  API: /lokayukt/get-users
->>>>>>> 7bf3404427c2c4baee34e47da50a5fe4a85facd3
           if (forwardType === "self") {
             const res = await api.get("/supervisor/get-users");
             return res.data?.data || res.data || [];
           }
   
-<<<<<<< HEAD
-          // Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
-          const res = await api.get("/supervisor/get-upsupervisor");
-=======
           const res = await api.get("/supervisor/get-uplokayukt");
->>>>>>> 7bf3404427c2c4baee34e47da50a5fe4a85facd3
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
   
@@ -903,13 +894,8 @@ function takefile(){
                   >
                     {forwardComplaintMutation.isPending
                       ? "Processing..."
-<<<<<<< HEAD
-                      : "Sent / Mark"}
-                  </button>
-=======
                       : "Send / Mark"}
                   </button> */}
->>>>>>> 7bf3404427c2c4baee34e47da50a5fe4a85facd3
                 </div>
               </div>
             </div>
@@ -999,7 +985,7 @@ function takefile(){
                   {confirmConfig.type === "receive"
                     ? "Mark as Received?"
                     : confirmConfig.type === "forward"
-                    ? "Sent"
+                    ? "Send"
                     : confirmConfig.type === "pullback"
                     ? "Pull Back Complaint?"
                     : "Assign to Yourself?"}
