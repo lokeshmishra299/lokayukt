@@ -234,6 +234,7 @@ $complainDetails->actions = DB::table('complaint_actions')
             $Notes = ComplaintNotes::where('complaint_id', $id)
             ->leftJoin('users', 'complaints_notes.forward_by', '=', 'users.id') // Left Join with users table
             ->select('complaints_notes.*', 'users.name as forwarded_by_name', 'users.email as forwarded_by_email') // You can select any fields you want
+            ->orderBy('id','desc')
             ->get();
 
    
