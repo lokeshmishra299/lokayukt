@@ -699,7 +699,7 @@ class UpLokAyuktCommonController extends Controller
         //    dd($request->all());
         $user = Auth::user()->id;
         // dd($usersubrole);
-        
+
         if(isset($complainId) && $request->isMethod('post')){
 
              $cmp =  Complaint::findOrFail($complainId);
@@ -731,4 +731,5 @@ class UpLokAyuktCommonController extends Controller
         }
 
     }
+    
 }
