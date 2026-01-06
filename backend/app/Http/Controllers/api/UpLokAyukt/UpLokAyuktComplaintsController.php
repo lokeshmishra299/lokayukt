@@ -611,7 +611,7 @@ $complainDetails->actions = DB::table('complaint_actions')
 
                 
      $complainDetails->where('form_status', 1)
-            ->where('approved_rejected_by_ro', 1)
+            ->where('approved_rejected_by_rk', 1)
                         ->where('approved_rejected_by_lokayukt',1);
                         // ->where('approved_rejected_by_lokayukt',1)
                         //  ->where(function($q){
