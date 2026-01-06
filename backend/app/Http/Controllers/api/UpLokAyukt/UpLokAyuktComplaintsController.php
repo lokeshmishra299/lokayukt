@@ -811,5 +811,41 @@ $complainDetails->actions = DB::table('complaint_actions')
 
     }
 
+          public function returnComplainByUpLokayukt(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+        // dd($usersubrole);
+
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->approved_rejected_by_rk = 0;
+               
+                if($cmp->save()){
+                    $apcAction = new ComplaintAction();
+                    $apcAction->complaint_id = $complainId;
+                    $apcAction->status = 'Return';
+                    $apcAction->remarks = $request->remarks;
+                    $apcAction->save();
+                }
+              
+            }
+       
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Return Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
     
 }
