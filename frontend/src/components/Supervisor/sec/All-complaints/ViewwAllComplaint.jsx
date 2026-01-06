@@ -499,9 +499,10 @@ function takefile(){
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_lokayukt == 1
-                      ? "In Motion – With Lokayukta"
-                      : "Received - Record Section" }
+                        {complaintData.approved_rejected_by_lokayukt === 1
+          ? "In Motion – With UpLokayukta"
+
+          : "In Motion - With Lokayukta"}
                   </span>
                 </div>
               </div>
@@ -520,9 +521,10 @@ function takefile(){
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_lokayukt == 1
-                      ? "In Motion – With Lokayukta"
-                      : "Received - Record Section" }
+                            {complaintData.approved_rejected_by_lokayukt === 1
+          ? "In Motion – With UpLokayukta"
+
+          : "In Motion - With Lokayukta"}
                     </span>
 
                     <button

@@ -454,9 +454,10 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
-                      : "Received - Record Section" }
+                    {complaintData.approved_rejected_by_lokayukt === 1
+          ? "In Motion – With UpLokayukta"
+
+          : "In Motion - With Lokayukta"}
                     </span>
 
                     <button
