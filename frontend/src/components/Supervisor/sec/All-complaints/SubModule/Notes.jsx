@@ -226,13 +226,14 @@ const Notes = ({ complaint }) => {
     const selectedDocObj = documents.find((doc) => doc.file === selectedDoc);
     const docId = selectedDocObj ? selectedDocObj.id : "";
 
-    const payload = {
-      complaint_id: complaint.id,
-      description: note,
-      d_id: docId,
-      range_from: pageRanges[0].from,
-      range_two: pageRanges[0].to,
-    };
+   const payload = {
+  complaint_id: complaint.id,
+  description: note,
+  d_id: docId,
+  range_from: pageRanges[0].from || null,
+  range_two: pageRanges[0].to || null,
+};
+
 
     try {
       const res = await api.post("/supervisor/add-notes", payload);
@@ -263,17 +264,13 @@ const Notes = ({ complaint }) => {
     setPageRanges(updated);
   };
 
-  const isFormValid = () => {
-    const contentState = editorState.getCurrentContent();
-    const hasText = contentState.hasText();
+ const isFormValid = () => {
+  const contentState = editorState.getCurrentContent();
+  const hasText = contentState.hasText();
 
-    return (
-      hasText &&
-      selectedDoc !== "" &&
-      pageRanges[0].from !== "" &&
-      pageRanges[0].to !== ""
-    );
-  };
+  return hasText && selectedDoc !== "";
+};
+
 
   const getDocName = (dId) => {
     if (!documents.length || !dId) return null;
@@ -500,11 +497,11 @@ const Notes = ({ complaint }) => {
                       }
                     />
                   </div>
-                  {(errors.range_from || errors.range_two) && (
+                  {/* {(errors.range_from || errors.range_two) && (
                     <p className="text-red-500 text-xs mt-1">
                       Required
                     </p>
-                  )}
+                  )} */}
                 </div>
               </div>
 

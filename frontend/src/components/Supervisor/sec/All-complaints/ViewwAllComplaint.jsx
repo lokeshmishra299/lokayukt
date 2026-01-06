@@ -964,6 +964,9 @@ function takefile(){
 )}
 
 
+
+
+
      {confirmConfig.open && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
               <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
@@ -985,7 +988,7 @@ function takefile(){
                   {confirmConfig.type === "receive"
                     ? "Return with Remarks?"
                     : confirmConfig.type === "forward"
-                    ? "Send"
+                    ? "Sent"
                     : confirmConfig.type === "pullback"
                     ? "Are you sure you want to pull back?"
                     : "Assign to Yourself?"}
@@ -1072,15 +1075,15 @@ function takefile(){
                     <>
                       <div className="mb-5 mt-3">
 
-                       {/* <label className="flex items-center gap-2 cursor-pointer mt-2"> */}
-  {/* <input
+                       <label className="flex items-center gap-2 cursor-pointer mt-2"> 
+ <input
     type="checkbox"
     checked={sent_through_rk}
     onChange={(e) => setThroughRC(e.target.checked)}
     className="w-4 h-4"
   />
   <span className="text-sm">Checkbox If Send through RC</span>
-</label> */}
+</label> 
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Remark <span className="text-red-500">*</span>
                         </label>
