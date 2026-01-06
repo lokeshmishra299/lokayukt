@@ -16,7 +16,7 @@ const api = axios.create({
 const Fees = ({ complaint, onFeeApproved }) => {
   const { id } = useParams();
   const [erorrss, setErrorss] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false); // Added loading state
   const [fessSubmitForm, setFessSubmitForm] = useState({
     fee_exempted: "2",
     remarks: "",
@@ -36,7 +36,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
   };
   const handleApprove = async () => {
     try {
-      setIsLoading(true); 
+      setIsLoading(true); // Start loading
       setErrorss(null);
       const res = await api.post(
         `/supervisor/fee-exempted/${id}`,
@@ -45,7 +45,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
       console.log("Fee Submitted:", res.data);
       // Success Toast
       toast.success("Fee Verified Successfully!");
-     
+      // Clear Remarks Field
 
       
     if (onFeeApproved) {
@@ -186,6 +186,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
               </div>
             </div>
           </div>
+          {/* Toast Container Configured exactly like Login.js */}
           <ToastContainer
             position="top-right"
             autoClose={3000}
