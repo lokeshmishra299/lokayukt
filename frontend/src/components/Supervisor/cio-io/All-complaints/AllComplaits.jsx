@@ -415,17 +415,16 @@ const AllComplaints = () => {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
-            { isLoading ? (
+            {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">Loading...</h1>
               </div>
             ) :
-            
             complaintsData?.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
-            ) :
+            ) : 
             isError ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-red-500 text-sm">Error: {error.message}</p>
@@ -485,13 +484,13 @@ const AllComplaints = () => {
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
                             New Case
                           </span>
-                          {/* {complaint.fee_exempted === 1 && ( */}
-                          <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                            {complaint.approved_rejected_by_lokayukt === 1
+                          {complaint.fee_exempted === 1 && (
+                            <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
+                              {complaint.approved_rejected_by_lokayukt === 1
                               ? " With UpLokayukta"
                               : "With Lokayukta"}
-                          </span>
-                          {/* )} */}
+                            </span>
+                          )}
                         </div>
                         <div className="flex gap-1.5">
                           <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
