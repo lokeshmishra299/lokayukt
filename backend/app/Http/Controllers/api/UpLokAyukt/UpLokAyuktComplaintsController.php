@@ -695,7 +695,7 @@ $complainDetails->actions = DB::table('complaint_actions')
             // dd($cmp);
 
                if($cmp){
-                $cmp->approved_rejected_by_lokayukt = 1;
+                $cmp->approved_rejected_by_uplokayukt = 1;
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Deputy Secretary / Joint Secretary';
                 // $remark.='\n';
