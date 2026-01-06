@@ -253,7 +253,7 @@ const Sidebar = ({
               >
                 <div className="flex items-center gap-3">
                   <FiSend size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
-                  {(isMobile || !isCollapsed) && <span>Send</span>}
+                  {(isMobile || !isCollapsed) && <span>Sent</span>}
                 </div>
                 {isActive("/approved-complaints") && (isMobile) && (
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">

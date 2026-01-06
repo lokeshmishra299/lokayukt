@@ -327,7 +327,7 @@ const handleSend = async () => {
           <div className="px-3 sm:px-4 py-3 border-b flex-shrink-0 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
               <h2 className="text-base sm:text-lg font-bold text-gray-900">Sent</h2>
-              <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
+              {/* <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                 <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
                   Inbox: {filteredComplaints.length}
                 </span>
@@ -337,10 +337,10 @@ const handleSend = async () => {
                 <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium whitespace-nowrap">
                   Received today: {stats.receivedToday}
                 </span>
-              </div>
+              </div> */}
             </div>
 
-          <div className="flex gap-2 mb-3">
+          {/* <div className="flex gap-2 mb-3">
               <div className="flex flex-col ">
               <button className=" flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
                 <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
@@ -348,7 +348,7 @@ const handleSend = async () => {
               <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
                 ₹ Fee Pending (0)
               </button>
-            </div>
+            </div> */}
 
             <div className="relative mb-3">
               <IoSearchOutline className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
