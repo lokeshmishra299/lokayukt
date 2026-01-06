@@ -1450,7 +1450,7 @@ class SupervisorComplaintsController extends Controller
     switch ($userSubrole) {
         case "so-us":
             $complainDetails->where('form_status', 1)
-                  ->where('approved_rejected_by_ro', 1)
+                  ->where('approved_rejected_by_rk', 1)
                   ->where('approved_rejected_by_so_us', 1);
                
                 //   ->where('approved_by_ro', 1);
@@ -1459,7 +1459,7 @@ class SupervisorComplaintsController extends Controller
 
         case "ds-js":
           $complainDetails->where('form_status', 1)
-                  ->where('approved_rejected_by_ro', 1)
+                  ->where('approved_rejected_by_rk', 1)
                   ->where('approved_rejected_by_so_us', 0)
                 //   ->whereOr('approved_rejected_by_so_us', 1)
                   ->where('approved_rejected_by_ds_js', 1);
