@@ -147,16 +147,20 @@ const ViewApprovedComplaints = () => {
 
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("fee");
+  const [activeTab, setActiveTab] = useState("documents");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
+    const [sent_through_rk, setThroughRC] = useState(false);
+  
 
+  // Single config for Action modals (Receive, Forward, Pullback)
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
     type: null,
   });
 
+  // Config for Data View Modal (Correspondence / Respondent)
   const [viewModalConfig, setViewModalConfig] = useState({
     open: false,
     type: null,
@@ -249,6 +253,7 @@ const ViewApprovedComplaints = () => {
       const res = await api.post("/supervisor/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
+         sent_through_rk: sent_through_rk ? 1 : 0
       });
       return res.data;
     },
@@ -427,9 +432,10 @@ const ViewApprovedComplaints = () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
-                      : "Received - Record Section" }
+                    {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                   </span>
                 </div>
               </div>
@@ -448,9 +454,10 @@ const ViewApprovedComplaints = () => {
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
-                      : "Received - Record Section" }
+                    {complaintData.approved_rejected_by_lokayukt === 1
+          ? "In Motion – With UpLokayukta"
+
+          : "In Motion - With Lokayukta"}
                     </span>
 
                     <button
@@ -489,6 +496,7 @@ const ViewApprovedComplaints = () => {
               {/* ===== DETAILS GRID (Hindi) ===== */}
                           <div className="space-y-3 mb-6">
   
+  {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य परिवादी का विवरण 
@@ -684,7 +692,7 @@ const ViewApprovedComplaints = () => {
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
-                  {tab === "fee" && "Fee Verification"}
+                  {/* {tab === "fee" && "Fee Verification"} */}
                       
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
@@ -707,7 +715,7 @@ const ViewApprovedComplaints = () => {
                         : "text-gray-600 hover:text-gray-800"
                     }`}
                   >
-                    {tab === "fee" && "Fee Verification"}
+                    {/* {tab === "fee" && "Fee Verification"} */}
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
@@ -722,7 +730,7 @@ const ViewApprovedComplaints = () => {
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
 
-  {activeTab === "fee" && (
+  {/* {activeTab === "fee" && (
   <Fees
     complaint={complaintData}
     onFeeApproved={() => {
@@ -731,7 +739,7 @@ const ViewApprovedComplaints = () => {
       });
     }}
   />
-)}
+)} */}
 
 
               {activeTab === "documents" && (
@@ -812,15 +820,14 @@ const ViewApprovedComplaints = () => {
                 {/* Title */}
                 <h3 className="text-lg font-semibold mb-4 pr-8">
                   {confirmConfig.type === "receive"
-                    ? "Mark as Received?"
+                    ? "Return with Remarks?"
                     : confirmConfig.type === "forward"
                     ? "Send"
                     : confirmConfig.type === "pullback"
-                    ? "Pull Back Complaint?"
+                    ? "Are you sure you want to pull back?"
                     : "Assign to Yourself?"}
                 </h3>
     
-                {/* --- FORWARDING LOGIC START --- */}
                 {confirmConfig.type === "forward" && (
                   <>
                     {/* Radio Buttons Section */}
@@ -893,6 +900,19 @@ const ViewApprovedComplaints = () => {
                     </div>
                   </>
                 )}
+
+
+             {confirmConfig.type === "forward" && (
+  <label className="flex items-center gap-2 cursor-pointer mt-2">
+    <input
+      type="checkbox"
+      checked={sent_through_rk}
+      onChange={(e) => setThroughRC(e.target.checked)}
+      className="w-4 h-4"
+    />
+    <span className="text-sm">Checkbox If Send through RC</span>
+  </label>
+)}
     
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
@@ -912,7 +932,6 @@ const ViewApprovedComplaints = () => {
                     </>
                   )}
     
-                {/* Buttons */}
                 <div className="flex justify-end gap-3">
                   <button
                     onClick={handleConfirmNo}
