@@ -516,7 +516,9 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-users',[UpLokAyuktComplaintsController::class,'getSubROleUsers']);
          Route::get('/get-notes/{id}',[UpLokAyuktComplaintsController::class,'getNotes']);
           Route::get('/get-document/{id}',[UpLokAyuktComplaintsController::class,'getUploadDoc']);
-        // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
+           Route::get('/return-complain-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'returnComplainByUpLokayukt']);
+        
+          // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/request-report/{complainId}',[UpLokAyuktReportController::class,'requestReport']);
         Route::get('/request-list/{complainId}',[UpLokAyuktReportController::class,'requestReportList']);

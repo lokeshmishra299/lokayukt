@@ -13,14 +13,15 @@ class SupervisorDashboardController extends Controller
        public function index(Request $request, $d)
     {
         //  $user_district_code = Auth::user()->district_id ?? null;
-        // $addedBy = Auth::user()->id ?? null;
+        $user = Auth::user()->id ?? null;
          $userSubrole = Auth::user()->subrole->name; 
 
 
         $year = now()->year;
         $date = Carbon::parse($d);
         // dd($date);
-        $query = DB::table('complaints as cmp');
+        $query = DB::table('complaints as cmp')
+          ->leftJoin('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id');
             // ->leftJoin('users as u', 'cmp.added_by', '=', 'u.id')
             // ->select('cmp.*', 'u.name as lekhpal_name', 'u.email')
             // ->where('cmp.approved_rejected_by_rk', 1)
@@ -189,6 +190,15 @@ class SupervisorDashboardController extends Controller
             // $query3->where('');
             // $query4->where('');
             // $avgPendingDays
+            break;
+
+          case "ro-aro":
+          $query->where('form_status', 1)
+                  ->where('approved_rejected_by_rk', 1)
+                  ->where('rep.forward_to_ro_aro', $user)
+                  ->whereOr('rep.forward_to_uplokayukt','<>',0);
+                //   ->where('forward_so', 1)
+                //   ->whereOr('forward_to_uplokayukt', 1);
             break;
 
         case "cio-io":
