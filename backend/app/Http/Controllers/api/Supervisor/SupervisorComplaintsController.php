@@ -1484,7 +1484,9 @@ class SupervisorComplaintsController extends Controller
 
         case "cio-io":
            $complainDetails->where('form_status', 1)
-                  ->where('approved_rejected_by_rk', 1);
+                  ->where('approved_rejected_by_rk', 1)
+                  ->where('approved_rejected_by_cio_io', 1)
+                  ->where('rep.forward_to_cio_io',$user);
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
             break;
@@ -1511,6 +1513,7 @@ class SupervisorComplaintsController extends Controller
     $complainDetails = $complainDetails
                       
                         // ->toSql();
+                       ->distinct('cm.id')
                       ->get();
 
                 // ->where('form_status',1)

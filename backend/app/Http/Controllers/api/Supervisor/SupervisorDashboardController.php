@@ -193,7 +193,8 @@ class SupervisorDashboardController extends Controller
 
         case "cio-io":
            $query->where('cmp.form_status', 1)
-                  ->where('cmp.approved_rejected_by_rk', 1);
+                //   ->where('cmp.approved_rejected_by_rk', 1)
+                    ->where('rep.forward_to_cio_io',$user);
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
            // $query1->where('');
