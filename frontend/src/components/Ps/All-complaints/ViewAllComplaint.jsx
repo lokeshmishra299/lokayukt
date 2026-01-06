@@ -454,22 +454,104 @@ const ViewAllComplaint = () => {
                 <h2 className="text-lg font-semibold text-gray-800 mb-2">
                   File No. {complaintData.complain_no}
                 </h2>
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <span
-                    className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
-                      complaintData.status
-                    )}`}
-                  >
-                    {complaintData.approved_rejected_by_lokayukt == 1
-                      ? "In Motion – With Lokayukta"
-                      : 
-                      complaintData.approved_rejected_by_uplokayukt == 1
-                      ? "In Motion – With upLokayukta"
-                      : 
-                      "Received - Record Section"
-                      }
-                  </span>
-                </div>
+  className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
+    complaintData.status
+  )}`}
+>
+  {complaintData.approved_rejected_by_lokayukt === 1
+    ? "In Motion – With UpLokayukta"
+    : "In Motion – With Lokayukta"}
+</span>
+
+                </div> */}
+
+                {/* मोबाइल वर्जन */}
+{/* Mobile Header */}
+<div className="md:hidden mb-4">
+  <div className="flex justify-between items-center mb-3">
+    <button
+      onClick={() => navigate(-1)}
+      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+    >
+      <IoMdArrowBack className="w-4 h-4" /> Back
+    </button>
+  </div>
+  <h2 className="text-lg font-semibold text-gray-800 mb-2">
+    File No. {complaintData.complain_no}
+  </h2>
+  <div className="mb-3">
+    <span
+      className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
+        complaintData.status
+      )}`}
+    >
+      {complaintData.approved_rejected_by_lokayukt == 0
+        ? "Received - Record Section"
+        : "In Motion – With Lokayukta"}
+    </span>
+  </div>
+</div>
+
+{/* Desktop Header */}
+<div className="hidden md:block">
+  <div className="flex justify-between items-start mb-3">
+    <h2 className="text-xl font-semibold text-gray-800">
+      File No. {complaintData.complain_no}(
+      <span className="text-blue-600">NEW CASE</span>)
+    </h2>
+
+    <div className="flex gap-2">
+      <span
+        className={`px-3 py-1 rounded ${getStatusColor(
+          complaintData.status
+        )}`}
+      >
+        {complaintData.approved_rejected_by_lokayukt == 0
+          ? "Received - Record Section"
+          : "In Motion – With Lokayukta"}
+      </span>
+
+      <button
+        onClick={() => navigate(-1)}
+        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+      >
+        <IoMdArrowBack className="w-4 h-4" /> Back
+      </button>
+    </div>
+  </div>
+</div>
+
+{/* डेस्कटोप वर्जन */}
+<div className="hidden md:block">
+  <div className="flex justify-between items-start mb-3">
+    <h2 className="text-xl font-semibold text-gray-800">
+      File No. {complaintData.complain_no}(
+      <span className="text-blue-600">NEW CASE</span>)
+    </h2>
+
+    <div className="flex gap-2">
+      <span
+        className={`px-3 py-1 rounded ${getStatusColor(
+          complaintData.status
+        )}`}
+      >
+        {complaintData.approved_rejected_by_lokayukt === 1
+          ? "In Motion – With UpLokayukta"
+
+          : "In Motion - With Lokayukta"}
+      </span>
+
+      <button
+        onClick={() => navigate(-1)}
+        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+      >
+        <IoMdArrowBack className="w-4 h-4" /> Back
+      </button>
+    </div>
+  </div>
+</div>
               </div>
 
               {/* Desktop Header */}
@@ -486,8 +568,8 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                      {complaintData.approved_rejected_by_lokayukt == 0
-                        ? "Received - Record Section"
+                      {complaintData.approved_rejected_by_lokayukt === 1
+                        ? "In Motion – With UpLokayukta"
                         : "In Motion – With Lokayukta"}
                     </span>
 

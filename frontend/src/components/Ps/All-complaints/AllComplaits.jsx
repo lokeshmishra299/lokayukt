@@ -38,30 +38,33 @@ const AllComplaints = () => {
   const [selectedCaseType, setSelectedCaseType] = useState("");
 
   const [uploadList, setUploadList] = useState([]);
-  const [selectedUpload, setSelectedUpload] = useState("");
-  const [isSending, setIsSending] = useState(false);
+const [selectedUpload, setSelectedUpload] = useState("");
+const [isSending, setIsSending] = useState(false);
 
-  const [apiStats, setApiStats] = useState({
-    feePending: 0,
-    older7DaysCount: 0,
-    older7DaysDueCount: 0,
-    todayCount: 0,
-  });
+const [apiStats, setApiStats] = useState({
+  feePending: 0,
+  older7DaysCount: 0,
+  older7DaysDueCount: 0,
+  todayCount: 0,
+});
 
-  //  const roleParent = localStorage.getItem("roleParent");
-  //  const roleParent = async () => {
-  //     const resNew = await api.get("/ps/all-complaints");
-  //     console.log("Data of roleparent", resNew.data)
-  //     return resNew,data;
-  //   };
+//  const roleParent = localStorage.getItem("roleParent");
+//  const roleParent = async () => {
+//     const resNew = await api.get("/ps/all-complaints");
+//     console.log("Data of roleparent", resNew.data)
+//     return resNew,data;
+//   };
 
-  //   const {data} = useQuery{
-  //     queryKey: [""]
-  //   }
-  // u
-  //  console.log(res.roleParent)
+//   const {data} = useQuery{
+//     queryKey: [""]
+//   }
+// u  
+//  console.log(res.roleParent)
 
   // const navigate = useNavigate();
+
+
+
 
   const sortComplaintsByDate = (complaints, order) => {
     return [...complaints].sort((a, b) => {
@@ -76,46 +79,53 @@ const AllComplaints = () => {
     });
   };
 
+
   const getAllComplaints = async () => {
     const res = await api.get("/ps/all-complaints");
-    console.log("Data he", res);
+    console.log("Data he", res)
     return res.data;
   };
 
-  const handleSendToUPLokayukt = async () => {
-    if (!selectedUpload || !complaintToApprove) return;
+const handleSendToUPLokayukt = async () => {
+  if (!selectedUpload || !complaintToApprove) return;
 
-    try {
-      setIsSending(true);
+  try {
+    setIsSending(true);
 
-      await api.post(`/ps/forward-to-uplokayukt/${complaintToApprove.id}`, {
+    await api.post(
+      `/ps/forward-to-uplokayukt/${complaintToApprove.id}`,
+      {
         forward_to: selectedUpload,
-      });
+      }
+    );
 
-      toast.success("Send To UPLokayukt Successfully!");
+    toast.success("Send To UPLokayukt Successfully!");
 
-      setIsConfirmModalOpen(false);
-      setSelectedUpload("");
-      setComplaintToApprove(null);
+    setIsConfirmModalOpen(false);
+    setSelectedUpload("");
+    setComplaintToApprove(null);
 
-      refetch();
-    } catch (error) {
-      console.error("Send error:", error);
-      toast.error("Send failed");
-    } finally {
-      setIsSending(false);
-    }
-  };
+    refetch();
+  } catch (error) {
+    console.error("Send error:", error);
+    toast.error("Send failed");
+  } finally {
+    setIsSending(false);
+  }
+};
+
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["complaints", location.pathname],
     queryFn: getAllComplaints,
   });
 
-  const stats = {
-    overdue: data?.older7DaysCount || 0,
-    receivedToday: data?.todayCount || 0,
-  };
+
+    const stats = {
+  overdue: data?.older7DaysCount || 0,
+  receivedToday: data?.todayCount || 0,
+};
+
 
   const getDistrict = async () => {
     const res = await api.get("/ps/all-district");
@@ -125,6 +135,7 @@ const AllComplaints = () => {
   const { data: districtData, isLoading: districtLoading } = useQuery({
     queryKey: ["district-api"],
     queryFn: getDistrict,
+
   });
 
   const getComplaintTypes = async () => {
@@ -132,29 +143,34 @@ const AllComplaints = () => {
     return res.data.data;
   };
 
+  
+
   const { data: complaintTypesData, isLoading: typesLoading } = useQuery({
     queryKey: ["complaint-types"],
     queryFn: getComplaintTypes,
+
   });
 
-  useEffect(() => {
-    if (!data) return;
+ useEffect(() => {
+  if (!data) return;
 
-    // 👇 complaint list (niche wali UI)
-    const complaints = data.data || [];
-    setAllComplaints(complaints);
+  // 👇 complaint list (niche wali UI)
+  const complaints = data.data || [];
+  setAllComplaints(complaints);
 
-    const sorted = sortComplaintsByDate(complaints, sortOrder);
-    setFilteredComplaints(sorted);
+  const sorted = sortComplaintsByDate(complaints, sortOrder);
+  setFilteredComplaints(sorted);
 
-    // 👇 top stats (badges)
-    setApiStats({
-      feePending: data.feePending || 0,
-      older7DaysCount: data.older7DaysCount || 0,
-      older7DaysDueCount: data.older7DaysDueCount || 0,
-      todayCount: data.todayCount || 0,
-    });
-  }, [data, sortOrder]);
+  // 👇 top stats (badges)
+  setApiStats({
+    feePending: data.feePending || 0,
+    older7DaysCount: data.older7DaysCount || 0,
+    older7DaysDueCount: data.older7DaysDueCount || 0,
+    todayCount: data.todayCount || 0,
+  });
+
+}, [data, sortOrder]);
+
 
   useEffect(() => {
     if (allComplaints.length === 0) return;
@@ -178,10 +194,7 @@ const AllComplaints = () => {
 
     if (selectedDistrict !== "") {
       filtered = filtered.filter((complaint) => {
-        return (
-          complaint.district_name?.toLowerCase() ===
-          selectedDistrict.toLowerCase()
-        );
+        return complaint.district_name?.toLowerCase() === selectedDistrict.toLowerCase();
       });
     }
 
@@ -214,18 +227,20 @@ const AllComplaints = () => {
     selectedCaseType,
   ]);
 
+
   useEffect(() => {
-    if (isConfirmModalOpen) {
-      api
-        .get("/ps/get-uplokayukt")
-        .then((res) => {
-          setUploadList(res.data);
-        })
-        .catch((err) => {
-          console.error("UPLokayukt API error:", err);
-        });
-    }
-  }, [isConfirmModalOpen]);
+  if (isConfirmModalOpen) {
+    api
+      .get("/ps/get-uplokayukt")
+      .then((res) => {
+        setUploadList(res.data);
+      })
+      .catch((err) => {
+        console.error("UPLokayukt API error:", err);
+      });
+  }
+}, [isConfirmModalOpen]);
+
 
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
@@ -297,9 +312,8 @@ const AllComplaints = () => {
   };
 
   const getStatistics = () => {
-    const overdueCount = allComplaints.filter(
-      (c) => c.status === "overdue"
-    ).length;
+    const overdueCount = allComplaints.filter((c) => c.status === "overdue")
+      .length;
     const receivedToday = allComplaints.filter((c) => {
       const today = new Date().toDateString();
       const complaintDate = new Date(c.created_at).toDateString();
@@ -314,14 +328,19 @@ const AllComplaints = () => {
   };
 
   const getDaysDifference = (date) => {
-    const created = new Date(date);
-    const today = new Date();
+  const created = new Date(date);
+  const today = new Date();
 
-    const diffTime = today - created;
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const diffTime = today - created; 
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-    return diffDays;
-  };
+  return diffDays;
+};
+
+
+
+
+
 
   return (
     <>
@@ -343,9 +362,7 @@ const AllComplaints = () => {
         <div className="w-full bg-white flex flex-col overflow-hidden">
           <div className="px-3 sm:px-4 py-3 border-b flex-shrink-0 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900">
-                Inbox
-              </h2>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">Inbox</h2>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                 <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
                   Inbox: {filteredComplaints.length}
@@ -359,13 +376,11 @@ const AllComplaints = () => {
               </div>
             </div>
 
-            <div className="flex gap-2 mb-3">
+          <div className="flex gap-2 mb-3">
               <div className="flex flex-col ">
-                <button className=" flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
-                  <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7
-                  days ({stats.overdue})
-                </button>
-              </div>
+              <button className=" flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
+                <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
+              </button></div>
               <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
                 ₹ Fee Pending ({apiStats.feePending})
               </button>
@@ -387,8 +402,7 @@ const AllComplaints = () => {
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                >
+                  onChange={(e) => setSelectedStatus(e.target.value)}>
                   <option value="">Status: All</option>
                   <option value="in_progress">In Progress</option>
                   <option value="disposed">Disposed Accepted</option>
@@ -439,18 +453,16 @@ const AllComplaints = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-gray-600 text-xs whitespace-nowrap">
-                  Sort by:
-                </span>
+                <span className="text-gray-600 text-xs whitespace-nowrap">Sort by:</span>
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={sortOrder}
                   onChange={handleSortChange}
                 >
-                  <option value="desc">Received Date </option>
-                  <option value="asc">Ascending Order</option>
-                  <option value="desc">Decending Order</option>
-                  {/* <option value="desc">Newest First</option>
+                <option value="desc">Received Date </option> 
+                <option value="asc">Ascending Order</option> 
+                <option value="desc">Decending Order</option>
+                 {/* <option value="desc">Newest First</option>
                   <option value="asc">Oldest First</option> */}
                 </select>
               </div>
@@ -458,15 +470,19 @@ const AllComplaints = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {allComplaints.length == 0 ? (
+          {allComplaints.length == 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
-            ) : isLoading ? (
-              <div className="flex items-center justify-center h-full">
+            ) :
+            
+             isLoading ? (
+                 <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">Loading...</h1>
               </div>
-            ) : isError ? (
+            ) :
+            
+             isError ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-red-500 text-sm">Error: {error.message}</p>
               </div>
@@ -483,17 +499,18 @@ const AllComplaints = () => {
                           File No. {complaint.complain_no}
                         </p>
                         <p className="text-xs text-gray-700 mb-1">
-                          Description:{" "}
-                          {complaint.complaint_description ||
+                          Description: {complaint.complaint_description ||
                             "No description available"}
                         </p>
-                        <div className="text-[11px] text-gray-600 mb-1">
-                          <span className="text-gray-500">Cause Date :</span>
-                          <span className="ml-1">
-                            {complaint.cause_date || "NA"}
-                          </span>
+                         <div className="text-[11px] text-gray-600 mb-1">
+                          <span className="text-gray-500">
+                            Cause Date
+                            :</span>
+                          <span className="ml-1">{complaint.cause_date || "NA"}</span>
                           <span className="mx-1 text-gray-400">•</span>
-                          <span className="text-gray-500">Category :</span>
+                          <span className="text-gray-500">
+                            Category
+                            :</span>
                           <span className="ml-1">
                             {complaint.category || "NA"}
                           </span>
@@ -525,7 +542,7 @@ const AllComplaints = () => {
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
                             New Case
                           </span>
-                          {/* {complaint.fee_exempted === 1 && ( */}
+                            {/* {complaint.fee_exempted === 1 && ( */}
                           <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
                             {complaint.approved_rejected_by_lokayukt === 1
                               ? " With UpLokayukta"
@@ -534,34 +551,37 @@ const AllComplaints = () => {
                           {/* )} */}
                         </div>
 
-                        <div className="flex gap-1.5">
-                          <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-                            {getDaysDifference(complaint.created_at)}d
-                          </span>
+                           <div className="flex gap-1.5">
+                         <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+                      {getDaysDifference(complaint.created_at)}d</span>
 
-                          <span
-                            className={`
+                  <span
+  className={`
     px-2 py-0.5 rounded text-[11px] font-medium
     ${
       complaint.fee_exempted === 0
-        ? "bg-green-50 text-blue-600"
+        ? "bg-green-50 text-blue-600"    
         : complaint.fee_exempted === 1
-        ? "bg-orange-50 text-orange-600"
+        ?
+        "bg-orange-50 text-orange-600"     
         : complaint.fee_exempted === 2
-        ? "bg-blue-50 text-orange-400"
+        ? "bg-blue-50 text-orange-400" 
         : ""
     }
   `}
-                          >
-                            {complaint.fee_exempted === 0
-                              ? "Exempted"
-                              : complaint.fee_exempted === 1
-                              ? "Paid"
-                              : complaint.fee_exempted === 2
-                              ? "Partial"
-                              : ""}
-                          </span>
+>
+  {complaint.fee_exempted === 0
+    ? "Exempted"
+    : complaint.fee_exempted === 1
+    ? "Paid"
+    : complaint.fee_exempted === 2
+    ? "Partial"
+    : ""}
+</span>
+
+
                         </div>
+
 
                         <div className="flex gap-2 w-full sm:w-auto">
                           <button
@@ -570,8 +590,8 @@ const AllComplaints = () => {
                           >
                             View Details
                           </button>
-
-                          {/* {roleParent == "lok-ayukt" && (
+                          
+                            {data?.roleParent == "lok-ayukt" && (
   complaint.approved_rejected_by_lokayukt === 1 ? (
     <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center">
      Send
@@ -586,24 +606,28 @@ const AllComplaints = () => {
       Send To UPLokayukt
     </button>
   )
-)} */}
-                          {data?.roleParent === "lok-ayukt" &&
-                            (complaint.approved_rejected_by_lokayukt === 1 ? (
-                              <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center">
-                                Send
-                              </span>
-                            ) : (
-                              <button
-                                onClick={(e) =>
-                                  handleApproveClick(e, complaint)
-                                }
-                                className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 
+)} 
+
+
+{/* {roleParent === "lok-ayukt" && (
+  complaint.approved_rejected_by_lokayukt === 1 ? (
+    <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center">
+      Send
+    </span>
+  ) : (
+    <button
+      onClick={(e) => handleApproveClick(e, complaint)}
+      className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 
                  hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 
                  text-xs font-medium whitespace-nowrap"
-                              >
-                                Send To UPLokayukt
-                              </button>
-                            ))}
+    >
+      Send To UPLokayukt
+    </button>
+  )
+)} */}
+
+
+
 
                           {/* {isApprovedByRO(complaint) ? (
                             <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
@@ -640,11 +664,7 @@ const AllComplaints = () => {
             ) : (
               <div className="flex items-center justify-center h-full">
                 <p className="text-gray-500 text-sm">
-                  {searchQuery ||
-                  selectedDistrict ||
-                  selectedStatus ||
-                  selectedFeeStatus ||
-                  selectedCaseType
+                  {searchQuery || selectedDistrict || selectedStatus || selectedFeeStatus || selectedCaseType
                     ? "No results found"
                     : ""}
                 </p>
@@ -711,55 +731,58 @@ const AllComplaints = () => {
         </div>
       )} */}
 
+
       {isConfirmModalOpen && roleParent !== "lok-ayukt" && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center">
-          <div className="bg-white rounded-xl shadow-2xl w-[440px] relative">
-            <button
-              onClick={() => {
-                setIsConfirmModalOpen(false);
-                setSelectedUpload("");
-                setComplaintToApprove(null);
-              }}
-              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full 
+  <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center">
+    <div className="bg-white rounded-xl shadow-2xl w-[440px] relative">
+
+      <button
+        onClick={() => {
+          setIsConfirmModalOpen(false);
+          setSelectedUpload("");
+          setComplaintToApprove(null);
+        }}
+        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full 
                    bg-gray-100 hover:bg-gray-200"
-            >
-              ✕
-            </button>
+      >
+        ✕
+      </button>
 
-            <div className="px-6 py-4 border-b">
-              <h3 className="text-lg font-semibold">Send to UPLokayukt</h3>
-            </div>
+      <div className="px-6 py-4 border-b">
+        <h3 className="text-lg font-semibold">Send to UPLokayukt</h3>
+      </div>
 
-            <div className="px-6 py-5">
-              <label className="block text-sm font-medium mb-2">
-                Select UPLokayukt
-              </label>
-              <select
-                value={selectedUpload}
-                onChange={(e) => setSelectedUpload(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
-              >
-                <option value="">Select</option>
-                {uploadList.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+      <div className="px-6 py-5">
+        <label className="block text-sm font-medium mb-2">
+          Select UPLokayukt
+        </label>
+        <select
+          value={selectedUpload}
+          onChange={(e) => setSelectedUpload(e.target.value)}
+          className="w-full border rounded-lg px-3 py-2"
+        >
+          <option value="">Select</option>
+          {uploadList.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-            <div className="flex justify-end px-6 py-4 bg-gray-50 rounded-b-xl">
-              <button
-                onClick={handleSendToUPLokayukt}
-                disabled={isSending || !selectedUpload}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg disabled:opacity-50"
-              >
-                {isSending ? "Sending..." : "Send"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <div className="flex justify-end px-6 py-4 bg-gray-50 rounded-b-xl">
+        <button
+          onClick={handleSendToUPLokayukt}
+          disabled={isSending || !selectedUpload}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg disabled:opacity-50"
+        >
+          {isSending ? "Sending..." : "Send"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </>
   );
 };
