@@ -172,13 +172,14 @@ const AllComplaints = () => {
     };
   };
 
-
-  const getDaysDifference = (dateString) => {
+  const getDaysDifference = (date) => {
+  const created = new Date(date);
   const today = new Date();
-  const createdDate = new Date(dateString);
 
-  const diffTime = today - createdDate;
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const diffTime = today - created; 
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays;
 };
 
 
@@ -292,14 +293,21 @@ const AllComplaints = () => {
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
-            ) : 
-            isLoading ? (
+            ) :
+
+             isLoading ? (
                  <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">Loading...</h1>
               </div>
-            ) :
+            )
 
-            isError ? (
+            :
+            
+            
+            
+            
+            
+             isError ? (
             <div className="flex items-center justify-center h-full">
               <p className="text-red-500 text-sm">Error: {error.message}</p>
             </div>
@@ -312,41 +320,46 @@ const AllComplaints = () => {
                 >
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
                     <div className="flex-1 min-w-0 w-full sm:w-auto">
-                      <p className="text-sm font-semibold text-gray-900 mb-1">
-                        File No. {complaint.complain_no}
-                      </p>
+                       <p className="text-sm font-semibold text-gray-900 mb-1">
+                          File No. {complaint.complain_no}
+                        </p>
                       <p className="text-xs text-gray-700 mb-1">
-                        {complaint.description ||
-                          complaint.remark ||
-                          "No description available"}
-                      </p>
-                      <div className="text-[11px] text-gray-600 mb-1">
-                        <span className="text-gray-500">Complainant:</span>
-                        <span className="ml-1">{complaint.name}</span>
-                        <span className="mx-1 text-gray-400">•</span>
-                        <span className="text-gray-500">District:</span>
-                        <span className="ml-1">{complaint.district_name}</span>
-                      </div>
+                          Description: {complaint.complaint_description ||
+                            "No description available"}
+                        </p>
+                   <div className="text-[11px] text-gray-600 mb-1">
+                          <span className="text-gray-500">
+                            Cause Date
+                            :</span>
+                          <span className="ml-1">{complaint.cause_date || "NA"}</span>
+                          <span className="mx-1 text-gray-400">•</span>
+                          <span className="text-gray-500">
+                            Category
+                            :</span>
+                          <span className="ml-1">
+                            {complaint.category || "NA"}
+                          </span>
+                        </div>
                       <div className="text-[10px] text-gray-400">
-                        Received:{" "}
-                        {new Date(complaint.created_at).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          }
-                        )}{" "}
-                        • Last action:{" "}
-                        {new Date(complaint.updated_at).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          }
-                        )}
-                      </div>
+                          Received:{" "}
+                          {new Date(complaint.created_at).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}{" "}
+                          • Last action:{" "}
+                          {new Date(complaint.updated_at).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )}
+                        </div>
                     </div>
 
                     <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
@@ -356,16 +369,16 @@ const AllComplaints = () => {
                         </span>
                         {complaint.fee_exempted === 1 && (
                           <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                            With uplokayukt
+                            With Lokayukta
                           </span>
                         )}
                       </div>
 
-                      <div className="flex gap-1.5">
-                                        <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-  {getDaysDifference(complaint.created_at)}d
-</span>
-                                                                <span
+                       <div className="flex gap-1.5">
+                         <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+                      {getDaysDifference(complaint.updated_at)}d</span>
+
+                                                             <span
   className={`
     px-2 py-0.5 rounded text-[11px] font-medium
     ${
@@ -388,7 +401,8 @@ const AllComplaints = () => {
     ? "Partial"
     : ""}
 </span>
-                      </div>
+
+                        </div>
 
                       <div className="flex gap-2 items-center w-full sm:w-auto">
                         <button
