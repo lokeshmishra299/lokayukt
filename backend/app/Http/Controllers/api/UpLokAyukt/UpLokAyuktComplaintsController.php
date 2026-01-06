@@ -641,7 +641,7 @@ $complainDetails->actions = DB::table('complaint_actions')
            ]);
     }
 
-     public function forwardComplaintbyuplokayuk(Request $request,$complainId){
+     public function forwardComplaintbyUplokayukt(Request $request,$complainId){
         //    dd($request->all());
         // $user = Auth::user()->id;
         // dd($usersubrole);
