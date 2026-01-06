@@ -291,7 +291,7 @@ const Notes = ({ complaint }) => {
     <div className="bg-white rounded-lg w-full p-3 md:p-4">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-3">
-        <p className="text-[16px] font-medium text-gray-800">
+        <p className="text-[17px] font-medium text-gray-800">
           Notes & Notings
         </p>
         <button
@@ -351,7 +351,7 @@ const Notes = ({ complaint }) => {
                             onClick={() => handleViewDocFromNote(referencedFile)}
                             className="flex items-center gap-1 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-blue-200 transition-colors"
                           >
-                            <FaEye className="w-3 h-3" />
+                            <FaEye className="w-3  h-3" />
                             <span className="font-medium">{referencedTitle}</span>
                           </button>
                         </div>
