@@ -226,6 +226,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-by-ds-js/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyds']);
         Route::post('/forward-by-da/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyRoAro']);
+        Route::post('/forward-by-sec/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySec']);
+        Route::post('/forward-by-cio/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyCio']);
         Route::post('/forward-report-by-so/{complainId}',[SupervisorReportController::class,'forwardReporttbySo']);
         Route::post('/forward-report-by-ds/{complainId}',[SupervisorReportController::class,'forwardReporttbyds']);
         Route::post('/forward-report-by-sec/{complainId}',[SupervisorReportController::class,'forwardReporttbysec']);
@@ -406,7 +408,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('forward-complain-by-ps/{complainId}',[PSComplaintsController::class,'forwardComplaintbyPS']);
         Route::post('assign-by-ps/{complainId}',[PSComplaintsController::class,'assignToPs']);
         Route::post('/fee-exempted/{complaint_id}',[PSComplaintsController::class,'approvedFeeByPS']);
-        Route::post('/forward-to-uplokayukt/{complaint_id}',[PSComplaintsControllerr::class,'approvedByupLokayukt']);
+        Route::post('/forward-to-uplokayukt/{complaint_id}',[PSComplaintsController::class,'approvedByupLokayukt']);
        
         // Route::post('/forward-by-ds-js/{complainId}',[PSComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[PSComplaintsController::class,'forwardComplaintbyda']);

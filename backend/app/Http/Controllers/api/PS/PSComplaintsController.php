@@ -27,95 +27,51 @@ class PSComplaintsController extends Controller
         $roleParent = $userParentData[0]->role->name;
         // dd($roleParent);
 
-// maan lo: 'lokayukt' | 'uplokayukt'
+  
+    $query = DB::table('complaints')
+        ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+        ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
+            $join->on('complaints.id', '=', 'rep.complaint_id')
+                ->where(function ($q) use ($parentId, $roleParent) {
 
-// $query = DB::table('complaints')
-//     ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
-//     ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
-//         $join->on('complaints.id', '=', 'rep.complaint_id');
+                    if ($roleParent === 'lok-ayukt') {
+                        //  $q->where('rep.forward_to_lokayukt', $parentId);      
+                    } elseif ($roleParent === 'up-lok-ayukt') {
+                        $q->where('rep.forward_to_uplokayukt', $parentId);
+                    } else {
+                        // 🔥 fallback (safe)
+                        $q->where('rep.forward_to_lokayukt', $parentId)
+                        ->orWhere('rep.forward_to_uplokayukt', $parentId);
+                    }
 
-//         if ($roleParent === 'lok-ayukt') {
-//             $join->where('rep.forward_to_lokayukt', $parentId);
-//         } elseif ($roleParent === 'up-lok-ayukt') {
-//             $join->where('rep.forward_to_uplokayukt', $parentId);
-//         }
-//     })
-//     ->select(
-//         'complaints.*',
-//         'dd.district_name',
-//         'rep.id as action_id'
-//     )
-//     ->where('complaints.form_status', 1)
-//     ->where('complaints.approved_rejected_by_rk', 1);
+                });
+        })
+        ->select(
+            'complaints.id',
+            'complaints.complain_no',
+            'complaints.complaint_description',
+            'complaints.cause_date',
+            'complaints.category',
+            'complaints.fee_exempted',
+            'complaints.approved_rejected_by_rk',
+            'complaints.approved_rejected_by_ps',
+            'complaints.approved_rejected_by_lokayukt',
+            'complaints.created_at',
+            'complaints.updated_at',
+            'dd.district_name',
+            DB::raw('MIN(rep.id) as action_id') // 🔥 avoid duplicates
+        )
+        ->where('complaints.form_status', 1)
+        ->where('complaints.approved_rejected_by_rk', 1)
+        ->groupBy('complaints.id','complaints.complaint_description','complaints.complain_no','complaints.cause_date','complaints.category','complaints.fee_exempted',
+         'complaints.approved_rejected_by_rk',
+            'complaints.approved_rejected_by_ps',
+            'complaints.approved_rejected_by_lokayukt',
+            'complaints.created_at','complaints.updated_at','dd.district_name');   // 🔥 distinct complaints
 
-// $records = $query->get();
-$query = DB::table('complaints')
-    ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
-    ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
-        $join->on('complaints.id', '=', 'rep.complaint_id')
-             ->where(function ($q) use ($parentId, $roleParent) {
-
-                 if ($roleParent === 'lok-ayukt') {
-                    //  $q->where('rep.forward_to_lokayukt', $parentId);      
-                 } elseif ($roleParent === 'up-lok-ayukt') {
-                     $q->where('rep.forward_to_uplokayukt', $parentId);
-                 } else {
-                     // 🔥 fallback (safe)
-                     $q->where('rep.forward_to_lokayukt', $parentId)
-                       ->orWhere('rep.forward_to_uplokayukt', $parentId);
-                 }
-
-             });
-    })
-    ->select(
-        'complaints.id',
-        'complaints.complain_no',
-        'complaints.complaint_description',
-        'complaints.cause_date',
-        'complaints.category',
-        'complaints.fee_exempted',
-        'complaints.created_at',
-        'complaints.updated_at',
-        'dd.district_name',
-        DB::raw('MIN(rep.id) as action_id') // 🔥 avoid duplicates
-    )
-    ->where('complaints.form_status', 1)
-    ->where('complaints.approved_rejected_by_rk', 1)
-    ->groupBy('complaints.id','complaints.complaint_description','complaints.complain_no','complaints.cause_date','complaints.category','complaints.fee_exempted','created_at','complaints.updated_at','dd.district_name');   // 🔥 distinct complaints
-
-$records = $query->get();
+    $records = $query->get();
 
        
-        // dd(Auth::user());
-    // $query = DB::table('complaints')
-    //     //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-    //     ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
-    //     // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
-    //     // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
-    //     // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
-    //     // ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id')
-    //     ->leftJoin('complaint_actions as rep', 'complaints.id', '=', 'rep.complaint_id')
-    //     // ->leftJoin('users as ul', 'rep.forward_to_lokayukt', '=', 'u.parent_user_id')
-    //     // ->leftJoin('users as uup', 'rep.forward_to_uplokayukt', '=', 'u.parent_user_id')
-    //     ->select(
-    //         'complaints.*',
-    //         'dd.district_name as district_name',
-
-    //     );
-
-
-    //  $query->where('form_status', 1)
-    //             //   ->where('approved_rejected_by_ro', 1)
-    //               ->where('approved_rejected_by_rk', 1);
-    //                 // ->where(function($q){
-    //                 //         $q->where('approved_rejected_by_so_us',1)
-    //                 //         ->Orwhere('approved_rejected_by_ds_js', 1);               
-    //                 //      })
-    //                 // ->where('approved_rejected_by_d_a', 1);
-    //                 // ->whereNotNull('forward_to_d_a');
-
-    // $records = $query->get();
-
       $todayCount = DB::table('complaints')
                     ->where('in_draft', 0)
                     ->whereDate('created_at', today())
