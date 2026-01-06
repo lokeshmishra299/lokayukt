@@ -592,9 +592,11 @@ $complainDetails->actions = DB::table('complaint_actions')
     }
 
      public function allComplainsapproved(){
+         $user = Auth::user()->id;
     //    $userSubrole = Auth::user()->subrole->name; 
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                 ->join('complaint_actions as rep', 'cm.id', '=', 'rep.complaint_id')
                 // ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')
@@ -611,8 +613,11 @@ $complainDetails->actions = DB::table('complaint_actions')
 
                 
      $complainDetails->where('form_status', 1)
-            ->where('approved_rejected_by_rk', 1)
-                        ->where('approved_rejected_by_lokayukt',1);
+      ->distinct('complaints.id')
+                  ->where('rep.forward_to_uplokayukt', $user)
+                  ->where('approved_rejected_by_rk', 1);
+            // ->where('approved_rejected_by_rk', 1)
+            //             ->where('approved_rejected_by_lokayukt',1);
                         // ->where('approved_rejected_by_lokayukt',1)
                         //  ->where(function($q){
                         //     $q->where('approved_rejected_by_so_us',1)
