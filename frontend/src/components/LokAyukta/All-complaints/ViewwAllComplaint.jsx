@@ -831,6 +831,14 @@ const ViewAllComplaint = () => {
                       : "Return with Remarks"}
                   </button>
 
+{
+  complaintData.approved_rejected_by_lokayukt == "1" ? (
+                    <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                      Forwarded
+                    </span>
+                  ) : 
+
+                  
                   <button
                     onClick={handleforwardphysical}
                     disabled={forwardComplaintMutation.isPending}
@@ -840,6 +848,9 @@ const ViewAllComplaint = () => {
                       ? "Processing..."
                       : "Send / Mark"}
                   </button>
+
+
+}
                 </div>
               </div>
             </div>
