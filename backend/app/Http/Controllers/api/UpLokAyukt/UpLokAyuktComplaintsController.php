@@ -769,6 +769,7 @@ $complainDetails->actions = DB::table('complaint_actions')
 
                                 case 'cio-io':
                                     $apcAction->forward_to_cio_io = $request->forward_to;
+                                     $cmp->status = "Under investigation";
                                     break;
 
                                 case 'so-us':
@@ -781,6 +782,7 @@ $complainDetails->actions = DB::table('complaint_actions')
                         $apcAction->type = '1';
                         $apcAction->remarks = $request->remark;
                         $apcAction->save();
+                        $cmp->save();
 
 
                         // $apcAction = new ComplaintAction();
