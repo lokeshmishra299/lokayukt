@@ -235,7 +235,7 @@ const ViewAllComplaint = () => {
           }
   
           //  Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
-          const res = await api.get("/supervisor/get-upsupervisor");
+          const res = await api.get("/supervisor/get-user-with-ps");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
   
@@ -253,7 +253,6 @@ const ViewAllComplaint = () => {
       const res = await api.post("/supervisor/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
-         sent_through_rk: sent_through_rk ? 1 : 0
       });
       return res.data;
     },
@@ -293,9 +292,11 @@ const ViewAllComplaint = () => {
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-supervisor/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-cio/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
+         sent_through_rk: sent_through_rk ? 1 : 0
+
         });
         return res.data;
       },
@@ -326,6 +327,7 @@ const ViewAllComplaint = () => {
       markAsReceivedMutation.mutate({
         complaintId: id,
         remarkData: remark,
+
       });
     } else if (confirmConfig.type === "forward") {
       if (!selectedForwardTo || !remark.trim()) {
