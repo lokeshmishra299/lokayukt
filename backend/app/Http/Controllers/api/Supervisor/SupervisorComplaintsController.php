@@ -1676,7 +1676,7 @@ class SupervisorComplaintsController extends Controller
             'complaint_id' => 'required|numeric',
             'title' => 'required|string',
             'draft_note' => 'required|string',
-             'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:5000',
+             'file' =>  'required|file|mimes:jpg,jpeg,png,pdf',
             
         ], [
             'complaint_id.required' => 'Complaint Id is required.',
