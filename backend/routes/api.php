@@ -245,6 +245,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-lokayukt',[SupervisorComplaintsController::class,'getLokayuktUsers']);
         Route::get('/get-users',[SupervisorComplaintsController::class,'getSubROleUsers']);
         Route::get('/get-uplokayukt',[SupervisorComplaintsController::class,'getUpLokayuktUsers']);
+        Route::get('/get-user-with-ps',[SupervisorComplaintsController::class,'getUserWithPs']);
         Route::get('/get-dealing-assistant',[SupervisorComplaintsController::class,'getDealingAssistantUsers']);
         Route::get('/progress-register',[SupervisorReportController::class,'progress_report']);
         Route::get('/complain-report',[SupervisorReportController::class,'complainReports']);
