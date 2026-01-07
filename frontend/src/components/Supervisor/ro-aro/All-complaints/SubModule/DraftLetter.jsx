@@ -31,6 +31,9 @@ const DraftLetter = ({ complaint }) => {
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedDraftId, setSelectedDraftId] = useState(null);
+const [selectedComplaintId, setSelectedComplaintId] = useState(null);
+
   
   // -- Add Document State --
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,7 +54,7 @@ const DraftLetter = ({ complaint }) => {
   const [errors, setErrors] = useState({});
   const [draftTitle, setDraftTitle] = useState(""); 
 
-  const [selectedDraftId, setSelectedDraftId] = useState(null);
+  // const [selectedDraftId, setSelectedDraftId] = useState(null);
 const [editDraftPopup, setEditDraftPopup] = useState(false);
 
 
@@ -67,9 +70,9 @@ const [editDraftPopup, setEditDraftPopup] = useState(false);
     setopenAddDocuments(true);
   };
 
-  // ✅ Updated Handle Edit: Opens popup correctly
-const handleEditDraft = (draftId) => {
+const handleEditDraft = (draftId, complaintId) => {
   setSelectedDraftId(draftId);
+  setSelectedComplaintId(complaintId);
   setEditDraftPopup(true);
 };
 
@@ -434,8 +437,8 @@ const handleEditDraft = (draftId) => {
                 </button>
 
                 {/* Edit Button (Opens Popup) */}
-            <button
-  onClick={() => handleEditDraft(doc.id)}   
+  <button
+  onClick={() => handleEditDraft(doc.id, doc.complain_id)}
   className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50"
 >
   <RiEditBoxLine className="w-4 h-4" />
@@ -448,15 +451,18 @@ const handleEditDraft = (draftId) => {
       </div>
 
       {/* ✅ Edit Draft Popup (Pass closeModal) */}
-     {editDraftPopup && (
+{editDraftPopup && (
   <EditDraft
     draftId={selectedDraftId}
+    complaintId={selectedComplaintId}
     closeModal={() => {
       setEditDraftPopup(false);
       setSelectedDraftId(null);
+      setSelectedComplaintId(null);
     }}
   />
 )}
+
 
       {/* Add Document Modal */}
       {openAddDocuments && (

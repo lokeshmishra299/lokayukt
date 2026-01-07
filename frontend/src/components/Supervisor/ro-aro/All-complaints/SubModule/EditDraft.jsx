@@ -16,7 +16,7 @@ const api = axios.create({
 });
 
 
-const EditDraft = ({ closeModal, draftId, complaintId }) => {
+const EditDraft = ({ closeModal, draftId, complaintId  }) => {
   const [formData, setFormData] = useState({
     title: "",
     file: null,
@@ -69,9 +69,10 @@ const EditDraft = ({ closeModal, draftId, complaintId }) => {
     try {
       const payload = new FormData();
       payload.append("id", draftId); 
+      // payload.append("complain_id",  complaintId); 
       payload.append("title", formData.title);
       payload.append("type", formData.type);
-      
+       
       if(complaintId) {
           payload.append("complain_id", complaintId);
       }
@@ -83,7 +84,7 @@ const EditDraft = ({ closeModal, draftId, complaintId }) => {
       const res = await api.post(`/supervisor/update-draft-letter/${draftId}`, payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
+x
       if (res.data.status) {
         toast.success(res.data.message || "Draft Updated Successfully!");
         if (closeModal) closeModal(); 
