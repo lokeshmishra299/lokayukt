@@ -296,7 +296,7 @@ class LokAyuktDashboardController extends Controller
             $rejectedcomplains = $query4->count();
             // $rejectedcomplains = $query4->toSql();
             $avgPendingDays = $avgPendingDays->value('avg_days');
-     $dataDashboard = array(
+         $dataDashboard = array(
            'totalcomplains'=> $totalcomplains,
            'pendingcomplains'=> $pendingcomplains,
           'approvedcomplains'=> $approvedcomplains,

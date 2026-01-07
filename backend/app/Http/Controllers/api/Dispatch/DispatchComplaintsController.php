@@ -29,7 +29,7 @@ class DispatchComplaintsController extends Controller
         // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
         // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
         // ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id')
-        // ->leftJoin('complaint_actions as rep', 'complaints.id', '=', 'rep.complaint_id')
+        ->leftJoin('complaint_actions as rep', 'complaints.id', '=', 'rep.complaint_id')
         ->select(
             'complaints.*',
             'dd.district_name as district_name',
@@ -39,7 +39,8 @@ class DispatchComplaintsController extends Controller
 
      $query->where('form_status', 1)
                 //   ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_rk', 1);
+                  ->where('approved_rejected_by_rk', 1)
+                  ->where('rep.forward_to_dispatch', $user);
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)
                     //         ->Orwhere('approved_rejected_by_ds_js', 1);               

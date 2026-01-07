@@ -1706,6 +1706,7 @@ class SupervisorComplaintsController extends Controller
                 $compDocument = new ComplainDocuments(); 
                 $compDocument->complain_id = $request->complaint_id;
                 $compDocument->added_by = $added_by;
+                $compDocument->title = $request->title;
                 $compDocument->type = "Draft Letter";
                 // $compDocument->title = $request->title;     
                 $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
