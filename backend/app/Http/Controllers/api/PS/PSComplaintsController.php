@@ -518,6 +518,8 @@ class PSComplaintsController extends Controller
 
                if($cmp){
                 $cmp->approved_rejected_by_ps = 1;  
+
+
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Deputy Secretary / Joint Secretary';
                 // $remark.='\n';
@@ -555,7 +557,7 @@ class PSComplaintsController extends Controller
                                     }elseif($subroleFwd ==="cio-io"){
 
                                             $apcAction->forward_to_cio_io = $request->forward_to;
-                                            
+                                            $cmp->status = "Under investigation";
                                     }elseif($subroleFwd ==="so-us"){
 
                                             $apcAction->forward_to_so_us = $request->forward_to;
@@ -576,17 +578,8 @@ class PSComplaintsController extends Controller
                         $apcAction->type = '1';
                         $apcAction->remarks = $request->remark;
                         $apcAction->save();
+                        $cmp->save();
 
-                        // $apcAction = new ComplaintAction();
-                        // $apcAction->complaint_id = $complainId;
-                        // $apcAction->forward_by_ps = $userId;
-
-                        // $apcAction->forward_to_lokayukt = $request->forward_to;
-                       
-                        // $apcAction->status = 'Forwarded';
-                        // $apcAction->type = '1';
-                        // $apcAction->remarks = $request->remark;
-                        // $apcAction->save();
                     }
                 
                 }

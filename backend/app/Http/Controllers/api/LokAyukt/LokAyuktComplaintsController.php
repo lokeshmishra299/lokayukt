@@ -794,6 +794,7 @@ class LokAyuktComplaintsController extends Controller
 
                                 case 'cio-io':
                                     $apcAction->forward_to_cio_io = $request->forward_to;
+                                     $cmp->status = "Under investigation";
                                     break;
 
                                 case 'so-us':
@@ -806,7 +807,7 @@ class LokAyuktComplaintsController extends Controller
                         $apcAction->type = '1';
                         $apcAction->remarks = $request->remark;
                         $apcAction->save();
-
+                         $cmp->save();
 
                         // $apcAction = new ComplaintAction();
                         // $apcAction->complaint_id = $complainId;
