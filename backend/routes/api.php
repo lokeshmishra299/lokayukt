@@ -456,7 +456,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/view-complaint/{id}',[DispatchComplaintsController::class,'viewComplaint']);
         Route::post('/forward-by-so/{complainId}',[DispatchComplaintsController::class,'forwardComplaintbySO']);
         Route::post('/dispose-complain/{complainId}',[DispatchComplaintsController::class,'disposeComplaints']);
-         Route::get('/get-lokayukt-uplokayukt',[DispatchComplaintsController::class,'getUsers']);
+        Route::get('/get-lokayukt-uplokayukt',[DispatchComplaintsController::class,'getUsers']);
         Route::get('/get-users',[DispatchComplaintsController::class,'getSubROleUsers']);
         Route::get('/get-document/{id}',[DispatchComplaintsController::class,'getUploadDoc']);
         Route::get('/get-notes/{id}',[DispatchComplaintsController::class,'getNotes']);
