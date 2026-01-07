@@ -1194,7 +1194,7 @@ class SupervisorComplaintsController extends Controller
      public function forwardComplaintbyCio(Request $request,$complainId){
         //    dd($request->all());
         // $user = Auth::user()->id;
-        // dd($usersubrole);
+        // dd($complainId);
 
         $userRole = User::with('role')->where('id',$request->forward_to)->get();
 
@@ -1205,7 +1205,7 @@ class SupervisorComplaintsController extends Controller
           $user = User::with('role','subrole')->where('id',$request->forward_to)->get();
             $subroleFwd = '';
             
-            $subroleFwd = $user[0]->subrole->name ?? null;
+            $subroleFwd = $user[0]->subrole->name ?? '';
 
        
  
@@ -1255,44 +1255,7 @@ class SupervisorComplaintsController extends Controller
                 
                     if($cmp->save()){
 
-                        //  $apcAction = new ComplaintAction();
-                        //     $apcAction->complaint_id = $complainId;
-                        //     $apcAction->forward_by_lokayukt = $userId;
-
-                             
-
-                        
-                        //     if($roleFwd === "lok-ayukt" || $roleFwd === "up-lok-ayukt"){
-                        //             if($roleFwd === "lok-ayukt"){
-                        //             $apcAction->forward_to_lokayukt = $request->forward_to;
-                        //         }elseif($roleFwd === "up-lok-ayukt"){
-                        //             $apcAction->forward_to_uplokayukt = $request->forward_to;
-                        //         }
-                        //     }else if($roleFwd === "supervisor"){
-                        //             if($subroleFwd === "ds-js"){
-                        //             $apcAction->forward_to_ds_js = $request->forward_to;
-                                
-                        //     }elseif($subroleFwd ==="sec"){
-                        //             $apcAction->forward_to_sec = $request->forward_to;
                     
-                        //     }elseif($subroleFwd ==="cio-io"){
-
-                        //             $apcAction->forward_to_cio_io = $request->forward_to;
-                                    
-                        //     }elseif($subroleFwd ==="so-us"){
-
-                        //             $apcAction->forward_to_so_us = $request->forward_to;
-                                    
-                        //     }
-                        //     }
-                          
-  
-                        // // $apcAction->forward_to_uplokayukt = $request->forward_to;
-                    
-                        // $apcAction->status = 'Forwarded';
-                        // $apcAction->type = '1';
-                        // $apcAction->remarks = $request->remark;
-                        // $apcAction->save();
 
                         $apcAction = new ComplaintAction();
                         $apcAction->complaint_id = $complainId;
