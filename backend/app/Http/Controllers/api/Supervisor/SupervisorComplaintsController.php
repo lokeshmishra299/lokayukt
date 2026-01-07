@@ -349,6 +349,28 @@ class SupervisorComplaintsController extends Controller
         }
         // dd($usersByRole['lok-ayukt']);
    }
+  
+   public function getUserWithPs(){
+     
+      $usersByRole = User::with('role')
+            ->whereNotNull('role_id')
+            ->get()
+            ->groupBy(fn ($user) => $user->role->name);
+
+        // lok-ayukt + ps users merge
+        $users = collect()
+            ->merge($usersByRole['lok-ayukt'] ?? collect())
+            ->merge($usersByRole['ps'] ?? collect());
+
+        if ($users->isNotEmpty()) {
+            return response()->json($users->values());
+        }
+
+        return response()->json([
+            "message" => "Data Not Found"
+        ]);
+        // dd($usersByRole['lok-ayukt']);
+   }
 //    public function getUpLokayuktUsers(){
 //     $usersByRole = User::with('role')
 //      ->whereNotNull('role_id')

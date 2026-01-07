@@ -86,10 +86,11 @@ public function role() {
 public function subrole() {
     return $this->belongsTo(SubRole::class, 'sub_role_id','id');
 }
-// public function user()
-// {
-//     return $this->belongsTo(User::class, 'user_id');
-// }
+
+public function userParentRole()
+{
+    return $this->belongsTo(User::class, '','');
+}
 
 
 }

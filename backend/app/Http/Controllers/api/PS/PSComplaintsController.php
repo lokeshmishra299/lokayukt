@@ -517,7 +517,7 @@ class PSComplaintsController extends Controller
             // dd($cmp);
 
                if($cmp){
-                $cmp->approved_rejected_by_ps = 1;
+                $cmp->approved_rejected_by_ps = 1;  
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Deputy Secretary / Joint Secretary';
                 // $remark.='\n';
