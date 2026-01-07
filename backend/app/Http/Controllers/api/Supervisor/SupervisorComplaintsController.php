@@ -1299,11 +1299,13 @@ class SupervisorComplaintsController extends Controller
                         $apcAction->forward_by_cio_io = $userId;
                         // $apcAction->approved_rejected_by_ro_aro = $userId;
 
-                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt'])) {
+                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','ps'])) {
 
                             if ($roleFwd === 'lok-ayukt') {
                                 $apcAction->forward_to_lokayukt = $request->forward_to;
-                            } else {
+                            } elseif($roleFwd === 'ps'){
+                                 $apcAction->forward_to_ps = $request->forward_to;
+                            }else {
                                 $apcAction->forward_to_uplokayukt = $request->forward_to;
                             }
 
