@@ -356,7 +356,7 @@ const ScanLetter = () => {
                   }`}
                 >
                   <option value="">Select type</option>
-                  <option value="Mode">Mode</option>
+                  <option value="Mode">Email</option>
                   <option value="Post">Post</option>
                   <option value="By Hand">By Hand</option>
                 </select>
