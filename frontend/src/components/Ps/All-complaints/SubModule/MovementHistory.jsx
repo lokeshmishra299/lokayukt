@@ -77,6 +77,9 @@ const MovementHistory = ({ complaint }) => {
     }
     if (item.forward_by_sec && item.sent_through_rk === 1 && item.forward_to_ro_aro) {
       return `Secratory → RO → RO/ARO`;
+    } 
+    if (item.forward_by_cio_io && item.sent_through_rk === 1 && item.forward_to_ps) {
+      return `CIO → RC → PS`;
     }
 
    

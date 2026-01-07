@@ -255,7 +255,7 @@ const Sidebar = ({
 
 {/* Reporting */}
 
-                             <li>
+                             {/* <li>
                           <Link
                             to="/dispatch/reporting"
                             onClick={handleLinkClick}
@@ -276,7 +276,7 @@ const Sidebar = ({
                               </div>
                             )}
                           </Link>
-                        </li>
+                        </li> */}
 
 
 {/* Scane Latter */}

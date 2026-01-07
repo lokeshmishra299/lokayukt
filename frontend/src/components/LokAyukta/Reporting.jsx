@@ -286,9 +286,9 @@ const Reporting = () => {
     },
     { id: "district", label: "District-wise", icon: <FaMapMarkerAlt /> },
     { id: "department", label: "Department-wise", icon: <FaBuilding /> },
-    // { id: "pendency", label: "Investigation Pendency", icon: <FaClock /> },
+    { id: "pendency", label: "Investigation Pendency", icon: <FaClock /> },
     { id: "dispatch", label: "Dispatch Register", icon: <FaPaperPlane /> },
-    // { id: "overall", label: "Overall Status", icon: <FaChartPie /> },
+    { id: "overall", label: "Overall Status", icon: <FaChartPie /> },
   ];
 
   return (
@@ -711,7 +711,7 @@ const Reporting = () => {
           </div>
         )}
 
-        {/* {activeTab === "pendency" && (
+        {activeTab === "pendency" && (
           <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <h2 className="text-base md:text-lg font-semibold text-gray-800">
@@ -734,7 +734,7 @@ const Reporting = () => {
               <p>Report Preview Area</p>
             </div>
           </div>
-        )} */}
+        )}
 
         {activeTab === "dispatch" && (
           <div>
@@ -879,7 +879,7 @@ const Reporting = () => {
           </div>
         )}
 
-        {/* {activeTab === "overall" && (
+        {activeTab === "overall" && (
           <div>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-base md:text-lg font-semibold text-gray-800">
@@ -984,7 +984,7 @@ const Reporting = () => {
               </div>
             </div>
           </div>
-        )} */}
+        )}
       </div>
     </div>
   );
