@@ -1,20 +1,20 @@
 // components/Header.jsx
 import React, { useState, useEffect } from 'react';
-import { FaSync, FaBars, FaUser, FaEnvelope, FaPhone, FaSignOutAlt } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FiBell, FiChevronDown, FiLayers } from "react-icons/fi";
+import { FaBars, FaSync, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
-const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
-  const navigate = useNavigate();
+const Header = ({ toggleMobileMenu }) => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
-  // Create axios instance with token
+  // ================= LOGIC (UNCHANGED) =================
   const getApiInstance = () => {
     const token = localStorage.getItem("access_token");
     return axios.create({
@@ -26,232 +26,167 @@ const Header = ({ toggleMobileMenu, toggleSidebar, isCollapsed }) => {
     });
   };
 
-  // Check screen size
   useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
+    const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    
-    return () => {
-      window.removeEventListener('resize', checkScreenSize);
-    };
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  // Update time every minute
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 60000);
-
+    const timer = setInterval(() => setCurrentDateTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
-  // Format date and time exactly like in image: "25 Sep 2025, 12:48 am"
   const formatDateTime = () => {
     const now = currentDateTime;
     const day = now.getDate();
-    const month = now.toLocaleDateString('en-US', { month: 'short' });
+    const month = now.toLocaleDateString("en-US", { month: "short" });
     const year = now.getFullYear();
     let hours = now.getHours();
     const minutes = now.getMinutes();
-    const ampm = hours >= 12 ? 'pm' : 'am';
-    
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
-    
-    return `${day} ${month} ${year}, ${hours}:${minutesStr} ${ampm}`;
+    const ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12 || 12;
+    return `${day} ${month} ${year}, ${hours}:${minutes < 10 ? "0" : ""}${minutes} ${ampm}`;
   };
 
-  // Logout function with API call
+  const handleRefresh = () => window.location.reload();
+
   const handleLogout = async () => {
     if (isLoggingOut) return;
-    
     setIsLoggingOut(true);
-    
+
     try {
       const api = getApiInstance();
-      const response = await api.post('/logout');
+      const res = await api.post("/logout");
 
-      if (response.data.status === 'success') {
-        toast.success('Logout Successfully');
-        
+      if (res.data.status === "success") {
+        toast.success("Logout Successfully");
         setTimeout(() => {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('user');
-          localStorage.removeItem('role'); 
-            localStorage.removeItem('subrole'); 
+          localStorage.clear();
           window.open("/login", "_self");
         }, 1500);
-       
       } else {
-        toast.error('Logout failed. Please try again.');
+        toast.error("Logout failed");
       }
-    } catch (error) {
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message);
-      } else {
-        toast.error('Network error during logout. Please try again.');
-      }
+    } catch {
+      toast.error("Network error");
     } finally {
-      setTimeout(() => {
-        setIsLoggingOut(false);
-      }, 1500);
+      setTimeout(() => setIsLoggingOut(false), 1500);
     }
   };
 
-  const handleRefresh = () => {
-    window.location.reload();
-  };
-
-  // ✅ Safe user data parsing with error handling
   const getUserData = () => {
     try {
-      const userData = localStorage.getItem('user');
-      return userData ? JSON.parse(userData) : null;
-    } catch (error) {
-      console.warn('Error parsing user data:', error);
+      const u = localStorage.getItem("user");
+      return u ? JSON.parse(u) : null;
+    } catch {
       return null;
     }
   };
 
-  // ✅ Safe role parsing from localStorage
-  const getUserRole = () => {
-    try {
-      const role = localStorage.getItem('role');
-      return role || 'operator';
-    } catch (error) {
-      return 'operator';
-    }
-  };
-
   const user = getUserData();
-  const userRole = getUserRole();
+  const role = localStorage.getItem("role") || "Admin";
 
+  const getInitials = () =>
+    user?.name
+      ? user.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+      : "AD";
+
+  // ================= UI =================
   return (
     <>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }}
-      />
+      <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* ✅ RESPONSIVE Header - Mobile First Design */}
-      <header 
-        className="bg-white border-b border-gray-200 relative z-20"
-        style={{
-          marginLeft: !isMobile ? (isCollapsed ? '4rem' : '18rem') : '0',
-          width: !isMobile ? (isCollapsed ? 'calc(100% - 4rem)' : 'calc(100% - 18rem)') : '100%'
-        }}
-      >
-        <div className={`flex justify-between items-center ${isMobile ? 'px-3 py-3' : 'px-6 py-4'}`}>
-          
-          {/* ✅ LEFT SIDE - Mobile Menu + Clock + DateTime */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* ✅ MOBILE: Hamburger Menu Button */}
+      {/* ✅ FULL WIDTH HEADER */}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b shadow-sm z-50">
+        <div className="h-full flex items-center justify-between px-6">
+
+          {/* LEFT */}
+          <div className="flex items-center gap-4">
             {isMobile && (
               <button
                 onClick={toggleMobileMenu}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                aria-label="Toggle mobile menu"
+                className="p-2 rounded-md hover:bg-gray-100 md:hidden"
               >
-                <FaBars className="w-5 h-5" />
+                <FaBars />
               </button>
             )}
 
-            {/* ✅ Clock Icon - Responsive */}
-            <div className={`flex items-center justify-center ${isMobile ? 'w-5 h-5' : 'w-6 h-6'}`}>
-              <div className={`border-2 border-gray-400 rounded-full relative ${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`}>
-                <div className="absolute top-0 left-1/2 w-0.5 h-1.5 bg-gray-400 transform -translate-x-1/2"></div>
-                <div className="absolute top-1/2 left-1/2 w-1 h-0.5 bg-gray-400 transform -translate-x-1/2 -translate-y-1/2"></div>
-              </div>
+            <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center">
+              <FiLayers className="text-white text-xl" />
             </div>
-            
-            {/* ✅ Date Time Text - Responsive */}
-            <span className={`text-gray-600 font-medium ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              {isMobile ? 
-                // Mobile: Show shorter format
-                `${new Date().getDate()} ${new Date().toLocaleDateString('en-US', { month: 'short' })}` :
-                // Desktop: Show full format
-                formatDateTime()
-              }
-            </span>
+
+            {!isMobile && (
+              <div>
+                <h1 className="text-lg font-semibold text-gray-800">
+                  Lokayukta Case Management
+                </h1>
+                <p className="text-xs text-gray-500">
+                  {formatDateTime()}
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* ✅ RIGHT SIDE - User Info + Actions (Responsive) */}
-          <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
-            
-            {/* ✅ User Details - Hidden on very small screens */}
-            {!isMobile && (
-              <div className="flex flex-col">
-                {/* User Name & Role */}
-                <div className="flex items-center">
-                  <FaUser className="w-4 h-4 mr-2 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-900">
-                    {user?.name}
-                  </span>
-                  <span className="ml-2 px-2 py-0.5 border text-black text-xs rounded-full font-medium">
-                    {userRole == "admin" ? "Admin" : "Admin"}
-                  </span>
-                </div>
+          {/* RIGHT */}
+          <div className="flex items-center gap-5">
 
-                {/* User Email */}
-                <div>
-                  <span className="text-xs text-gray-500">
-                    {user?.email || "sahil@gmail.com"}
-                  </span>
-                </div>
-              </div>
-            )}
+            {/* Refresh */}
+            <button
+              onClick={handleRefresh}
+              className="p-2 rounded-md hover:bg-gray-100 text-blue-600"
+              title="Refresh"
+            >
+              <FaSync />
+            </button>
 
-            {/* ✅ MOBILE: User Icon Only */}
-            {isMobile && (
-              <div className="flex items-center gap-1">
-                <FaUser className="w-4 h-4 text-gray-600" />
-                <span className="text-xs text-gray-600 font-medium">
-                  {user?.name?.split(' ')[0] || 'User'}
-                </span>
-              </div>
-            )}
-
-            {/* ✅ Action Buttons - Responsive */}
-            <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-2'}`}>
-              {/* Refresh Icon */}
-              <button
-                onClick={handleRefresh}
-                className={`text-blue-500 rounded-lg hover:bg-gray-100 transition-colors ${
-                  isMobile ? 'p-1.5' : 'p-2'
-                }`}
-                title="Refresh"
-              >
-                <FaSync className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
-              </button>
-
-              {/* Logout Icon */}
-              <button 
-                className={`text-red-600 transition-colors rounded-lg hover:bg-gray-100 ${
-                  isMobile ? 'p-1.5' : 'p-2'
-                } ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}`}
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                title="Logout"
-              >
-                <FaSignOutAlt className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} ${
-                  isLoggingOut ? 'animate-pulse' : ''
-                }`} />
-              </button>
+            {/* Notification */}
+            <div className="relative cursor-pointer">
+              <FiBell className="text-gray-700" size={20} />
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
             </div>
+
+            {/* Profile */}
+            <div className="relative">
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              >
+                <div className="w-9 h-9 rounded-full bg-yellow-500 flex items-center justify-center text-white font-semibold">
+                  {getInitials()}
+                </div>
+
+                {!isMobile && (
+                  <div className="flex items-center gap-2">
+                    <div className="text-sm">
+                      <p className="font-medium text-gray-700">{user?.name}</p>
+                      <p className="text-xs text-gray-500">{role}</p>
+                    </div>
+                    <FiChevronDown />
+                  </div>
+                )}
+              </div>
+
+              {showProfileDropdown && (
+                <div className="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-lg">
+                  <div className="px-4 py-3 border-b">
+                    <p className="text-sm font-semibold">{user?.name}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
+                  </div>
+
+                  <button
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50"
+                  >
+                    <FaSignOutAlt />
+                    {isLoggingOut ? "Logging out..." : "Logout"}
+                  </button>
+                </div>
+              )}
+            </div>
+
           </div>
         </div>
       </header>

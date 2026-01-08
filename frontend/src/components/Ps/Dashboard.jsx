@@ -273,7 +273,8 @@ const Dashboard = ({ userRole = "ps" }) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7));
-
+   // Component के top में
+const [isLoading, setIsLoading] = useState(false);
 
   //  NEW: Fetch Weekly Graph Data
   const fetchWeeklyData = async () => {
@@ -418,14 +419,25 @@ const Dashboard = ({ userRole = "ps" }) => {
   };
 
 
-  //  Refresh to Current Month
-  const handleRefresh = () => {
-    const now = new Date();
-    setSelectedDate(now);
-    const currentMonthYear = now.toISOString().slice(0, 7);
-    setCurrentMonth(currentMonthYear);
-    fetchDashboardData(currentMonthYear);
-  };
+ const handleRefresh = () => {
+    window.location.reload();
+  // 1. पहले loading state show करें
+  setIsLoading(true);
+  
+  // 2. Date reset करें
+  const now = new Date();
+  setSelectedDate(now);
+  const currentMonthYear = now.toISOString().slice(0, 7);
+  setCurrentMonth(currentMonthYear);
+  
+  // 3. Data फिर से fetch करें
+  fetchDashboardData(currentMonthYear);
+  
+  // 4. 500ms बाद loading hide करें
+  setTimeout(() => {
+    setIsLoading(false);
+  }, 500);
+};
 
 
   // Sample data for charts with realistic values (keeping original for other tabs)
@@ -573,10 +585,24 @@ const Dashboard = ({ userRole = "ps" }) => {
                 )}
       
                 {/*  Refresh Button */}
-                <Button variant="outline" size="sm" onClick={handleRefresh}>
-                  <FaChartLine className="h-4 w-4 mr-2 text-green-500" />
-                  Refresh
-                </Button>
+              <Button 
+  variant="outline" 
+  size="sm" 
+  onClick={handleRefresh}
+  disabled={isLoading}  // ✅ Loading हो तो disable
+>
+  {isLoading ? (
+    <>
+      <FaSpinner className="h-4 w-4 mr-2 animate-spin" />  // ✅ Loading spinner
+      Refreshing...
+    </>
+  ) : (
+    <>
+      <FaChartLine className="h-4 w-4 mr-2 text-green-500" />
+      Refresh
+    </>
+  )}
+</Button>
               </div>
             </div>
 

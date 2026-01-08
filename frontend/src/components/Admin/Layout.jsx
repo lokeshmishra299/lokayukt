@@ -1,67 +1,71 @@
-// components/Layout.js
-import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
-import Sidebar from "./Sidebar"
-import Header from './Header';
+import React, { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
+import Footer from "../Footer";
 
 const Layout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check screen size
+  // Detect screen size
   useEffect(() => {
     const checkScreenSize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      
-      // Auto-collapse sidebar on mobile
+
       if (mobile) {
-        setIsCollapsed(true);
-      } else {
         setIsCollapsed(false);
       }
     };
 
     checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    
-    return () => {
-      window.removeEventListener('resize', checkScreenSize);
-    };
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsMobileMenuOpen((prev) => !prev);
   };
 
   const toggleSidebar = () => {
     if (!isMobile) {
-      setIsCollapsed(!isCollapsed);
+      setIsCollapsed((prev) => !prev);
     }
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      <Header 
-        toggleMobileMenu={toggleMobileMenu} 
+    <div className="min-h-screen bg-gray-50">
+      {/* HEADER */}
+      <Header
+        toggleMobileMenu={toggleMobileMenu}
         toggleSidebar={toggleSidebar}
         isCollapsed={isCollapsed}
       />
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar
-          isMobileMenuOpen={isMobileMenuOpen} 
-          toggleMobileMenu={toggleMobileMenu} 
-          isCollapsed={isCollapsed}
-          toggleSidebar={toggleSidebar}
-        />
-        <main className={`flex-1 overflow-y-auto transition-all duration-300 ${
-          isMobile ? 'p-4' : 'p-6'
-        }`} style={{
-          marginLeft: !isMobile ? (isCollapsed ? '4rem' : '18rem') : '0'
-        }}>
+
+      {/* SIDEBAR */}
+      <Sidebar
+        isMobileMenuOpen={isMobileMenuOpen}
+        toggleMobileMenu={toggleMobileMenu}
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+      />
+
+      {/* MAIN CONTENT */}
+      <div
+        className="transition-all duration-300 min-h-screen"
+        style={{
+          marginLeft: !isMobile ? (isCollapsed ? "4rem" : "16rem") : "0",
+          paddingTop: "4rem", // header height
+        }}
+      >
+        <main className={isMobile ? "p-4" : "p-6"}>
           <Outlet />
         </main>
+
+        <Footer />
       </div>
     </div>
   );
