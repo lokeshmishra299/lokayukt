@@ -14,10 +14,12 @@ import draftToHtml from "draftjs-to-html";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import EditDraft from "./EditDraft";
+// import image from '../public/Lokimage.png' 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
 const subrole = localStorage.getItem("subrole");
+
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -32,6 +34,9 @@ const DraftLetter = ({ complaint }) => {
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedDraftId, setSelectedDraftId] = useState(null);
+const [selectedComplaintId, setSelectedComplaintId] = useState(null);
+
   
   // -- Add Document State --
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,7 +57,7 @@ const DraftLetter = ({ complaint }) => {
   const [errors, setErrors] = useState({});
   const [draftTitle, setDraftTitle] = useState(""); 
 
-  const [selectedDraftId, setSelectedDraftId] = useState(null);
+  // const [selectedDraftId, setSelectedDraftId] = useState(null);
 const [editDraftPopup, setEditDraftPopup] = useState(false);
 
 
@@ -68,67 +73,10 @@ const [editDraftPopup, setEditDraftPopup] = useState(false);
     setopenAddDocuments(true);
   };
 
-  //  const handleViewPdf = async (filename) => {
-  //   try {
-  //     setLoadingDoc(filename);
-  //     const res = await api.get(`/supervisor/get-file-preview/${complaint.id}`);
-  //     if (res.data.status && res.data.data.length > 0) {
-  //       const match = res.data.data.find((p) => p.includes(filename));
-  //       if (match) {
-  //         const url = makeFileUrl(match);
-  //         setPdfViewUrl(url);
-  //       }
-  //     }
-  //   } catch (err) {
-  //     alert("PDF नहीं खुल पाया");
-  //   } finally {
-  //     setLoadingDoc(null);
-  //   }
-  // };
-
-  // ✅ Updated Handle Edit: Opens popup correctly
-// ✅ Updated Handle Edit: Fetch data and open popup
-const handleEditDraft = async (draftId) => {
-  try {
-    // Draft ID को सेट करें
-    setSelectedDraftId(draftId);
-    
-    // Loading शुरू करें (optional)
-    setLoadingDoc(draftId);
-    
-    // ✅ API Call: Draft data fetch करें
-    console.log("Fetching draft data for ID:", draftId);
-    
-    const response = await api.get(`/supervisor/edit-draft-letter/${draftId}`);
-    
-    if (response.data.status) {
-      console.log("Draft data fetched successfully:", response.data.data);
-      
-      // ✅ यहाँ आप draft data को state में save कर सकते हैं
-      // अगर EditDraft component को directly data pass करना चाहते हैं
-      // तो state बनाएँ:
-      // const [editDraftData, setEditDraftData] = useState(null);
-      // setEditDraftData(response.data.data);
-      
-      // Popup खोलें
-      setEditDraftPopup(true);
-    } else {
-      toast.error("Failed to load draft data");
-    }
-    
-  } catch (error) {
-    console.error("Error fetching draft:", error);
-    
-    if (error.response?.status === 404) {
-      toast.error("Draft not found!");
-    } else if (error.response?.status === 401) {
-      toast.error("Session expired. Please login again.");
-    } else {
-      toast.error("Failed to load draft");
-    }
-  } finally {
-    setLoadingDoc(null);
-  }
+const handleEditDraft = (draftId, complaintId) => {
+  setSelectedDraftId(draftId);
+  setSelectedComplaintId(complaintId);
+  setEditDraftPopup(true);
 };
 
   // ✅ New Function to Close Popup properly
@@ -492,8 +440,8 @@ const handleEditDraft = async (draftId) => {
                 </button>
 
                 {/* Edit Button (Opens Popup) */}
-            <button
-  onClick={() => handleEditDraft(doc.id)}   
+  <button
+  onClick={() => handleEditDraft(doc.id, doc.complain_id)}
   className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50"
 >
   <RiEditBoxLine className="w-4 h-4" />
@@ -506,15 +454,18 @@ const handleEditDraft = async (draftId) => {
       </div>
 
       {/* ✅ Edit Draft Popup (Pass closeModal) */}
-     {editDraftPopup && (
+{editDraftPopup && (
   <EditDraft
     draftId={selectedDraftId}
+    complaintId={selectedComplaintId}
     closeModal={() => {
       setEditDraftPopup(false);
       setSelectedDraftId(null);
+      setSelectedComplaintId(null);
     }}
   />
 )}
+
 
       {/* Add Document Modal */}
       {openAddDocuments && (
@@ -736,6 +687,44 @@ const handleEditDraft = async (draftId) => {
                   </button>
                 </div>
               </div>
+
+ <div className="mt-5 py-5 px-6 w-full flex justify-between items-start font-[Mangal] text-black">
+
+  {/* Left Section (Empty but spacing ke liye zaroori) */}
+  <div className="w-1/3"></div>
+
+  {/* Center Section */}
+  <div className="w-1/3 text-center">
+    <h1 className="text-xl font-bold">लोक आयुक्त</h1>
+    <h2 className="text-md font-bold mt-1">उत्तर प्रदेश</h2>
+
+    <div className="mt-4 mx-auto w-28 h-28 border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
+      <img
+        src="/images/Lokimage.png"
+        alt="Lok Ayukt"
+        className="w-full h-full object-cover"
+      />
+    </div>
+  </div>
+
+  {/* Right Section */}
+  <div className="w-1/3 text-sm font-medium leading-5 text-right">
+    <p>पोस्ट बाक्स नं 172 (जी.पी.ओ.)</p>
+    <p>टी.सी. 46/बी-1, विभूति खण्ड</p>
+    <p>गोमती नगर</p>
+    <p>लखनऊ-226 010</p>
+
+    <div className="mt-1">
+      <p>दूरभाष : 2728660</p>
+      <p className="pr-0">2306717</p>
+    </div>  
+
+    <p className="mt-1">फैक्स : (0522) 2306647</p>
+  </div>
+
+</div>
+
+
               <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
                 <p className="text-sm text-center font-semibold text-gray-800">
                   File No: {complaint?.file_number || complaint?.complain_no}

@@ -688,38 +688,42 @@ const handleEditDraft = (draftId, complaintId) => {
                 </div>
               </div>
 
-      <div className="mt-5 py-5 px-6 w-full flex justify-between font-[Mangal] text-black">
-      {/* Left Section */}
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">लोक आयुक्त</h1>
-        <h2 className="text-xl font-bold mt-1">उत्तर प्रदेश</h2>
+ <div className="mt-5 py-5 px-6 w-full flex justify-between items-start font-[Mangal] text-black">
 
-        <div className="mt-4 mx-auto w-28 h-28 border-2 border-black rounded-full flex items-center justify-center text-sm leading-tight">
-         <img
-  src="/public/images/Lokimage.png"  // ✅ public folder से direct
-  alt="Lok Ayukt"
-  className="max-w-full max-h-full"
-/>
-        </div>
-      </div>
+  {/* Left Section (Empty but spacing ke liye zaroori) */}
+  <div className="w-1/3"></div>
 
-      {/* Right Section */}
-      <div className="text-base leading-7">
-        <p>पोस्ट बाक्स नं 172 (जी.पी.ओ.)</p>
-        <p>टी.सी. 46/बी-1, विभूति खण्ड</p>
-        <p>गोमती नगर</p>
-        <p>लखनऊ-226 010</p>
+  {/* Center Section */}
+  <div className="w-1/3 text-center">
+    <h1 className="text-xl font-bold">लोक आयुक्त</h1>
+    <h2 className="text-md font-bold mt-1">उत्तर प्रदेश</h2>
 
-        <div className="mt-4">
-          <p>दूरभाष : 2728660</p>
-          <p className="ml-14">2306717</p>
-        </div>
-
-        <div className="mt-4">
-          <p>फैक्स : (0522) 2306647</p>
-        </div>
-      </div>
+    <div className="mt-4 mx-auto w-28 h-28 border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
+      <img
+        src="/images/Lokimage.png"
+        alt="Lok Ayukt"
+        className="w-full h-full object-cover"
+      />
     </div>
+  </div>
+
+  {/* Right Section */}
+  <div className="w-1/3 text-sm font-medium leading-5 text-right">
+    <p>पोस्ट बाक्स नं 172 (जी.पी.ओ.)</p>
+    <p>टी.सी. 46/बी-1, विभूति खण्ड</p>
+    <p>गोमती नगर</p>
+    <p>लखनऊ-226 010</p>
+
+    <div className="mt-1">
+      <p>दूरभाष : 2728660</p>
+      <p className="pr-0">2306717</p>
+    </div>  
+
+    <p className="mt-1">फैक्स : (0522) 2306647</p>
+  </div>
+
+</div>
+
 
               <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
                 <p className="text-sm text-center font-semibold text-gray-800">
