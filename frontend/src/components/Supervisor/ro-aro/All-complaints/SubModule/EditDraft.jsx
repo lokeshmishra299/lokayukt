@@ -57,53 +57,100 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
     }
   };
 
-  const handleSubmit = async () => {
-    setErrors({});
+//   const handleSubmit = async () => {
+//     setErrors({});
 
-    if (!formData.title) {
-      toast.error("Title is required.");
-      return;
-    }
+//     if (!formData.title) {
+//       toast.error("Title is required.");
+//       return;
+//     }
 
-    setIsSubmitting(true);
-    try {
-      const payload = new FormData();
-      payload.append("id", draftId); 
-      // payload.append("complain_id",  complaintId); 
-      payload.append("title", formData.title);
-      payload.append("type", formData.type);
+//     setIsSubmitting(true);
+//     try {
+//       const payload = new FormData();
+//       payload.append("id", draftId); 
+//       // payload.append("complain_id",  complaintId); 
+//       payload.append("title", formData.title);
+//       payload.append("type", formData.type);
        
-      if(complaintId) {
-          payload.append("complain_id", complaintId);
-      }
+//       if(complaintId) {
+//           payload.append("complain_id", complaintId);
+//       }
 
-      if (formData.file) {
-        payload.append("file", formData.file);
-      }
+//       if (formData.file) {
+//         payload.append("file", formData.file);
+//       }
 
-      const res = await api.post(`/supervisor/update-draft-letter/${draftId}`, payload, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-x
-      if (res.data.status) {
-        toast.success(res.data.message || "Draft Updated Successfully!");
-        if (closeModal) closeModal(); 
-      } else {
-        if (res.data.errors) {
-            setErrors(res.data.errors);
-            const firstErrorKey = Object.keys(res.data.errors)[0];
-            if(firstErrorKey) toast.error(res.data.errors[firstErrorKey][0]);
-        } else {
-            toast.error(res.data.message || "Failed to update draft.");
-        }
-      }
-    } catch (error) {
-      console.error("Update failed:", error);
-      toast.error("Server Error while updating.");
-    } finally {
-      setIsSubmitting(false);
+//       const res = await api.post(`/supervisor/update-draft-letter/${draftId}`, payload, {
+//         headers: { "Content-Type": "multipart/form-data" },
+//       });
+// x
+//       if (res.data.status) {
+//         toast.success("Draft Updated Successfully!");
+//         if (closeModal) closeModal(); 
+//       } else {
+//         if (res.data.errors) {
+//             setErrors(res.data.errors);
+//             const firstErrorKey = Object.keys(res.data.errors)[0];
+//             if(firstErrorKey) toast.error(res.data.errors[firstErrorKey][0]);
+//         } else {
+//             toast.error(res.data.message || "Failed to update draft.");
+//         }
+//       }
+//     } catch (error) {
+//       console.error("Update failed:", error);
+//       // toast.error("Server Error while updating.");
+//     } finally {
+//       setIsSubmitting(false);
+//     }
+//   };
+
+const handleSubmit = async () => {
+  setErrors({});
+
+  if (!formData.title) {
+    toast.error("Title is required.");
+    return;
+  }
+
+  setIsSubmitting(true);
+  try {
+    const payload = new FormData();
+    payload.append("id", draftId); 
+    payload.append("title", formData.title);
+    payload.append("type", formData.type);
+    
+    if(complaintId) {
+      payload.append("complain_id", complaintId);
     }
-  };
+
+    if (formData.file) {
+      payload.append("file", formData.file);
+    }
+
+    const res = await api.post(`/supervisor/update-draft-letter/${draftId}`, payload, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    if (res.data.status) {
+      toast.success("Draft Updated Successfully!");
+      closeModal(); // यहाँ सीधे closeModal को कॉल करें
+    } else {
+      if (res.data.errors) {
+        setErrors(res.data.errors);
+        const firstErrorKey = Object.keys(res.data.errors)[0];
+        if(firstErrorKey) toast.error(res.data.errors[firstErrorKey][0]);
+      } else {
+        toast.error(res.data.message || "Failed to update draft.");
+      }
+    }
+  } catch (error) {
+    console.error("Update failed:", error);
+    toast.error("Server Error while updating.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   if (isLoading) {
     return (

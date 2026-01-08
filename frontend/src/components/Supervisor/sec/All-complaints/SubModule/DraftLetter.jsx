@@ -17,6 +17,7 @@ import EditDraft from "./EditDraft";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
+const subrole = localStorage.getItem("subrole");
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -67,10 +68,67 @@ const [editDraftPopup, setEditDraftPopup] = useState(false);
     setopenAddDocuments(true);
   };
 
+  //  const handleViewPdf = async (filename) => {
+  //   try {
+  //     setLoadingDoc(filename);
+  //     const res = await api.get(`/supervisor/get-file-preview/${complaint.id}`);
+  //     if (res.data.status && res.data.data.length > 0) {
+  //       const match = res.data.data.find((p) => p.includes(filename));
+  //       if (match) {
+  //         const url = makeFileUrl(match);
+  //         setPdfViewUrl(url);
+  //       }
+  //     }
+  //   } catch (err) {
+  //     alert("PDF नहीं खुल पाया");
+  //   } finally {
+  //     setLoadingDoc(null);
+  //   }
+  // };
+
   // ✅ Updated Handle Edit: Opens popup correctly
-const handleEditDraft = (draftId) => {
-  setSelectedDraftId(draftId);
-  setEditDraftPopup(true);
+// ✅ Updated Handle Edit: Fetch data and open popup
+const handleEditDraft = async (draftId) => {
+  try {
+    // Draft ID को सेट करें
+    setSelectedDraftId(draftId);
+    
+    // Loading शुरू करें (optional)
+    setLoadingDoc(draftId);
+    
+    // ✅ API Call: Draft data fetch करें
+    console.log("Fetching draft data for ID:", draftId);
+    
+    const response = await api.get(`/supervisor/edit-draft-letter/${draftId}`);
+    
+    if (response.data.status) {
+      console.log("Draft data fetched successfully:", response.data.data);
+      
+      // ✅ यहाँ आप draft data को state में save कर सकते हैं
+      // अगर EditDraft component को directly data pass करना चाहते हैं
+      // तो state बनाएँ:
+      // const [editDraftData, setEditDraftData] = useState(null);
+      // setEditDraftData(response.data.data);
+      
+      // Popup खोलें
+      setEditDraftPopup(true);
+    } else {
+      toast.error("Failed to load draft data");
+    }
+    
+  } catch (error) {
+    console.error("Error fetching draft:", error);
+    
+    if (error.response?.status === 404) {
+      toast.error("Draft not found!");
+    } else if (error.response?.status === 401) {
+      toast.error("Session expired. Please login again.");
+    } else {
+      toast.error("Failed to load draft");
+    }
+  } finally {
+    setLoadingDoc(null);
+  }
 };
 
   // ✅ New Function to Close Popup properly
@@ -696,7 +754,7 @@ const handleEditDraft = (draftId) => {
                     <p className="font-semibold mt-1 text-gray-800">
                       Shri Sanjay Mishra
                     </p>
-                    <p>PS Name...</p>
+                    <p>{subrole}</p>
                   </div>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import {
   FaFilePdf,
@@ -8,6 +8,7 @@ import {
   FaCloudUploadAlt,
   FaCheckCircle,
   FaTrash,
+  FaSearch,
 } from "react-icons/fa";
 import { MdOutlineScanner } from "react-icons/md";
 
@@ -28,7 +29,7 @@ const ScanLetter = () => {
   const [formData, setFormData] = useState({
     complaint_id: "",
     letter_type: "",
-     medium:"",
+    medium: "",
     subject: "",
   });
 
@@ -36,6 +37,8 @@ const ScanLetter = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
+  const [searchCase, setSearchCase] = useState("");
+  const [filteredComplainList, setFilteredComplainList] = useState([]);
 
   // 1. Fetch Complaint IDs
   const getAllComplainsID = async () => {
@@ -50,7 +53,21 @@ const ScanLetter = () => {
 
   const complainList = complainIdsData?.data || [];
 
-  // 2. Fetch All Dispatch Letters (NEW API CALL)
+  // Filter complain list based on search input
+  useEffect(() => {
+    if (complainList.length > 0) {
+      if (searchCase.trim() === "") {
+        setFilteredComplainList(complainList);
+      } else {
+        const filtered = complainList.filter((item) =>
+          item.compNo.toLowerCase().includes(searchCase.toLowerCase())
+        );
+        setFilteredComplainList(filtered);
+      }
+    }
+  }, [complainList, searchCase]);
+
+  // 2. Fetch All Dispatch Letters
   const getAllDispatchLetters = async () => {
     const res = await api.get("/lokayukt/all-dispatch-letters");
     return res.data;
@@ -93,7 +110,7 @@ const ScanLetter = () => {
 
     payload.append("complaint_id", formData.complaint_id);
     payload.append("letter_type", formData.letter_type);
-    payload.append(" medium", formData.medium);
+    payload.append("medium", formData.medium);
     payload.append("subject", formData.subject);
 
     if (selectedFile) {
@@ -117,7 +134,7 @@ const ScanLetter = () => {
       setFormData({
         complaint_id: "",
         letter_type: "",
-         medium:"",
+        medium: "",
         subject: "",
       });
       setSelectedFile(null);
@@ -127,7 +144,6 @@ const ScanLetter = () => {
 
       if (error.response && error.response.status === 422) {
         setErrors(error.response.data.errors);
-        // toast.error("Please check the required fields.");
       } else {
         toast.error("Something went wrong. Please try again.");
       }
@@ -239,8 +255,6 @@ const ScanLetter = () => {
                       <button className="text-gray-500 hover:text-gray-700 p-2">
                         <FaFilePdf />
                       </button>
-                      {/* You can re-enable this check mark if you have status logic later */}
-                      {/* <button className="text-green-600 hover:text-green-700 p-2"><FaCheckCircle /></button> */}
                     </td>
                   </tr>
                 ))
@@ -277,6 +291,7 @@ const ScanLetter = () => {
                   setIsModalOpen(false);
                   setSelectedFile(null);
                   setErrors({});
+                  setSearchCase("");
                 }}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-1"
               >
@@ -285,29 +300,57 @@ const ScanLetter = () => {
             </div>
 
             <div className="p-4 md:p-6 space-y-4 overflow-y-auto">
-              {/* ------------ UPDATED DROPDOWN START ------------ */}
+              {/* ------------ UPDATED DROPDOWN WITH SEARCH BAR ------------ */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Case Number / प्रकरण संख्या{" "}
                   <span className="text-red-500">*</span>
                 </label>
+                
+                {/* Search Bar */}
+                <div className="mb-2 relative">
+                  <div className="relative">
+                    <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                    <input
+                      type="text"
+                      placeholder="Search case number..."
+                      value={searchCase}
+                      onChange={(e) => setSearchCase(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Dropdown */}
                 <select
                   name="complaint_id"
                   value={formData.complaint_id}
                   onChange={handleChange}
                   className={`w-full px-3 py-2 bg-gray-50 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600 ${
-                    errors.complaint_id ? "" : "border-gray-200"
+                    errors.complaint_id ? "border-red-300" : "border-gray-200"
                   }`}
                 >
                   <option value="">Select Case Number</option>
-
-                  {/* Mapping the data: Value is ID, Display is compNo */}
-                  {complainList.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.compNo}
+                  {filteredComplainList.length > 0 ? (
+                    filteredComplainList.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.compNo}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="" disabled>
+                      No cases found
                     </option>
-                  ))}
+                  )}
                 </select>
+                
+                {/* Show message if no search results */}
+                {searchCase.trim() !== "" && filteredComplainList.length === 0 && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    No cases found matching "{searchCase}"
+                  </p>
+                )}
+                
                 {/* Validation Error Message */}
                 {errors.complaint_id && (
                   <p className="text-red-500 text-xs mt-1">
@@ -325,9 +368,9 @@ const ScanLetter = () => {
                 <select
                   name="letter_type"
                   value={formData.letter_type}
-                  onChange= {handleChange}
+                  onChange={handleChange}
                   className={`w-full px-3 py-2 bg-gray-50 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600 ${
-                    errors.letter_type ? "" : "border-gray-200"
+                    errors.letter_type ? "border-red-300" : "border-gray-200"
                   }`}
                 >
                   <option value="">Select type</option>
@@ -352,11 +395,11 @@ const ScanLetter = () => {
                   value={formData.medium}
                   onChange={handleChange}
                   className={`w-full px-3 py-2 bg-gray-50 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all text-gray-600 ${
-                    errors.medium ? "" : "border-gray-200"
+                    errors.medium ? "border-red-300" : "border-gray-200"
                   }`}
                 >
-                  <option value="">Select type</option>
-                  <option value="Mode">Email</option>
+                  <option value="">Select medium</option>
+                  <option value="Email">Email</option>
                   <option value="Post">Post</option>
                   <option value="By Hand">By Hand</option>
                 </select>
@@ -378,7 +421,7 @@ const ScanLetter = () => {
                   rows={2}
                   placeholder="Enter letter subject..."
                   className={`w-full px-3 py-2 bg-gray-50 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all resize-none ${
-                    errors.subject ? "" : "border-gray-200"
+                    errors.subject ? "border-red-300" : "border-gray-200"
                   }`}
                 ></textarea>
                 {errors.subject && (
@@ -459,6 +502,7 @@ const ScanLetter = () => {
                   setIsModalOpen(false);
                   setSelectedFile(null);
                   setErrors({});
+                  setSearchCase("");
                 }}
                 className="w-full md:w-auto px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
               >
