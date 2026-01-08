@@ -169,7 +169,7 @@ const isPersonalSecretary = formData.role_id === "6";
   const validateName = (name) => /^[A-Za-z\s]*$/.test(name);
   const validateMobile = (mobile) => /^\d{10}$/.test(mobile);
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
+  
 const handleInputChange = (e) => {
   const { name, value } = e.target;
   
@@ -190,14 +190,7 @@ const handleInputChange = (e) => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors.ps_parent) setErrors(prev => ({ ...prev, ps_parent: '' }));
   }
-   else {
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // Clear error
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  }
+  // ... बाकी code
 };
 
 
@@ -470,40 +463,6 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
     )}
   </div>
 )}
-
-  {/* LOKAYUKT-UPLOKAYUKT - केवल role_id = 6 होने पर दिखेगा */}
-  {isPersonalSecretary && (
-    <div>
-      <label htmlFor="lokayukt_uplokayukt" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-       PS Under Hon' Lokayukt/Uplokayukt *
-      </label>
-      <select
-        id="ps_parent"
-        name="ps_parent"
-        value={formData.ps_parent}
-        onChange={handleInputChange}
-        className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
-          errors.ps_parent ? 'border-red-500' : 'border-gray-300'
-        }`}
-      >
-        <option value="">Select User</option>
-        
-        {/* ये code अपडेट करें */}
-        {fetchLokayuktData?.flat(2)?.map((item) => (
-          <option key={item.id} value={item.user_name}>
-            {item.user_name} ({item.name})
-          </option>
-        ))}
-      </select>
-      {errors.lokayukt_uplokayukt && (
-        <p className="mt-1 text-sm text-red-600 flex items-center">
-          {errors.lokayukt_uplokayukt}
-        </p>
-      )}
-    </div>
-  )}
-
-
 
               {/* District */}
               <div>
