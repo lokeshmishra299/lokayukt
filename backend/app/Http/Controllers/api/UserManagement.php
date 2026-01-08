@@ -95,10 +95,12 @@ class UserManagement extends Controller
             'password'     => bcrypt('password123'),
         ]);
 
-        if($user['role_id'] == 6){
-              $user->update([
-                    'parent_user_id' => $request->ps_parent
-                ]);
+
+
+    if ($user->role_id == 6) {
+            $user->update([
+                'parent_user_id' => $request->ps_parent
+            ]);
         }
         // dd($user);
 

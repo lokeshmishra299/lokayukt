@@ -1551,16 +1551,20 @@ class SupervisorComplaintsController extends Controller
             break;
 
         case "sec":
-           $complainDetails->where('form_status', 1)
-                  ->where('approved_rejected_by_rk', 1);
+           $complainDetails->where('rep.status', 'Forwarded')
+                                ->whereNotNull('rep.forward_to_sec')
+                                ->where('approved_rejected_by_rk', 1)
+                                ->where('approved_rejected_by_sec', 1)
+                                 ->where('rep.forward_to_sec',$user);
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
             break;
        case "ro-aro":
           $complainDetails->where('form_status', 1)
                   ->where('approved_rejected_by_rk', 1)
-                  ->where('rep.forward_to_ro_aro', $user)
-                  ->whereOr('rep.forward_to_uplokayukt','<>',0);
+                  ->where('approved_rejected_by_ro_aro', 1)
+                  ->where('rep.forward_to_ro_aro', $user);
+                //   ->whereOr('rep.forward_to_uplokayukt','<>',0);
                 //   ->where('forward_so', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
             break;
