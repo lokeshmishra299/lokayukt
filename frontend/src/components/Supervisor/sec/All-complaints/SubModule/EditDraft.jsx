@@ -99,7 +99,7 @@ x
       }
     } catch (error) {
       console.error("Update failed:", error);
-      toast.error("Server Error while updating.");
+      // toast.error("Server Error while updating.");
     } finally {
       setIsSubmitting(false);
     }
