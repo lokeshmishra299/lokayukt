@@ -32,6 +32,7 @@ class SupervisorDashboardController extends Controller
 
          
         $queryDay = DB::table('complaints as cmp')
+        ->join('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id')
             // ->leftJoin('users as u', 'cmp.added_by', '=', 'u.id')
             // ->select('cmp.*', 'u.name as lekhpal_name', 'u.email')
             ->select('cmp.*');
@@ -40,6 +41,7 @@ class SupervisorDashboardController extends Controller
         
 
          $query1 = DB::table('complaints as cmp')
+         ->join('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id')
             // ->leftJoin('users as u', 'cmp.added_by', '=', 'u.id')
             ->select(DB::raw('COUNT(cmp.id) as total_complains'),DB::raw('AVG(DATEDIFF(now(), created_at)) as avg_days'));
             // ->where('cmp.approved_rejected_by_ri', 1)
@@ -49,12 +51,14 @@ class SupervisorDashboardController extends Controller
           
         
 
-           $query2 = DB::table('complaints as cmp');
+           $query2 = DB::table('complaints as cmp')
+           ->join('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id');
         
            
        
 
         $query3 = DB::table('complaints as cmp')
+        ->join('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id')
                     ->where('cmp.status','Under Investigation')
                      ->where('cmp.form_status', 1)
                       ->where('cmp.approved_rejected_by_rk', 1)
@@ -63,11 +67,13 @@ class SupervisorDashboardController extends Controller
                     ->orderByDesc('cmp.id');
               
 
-                    $query4 = DB::table('complaints as cmp');
+                    $query4 = DB::table('complaints as cmp')
+                    ->leftJoin('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id');
                    
                
 
                 $avgPendingDays = DB::table('complaints as cmp')
+                ->join('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id')
                     // ->where('cmp.status', 'In Progress')
                     ->whereYear('cmp.created_at', $date->year)
                     ->whereMonth('cmp.created_at', $date->month)
@@ -181,30 +187,127 @@ class SupervisorDashboardController extends Controller
 
         case "sec":
            $query->where('cmp.form_status', 1)
-                  ->where('cmp.approved_rejected_by_rk', 1);
-                //    ->where('forward_to_lokayukt', 1)
-                //   ->whereOr('forward_to_uplokayukt', 1);
-              // $query1->where('');
-            // $query2->where('');
-            // $queryDay->where('');
-            // $query3->where('');
-            // $query4->where('');
-            // $avgPendingDays
+                  ->where('cmp.approved_rejected_by_rk', 1)
+                //   ->where('cmp.approved_rejected_by_sec', 0)
+                  ->distinct('cmp.id')
+                  ->where('rep.forward_to_sec',$user);
+            
+            $queryDay = $queryDay->where('cmp.form_status', 1)
+              ->where('cmp.approved_rejected_by_rk', 1)
+              ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
+              ->groupBy(DB::raw('DATE(cmp.created_at)'))
+                // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
+                // ->where('cmp.status', 2)
+                // ->where('cmp.district_id', $user_district_code)
+                ->orderByDesc('cmp.id');
+            
+            $query1 = $query1->where('cmp.form_status', 1)
+                ->where('cmp.approved_rejected_by_rk', 1)
+                ->where('cmp.approved_rejected_by_sec', 0)
+                ->whereYear('cmp.created_at', $date->year)
+                ->whereMonth('cmp.created_at', $date->month)
+                ->groupBy(groups: 'cmp.status')
+                 ->distinct('cmp.id')
+                ->where('rep.forward_to_sec',$user)
+                 ->orderByDesc('cmp.id');
+            
+            $query2=$query2->whereYear('cmp.created_at', $date->year)
+                ->whereMonth('cmp.created_at', $date->month)
+                ->where('cmp.approved_rejected_by_sec', 1)
+                ->where('rep.forward_to_sec',$user)
+                ->distinct('cmp.id')
+                ->orderByDesc('cmp.id');
+             $query4 = $query4->where('cmp.status','Rejected')
+                     ->where('cmp.form_status', 1)
+                      ->where('cmp.approved_rejected_by_rk', 1)
+                       ->whereYear('cmp.created_at', $date->year)
+                        ->whereMonth('cmp.created_at', $date->month)
+                        ->distinct('cmp.id')
+                        ->where('rep.forward_to_sec',$user)
+                    ->orderByDesc('cmp.id');
+               $avgPendingDays = $avgPendingDays
+             ->where('rep.forward_to_sec', $user)
+            ->value('avg_days');
             break;
 
           case "ro-aro":
           $query->where('form_status', 1)
                   ->where('approved_rejected_by_rk', 1)
                   ->where('rep.forward_to_ro_aro', $user)
+                    ->distinct('cmp.id')
                   ->whereOr('rep.forward_to_uplokayukt','<>',0);
                 //   ->where('forward_so', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
+                     $queryDay = $queryDay->where('cmp.form_status', 1)
+              ->where('cmp.approved_rejected_by_rk', 1)
+           ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
+            ->groupBy(DB::raw('DATE(cmp.created_at)'))
+            // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
+            // ->where('cmp.status', 2)
+            // ->where('cmp.district_id', $user_district_code)
+            ->orderByDesc('cmp.id');
+            $query1 = $query1->where('cmp.form_status', 1)
+                     ->where('cmp.approved_rejected_by_rk', 1)
+                     ->where('approved_rejected_by_ro_aro', 0)
+                    ->whereYear('cmp.created_at', $date->year)
+                    ->whereMonth('cmp.created_at', $date->month)
+                    ->groupBy(groups: 'cmp.status')
+                    ->distinct('cmp.id')
+                    ->orderByDesc('cmp.id')
+                    ->where('rep.forward_to_ro_aro', $user);
+            
+            $query2=$query2->whereYear('cmp.created_at', $date->year)
+            ->whereMonth('cmp.created_at', $date->month)
+             ->where('approved_rejected_by_rk', 1)
+             ->where('approved_rejected_by_ro_aro', 1)
+                  ->where('rep.forward_to_ro_aro', $user)
+              ->distinct('cmp.id')
+            ->orderByDesc('cmp.id');
+             $query4 = $query4->where('cmp.status','Rejected')
+                     ->where('cmp.form_status', 1)
+                      ->where('cmp.approved_rejected_by_rk', 1)
+                       ->whereYear('cmp.created_at', $date->year)
+                  ->whereMonth('cmp.created_at', $date->month)
+                   ->where('approved_rejected_by_rk', 1)
+                  ->where('rep.forward_to_ro_aro', $user)
+                    ->distinct('cmp.id')
+                    ->orderByDesc('cmp.id');
+                   $avgPendingDays = $avgPendingDays
+             ->where('rep.forward_to_ro_aro', $user)
+            ->value('avg_days');
             break;
 
         case "cio-io":
            $query->where('cmp.form_status', 1)
                 //   ->where('cmp.approved_rejected_by_rk', 1)
                     ->where('rep.forward_to_cio_io',$user);
+
+                         $queryDay = $queryDay->where('cmp.form_status', 1)
+              ->where('cmp.approved_rejected_by_rk', 1)
+           ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
+            ->groupBy(DB::raw('DATE(cmp.created_at)'))
+            // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
+            // ->where('cmp.status', 2)
+            // ->where('cmp.district_id', $user_district_code)
+            ->orderByDesc('cmp.id');
+            $query1 = $query1->where('cmp.form_status', 1)
+              ->where('cmp.approved_rejected_by_rk', 1)
+             ->whereYear('cmp.created_at', $date->year)
+            ->whereMonth('cmp.created_at', $date->month)
+            ->groupBy(groups: 'cmp.status')
+            ->orderByDesc('cmp.id');
+            $query2=$query2->whereYear('cmp.created_at', $date->year)
+            ->whereMonth('cmp.created_at', $date->month)
+            ->orderByDesc('cmp.id');
+             $query4 = $query4->where('cmp.status','Rejected')
+                     ->where('cmp.form_status', 1)
+                      ->where('cmp.approved_rejected_by_rk', 1)
+                    ->whereYear('cmp.created_at', $date->year)
+                  ->whereMonth('cmp.created_at', $date->month)
+                    ->orderByDesc('cmp.id');
+               $avgPendingDays = $avgPendingDays
+             ->where('rep.forward_to_cio_io', $user)
+            ->value('avg_days');
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
            // $query1->where('');
@@ -273,29 +376,29 @@ class SupervisorDashboardController extends Controller
           $query=$query->whereYear('cmp.created_at', $date->year)
             ->whereMonth('cmp.created_at', $date->month)
             ->orderByDesc('cmp.id');
-            $queryDay = $queryDay->where('cmp.form_status', 1)
-              ->where('cmp.approved_rejected_by_rk', 1)
-           ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
-            ->groupBy(DB::raw('DATE(cmp.created_at)'))
-            // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
-            // ->where('cmp.status', 2)
-            // ->where('cmp.district_id', $user_district_code)
-            ->orderByDesc('cmp.id');
-            $query1 = $query1->where('cmp.form_status', 1)
-              ->where('cmp.approved_rejected_by_rk', 1)
-             ->whereYear('cmp.created_at', $date->year)
-            ->whereMonth('cmp.created_at', $date->month)
-            ->groupBy(groups: 'cmp.status')
-            ->orderByDesc('cmp.id');
-            $query2=$query2->whereYear('cmp.created_at', $date->year)
-            ->whereMonth('cmp.created_at', $date->month)
-            ->orderByDesc('cmp.id');
-             $query4 = $query4->where('cmp.status','Rejected')
-                     ->where('cmp.form_status', 1)
-                      ->where('cmp.approved_rejected_by_rk', 1)
-                       ->whereYear('cmp.created_at', $date->year)
-                  ->whereMonth('cmp.created_at', $date->month)
-                    ->orderByDesc('cmp.id');
+        //     $queryDay = $queryDay->where('cmp.form_status', 1)
+        //       ->where('cmp.approved_rejected_by_rk', 1)
+        //    ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
+        //     ->groupBy(DB::raw('DATE(cmp.created_at)'))
+        //     // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
+        //     // ->where('cmp.status', 2)
+        //     // ->where('cmp.district_id', $user_district_code)
+        //     ->orderByDesc('cmp.id');
+        //     $query1 = $query1->where('cmp.form_status', 1)
+        //       ->where('cmp.approved_rejected_by_rk', 1)
+        //      ->whereYear('cmp.created_at', $date->year)
+        //     ->whereMonth('cmp.created_at', $date->month)
+        //     ->groupBy(groups: 'cmp.status')
+        //     ->orderByDesc('cmp.id');
+        //     $query2=$query2->whereYear('cmp.created_at', $date->year)
+        //     ->whereMonth('cmp.created_at', $date->month)
+        //     ->orderByDesc('cmp.id');
+        //      $query4 = $query4->where('cmp.status','Rejected')
+        //              ->where('cmp.form_status', 1)
+        //               ->where('cmp.approved_rejected_by_rk', 1)
+        //                ->whereYear('cmp.created_at', $date->year)
+        //           ->whereMonth('cmp.created_at', $date->month)
+        //             ->orderByDesc('cmp.id');
     
          $totalcomplains = $query->count();
           $todaycomplains = $queryDay->count();
@@ -305,7 +408,7 @@ class SupervisorDashboardController extends Controller
            $underinvestigationcomplains = $query3->count();
             $rejectedcomplains = $query4->count();
             // $rejectedcomplains = $query4->toSql();
-            $avgPendingDays = $avgPendingDays->value('avg_days');
+         
      $dataDashboard = array(
            'totalcomplains'=> $totalcomplains,
            'pendingcomplains'=> $pendingcomplains,
