@@ -14,6 +14,7 @@ import draftToHtml from "draftjs-to-html";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import EditDraft from "./EditDraft";
+// import image from '../public/Lokimage.png' 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -686,18 +687,19 @@ const handleEditDraft = (draftId, complaintId) => {
                   </button>
                 </div>
               </div>
-              <div className="mt-5 py-5 px-6 w-[100%] flex justify-between font-[Mangal]">
-      
+
+      <div className="mt-5 py-5 px-6 w-full flex justify-between font-[Mangal] text-black">
       {/* Left Section */}
       <div className="text-center">
         <h1 className="text-3xl font-bold">लोक आयुक्त</h1>
         <h2 className="text-xl font-bold mt-1">उत्तर प्रदेश</h2>
 
         <div className="mt-4 mx-auto w-28 h-28 border-2 border-black rounded-full flex items-center justify-center text-sm leading-tight">
-          <div>
-            लोक आयुक्त<br />
-            उत्तर प्रदेश
-          </div>
+         <img
+  src="/public/images/Lokimage.png"  // ✅ public folder से direct
+  alt="Lok Ayukt"
+  className="max-w-full max-h-full"
+/>
         </div>
       </div>
 
@@ -717,7 +719,6 @@ const handleEditDraft = (draftId, complaintId) => {
           <p>फैक्स : (0522) 2306647</p>
         </div>
       </div>
-      
     </div>
 
               <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">

@@ -14,7 +14,7 @@ import {
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-
+import { useQuery } from '@tanstack/react-query';
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
 
@@ -34,6 +34,7 @@ const AddUserManagement = () => {
     number: '',
     role_id: '',
     sub_role_id: '',
+    ps_parent: "",
     designation: '',
     department_id: '',
     district_id: '', 
@@ -56,6 +57,14 @@ const AddUserManagement = () => {
   const [roles, setRoles] = useState([]);
   const [subRoles, setSubRoles] = useState([]);
   const [isLoadingSubRoles, setIsLoadingSubRoles] = useState(false);
+
+  // PS Under Lokayukat state
+const [psUnderLokayukat, setPsUnderLokayukat] = useState('');
+const [lokayuktList, setLokayuktList] = useState([]);
+const [isLoadingLokayukt, setIsLoadingLokayukt] = useState(false);
+const isPersonalSecretary = formData.role_id === "6";
+
+
 
   // Fetch all data from APIs on component mount
   useEffect(() => {
@@ -98,6 +107,8 @@ const AddUserManagement = () => {
     fetchAllData();
   }, []);
 
+  const [savedRoleId, setSavedRoleId] = useState()
+
   // Fetch roles on component mount
   useEffect(() => {
     async function fetchRoles() {
@@ -106,6 +117,11 @@ const AddUserManagement = () => {
         if (res.data.status === true) {
           setRoles(res.data.role);
           console.log('Roles fetched:', res.data.role);
+          const setRoleIDForCheek = res.data.role.map((items)=>{
+            return items.id
+          })
+
+          console.log("Id he ye ", setRoleIDForCheek)
         }
       } catch (error) {
         console.log("Roles are not defined:", error);
@@ -154,136 +170,129 @@ const AddUserManagement = () => {
   const validateMobile = (mobile) => /^\d{10}$/.test(mobile);
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+  
+  if (name === 'role_id') {
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: value,
+      sub_role_id: '',
+      ps_parent: "" // ✅ Reset ps_parent
+    }));
     
-    // Handle role_id change - reset sub_role_id when role changes
-    if (name === 'role_id') {
-      setFormData(prev => ({ 
-        ...prev, 
-        [name]: value,
-        sub_role_id: '' // Reset sub-role when role changes
-      }));
-      
-      // Clear sub-role error
-      if (errors.sub_role_id) {
-        setErrors(prev => ({ ...prev, sub_role_id: '' }));
-      }
-    }
-    // Handle name validation - only alphabets and spaces
-    else if (name === 'name') {
-      setFormData(prev => ({ ...prev, [name]: value }));
-      if (errors[name]) {
-        setErrors(prev => ({ ...prev, [name]: '' }));
-      }
-    }
-    // Handle mobile validation
-    else if (name === 'number') {
-      if (value === '' || validateMobile(value)) {
-        setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) {
-          setErrors(prev => ({ ...prev, [name]: '' }));
-        }
-      } else {
-        setErrors(prev => ({ ...prev, [name]: 'Enter exactly 10 digits for mobile number' }));
-        return;
-      }
-    }
-    // Handle password confirmation validation
-    else if (name === 'password_confirmation') {
-      setFormData(prev => ({ ...prev, [name]: value }));
-      if (value && formData.password && value !== formData.password) {
-        setErrors(prev => ({ ...prev, [name]: 'Passwords do not match' }));
-      } else {
-        setErrors(prev => ({ ...prev, [name]: '' }));
-      }
-    }
-    // Handle other fields
-    else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-      
-      if (name === 'password' && formData.password_confirmation && value !== formData.password_confirmation) {
-        setErrors(prev => ({ ...prev, password_confirmation: 'Passwords do not match' }));
-      } else if (name === 'password') {
-        setErrors(prev => ({ ...prev, password_confirmation: '' }));
-      }
-    }
-
-    // Clear error when user starts typing
+    // Clear errors
+    if (errors.sub_role_id) setErrors(prev => ({ ...prev, sub_role_id: '' }));
+    if (errors.ps_parent) setErrors(prev => ({ ...prev, ps_parent: '' }));
+  }
+  else if (name === 'ps_parent') {
+    // ✅ सही से handle करें
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (errors.ps_parent) setErrors(prev => ({ ...prev, ps_parent: '' }));
+  }
+   else {
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clear error
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
+      setErrors(prev => ({ ...prev, [name]: '' }));
     }
+  }
+};
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  setErrors({});
+
+  // ✅ पहले payload बनाएं
+  let payload = {
+    name: formData.name,
+    email: formData.email,
+    number: formData.number,
+    role_id: parseInt(formData.role_id) || '',
+    designation: formData.designation || '',
+    department: formData.department_id || '',
+    district_id: formData.district_id,
+    password: formData.password,
+    password_confirmation: formData.password_confirmation
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrors({});
+  // ✅ Role के according fields add करें
+  if (isPersonalSecretary) {
+    // Personal Secretary के लिए
+    payload.ps_parent = formData.ps_parent || "";
+    payload.sub_role_id = ""; // empty string
+  } else {
+    // दूसरे roles के लिए
+    payload.sub_role_id = formData.sub_role_id || "";
+    payload.ps_parent = ""; // empty string
+  }
 
-    try {
-      const response = await api.post('/admin/add-user', {
-        name: formData.name,
-        email: formData.email,
-        number: formData.number,
-        role_id: parseInt(formData.role_id) || '',
-        sub_role_id: formData.sub_role_id || '',  
-        designation: formData.designation || '',
-        department: formData.department_id || '', 
-        district_id: formData.district_id, 
-        password: formData.password,
-        password_confirmation: formData.password_confirmation
+  console.log("Submitting payload:", payload);
+
+  try {
+    const response = await api.post('/admin/add-user', payload); // ✅ सही payload भेजें
+    
+    if (response.data.status === true) {
+      toast.success(response.data.message || 'User created successfully!');
+      
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        number: '',
+        role_id: '',
+        sub_role_id: '',
+        ps_parent: "",
+        designation: '',
+        department_id: '',
+        district_id: '',
+        password: '',
+        password_confirmation: ''
       });
-
-      if (response.data.status === true) {
-        toast.success(response.data.message || 'User created successfully!');
-        
-        // Reset form completely
-        setFormData({
-          name: '',
-          email: '',
-          number: '',
-          role_id: '',
-          sub_role_id: '',
-          designation: '',
-          department_id: '',
-          district_id: '',
-          password: '',
-          password_confirmation: ''
-        });
-        setErrors({});
-        setSubRoles([]); // Clear sub-roles
-      }
-    } catch (error) {
-      // Enhanced error handling for backend validation
-      if (error.response?.status === 422 && error.response?.data?.errors) {
-        const backendErrors = {};
-        
-        // Process backend errors - handle array format
-        Object.keys(error.response.data.errors).forEach(field => {
-          const errorArray = error.response.data.errors[field];
-          // Get first error message from array
-          backendErrors[field] = Array.isArray(errorArray) ? errorArray[0] : errorArray;
-        });
-        
-        setErrors(backendErrors);
-        
-        // Show toast with first error for user feedback
-        const firstError = Object.values(backendErrors)[0];
-        // toast.error(firstError || 'Please fix the validation errors');
-        
-        console.log('Backend validation errors:', backendErrors);
-      } else {
-        // Generic error handling
-        // toast.error(error.response?.data?.message || 'Something went wrong. Please try again.');
-      }
-      console.error('Submit error:', error.response?.data || error);
-    } finally {
-      setIsSubmitting(false);
+      setErrors({});
+      setSubRoles([]);
     }
-  };
+  } catch (error) {
+    // Error handling
+    if (error.response?.status === 422 && error.response?.data?.errors) {
+      const backendErrors = {};
+      Object.keys(error.response.data.errors).forEach(field => {
+        const errorArray = error.response.data.errors[field];
+        backendErrors[field] = Array.isArray(errorArray) ? errorArray[0] : errorArray;
+      });
+      setErrors(backendErrors);
+    }
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+
+const fetchLokayukt = async () => {
+  const res = await api.get('/admin/get-lokayukt-uplokayukt')
+  console.log("Show Data", res.data)
+  console.log("Response structure:", {
+    hasData: !!res.data,
+    hasDataData: !!res.data?.data,
+    isArray: Array.isArray(res.data?.data),
+    isArrayOfArrays: Array.isArray(res.data?.data?.[0])
+  })
+  
+  // सही data access करें
+  return res.data?.data || res.data || []
+}
+
+const { data: fetchLokayuktData } = useQuery({
+  queryKey: ["get-lokayukt-uplokayukt"],
+  queryFn: fetchLokayukt
+})
+
+// Temporary debug
+console.log("fetchLokayuktData in component:", fetchLokayuktData)
+  
 
   return (
     <div className="p-3 sm:p-4 md:p-6 bg-gray-50 min-h-screen">
@@ -403,75 +412,98 @@ const AddUserManagement = () => {
                 )}
               </div>
 
-              {/* Role */}
-              <div>
-                <label htmlFor="role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  Role *
-                </label>
-                <select
-                  id="role_id"
-                  name="role_id"
-                  value={formData.role_id}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
-                    errors.role_id ? '' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select Role</option>
-                  {roles.map(role => (
-                    <option key={role.id} value={role.id}>{role.label}</option>
-                  ))}
-                </select>
-                {errors.role_id && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    {errors.role_id}
-                  </p>
-                )}
-              </div>
+               {/* Role - यह हमेशा दिखेगा */}
+  <div>
+    <label htmlFor="role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+      Role *
+    </label>
+    <select
+      id="role_id"
+      name="role_id"
+      value={formData.role_id}
+      onChange={handleInputChange}
+      className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+        errors.role_id ? 'border-red-500' : 'border-gray-300'
+      }`}
+    >
+      <option value="">Select Role</option>
+      {roles.map(role => (
+        <option key={role.id} value={role.id}>{role.label}</option>
+      ))}
+    </select>
+    {errors.role_id && (
+      <p className="mt-1 text-sm text-red-600 flex items-center">
+        {errors.role_id}
+      </p>
+    )}
+  </div>
 
-              {/* Sub Role - Now dynamic based on selected role */}
-              <div>
-                <label htmlFor="sub_role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  Sub Role *
-                </label>
-                <select
-                  id="sub_role_id"
-                  name="sub_role_id"
-                  value={formData.sub_role_id}
-                  onChange={handleInputChange}
-                  disabled={!formData.role_id || isLoadingSubRoles}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
-                    errors.sub_role_id ? '' : 'border-gray-300'
-                  } ${(!formData.role_id || isLoadingSubRoles) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <option value="">
-                    {!formData.role_id 
-                      ? 'First select a role' 
-                      : isLoadingSubRoles 
-                        ? 'Loading sub-roles...' 
-                        : subRoles.length === 0 
-                          ? 'No sub-roles'
-                          : 'Select Sub Role'
-                    }
-                  </option>
-                  {subRoles.map(subRole => (
-                    <option key={subRole.id} value={subRole.id}>
-                      {subRole.label || subRole.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.sub_role_id && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    {errors.sub_role_id}
-                  </p>
-                )}
-                {/* Debug info - Remove in production */}
-                {/* {formData.role_id && (
-                  <p className="mt-1 text-xs text-gray-400">
-                    Found {subRoles.length} sub-role(s) for selected role
-                  </p>
-                )} */}
-              </div>
+  {/* SUB ROLE - केवल role_id != 6 होने पर दिखेगा */}
+{isPersonalSecretary && (
+  <div>
+    {/* ✅ label और id एक ही करें */}
+    <label htmlFor="ps_parent" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+      PS Under Hon' Lokayukt/Uplokayukt *
+    </label>
+    <select
+      id="ps_parent"
+      name="ps_parent"
+      value={formData.ps_parent}
+      onChange={handleInputChange}
+      className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+        errors.ps_parent ? 'border-red-500' : 'border-gray-300'
+      }`}
+    >
+      <option value="">Select User</option>
+      {/* ✅ value में item.id भेजें */}
+      {fetchLokayuktData?.flat(2)?.map((item) => (
+        <option key={item.id} value={item.id}>
+          {item.user_name} ({item.name})
+        </option>
+      ))}
+    </select>
+    {/* ✅ सही error key का use करें */}
+    {errors.ps_parent && (
+      <p className="mt-1 text-sm text-red-600 flex items-center">
+        {errors.ps_parent}
+      </p>
+    )}
+  </div>
+)}
+
+  {/* LOKAYUKT-UPLOKAYUKT - केवल role_id = 6 होने पर दिखेगा */}
+  {isPersonalSecretary && (
+    <div>
+      <label htmlFor="lokayukt_uplokayukt" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+       PS Under Hon' Lokayukt/Uplokayukt *
+      </label>
+      <select
+        id="ps_parent"
+        name="ps_parent"
+        value={formData.ps_parent}
+        onChange={handleInputChange}
+        className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+          errors.ps_parent ? 'border-red-500' : 'border-gray-300'
+        }`}
+      >
+        <option value="">Select User</option>
+        
+        {/* ये code अपडेट करें */}
+        {fetchLokayuktData?.flat(2)?.map((item) => (
+          <option key={item.id} value={item.user_name}>
+            {item.user_name} ({item.name})
+          </option>
+        ))}
+      </select>
+      {errors.lokayukt_uplokayukt && (
+        <p className="mt-1 text-sm text-red-600 flex items-center">
+          {errors.lokayukt_uplokayukt}
+        </p>
+      )}
+    </div>
+  )}
+
+
 
               {/* District */}
               <div>
