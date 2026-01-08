@@ -169,54 +169,74 @@ const isPersonalSecretary = formData.role_id === "6";
   const validateName = (name) => /^[A-Za-z\s]*$/.test(name);
   const validateMobile = (mobile) => /^\d{10}$/.test(mobile);
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  
-const handleInputChange = (e) => {
+
+ const handleInputChange = (e) => {
   const { name, value } = e.target;
-
-    // ✅ YEH PART ADD KARO - सबसे पहले
-  if (name === 'name' || name === 'email' || name === 'designation' || 
-      name === 'password' || name === 'password_confirmation') {
-    // Basic fields के लिए
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: value 
-    }));
-  }
-  else if (name === 'number') {
-    // Mobile number के लिए
-    const onlyDigits = value.replace(/\D/g, "");
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: onlyDigits 
-    }));
-  }
-
   
+  // Handle role_id change - reset sub_role_id when role changes
   if (name === 'role_id') {
     setFormData(prev => ({ 
       ...prev, 
       [name]: value,
-      sub_role_id: '',
-      ps_parent: "" // ✅ Reset ps_parent
+      sub_role_id: '', // Reset sub-role when role changes
+      ps_parent: "" // Reset lokayukt-uplokayukt
     }));
     
-    // Clear errors
-    if (errors.sub_role_id) setErrors(prev => ({ ...prev, sub_role_id: '' }));
-    if (errors.ps_parent) setErrors(prev => ({ ...prev, ps_parent: '' }));
+    // Clear sub-role error
+    if (errors.sub_role_id) {
+      setErrors(prev => ({ ...prev, sub_role_id: '' }));
+    }
+      if (errors.lokayukt_uplokayukt) setErrors(prev => ({ ...prev, lokayukt_uplokayukt: '' }));
   }
-  else if (name === 'ps_parent') {
-    // ✅ सही से handle करें
+  // Handle name validation - only alphabets and spaces
+  else if (name === 'name') {
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors.ps_parent) setErrors(prev => ({ ...prev, ps_parent: '' }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   }
-  // ✅ YEH NAYA PART ADD KARO - dropdowns के लिए
-  else if (name === 'district_id' || name === 'department_id' || name === 'sub_role_id') {
+  // Handle mobile validation
+  else if (name === 'number') {
+    if (value === '' || validateMobile(value)) {
+      setFormData(prev => ({ ...prev, [name]: value }));
+      if (errors[name]) {
+        setErrors(prev => ({ ...prev, [name]: '' }));
+      }
+    } else {
+      setErrors(prev => ({ ...prev, [name]: 'Enter exactly 10 digits for mobile number' }));
+      return;
+    }
+  }
+  // Handle password confirmation validation
+  else if (name === 'password_confirmation') {
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (value && formData.password && value !== formData.password) {
+      setErrors(prev => ({ ...prev, [name]: 'Passwords do not match' }));
+    } else {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   }
-  
-  // ✅ YEH LINE SABKE LIYE ADD KARO - errors clear करने के लिए
+  // Handle PS Under Lokayukat input
+  else if (name === 'ps_under_lokayukat') {
+    setPsUnderLokayukat(value);
+  }
+  // Handle other fields
+  else {
+    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    if (name === 'password' && formData.password_confirmation && value !== formData.password_confirmation) {
+      setErrors(prev => ({ ...prev, password_confirmation: 'Passwords do not match' }));
+    } else if (name === 'password') {
+      setErrors(prev => ({ ...prev, password_confirmation: '' }));
+    }
+  }
+
+  // Clear error when user starts typing
   if (errors[name]) {
-    setErrors(prev => ({ ...prev, [name]: '' }));
+    setErrors(prev => ({
+      ...prev,
+      [name]: ''
+    }));
   }
 };
 
@@ -459,37 +479,78 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
   </div>
 
   {/* SUB ROLE - केवल role_id != 6 होने पर दिखेगा */}
-{isPersonalSecretary && (
-  <div>
-    {/* ✅ label और id एक ही करें */}
-    <label htmlFor="ps_parent" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-      PS Under Hon' Lokayukt/Uplokayukt *
-    </label>
-    <select
-      id="ps_parent"
-      name="ps_parent"
-      value={formData.ps_parent}
-      onChange={handleInputChange}
-      className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
-        errors.ps_parent ? 'border-red-500' : 'border-gray-300'
-      }`}
-    >
-      <option value="">Select User</option>
-      {/* ✅ value में item.id भेजें */}
-      {fetchLokayuktData?.flat(2)?.map((item) => (
-        <option key={item.id} value={item.id}>
-          {item.user_name} ({item.name})
+  {!isPersonalSecretary && (
+    <div>
+      <label htmlFor="sub_role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+        Sub Role *
+      </label>
+      <select
+        id="sub_role_id"
+        name="sub_role_id"
+        value={formData.sub_role_id}
+        onChange={handleInputChange}
+        disabled={!formData.role_id || isLoadingSubRoles}
+        className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+          errors.sub_role_id ? 'border-red-500' : 'border-gray-300'
+        } ${(!formData.role_id || isLoadingSubRoles) ? 'opacity-50 cursor-not-allowed' : ''}`}
+      >
+        <option value="">
+          {!formData.role_id 
+            ? 'First select a role' 
+            : isLoadingSubRoles 
+              ? 'Loading sub-roles...' 
+              : subRoles.length === 0 
+                ? 'No sub-roles'
+                : 'Select Sub Role'
+          }
         </option>
-      ))}
-    </select>
-    {/* ✅ सही error key का use करें */}
-    {errors.ps_parent && (
-      <p className="mt-1 text-sm text-red-600 flex items-center">
-        {errors.ps_parent}
-      </p>
-    )}
-  </div>
-)}
+        {subRoles.map(subRole => (
+          <option key={subRole.id} value={subRole.id}>
+            {subRole.label || subRole.name}
+          </option>
+        ))}
+      </select>
+      {errors.sub_role_id && (
+        <p className="mt-1 text-sm text-red-600 flex items-center">
+          {errors.sub_role_id}
+        </p>
+      )}
+    </div>
+  )}
+
+  {/* LOKAYUKT-UPLOKAYUKT - केवल role_id = 6 होने पर दिखेगा */}
+  {isPersonalSecretary && (
+    <div>
+      <label htmlFor="lokayukt_uplokayukt" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+       PS Under Hon' Lokayukt/Uplokayukt *
+      </label>
+      <select
+        id="ps_parent"
+        name="ps_parent"
+        value={formData.ps_parent}
+        onChange={handleInputChange}
+        className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+          errors.ps_parent ? 'border-red-500' : 'border-gray-300'
+        }`}
+      >
+        <option value="">Select User</option>
+        
+        {/* ये code अपडेट करें */}
+        {fetchLokayuktData?.flat(2)?.map((item) => (
+          <option key={item.id} value={item.user_name}>
+            {item.user_name} ({item.name})
+          </option>
+        ))}
+      </select>
+      {errors.lokayukt_uplokayukt && (
+        <p className="mt-1 text-sm text-red-600 flex items-center">
+          {errors.lokayukt_uplokayukt}
+        </p>
+      )}
+    </div>
+  )}
+
+
 
               {/* District */}
               <div>
