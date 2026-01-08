@@ -39,6 +39,7 @@ class UserManagement extends Controller
             // 'designation'  => 'required|exists:designations,id',
             // 'department'   => 'required|exists:departments,id',
             'district_id'  => 'required|exists:district_master,district_code',
+            'ps_parent'  => 'required',
         ], [
 
             'name.required'        => 'Name is required.',
@@ -77,6 +78,9 @@ class UserManagement extends Controller
         $count = User::where('user_name', 'LIKE', "$baseUserName%")->count();
         $userName = $count > 0 ? $baseUserName . '-' . str_pad($count + 1, 3, '0', STR_PAD_LEFT) : $baseUserName . '-001';
 
+        // parent_user_id
+       
+
         $user = User::create([
             'name'         => $request->name,
             'email'        => $request->email,
@@ -90,6 +94,10 @@ class UserManagement extends Controller
             'password1'    => $request->password,
             'password'     => bcrypt('password123'),
         ]);
+
+        if($user['role_id'] === 6){
+            $user->parent_user_id = '';
+        }
         // dd($user);
 
         return response()->json([

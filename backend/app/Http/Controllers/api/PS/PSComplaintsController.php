@@ -71,10 +71,14 @@ class PSComplaintsController extends Controller
 
     $records = $query->get();
 
+     if ($roleParent === 'lok-ayukt') {
+                        //  $q->where('rep.forward_to_lokayukt', $parentId);      
+     }
        
       $todayCount = DB::table('complaints')
                     ->where('in_draft', 0)
                     ->whereDate('created_at', today())
+                     ->distinct('complaints.id')
                     ->count();
 
              
@@ -82,17 +86,21 @@ class PSComplaintsController extends Controller
                     ->where('in_draft', 0)
                     ->where('approved_rejected_by_rk', 1)
                     ->where('created_at', '<', now()->subDays(7))
+                     ->distinct('complaints.id')
                     ->count();
 
                 $older7DaysDueCount = DB::table('complaints')
                     ->where('in_draft', 0)
                     ->where('approved_rejected_by_rk', 0)
                     ->where('created_at', '<', now()->subDays(7))
+                     ->distinct('complaints.id')
                     ->count();
               
                 $feePending = DB::table('complaints')
+                    ->where('approved_rejected_by_rk', 1)
                     ->where('in_draft', 0)
                     ->where('fee_exempted', 0)
+                     ->distinct('complaints.id')
                     ->count();
 
 

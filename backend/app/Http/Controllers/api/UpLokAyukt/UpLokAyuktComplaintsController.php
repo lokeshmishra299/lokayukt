@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 
 class UpLokAyuktComplaintsController extends Controller
@@ -48,27 +49,67 @@ class UpLokAyuktComplaintsController extends Controller
                     // ->whereNotNull('forward_to_d_a');
 
     $records = $query->get();
-      $todayCount = DB::table('complaints')
-                    ->where('in_draft', 0)
-                    ->whereDate('created_at', today())
-                    ->count();
+    //   $todayCount = DB::table('complaints')
+    //                 ->where('in_draft', 0)
+    //                 ->whereDate('created_at', today())
+    //                 ->count();
+
+             
+    //             $older7DaysCount = DB::table('complaints')
+    //                 ->where('in_draft', 0)
+    //                 ->where('approved_rejected_by_rk', 1)
+    //                 ->where('created_at', '<', now()->subDays(7))
+    //                 ->count();
+
+    //             $older7DaysDueCount = DB::table('complaints')
+    //                 ->where('in_draft', 0)
+    //                 ->where('approved_rejected_by_rk', 0)
+    //                 ->where('created_at', '<', now()->subDays(7))
+    //                 ->count();
+              
+    //             $feePending = DB::table('complaints')
+    //                 ->where('in_draft', 0)
+    //                 ->where('fee_exempted', 0)
+    //                 ->count();
+     $todayCount = DB::table('complaints')
+                              ->join('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                                ->where('in_draft', 0)
+                                ->whereDate('repN.created_at', today())
+                                 ->where('complaints.approved_rejected_by_lokayukt', 1)
+                                   ->where('repN.forward_to_uplokayukt', $user)
+                                   ->distinct('complaints.id')
+                                ->count();
 
              
                 $older7DaysCount = DB::table('complaints')
+                ->join('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
                     ->where('in_draft', 0)
                     ->where('approved_rejected_by_rk', 1)
-                    ->where('created_at', '<', now()->subDays(7))
+                    ->where('repN.created_at', '<', now()->subDays(7))
+                    ->where('complaints.approved_rejected_by_rk', 1)
+                    ->where('complaints.approved_rejected_by_lokayukt', 0)
+                      ->where('repN.forward_to_uplokayukt', $user)
+                      ->distinct('complaints.id')
                     ->count();
 
                 $older7DaysDueCount = DB::table('complaints')
-                    ->where('in_draft', 0)
-                    ->where('approved_rejected_by_rk', 0)
-                    ->where('created_at', '<', now()->subDays(7))
-                    ->count();
+                ->join('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                ->where('complaints.in_draft', 0)
+                ->where('complaints.approved_rejected_by_rk', 1)
+                ->where('complaints.approved_rejected_by_lokayukt', 0)
+                ->where('repN.created_at', '<', now()->subDays(7))   // <-- FIX
+                  ->where('repN.forward_to_uplokayukt', $user)
+                  ->distinct('complaints.id')
+                ->count();
               
                 $feePending = DB::table('complaints')
+                    ->join('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
                     ->where('in_draft', 0)
-                    ->where('fee_exempted', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                     ->where('complaints.approved_rejected_by_lokayukt', 1)
+                    ->where('complaints.fee_exempted', 0)
+                    ->distinct('complaints.id')
+                      ->where('repN.forward_to_uplokayukt', $user)
                     ->count();
 
 
@@ -83,6 +124,23 @@ class UpLokAyuktComplaintsController extends Controller
     ]);
 
 }
+
+  public function getFilePreview($id){
+        $cmp = Complaint::findOrFail($id);
+        $cmpDetail = ComplainDocuments::where('complain_id',$cmp->id)->get();
+        foreach($cmpDetail as $c){
+
+            $path[] = Storage::url($c->file);
+
+            $cmp->filepath = $path;
+        }
+           return response()->json([
+               'status' => true,
+               'message' => 'File Fetch successfully',
+               'data' => $cmp->filepath,
+           ]);
+
+    }
        public function viewComplaint($id)
   {
     //    $complainDetails = DB::table('complaints as cm')

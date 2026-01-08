@@ -112,6 +112,45 @@ class SupervisorComplaintsController extends Controller
                   ->whereOr('rep.forward_to_uplokayukt','<>',0);
                 //   ->where('forward_so', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
+
+                 $todayCount = DB::table('complaints')
+                              ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                                ->where('in_draft', 0)
+                                ->whereDate('repN.created_at', today())
+                                 ->where('repN.forward_to_ro_aro', $user)
+                                 ->distinct('complaints.id')
+                                ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('repN.created_at', '<', now()->subDays(7))
+                    ->where('complaints.approved_rejected_by_rk', 1)
+                    ->where('complaints.approved_rejected_by_ro_aro', 0)
+                     ->where('repN.forward_to_ro_aro', $user)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                ->where('complaints.in_draft', 0)
+                ->where('complaints.approved_rejected_by_rk', 1)
+                ->where('complaints.approved_rejected_by_ro_aro', 0)
+                ->where('repN.created_at', '<', now()->subDays(7))   // <-- FIX
+                ->where('repN.forward_to_ro_aro', $user)
+                ->distinct('complaints.id')
+                ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('fee_exempted', 0)
+                    ->where('repN.forward_to_ro_aro', $user)
+                    ->distinct('complaints.id')
+                    ->count();
             break;
 
         case "sec":
@@ -127,6 +166,45 @@ class SupervisorComplaintsController extends Controller
                 //                 ->where('rep.status', 'Report Requested')
                 //                 ->whereNotNull('rep.forward_to_sec')
                 //                  ->where('rep.forward_to_sec',$user);
+
+                 $todayCount = DB::table('complaints')
+                              ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                                ->where('in_draft', 0)
+                                ->whereDate('repN.created_at', today())
+                                 ->where('repN.forward_to_sec', $user)
+                                 ->distinct('complaints.id')
+                                ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('repN.created_at', '<', now()->subDays(7))
+                    ->where('complaints.approved_rejected_by_rk', 1)
+                    ->where('complaints.approved_rejected_by_sec', 0)
+                     ->where('repN.forward_to_sec', $user)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                ->where('complaints.in_draft', 0)
+                ->where('complaints.approved_rejected_by_rk', 1)
+                ->where('complaints.approved_rejected_by_sec', 0)
+                ->where('repN.created_at', '<', now()->subDays(7))   // <-- FIX
+                ->where('repN.forward_to_sec', $user)
+                ->distinct('complaints.id')
+                ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('fee_exempted', 0)
+                    ->where('repN.forward_to_sec', $user)
+                    ->distinct('complaints.id')
+                    ->count();
             break;
 
         case "cio-io":
@@ -139,6 +217,45 @@ class SupervisorComplaintsController extends Controller
         //           ->where('approved_rejected_by_ro', 1);
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
+             $todayCount = DB::table('complaints')
+                              ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                                ->where('in_draft', 0)
+                                ->whereDate('repN.created_at', today())
+                                 ->where('repN.forward_to_cio_io', $user)
+                                 ->distinct('complaints.id')
+                                ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('repN.created_at', '<', now()->subDays(7))
+                    ->where('complaints.approved_rejected_by_rk', 1)
+                    ->where('complaints.approved_rejected_by_cio_io', 0)
+                     ->where('repN.forward_to_cio_io', $user)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                ->where('complaints.in_draft', 0)
+                ->where('complaints.approved_rejected_by_rk', 1)
+                ->where('complaints.approved_rejected_by_cio_io', 0)
+                ->where('repN.created_at', '<', now()->subDays(7))   // <-- FIX
+                ->where('repN.forward_to_cio_io', $user)
+                ->distinct('complaints.id')
+                ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('fee_exempted', 0)
+                    ->where('repN.forward_to_cio_io', $user)
+                    ->distinct('complaints.id')
+                    ->count();
+
             break;
 
         case "dea-assis":
@@ -161,28 +278,7 @@ class SupervisorComplaintsController extends Controller
 
     $records = $query->distinct('complaints.id')->get();
 
-      $todayCount = DB::table('complaints')
-                    ->where('in_draft', 0)
-                    ->whereDate('created_at', today())
-                    ->count();
-
-             
-                $older7DaysCount = DB::table('complaints')
-                    ->where('in_draft', 0)
-                    ->where('approved_rejected_by_rk', 1)
-                    ->where('created_at', '<', now()->subDays(7))
-                    ->count();
-
-                $older7DaysDueCount = DB::table('complaints')
-                    ->where('in_draft', 0)
-                    ->where('approved_rejected_by_rk', 0)
-                    ->where('created_at', '<', now()->subDays(7))
-                    ->count();
-              
-                $feePending = DB::table('complaints')
-                    ->where('in_draft', 0)
-                    ->where('fee_exempted', 0)
-                    ->count();
+               
 
 
     return response()->json([

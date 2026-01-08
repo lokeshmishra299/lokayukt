@@ -49,7 +49,7 @@ class LokAyuktComplaintsController extends Controller
 
     $records = $query->get();
 
-      $todayCount = DB::table('complaints')
+                 $todayCount = DB::table('complaints')
                     ->where('in_draft', 0)
                     ->whereDate('created_at', today())
                     ->count();

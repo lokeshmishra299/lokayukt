@@ -58,7 +58,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/check-duplicate',[ComplaintsController::class,'checkDuplicate']);
 
         Route::get('/progress-register',[ComplaintsController::class,'progress_report']);
-
+        
+        Route::get('/get-lokayukt-uplokayukt',[ComplaintsController::class,'getUsers']);
         //USER-MANAGEMENT
 
         Route::post('/add-user',[UserManagement::class,'user_management']);
@@ -159,11 +160,11 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/rejections',[OperatorCommonController::class,'fetch_rejection']);
         Route::get('/complainstype',[OperatorCommonController::class,'fetch_complainstype']);
         Route::post('/add-complaint',[OperatorComplaintsController::class,'store']);
-         Route::post('/upload-document',[OperatorComplaintsController::class,'uploadDocument']);
-         Route::post('/forward-physical',[OperatorComplaintsController::class,'makedforwardbyRk']);
-         Route::post('/received-physical',[OperatorComplaintsController::class,'makedreceivedbyRk']);
+        Route::post('/upload-document',[OperatorComplaintsController::class,'uploadDocument']);
+        Route::post('/forward-physical',[OperatorComplaintsController::class,'makedforwardbyRk']);
+        Route::post('/received-physical',[OperatorComplaintsController::class,'makedreceivedbyRk']);
         Route::get('/get-lokayukt',[OperatorComplaintsController::class,'getLokayuktUsers']);
-         Route::get('/all-complaints',[OperatorComplaintsController::class,'allComplainsDashboard']);
+        Route::get('/all-complaints',[OperatorComplaintsController::class,'allComplainsDashboard']);
         Route::get('/all-draft',[OperatorComplaintsController::class,'allDraft']);
         Route::get('/all-pending-complaints',[OperatorComplaintsController::class,'allComplainspending']);
         Route::get('/all-approved-complaints',[OperatorComplaintsController::class,'allComplainsapproved']);
@@ -212,17 +213,17 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-document/{id}',[SupervisorComplaintsController::class,'getUploadDoc']);
         Route::get('/get-documentdraft/{id}',[SupervisorComplaintsController::class,'getUploadDocAndDraft']);
         Route::get('/get-draft-letter/{id}',[SupervisorComplaintsController::class,'getDraftLetter']);
-         Route::get('/get-file-preview/{id}',[SupervisorComplaintsController::class,'getFilePreview']);
-         Route::post('/add-notes',[SupervisorComplaintsController::class,'addNotes']);
-         Route::post('/create-draft',[SupervisorComplaintsController::class,'createDraft']);
-         Route::get('/edit-draft-letter/{id}',[SupervisorComplaintsController::class,'editDraftLetter']);
-         Route::post('/update-draft-letter/{id}',[SupervisorComplaintsController::class,'updateDraftLetter']);
+        Route::get('/get-file-preview/{id}',[SupervisorComplaintsController::class,'getFilePreview']);
+        Route::post('/add-notes',[SupervisorComplaintsController::class,'addNotes']);
+        Route::post('/create-draft',[SupervisorComplaintsController::class,'createDraft']);
+        Route::get('/edit-draft-letter/{id}',[SupervisorComplaintsController::class,'editDraftLetter']);
+        Route::post('/update-draft-letter/{id}',[SupervisorComplaintsController::class,'updateDraftLetter']);
          
-         Route::get('/get-notes/{id}',[SupervisorComplaintsController::class,'getNotes']);
-          Route::post('assign-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'assignToRoAro']);
-         Route::post('/upload-document',[SupervisorComplaintsController::class,'uploadDocument']);
-         Route::post('/upload-draft-letter',[SupervisorComplaintsController::class,'uploadDraftLetter']);
-         Route::post('/forward-by-so/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySO']);
+        Route::get('/get-notes/{id}',[SupervisorComplaintsController::class,'getNotes']);
+        Route::post('assign-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'assignToRoAro']);
+        Route::post('/upload-document',[SupervisorComplaintsController::class,'uploadDocument']);
+        Route::post('/upload-draft-letter',[SupervisorComplaintsController::class,'uploadDraftLetter']);
+        Route::post('/forward-by-so/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySO']);
         Route::post('/forward-by-ds-js/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyds']);
         Route::post('/forward-by-da/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyRoAro']);
@@ -519,6 +520,8 @@ Route::middleware('auth:sanctum')->group(function(){
           Route::get('/get-document/{id}',[UpLokAyuktComplaintsController::class,'getUploadDoc']);
            Route::post('/return-complain-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'returnComplainByUpLokayukt']);
           Route::post('/forward-by-uplokayukt/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyUplokayukt']);
+          Route::get('/get-file-preview/{id}',[UpLokAyuktComplaintsController::class,'getFilePreview']);
+          
           // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/request-report/{complainId}',[UpLokAyuktReportController::class,'requestReport']);
@@ -531,7 +534,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-report-by-sec{complainId}',[UpLokAyuktReportController::class,'forwardReporttbysec']);
         Route::post('/forward-report-by-cio/{complainId}',[UpLokAyuktReportController::class,'forwardReporttbycio']);
         Route::post('/forward-report-by-da/{complainId}',[UpLokAyuktReportController::class,'forwardReporttbyda']);
-       
+        
         Route::get('/get-lokayukt',[UpLokAyuktComplaintsController::class,'getLokayuktUsers']);
         Route::get('/get-uplokayukt',[UpLokAyuktComplaintsController::class,'getUpLokayuktUsers']);
         Route::get('/get-dealing-assistant',[UpLokAyuktComplaintsController::class,'getDealingAssistantUsers']);
