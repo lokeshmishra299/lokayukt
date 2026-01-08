@@ -172,6 +172,25 @@ const isPersonalSecretary = formData.role_id === "6";
   
 const handleInputChange = (e) => {
   const { name, value } = e.target;
+
+    // ✅ YEH PART ADD KARO - सबसे पहले
+  if (name === 'name' || name === 'email' || name === 'designation' || 
+      name === 'password' || name === 'password_confirmation') {
+    // Basic fields के लिए
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: value 
+    }));
+  }
+  else if (name === 'number') {
+    // Mobile number के लिए
+    const onlyDigits = value.replace(/\D/g, "");
+    setFormData(prev => ({ 
+      ...prev, 
+      [name]: onlyDigits 
+    }));
+  }
+
   
   if (name === 'role_id') {
     setFormData(prev => ({ 
@@ -190,7 +209,15 @@ const handleInputChange = (e) => {
     setFormData(prev => ({ ...prev, [name]: value }));
     if (errors.ps_parent) setErrors(prev => ({ ...prev, ps_parent: '' }));
   }
-  // ... बाकी code
+  // ✅ YEH NAYA PART ADD KARO - dropdowns के लिए
+  else if (name === 'district_id' || name === 'department_id' || name === 'sub_role_id') {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  }
+  
+  // ✅ YEH LINE SABKE LIYE ADD KARO - errors clear करने के लिए
+  if (errors[name]) {
+    setErrors(prev => ({ ...prev, [name]: '' }));
+  }
 };
 
 
