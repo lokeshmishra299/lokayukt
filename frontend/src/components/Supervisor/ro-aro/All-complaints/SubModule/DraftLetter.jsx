@@ -17,6 +17,8 @@ import EditDraft from "./EditDraft";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
+const subrole = localStorage.getItem("subrole");
+
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -736,7 +738,7 @@ const handleEditDraft = (draftId, complaintId) => {
                     <p className="font-semibold mt-1 text-gray-800">
                       Shri Sanjay Mishra
                     </p>
-                    <p>PS Name...</p>
+                    <p>{subrole}</p>
                   </div>
                 </div>
               </div>

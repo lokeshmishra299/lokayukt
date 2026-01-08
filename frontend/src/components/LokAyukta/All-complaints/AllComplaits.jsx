@@ -190,7 +190,7 @@ const AllComplaints = () => {
 
     if (selectedFeeStatus !== "") {
       filtered = filtered.filter((complaint) => {
-        return complaint.fee_status === selectedFeeStatus;
+          return complaint.fee_exempted?.toString() === selectedFeeStatus;
       });
     }
 
@@ -357,12 +357,12 @@ const AllComplaints = () => {
                   onChange={(e) => setSelectedStatus(e.target.value)}
                 >
                   <option value="">Status: All</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="disposed">Disposed Accepted</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="investigating">Under Investigation</option>
-                  <option value="pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Disposed Accepted">Disposed Accepted</option>
+                  <option value="Resolved">Resolved</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Under Investigation">Under Investigation</option>
+                  <option value="Pending">Pending</option>
                 </select>
 
                 <select
@@ -378,15 +378,16 @@ const AllComplaints = () => {
                     </option>
                   ))}
                 </select>
-                <select
+                 <select 
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedFeeStatus}
                   onChange={(e) => setSelectedFeeStatus(e.target.value)}
                 >
                   <option value="">Fee Status: All</option>
-                  <option value="paid">Paid</option>
-                  <option value="pending">Pending</option>
-                  <option value="exempted">Exempted</option>
+                  <option value="0">Pending</option>
+                  <option value="2">Partial</option>
+                  <option value="1">Paid</option>
+                  <option value="3">Exempted</option>
                 </select>
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
