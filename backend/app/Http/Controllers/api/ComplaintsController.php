@@ -345,4 +345,24 @@ class ComplaintsController extends Controller
         ]);
     }
 
+        public function getUsers(){
+     
+        $usersByRole = User::with('role')
+         ->whereNotNull('role_id')
+        ->get()
+        ->groupBy(fn ($user) => $user->role->name);
+        
+
+         if(!empty($usersByRole['lok-ayukt'])){
+            $data[] =  $usersByRole['lok-ayukt'];
+            $data[] =  $usersByRole['up-lok-ayukt'];
+
+           return response()->json($data);
+        }else{
+
+            return response()->json(["message"=>"Data Not Found"]);
+        }
+        // dd($usersByRole['lok-ayukt']);
+   }
+
 }
