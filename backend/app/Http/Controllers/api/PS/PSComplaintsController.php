@@ -72,10 +72,7 @@ class PSComplaintsController extends Controller
     $records = $query->get();
 
      if ($roleParent === 'lok-ayukt') {
-                        //  $q->where('rep.forward_to_lokayukt', $parentId);      
-     }
-       
-      $todayCount = DB::table('complaints')
+             $todayCount = DB::table('complaints')
                     ->where('in_draft', 0)
                     ->whereDate('created_at', today())
                      ->distinct('complaints.id')
@@ -101,7 +98,46 @@ class PSComplaintsController extends Controller
                     ->where('in_draft', 0)
                     ->where('fee_exempted', 0)
                      ->distinct('complaints.id')
+                    ->count();           
+     }elseif($roleParent === 'up-lok-ayukt'){
+         $todayCount = DB::table('complaints')
+             ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
+                    ->where('in_draft', 0)
+                    ->whereDate('rep.created_at', today())
+                     ->distinct('complaints.id')
+                     ->where('rep.forward_to_uplokayukt', $parentId)
                     ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('rep.created_at', '<', now()->subDays(7))
+                    ->where('rep.forward_to_uplokayukt', $parentId)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 0)
+                    ->where('rep.created_at', '<', now()->subDays(7))
+                    ->where('rep.forward_to_uplokayukt', $parentId)
+                     ->distinct('complaints.id')
+                    ->count();
+              
+                $feePending = DB::table('complaints')
+                ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('rep.forward_to_uplokayukt', $parentId)
+                    ->where('in_draft', 0)
+                    ->where('fee_exempted', 0)
+                     ->distinct('complaints.id')
+                    ->count();
+     }
+       
+     
 
 
     return response()->json([
