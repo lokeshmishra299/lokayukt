@@ -9,8 +9,10 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { toast, ToastContainer } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster } from "react-hot-toast";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
@@ -416,7 +418,7 @@ const ViewApprovedComplaints = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <Toaster position="top-right"  />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>

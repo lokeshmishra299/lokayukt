@@ -181,7 +181,7 @@ const ScanLetter = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster position="top-right"  />
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>

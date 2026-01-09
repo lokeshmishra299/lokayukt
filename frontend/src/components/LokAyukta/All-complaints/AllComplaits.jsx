@@ -3,7 +3,9 @@ import { IoSearchOutline } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { ToastContainer, toast } from "react-toastify";
+// import { ToastContainer, toast } from "react-toastify";
+import { toast, Toaster } from "react-hot-toast";
+
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdTime } from "react-icons/io";
 
@@ -292,18 +294,9 @@ const AllComplaints = () => {
 
   return (
     <>
-      <ToastContainer
+      <Toaster
         position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }}
+     
       />
 
       <div className="w-full h-screen flex bg-gray-50 rounded-md overflow-hidden">
@@ -420,13 +413,15 @@ const AllComplaints = () => {
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
-            {data?.length === 0 ? (
-              <div className="flex items-center justify-center h-full">
-                <h1 className="text-gray-600">No Data Found.</h1>
-              </div>
-            ) : isLoading ? (
+            {
+               isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">Loading...</h1>
+              </div>
+            ) :
+              filteredComplaints?.length === 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <h1 className="text-gray-600">No Data Found.</h1>
               </div>
             ) : isError ? (
               <div className="flex items-center justify-center h-full">

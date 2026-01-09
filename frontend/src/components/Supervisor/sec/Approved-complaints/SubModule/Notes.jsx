@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaSpinner, FaDownload, FaPrint, FaEye } from "react-icons/fa";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster } from "react-hot-toast";
+
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -665,7 +667,7 @@ const Notes = ({ complaint }) => {
       )}
 
       {/* TOAST */}
-      <ToastContainer />
+      <Toaster position="top-right" />
     </div>
   );
 };
