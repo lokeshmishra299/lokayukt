@@ -3,13 +3,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
+import { toast, Toaster } from "react-hot-toast";
+
+// import "react-toastify/dist/ReactToastify.css";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
-import MovementHistory  from "./SubModule/MovementHistory";
+import MovementHistory from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
-import { toast, Toaster } from "react-hot-toast";
-
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -260,6 +262,21 @@ const ViewApprovedComplaints = () => {
       staleTime: 0,
     });
 
+    // Pull backe he ye
+  const pullBackMutation = useMutation({
+    mutationFn: async ({ complaintId }) => {
+      return api.post(`/lokayukt/pull-back-by-lokayukt/${complaintId}`);
+    },
+    onSuccess: (res) => {
+      toast.success("Complaint pulled back successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Pull back failed");
+    },
+  });
+
 const markAsReceivedMutation = useMutation({
   mutationFn: async ({ complaintId, remarkData }) => {
     const res = await api.get(
@@ -273,7 +290,7 @@ const markAsReceivedMutation = useMutation({
   },
 
   onSuccess: (data) => {
-    toast.success(data?.message || "Marked as received successfully");
+    toast.success("Marked as received successfully");
     queryClient.invalidateQueries({
       queryKey: ["complaint-details", id],
     });
@@ -289,6 +306,7 @@ const markAsReceivedMutation = useMutation({
     );
   },
 });
+
 
   const dispose = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
@@ -381,8 +399,10 @@ const markAsReceivedMutation = useMutation({
         remarkData: remark,
       });
     } else if (confirmConfig.type === "pullback") {
-      // toast.success("Complaint Pulled Back Successfully");
-      setConfirmConfig({ open: false, type: null });
+     
+      pullBackMutation.mutate({
+        complaintId: id,
+      });
     }
   };
 
@@ -454,8 +474,9 @@ const markAsReceivedMutation = useMutation({
   }
 
   return (
-    <div className="w-full min-h-screen bg-gray-50">
+    <>
       <Toaster position="top-right"  />
+    <div className="w-full min-h-screen bg-gray-50">
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
@@ -658,7 +679,7 @@ const markAsReceivedMutation = useMutation({
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${
                     complaintData.fee_exempted === 1
-                      ? "bg-green-50 text-green-700 border-green-200"
+                    ? "bg-green-50 text-green-700 border-green-200"
                       : "bg-gray-50 text-gray-700 border-gray-200"
                   }`}
                 >
@@ -846,7 +867,7 @@ const markAsReceivedMutation = useMutation({
 
                   
                   <button
-                    onClick={handleforwardphysical}
+                  onClick={handleforwardphysical}
                     disabled={forwardComplaintMutation.isPending}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -965,14 +986,14 @@ const markAsReceivedMutation = useMutation({
                         </div>
                       ) : (
                         <SearchableDropdown
-                          options={
-                            Array.isArray(forwardOptionsData)
-                              ? forwardOptionsData
-                              : []
-                          }
-                          value={selectedForwardTo}
-                          onChange={(val) => setSelectedForwardTo(val)}
-                          placeholder="Select Officer..."
+                        options={
+                          Array.isArray(forwardOptionsData)
+                          ? forwardOptionsData
+                          : []
+                        }
+                        value={selectedForwardTo}
+                        onChange={(val) => setSelectedForwardTo(val)}
+                        placeholder="Select Officer..."
                         />
                       )}
 
@@ -1007,7 +1028,7 @@ const markAsReceivedMutation = useMutation({
                           rows={4}
                           placeholder="Enter your remark here..."
                           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                        />
+                          />
                       </div>
                     </>
                   )}
@@ -1029,27 +1050,29 @@ const markAsReceivedMutation = useMutation({
                   </button>
     
                   <button
-                    onClick={handleConfirmYes}
-                    disabled={
-                      markAsReceivedMutation.isPending ||
-                     forwardComplaintMutation.isPending ||
-                      (confirmConfig.type === "receive" && !remark.trim()) ||
-                      (confirmConfig.type === "forward" &&
-                        (!remark.trim() ||
-                          !selectedForwardTo ||
-                          isLoadingOptions ||
-                          isFetchingOptions))
-                    }
-                    className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                  >
-                    {markAsReceivedMutation.isPending ||
-                   forwardComplaintMutation.isPending
-                      ? "Sending..."
-                      : confirmConfig.type === "assign" ||
-                        confirmConfig.type === "pullback"
-                      ? "Yes"
-                      : "Send"}
-                  </button>
+  onClick={handleConfirmYes}
+  disabled={
+    markAsReceivedMutation.isPending ||
+    forwardComplaintMutation.isPending ||
+    pullBackMutation.isPending || 
+    (confirmConfig.type === "receive" && !remark.trim()) ||
+    (confirmConfig.type === "forward" &&
+      (!remark.trim() ||
+        !selectedForwardTo ||
+        isLoadingOptions ||
+        isFetchingOptions))
+  }
+  className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+>
+  {markAsReceivedMutation.isPending ||
+  forwardComplaintMutation.isPending ||
+  pullBackMutation.isPending // ✅ Ye check add kiya
+    ? "Processing..." // ✅ Ab yahan Processing dikhega
+    : confirmConfig.type === "assign" ||
+      confirmConfig.type === "pullback"
+    ? "Yes"
+    : "Send"}
+</button>
                 </div>
               </div>
             </div>
@@ -1108,7 +1131,7 @@ const markAsReceivedMutation = useMutation({
               complaintId: id,
               remarkData: remark,
             });
-
+            
             setshowDispatch(false);
           }}
           disabled={dispose.isPending || !remark.trim()}
@@ -1153,19 +1176,19 @@ const markAsReceivedMutation = useMutation({
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
-                      Name
+                  <p className="text-xs text-gray-500 uppercase font-semibold">
+                  Name
                     </p>
                     <p className="text-gray-800 font-medium">
                       {complaintData.complainants?.[0]?.complainant_name ||
                         "N/A"}
-                    </p>
+                        </p>
                   </div>
 
                   <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
-                      Father Name
-                    </p>
+                  <p className="text-xs text-gray-500 uppercase font-semibold">
+                  Father Name
+                  </p>
                     <p className="text-gray-800 font-medium">
                       {complaintData.complainants?.[0]?.father_name || "N/A"}
                     </p>
@@ -1182,15 +1205,15 @@ const markAsReceivedMutation = useMutation({
                   </div>
 
                   <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
+                  <p className="text-xs text-gray-500 uppercase font-semibold">
                       Occupation
                     </p>
                     <p className="text-gray-800 font-medium">
                       {complaintData.complainants?.[0]?.occupation || "N/A"}
-                    </p>
-                  </div>
+                      </p>
+                      </div>
                 </div>
-              </div>
+                </div>
             )} */}
 
               
@@ -1276,7 +1299,7 @@ const markAsReceivedMutation = useMutation({
                                     ? "bg-green-100 text-green-800"
                                     : "bg-gray-100 text-gray-600"
                                 }`}
-                              >
+                                >
                                 {comp.is_public_servant || "-"}
                               </span>
                             </td>
@@ -1324,7 +1347,7 @@ const markAsReceivedMutation = useMutation({
                       <div className="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
                         <h4 className="text-sm font-bold text-gray-700">
                           Respondent #{idx + 1}
-                        </h4>
+                          </h4>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                         <div>
@@ -1332,28 +1355,28 @@ const markAsReceivedMutation = useMutation({
                             NAME
                           </p>
                           <p className="text-sm text-gray-800">
-                            {resp?.respondent_name || "N/A"}
+                          {resp?.respondent_name || "N/A"}
                           </p>
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 font-semibold">
-                            DESIGNATION
+                          DESIGNATION
                           </p>
                           <p className="text-sm text-gray-800">
-                            {resp?.designation || "N/A"}
+                          {resp?.designation || "N/A"}
                           </p>
-                        </div>
+                          </div>
 
-                        <div className="sm:col-span-2">
+                          <div className="sm:col-span-2">
                           <p className="text-xs text-gray-500 font-semibold">
-                            ADDRESS
+                          ADDRESS
                           </p>
                           <p className="text-sm text-gray-800">
                             {resp?.current_address || "N/A"}
-                          </p>
+                            </p>
                         </div>
                       </div>
-                    </div>
+                      </div>
                   ))
                 ) : (
                   <div className="text-center py-8 bg-gray-50 rounded border border-dashed border-gray-300">
@@ -1361,7 +1384,7 @@ const markAsReceivedMutation = useMutation({
                       No respondent data available.
                     </p>
                   </div>
-                )}
+                  )}
               </div>
             )} */}
 
@@ -1461,7 +1484,7 @@ const markAsReceivedMutation = useMutation({
                       <tbody className="bg-white divide-y divide-gray-200">
                         {complaintData.support.map((item, idx) => (
                           <tr
-                            key={idx}
+                          key={idx}
                             className="hover:bg-blue-50 transition-colors"
                           >
                             <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
@@ -1489,7 +1512,7 @@ const markAsReceivedMutation = useMutation({
             )}
 
   {viewModalConfig.type === "witness" && (
-              <div className="w-full">
+    <div className="w-full">
                 {complaintData.witness && complaintData.witness.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -1549,6 +1572,7 @@ const markAsReceivedMutation = useMutation({
         </div>
       )}
     </div>
+      </>
   );
 };
 

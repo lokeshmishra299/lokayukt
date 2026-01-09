@@ -694,13 +694,16 @@ const SearchReports = () => {
         style={{ zIndex: 9999 }}
       />
 
-      <div className="max-w-full px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
+      <div className="max-w-full space-y-3">
         {/* ✅ UPDATED: Header with Export Button */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold pt-2 text-gray-900 truncate">
-              Search & Reports / खोज और रिपोर्ट
-            </h1>
+           
+            
+               <div>
+            <h1 className="text-xl font-bold text-gray-900">Search & Reports</h1>
+            <p className="text-sm text-gray-600">खोज और रिपोर्ट</p>
+          </div>
           </div>
           
           {/* ✅ Export button with functionality */}

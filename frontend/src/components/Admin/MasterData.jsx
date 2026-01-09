@@ -13,8 +13,10 @@ import {
   FaSpinner,
   FaExclamationTriangle
 } from 'react-icons/fa';
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster } from "react-hot-toast";
+
 
 // Import the separate Pagination component
 import Pagination from '../Pagination';
@@ -1143,23 +1145,19 @@ const MasterData = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen overflow-hidden">
-      <ToastContainer
+      <Toaster
         position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }}
+      
       />
       
-      <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className=" space-y-4 sm:space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Master Data / मास्टर डेटा</h1>
+          
+               <div>
+            <h1 className="text-xl font-bold text-gray-900">Master Data</h1>
+            <p className="text-sm text-gray-600">मास्टर डेटा</p>
+          </div>
+
           <button className="inline-flex items-center gap-2 px-3 py-2 border rounded-md text-sm hover:bg-gray-50">
             <FaDatabase className="w-4 h-4 text-slate-600" />
             <span className="hidden sm:inline">Backup Data</span>

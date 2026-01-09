@@ -262,6 +262,21 @@ const ViewAllComplaint = () => {
       staleTime: 0,
     });
 
+    // Pull backe he ye
+  const pullBackMutation = useMutation({
+    mutationFn: async ({ complaintId }) => {
+      return api.post(`/lokayukt/pull-back-by-lokayukt/${complaintId}`);
+    },
+    onSuccess: (res) => {
+      toast.success("Complaint pulled back successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Pull back failed");
+    },
+  });
+
 const markAsReceivedMutation = useMutation({
   mutationFn: async ({ complaintId, remarkData }) => {
     const res = await api.get(
@@ -384,8 +399,10 @@ const markAsReceivedMutation = useMutation({
         remarkData: remark,
       });
     } else if (confirmConfig.type === "pullback") {
-      // toast.success("Complaint Pulled Back Successfully");
-      setConfirmConfig({ open: false, type: null });
+     
+      pullBackMutation.mutate({
+        complaintId: id,
+      });
     }
   };
 
@@ -1033,27 +1050,29 @@ const markAsReceivedMutation = useMutation({
                   </button>
     
                   <button
-                    onClick={handleConfirmYes}
-                    disabled={
-                      markAsReceivedMutation.isPending ||
-                     forwardComplaintMutation.isPending ||
-                      (confirmConfig.type === "receive" && !remark.trim()) ||
-                      (confirmConfig.type === "forward" &&
-                        (!remark.trim() ||
-                          !selectedForwardTo ||
-                          isLoadingOptions ||
-                          isFetchingOptions))
-                    }
-                    className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                  >
-                    {markAsReceivedMutation.isPending ||
-                   forwardComplaintMutation.isPending
-                      ? "Sending..."
-                      : confirmConfig.type === "assign" ||
-                        confirmConfig.type === "pullback"
-                      ? "Yes"
-                      : "Send"}
-                  </button>
+  onClick={handleConfirmYes}
+  disabled={
+    markAsReceivedMutation.isPending ||
+    forwardComplaintMutation.isPending ||
+    pullBackMutation.isPending || 
+    (confirmConfig.type === "receive" && !remark.trim()) ||
+    (confirmConfig.type === "forward" &&
+      (!remark.trim() ||
+        !selectedForwardTo ||
+        isLoadingOptions ||
+        isFetchingOptions))
+  }
+  className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+>
+  {markAsReceivedMutation.isPending ||
+  forwardComplaintMutation.isPending ||
+  pullBackMutation.isPending // ✅ Ye check add kiya
+    ? "Processing..." // ✅ Ab yahan Processing dikhega
+    : confirmConfig.type === "assign" ||
+      confirmConfig.type === "pullback"
+    ? "Yes"
+    : "Send"}
+</button>
                 </div>
               </div>
             </div>
