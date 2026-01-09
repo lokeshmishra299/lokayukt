@@ -3,12 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
-import MovementHistory from "./SubModule/MovementHistory";
+import MovementHistory  from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -260,29 +260,35 @@ const ViewApprovedComplaints = () => {
       staleTime: 0,
     });
 
-  const markAsReceivedMutation = useMutation({
-    mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post(`/lokayukt/return-complain-by-lokayukt/${id}`, {
-        complaint_id: complaintId,
-        remark: remarkData,
-        sent_through_rk: sent_through_rk ? 1 : 0
+const markAsReceivedMutation = useMutation({
+  mutationFn: async ({ complaintId, remarkData }) => {
+    const res = await api.get(
+      `/lokayukt/return-complain-by-lokayukt/${id}`,{ params: { complaint_id: complaintId,
+          remark: remarkData,
+          sent_through_rk: sent_through_rk ? 1 : 0,
+        },
+      }
+    );
+    return res.data;
+  },
 
-      });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || "Marked as received successfully");
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-       setThroughRC(false);
-      setRemark("");
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to mark as received"
-      );
-    },
-  });
+  onSuccess: (data) => {
+    toast.success(data?.message || "Marked as received successfully");
+    queryClient.invalidateQueries({
+      queryKey: ["complaint-details", id],
+    });
+
+    setThroughRC(false);
+    setRemark("");
+    setConfirmConfig({ open: false, type: null });
+  },
+
+  onError: (error) => {
+    toast.error(
+      error?.response?.data?.message || "Failed to mark as received"
+    );
+  },
+});
 
   const dispose = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
@@ -449,7 +455,7 @@ const ViewApprovedComplaints = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right"  />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>

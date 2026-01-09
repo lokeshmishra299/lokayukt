@@ -4,7 +4,8 @@ import { FaTimes } from "react-icons/fa";
 import { CiLock } from "react-icons/ci";
 import { FiUpload } from "react-icons/fi";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
+// import { ToastContainer, toast } from "react-toastify";
+import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -285,7 +286,7 @@ const Documents = ({ complaint }) => {
         </div>
       </div>
 
-      <ToastContainer />
+      <Toaster position="top-right"  />
     </>
   );
 };
