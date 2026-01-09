@@ -84,9 +84,19 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
       const res = await api.post(`/supervisor/update-draft-letter/${draftId}`, payload, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-x
-      if (res.data.status) {
-        toast.success(res.data.message || "Draft Updated Successfully!");
+
+       // ✅ YEH FIX KARO:
+  if (res.data.status) {
+    toast.success(res.data.message || "Draft Updated Successfully!");
+    
+    // ✅ Automatic close ke liye
+    setTimeout(() => {
+      if (closeModal) closeModal(true); // ✅ true pass karo success ka indication
+    }, 1000); // 1 second delay
+    
+  }
+   if (res.data.status) {
+        // toast.success(res.data.message || "Draft Updated Successfully!");
         if (closeModal) closeModal(); 
       } else {
         if (res.data.errors) {
