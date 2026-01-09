@@ -36,7 +36,7 @@ const Notes = ({ complaint }) => {
 
   const [selectedDoc, setSelectedDoc] = useState("");
   const [pdfViewUrl, setPdfViewUrl] = useState(null); // Used for Add Note Preview
-  const [viewDocUrl, setViewDocUrl] = useState(null); // Used for List View Modal
+  const [viewDocUrl, setViewDocUrl] = useState(null); // Used for List View (Right Panel)
   const [loading, setLoading] = useState(false);
   const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
   const [errors, setErrors] = useState({});
@@ -61,12 +61,16 @@ const Notes = ({ complaint }) => {
   const fetchNotes = async () => {
     if (!complaint?.id) return;
     try {
+       setLoading(true);
       const res = await api.get(`/lokayukt/get-notes/${complaint.id}`);
       if (res.data.status) {
         setNotesList(res.data.data);
       }
     } catch (err) {
       console.log("Notes fetch error:", err);
+    }
+    finally{
+       setLoading(false);
     }
   };
 
@@ -227,13 +231,12 @@ const Notes = ({ complaint }) => {
     const docId = selectedDocObj ? selectedDocObj.id : "";
 
     const payload = {
-  complaint_id: complaint.id,
-  description: note,
-  d_id: docId,
-  range_from: pageRanges[0].from || null,
-  range_two: pageRanges[0].to || null,
-};
-
+      complaint_id: complaint.id,
+      description: note,
+      d_id: docId,
+      range_from: pageRanges[0].from,
+      range_two: pageRanges[0].to,
+    };
 
     try {
       const res = await api.post("/lokayukt/add-notes", payload);
@@ -264,18 +267,17 @@ const Notes = ({ complaint }) => {
     setPageRanges(updated);
   };
 
- const isFormValid = () => {
-  const contentState = editorState.getCurrentContent();
-  const hasText = contentState.hasText();
+  const isFormValid = () => {
+    const contentState = editorState.getCurrentContent();
+    const hasText = contentState.hasText();
 
-  return hasText && selectedDoc !== "";
-};
-
+    return hasText && selectedDoc !== "";
+  };
 
   const getDocName = (dId) => {
     if (!documents.length || !dId) return null;
     const doc = documents.find((d) => d.id === dId);
-    return doc ? (doc.title || doc.file) : null;
+    return doc ? doc.title || doc.file : null;
   };
 
   const getDocFilename = (dId) => {
@@ -299,103 +301,122 @@ const Notes = ({ complaint }) => {
         </button>
       </div>
 
-      {/* DISPLAY NOTES (Dynamic from API) */}
-      <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-        {notesList.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-4">
-            No notes available.
-          </p>
-        ) : (
-          notesList.map((item, index) => {
-            const referencedTitle = getDocName(item.d_id);
-            const referencedFile = getDocFilename(item.d_id);
+      {/* 50:50 SPLIT CONTAINER */}
+      <div className="flex flex-col md:flex-row gap-4">
+        
+        {/* LEFT SIDE: NOTES LIST (Takes 50% if viewed, 100% otherwise) */}
+        <div
+          className={`space-y-4 overflow-y-auto pr-2 custom-scrollbar transition-all duration-300 ${
+            viewDocUrl ? "w-full md:w-1/2 h-[600px]" : "w-full max-h-[600px]"
+          }`}
+        >
+          {
+           loading?
+          (
+            <p className="text-sm text-gray-500 text-center py-4">
+              Loading...
+            </p>
+          ) :
+          notesList.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-4">
+              No notes available.
+            </p>
+          ) : (
+            notesList.map((item, index) => {
+              const referencedTitle = getDocName(item.d_id);
+              const referencedFile = getDocFilename(item.d_id);
 
-            return (
-              <div
-                key={item.id || index}
-                className="border rounded-lg p-3 md:p-4 bg-gray-50"
-              >
-                <div className="flex flex-col md:flex-row justify-between md:items-start gap-2 md:gap-0">
-                  <p className="text-gray-800 font-medium">
-                     {item?.forwarded_by_name}
-                  </p>
-                  <p className="text-xs text-gray-400 whitespace-nowrap">
-                    {new Date(item.created_at).toLocaleString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-
+              return (
                 <div
-                  className="mt-2 whitespace-pre-wrap text-sm text-gray-700 overflow-x-auto"
-                  dangerouslySetInnerHTML={{ __html: item.description }}
-                />
-
-                {(referencedTitle || (item.range_from && item.range_two)) && (
-                  <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500">
-                    <span className="font-semibold">References:</span>
-                    <div className="mt-1 pl-2 border-l-2 border-blue-200 flex flex-col gap-1">
-                      {referencedTitle && (
-
-                        
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {/* <span>Doc: {referencedTitle}</span> */}
-                          <button
-                            onClick={() => handleViewDocFromNote(referencedFile)}
-                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded border border-blue-200 transition-colors"
-                          >
-                            <FaEye className="w-3 h-3" />
-                            <span className="font-medium">{referencedTitle}</span>
-                          </button>
-                        </div>
-                      )}
-                      {item.range_from && item.range_two && (
-                        <p>
-                          Pages: {item.range_from} – {item.range_two}
-                        </p>
-                      )}
-                    </div>
+                  key={item.id || index}
+                  className="border rounded-lg p-3 md:p-4 bg-gray-50"
+                >
+                  <div className="flex flex-col md:flex-row justify-between md:items-start gap-2 md:gap-0">
+                    <p className="text-gray-800 font-medium"> {item?.forwarded_by_name}</p>
+                    <p className="text-xs text-gray-400 whitespace-nowrap">
+                      {new Date(item.created_at).toLocaleString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
                   </div>
-                )}
-              </div>
-            );
-          })
-        )}
-      </div>
 
-      {/* STANDALONE VIEW MODAL (FOR LIST VIEW) */}
-      {viewDocUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col relative">
-            <div className="flex items-center justify-between p-4 border-b">
-              <h3 className="text-lg font-semibold">Document Viewer</h3>
+                  <div
+                    className="mt-2 whitespace-pre-wrap text-sm text-gray-700 overflow-x-auto"
+                    dangerouslySetInnerHTML={{ __html: item.description }}
+                  />
+
+                  {(referencedTitle || (item.range_from && item.range_two)) && (
+                    <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500">
+                      <span className="font-semibold">References:</span>
+                      <div className="mt-1 pl-2 border-l-2 border-blue-200 flex flex-col gap-1">
+                        {referencedTitle && (
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <button
+                              onClick={() => handleViewDocFromNote(referencedFile)}
+                              className={`flex items-center gap-1 px-2 py-0.5 rounded border transition-colors ${
+                                viewDocUrl && viewDocUrl.includes(referencedFile || '') 
+                                  ? "bg-blue-600 text-white border-blue-600"
+                                  : "text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border-blue-200"
+                              }`}
+                            >
+                              <FaEye className="w-3 h-3" />
+                              <span className="font-medium">
+                                {referencedTitle}
+                              </span>{" "}
+                              {item.range_from && item.range_two && (
+                                <p>
+                                  Pages: {item.range_from} – {item.range_two}
+                                </p>
+                              )}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* RIGHT SIDE: DOCUMENT VIEWER (Only shows when viewDocUrl is set) */}
+        {viewDocUrl && (
+          <div className="w-full md:w-1/2 h-[600px] bg-gray-100 rounded-lg border flex flex-col shadow-sm animate-fade-in">
+            {/* Viewer Header */}
+            <div className="flex items-center justify-between p-3 border-b bg-white rounded-t-lg">
+              <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                 Document View
+              </h3>
               <button
                 onClick={() => setViewDocUrl(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
+                className="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-red-500 rounded-full transition-colors"
+                title="Close Viewer"
               >
-                <FaTimes className="w-5 h-5" />
+                <FaTimes className="w-4 h-4" />
               </button>
             </div>
-            <div className="flex-1 bg-gray-100 p-2 overflow-hidden">
-              <iframe
-                src={`${viewDocUrl}#zoom=page-width`}
-                className="w-full h-full border-0 rounded bg-white shadow-sm"
-                title="PDF Viewer"
-              />
+            
+            {/* Viewer Iframe */}
+            <div className="flex-1 overflow-hidden relative bg-gray-200">
+                <iframe
+                  src={`${viewDocUrl}#zoom=page-width`}
+                  className="w-full h-full border-0"
+                  title="PDF Viewer"
+                />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* ADD NOTE MODAL (UNCHANGED) */}
       {open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 md:p-0">
           <div className="bg-white w-full md:w-11/12 h-full md:h-5/6 shadow-xl relative flex flex-col md:flex-row rounded-md overflow-hidden">
-            
             <button
               className="absolute top-2 right-2 md:top-4 md:right-4 p-2 bg-white/80 hover:bg-gray-100 rounded-full z-10"
               onClick={() => setOpen(false)}
@@ -404,7 +425,9 @@ const Notes = ({ complaint }) => {
             </button>
 
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
-              <h2 className="text-lg font-semibold mb-4 md:mb-6">Add Note / Noting</h2>
+              <h2 className="text-lg font-semibold mb-4 md:mb-6">
+                Add Note / Noting
+              </h2>
 
               <label className="block text-sm font-medium mb-2">
                 Note Content <span className="text-red-500">*</span>
@@ -460,12 +483,14 @@ const Notes = ({ complaint }) => {
                     <option value="">Select a document...</option>
                     {documents.map((doc) => (
                       <option key={doc.id} value={doc.file}>
-                        {doc.title ||  "NA"}
+                        {doc.title || "NA"}
                       </option>
                     ))}
                   </select>
                   {errors.d_id && (
-                    <p className="text-red-500 text-xs mt-1">{errors.d_id[0]}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.d_id[0]}
+                    </p>
                   )}
                 </div>
 
@@ -477,7 +502,9 @@ const Notes = ({ complaint }) => {
                     <input
                       type="number"
                       className={`w-20 md:w-20 border rounded-md p-2 ${
-                        errors.range_from ? "border-red-500" : "border-gray-300"
+                        errors.range_from
+                          ? "border-red-500"
+                          : "border-gray-300"
                       }`}
                       placeholder="From"
                       value={pageRanges[0].from}
@@ -488,7 +515,9 @@ const Notes = ({ complaint }) => {
                     <input
                       type="number"
                       className={`w-20 md:w-20 border rounded-md p-2 ${
-                        errors.range_two ? "border-red-500" : "border-gray-300"
+                        errors.range_two
+                          ? "border-red-500"
+                          : "border-gray-300"
                       }`}
                       placeholder="To"
                       value={pageRanges[0].to}
@@ -497,11 +526,9 @@ const Notes = ({ complaint }) => {
                       }
                     />
                   </div>
-                  {/* {(errors.range_from || errors.range_two) && (
-                    <p className="text-red-500 text-xs mt-1">
-                      Required
-                    </p>
-                  )} */}
+                  {(errors.range_from || errors.range_two) && (
+                    <p className="text-red-500 text-xs mt-1">Required</p>
+                  )}
                 </div>
               </div>
 
@@ -541,7 +568,7 @@ const Notes = ({ complaint }) => {
                   />
                 ) : (
                   <p className="text-gray-400 text-sm text-center px-4">
-                    Select a document to preview PDF <br/>
+                    Select a document to preview PDF <br />
                     (Preview appears here)
                   </p>
                 )}
@@ -551,11 +578,14 @@ const Notes = ({ complaint }) => {
         </div>
       )}
 
-      {/* SUCCESS POPUP */}
+      {/* SUCCESS POPUP (UNCHANGED) */}
       {showSuccess && (
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl my-auto">
-            <div ref={popupRef} className="bg-white rounded-lg overflow-hidden">
+            <div
+              ref={popupRef}
+              className="bg-white rounded-lg overflow-hidden"
+            >
               <div className="px-4 py-3 md:px-6 md:py-4 border-b flex flex-wrap justify-between items-center bg-gray-100 pdf-hide-section gap-2">
                 <p className="text-sm font-semibold text-gray-800">
                   Preview Note
@@ -575,7 +605,8 @@ const Notes = ({ complaint }) => {
                     className="p-2 rounded hover:bg-gray-200 text-blue-600 flex items-center gap-1 text-xs font-medium"
                     title="Download as PDF"
                   >
-                    <FaDownload /> <span className="hidden sm:inline">Download</span>
+                    <FaDownload />{" "}
+                    <span className="hidden sm:inline">Download</span>
                   </button>
 
                   <button

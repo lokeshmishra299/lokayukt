@@ -203,13 +203,11 @@ const handleSendToUPLokayukt = async () => {
         return complaint.status === selectedStatus;
       });
     }
-
-    if (selectedFeeStatus !== "") {
+ if (selectedFeeStatus !== "") {
       filtered = filtered.filter((complaint) => {
-        return complaint.fee_status === selectedFeeStatus;
+          return complaint.fee_exempted?.toString() === selectedFeeStatus;
       });
     }
-
     if (selectedCaseType !== "") {
       filtered = filtered.filter((complaint) => {
         return complaint.complaint_type_id === parseInt(selectedCaseType);
@@ -404,12 +402,12 @@ const handleSendToUPLokayukt = async () => {
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}>
                   <option value="">Status: All</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="disposed">Disposed Accepted</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="investigating">Under Investigation</option>
-                  <option value="pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Disposed Accepted">Disposed Accepted</option>
+                  <option value="Resolved">Resolved</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Under Investigation">Under Investigation</option>
+                  <option value="Pending">Pending</option>
                 </select>
 
                 <select
@@ -432,9 +430,10 @@ const handleSendToUPLokayukt = async () => {
                   onChange={(e) => setSelectedFeeStatus(e.target.value)}
                 >
                   <option value="">Fee Status: All</option>
-                  <option value="paid">Paid</option>
-                  <option value="pending">Pending</option>
-                  <option value="exempted">Exempted</option>
+                   <option value="0">Pending</option>
+                  <option value="2">Partial</option>
+                  <option value="1">Paid</option>
+                  <option value="3">Exempted</option>
                 </select>
 
                 <select
@@ -470,17 +469,19 @@ const handleSendToUPLokayukt = async () => {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-          {allComplaints.length == 0 ? (
+          {
+                 isLoading ? (
+                 <div className="flex items-center justify-center h-full">
+                <h1 className="text-gray-600">Loading...</h1>
+              </div>
+            ) :
+          allComplaints.length == 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
             ) :
             
-             isLoading ? (
-                 <div className="flex items-center justify-center h-full">
-                <h1 className="text-gray-600">Loading...</h1>
-              </div>
-            ) :
+       
             
              isError ? (
               <div className="flex items-center justify-center h-full">
@@ -570,13 +571,13 @@ const handleSendToUPLokayukt = async () => {
     }
   `}
 >
-  {complaint.fee_exempted === 0
+  {complaint.fee_exempted === 3
     ? "Exempted"
     : complaint.fee_exempted === 1
     ? "Paid"
     : complaint.fee_exempted === 2
     ? "Partial"
-    : ""}
+    : "Pending"}
 </span>
 
 
@@ -732,7 +733,7 @@ const handleSendToUPLokayukt = async () => {
       )} */}
 
 
-      {isConfirmModalOpen && roleParent !== "lok-ayukt" && (
+      {isConfirmModalOpen  && (
   <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center">
     <div className="bg-white rounded-xl shadow-2xl w-[440px] relative">
 

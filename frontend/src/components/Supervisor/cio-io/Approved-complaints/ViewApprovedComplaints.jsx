@@ -235,7 +235,7 @@ const ViewApprovedComplaints = () => {
           }
   
           //  Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
-          const res = await api.get("/supervisor/get-upsupervisor");
+          const res = await api.get("/supervisor/get-user-with-ps");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
   
@@ -253,7 +253,6 @@ const ViewApprovedComplaints = () => {
       const res = await api.post("/supervisor/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
-         sent_through_rk: sent_through_rk ? 1 : 0
       });
       return res.data;
     },
@@ -293,9 +292,11 @@ const ViewApprovedComplaints = () => {
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-supervisor/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-cio/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
+         sent_through_rk: sent_through_rk ? 1 : 0
+
         });
         return res.data;
       },
@@ -326,6 +327,7 @@ const ViewApprovedComplaints = () => {
       markAsReceivedMutation.mutate({
         complaintId: id,
         remarkData: remark,
+
       });
     } else if (confirmConfig.type === "forward") {
       if (!selectedForwardTo || !remark.trim()) {
@@ -777,6 +779,12 @@ const ViewApprovedComplaints = () => {
                       ? "Processing..."
                       : "Return with Remarks"}
                   </button>
+                  {
+  complaintData.approved_rejected_by_cio_io == "1" ? (
+                    <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                      Forwarded
+                    </span>
+                  ) : 
 
                   <button
                     onClick={handleforwardphysical}
@@ -787,6 +795,7 @@ const ViewApprovedComplaints = () => {
                       ? "Processing..."
                       : "Send / Mark"}
                   </button>
+}
                 </div>
               </div>
             </div>

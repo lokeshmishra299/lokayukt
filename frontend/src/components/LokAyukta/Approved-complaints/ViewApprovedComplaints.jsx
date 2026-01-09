@@ -65,6 +65,7 @@ const SearchableDropdown = ({
     setSearchTerm("");
   };
 
+  
   return (
     <div className="relative" ref={wrapperRef}>
       <div
@@ -136,9 +137,16 @@ const SearchableDropdown = ({
   );
 };
 
-const ViewAllComplaint = () => {
+const ViewApprovedComplaints = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+
+  
+
+
+
+  
+
 
     const capitalizeFirstLetter = (text = "") => {
   if (!text) return "N/A";
@@ -151,13 +159,20 @@ const ViewAllComplaint = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
+  const [showDispatch, setshowDispatch] = useState(false);
+  const [sent_through_rk, setThroughRC] = useState(false);
 
+  function diposeShow (){
+    setshowDispatch(true)
+  }
+  function closePoup (){
+    setshowDispatch(false)
+  }
 
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
     type: null,
   });
-
 
   const [viewModalConfig, setViewModalConfig] = useState({
     open: false,
@@ -226,13 +241,12 @@ const ViewAllComplaint = () => {
       queryKey: ["lokayukt-options", forwardType], // 
       queryFn: async () => {
         try {
-   
+          //  Send To My Pool  API: /lokayukt/get-users
           if (forwardType === "self") {
             const res = await api.get("/lokayukt/get-users");
             return res.data?.data || res.data || [];
           }
   
-       
           const res = await api.get("/lokayukt/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
@@ -248,14 +262,38 @@ const ViewAllComplaint = () => {
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post("/lokayukt/received-physical", {
+      const res = await api.post(`/lokayukt/return-complain-by-lokayukt/${id}`, {
+        complaint_id: complaintId,
+        remark: remarkData,
+        sent_through_rk: sent_through_rk ? 1 : 0
+
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Marked as received successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+       setThroughRC(false);
+      setRemark("");
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to mark as received"
+      );
+    },
+  });
+
+  const dispose = useMutation({
+    mutationFn: async ({ complaintId, remarkData }) => {
+      const res = await api.post(`/lokayukt/dispose-complain/${id}`, {
         complaint_id: complaintId,
         remark: remarkData,
       });
       return res.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message || "Marked as received successfully");
+      toast.success( "Dispose successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setRemark("");
       setConfirmConfig({ open: false, type: null });
@@ -293,6 +331,7 @@ const ViewAllComplaint = () => {
         const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
+          sent_through_rk: sent_through_rk ? 1 : 0
         });
         return res.data;
       },
@@ -300,6 +339,7 @@ const ViewAllComplaint = () => {
         toast.success(data.message || "Forwarded successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
         setRemark("");
+        setThroughRC(false)
         setSelectedForwardTo("");
         setConfirmConfig({ open: false, type: null });
       },
@@ -345,6 +385,10 @@ const ViewAllComplaint = () => {
     setRemark("");
     setSelectedForwardTo("");
   };
+
+
+
+  
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -429,9 +473,10 @@ const ViewAllComplaint = () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_lokayukt == 1
-                      ? "In Motion – With Lokayukta"
-                      : "Received - Record Section" }
+                    {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                   </span>
                 </div>
               </div>
@@ -450,9 +495,10 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_lokayukt == 1
-                      ? "In Motion – With Lokayukta"
-                      : "Received - Record Section" }
+                         {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                     </span>
 
                     <button
@@ -465,7 +511,6 @@ const ViewAllComplaint = () => {
                 </div>
               </div>
 
-              {/*DESCRIPTION */}
             
               <p className="text-[14px] text-black font-semibold uppercase my-2">
                 {/* Description:{" "} */}
@@ -488,10 +533,8 @@ const ViewAllComplaint = () => {
 
               </p> */}
 
-              {/*  DETAILS GRID  */}
                           <div className="space-y-3 mb-6">
   
-
   <div>
     <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
       मुख्य परिवादी का विवरण 
@@ -566,7 +609,6 @@ const ViewAllComplaint = () => {
     </div>
   </div>
 
-  {/*  अन्य विवरण  */}
   <div>
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Relation */}
@@ -605,7 +647,7 @@ const ViewAllComplaint = () => {
 
 </div>
 
-              {/* Fee Status and Fee Type Section  */}
+              {/* Fee Status and Fee Type Section */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${
@@ -763,7 +805,22 @@ const ViewAllComplaint = () => {
                   </button>
                 </div>
 
+
+                
+
                 <div className="flex gap-2">
+
+
+                    <button
+  onClick={diposeShow}
+  disabled={dispose.isPending}
+  className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+>
+  {dispose.isPending ? "Processing..." : "Dispose"}
+</button>
+
+                   
+
                   <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
@@ -774,6 +831,14 @@ const ViewAllComplaint = () => {
                       : "Return with Remarks"}
                   </button>
 
+{
+  complaintData.approved_rejected_by_lokayukt == "1" ? (
+                    <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                      Forwarded
+                    </span>
+                  ) : 
+
+                  
                   <button
                     onClick={handleforwardphysical}
                     disabled={forwardComplaintMutation.isPending}
@@ -783,6 +848,9 @@ const ViewAllComplaint = () => {
                       ? "Processing..."
                       : "Send / Mark"}
                   </button>
+
+
+}
                 </div>
               </div>
             </div>
@@ -797,9 +865,19 @@ const ViewAllComplaint = () => {
         )}
       </div>
 
+
+      {/* {
+        showDispatch && (
+          <div>
+            <h1>djudjdjj</h1>
+          </div>
+        )
+      } */}
+
      {confirmConfig.open && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
               <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+                {/* Close Button */}
                 <button
                   onClick={handleConfirmNo}
                   disabled={
@@ -815,18 +893,16 @@ const ViewAllComplaint = () => {
                 {/* Title */}
                 <h3 className="text-lg font-semibold mb-4 pr-8">
                   {confirmConfig.type === "receive"
-                    ? "Mark as Received?"
+                    ? "Return with Remarks?"
                     : confirmConfig.type === "forward"
                     ? "Send"
                     : confirmConfig.type === "pullback"
-                    ? "Pull Back Complaint?"
+                    ? "Are you sure you want to pull back?"
                     : "Assign to Yourself?"}
                 </h3>
     
-             
                 {confirmConfig.type === "forward" && (
                   <>
-                
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Forward Type <span className="text-red-500">*</span>
@@ -845,7 +921,7 @@ const ViewAllComplaint = () => {
                             className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                           />
                           <span className="ml-2 text-sm text-gray-700 font-medium">
-                            Send To My Pool
+                            Send Direct
                           </span>
                         </label>
                         <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
@@ -867,7 +943,6 @@ const ViewAllComplaint = () => {
                       </div>
                     </div>
     
-                 
                     <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
@@ -894,15 +969,29 @@ const ViewAllComplaint = () => {
                           placeholder="Select Officer..."
                         />
                       )}
+
+                          
+                 
                     </div>
                   </>
                 )}
-          
-    
+
+{confirmConfig.type === "forward" && (
+  <label className="flex items-center gap-2 cursor-pointer mt-2">
+    <input
+      type="checkbox"
+      checked={sent_through_rk}
+      onChange={(e) => setThroughRC(e.target.checked)}
+      className="w-4 h-4"
+    />
+    <span className="text-sm">Checkbox If Send through RC</span>
+  </label>
+)}
+
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
                     <>
-                      <div className="mb-5">
+                      <div className="mb-5 mt-3">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Remark <span className="text-red-500">*</span>
                         </label>
@@ -959,6 +1048,73 @@ const ViewAllComplaint = () => {
               </div>
             </div>
           )}
+
+
+          {showDispatch && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+      
+      {/* Close Button */}
+      <button
+        onClick={closePoup}
+        disabled={markAsReceivedMutation.isPending}
+        className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <FaTimes className="w-5 h-5 text-gray-600" />
+      </button>
+
+      {/* Title */}
+      <h3 className="text-lg font-semibold mb-4 pr-8">
+        Dispose Complaint
+      </h3>
+
+      {/* Remark */}
+      <div className="mb-5">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Disposal Remark <span className="text-red-500">*</span>
+        </label>
+        <textarea
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          rows={4}
+          placeholder="Enter disposal remark..."
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={closePoup}
+          className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            if (!remark.trim()) {
+              toast.error("Please enter disposal remark");
+              return;
+            }
+
+            dispose.mutate({
+              complaintId: id,
+              remarkData: remark,
+            });
+
+            setshowDispatch(false);
+          }}
+          disabled={dispose.isPending || !remark.trim()}
+          className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {dispose.isPending ? "Disposing..." : "Dispose Now"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
       {viewModalConfig.open && (
         <div
@@ -1260,7 +1416,6 @@ const ViewAllComplaint = () => {
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.officer_category || "-"}
                             </td>
-                            {/* Address Column: whitespace-normal ensures text wrapping */}
                             <td className="px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {resp.current_address || "-"}
                             </td>
@@ -1391,4 +1546,4 @@ const ViewAllComplaint = () => {
   );
 };
 
-export default ViewAllComplaint;
+export default ViewApprovedComplaints;

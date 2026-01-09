@@ -475,7 +475,7 @@ function takefile(){
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} closeButton={true} draggable={false} pauseOnHover={true}  />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
@@ -873,7 +873,7 @@ function takefile(){
                       : "Return with Remarks"}
                   </button>
 
-                    {complaintData.approved_rejected_by_ro_aro == "1" ? (
+                    {complaintData.approved_rejected_by_sec == "1" ? (
                     <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
                       Forwarded
                     </span>

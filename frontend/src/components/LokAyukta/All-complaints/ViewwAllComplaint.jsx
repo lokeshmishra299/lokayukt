@@ -262,7 +262,7 @@ const ViewAllComplaint = () => {
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post("/lokayukt/received-physical", {
+      const res = await api.post(`/lokayukt/return-complain-by-lokayukt/${id}`, {
         complaint_id: complaintId,
         remark: remarkData,
         sent_through_rk: sent_through_rk ? 1 : 0

@@ -19,13 +19,10 @@ import MovementHistory from "./SubModule/MovementHistory";
 import HideModule from "./SubModule/HideModule";
 import Fees from "./SubModule/Fees";
 
-
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
 const token = localStorage.getItem("access_token");
-const UserID = localStorage.getItem("UserID")
-
-
+const UserID = localStorage.getItem("UserID");
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -148,14 +145,14 @@ const SearchableDropdown = ({
   );
 };
 
-const ViewAllComplaint = () => {
+const ViewApprovedComplaints = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-    const capitalizeFirstLetter = (text = "") => {
-  if (!text) return "N/A";
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
+  const capitalizeFirstLetter = (text = "") => {
+    if (!text) return "N/A";
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  };
 
   const queryClient = useQueryClient();
 
@@ -178,6 +175,8 @@ const ViewAllComplaint = () => {
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
   const [forwardType, setForwardType] = useState("self");
   const [assinedMyself, setassinedMyself] = useState(false);
+
+  const [sent_through_rk, setSentThroughRK] = useState(false);
 
   const {
     data: complaintData,
@@ -279,6 +278,7 @@ const ViewAllComplaint = () => {
       const res = await api.post(`/ps/forward-complain-by-ps/${complaintId}`, {
         forward_to: forwardTo,
         remark: remarkData,
+        sent_through_rk: sent_through_rk ? 1 : 0,
       });
       return res.data;
     },
@@ -454,17 +454,104 @@ const ViewAllComplaint = () => {
                 <h2 className="text-lg font-semibold text-gray-800 mb-2">
                   File No. {complaintData.complain_no}
                 </h2>
-                <div className="mb-3">
+                {/* <div className="mb-3">
                   <span
-                    className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
-                      complaintData.status
-                    )}`}
-                  >
-                    {complaintData.approved_rejected_by_lokayukt == 0
-                      ? "Received - Record Section"
-                      : "In Motion – With Lokayukta"}
-                  </span>
-                </div>
+  className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
+    complaintData.status
+  )}`}
+>
+  {complaintData.approved_rejected_by_lokayukt === 1
+    ? "In Motion – With UpLokayukta"
+    : "In Motion – With Lokayukta"}
+</span>
+
+                </div> */}
+
+                {/* मोबाइल वर्जन */}
+{/* Mobile Header */}
+<div className="md:hidden mb-4">
+  <div className="flex justify-between items-center mb-3">
+    <button
+      onClick={() => navigate(-1)}
+      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+    >
+      <IoMdArrowBack className="w-4 h-4" /> Back
+    </button>
+  </div>
+  <h2 className="text-lg font-semibold text-gray-800 mb-2">
+    File No. {complaintData.complain_no}
+  </h2>
+  <div className="mb-3">
+    <span
+      className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
+        complaintData.status
+      )}`}
+    >
+      {complaintData.approved_rejected_by_lokayukt == 0
+        ? "Received - Record Section"
+        : "In Motion – With Lokayukta"}
+    </span>
+  </div>
+</div>
+
+{/* Desktop Header */}
+<div className="hidden md:block">
+  <div className="flex justify-between items-start mb-3">
+    <h2 className="text-xl font-semibold text-gray-800">
+      File No. {complaintData.complain_no}(
+      <span className="text-blue-600">NEW CASE</span>)
+    </h2>
+
+    <div className="flex gap-2">
+      <span
+        className={`px-3 py-1 rounded ${getStatusColor(
+          complaintData.status
+        )}`}
+      >
+        {complaintData.approved_rejected_by_lokayukt == 0
+          ? "Received - Record Section"
+          : "In Motion – With Lokayukta"}
+      </span>
+
+      <button
+        onClick={() => navigate(-1)}
+        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+      >
+        <IoMdArrowBack className="w-4 h-4" /> Back
+      </button>
+    </div>
+  </div>
+</div>
+
+{/* डेस्कटोप वर्जन */}
+<div className="hidden md:block">
+  <div className="flex justify-between items-start mb-3">
+    <h2 className="text-xl font-semibold text-gray-800">
+      File No. {complaintData.complain_no}(
+      <span className="text-blue-600">NEW CASE</span>)
+    </h2>
+
+    <div className="flex gap-2">
+      <span
+        className={`px-3 py-1 rounded ${getStatusColor(
+          complaintData.status
+        )}`}
+      >
+        {complaintData.approved_rejected_by_lokayukt === 1
+          ? "In Motion – With UpLokayukta"
+
+          : "In Motion - With Lokayukta"}
+      </span>
+
+      <button
+        onClick={() => navigate(-1)}
+        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+      >
+        <IoMdArrowBack className="w-4 h-4" /> Back
+      </button>
+    </div>
+  </div>
+</div>
               </div>
 
               {/* Desktop Header */}
@@ -481,8 +568,8 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                      {complaintData.approved_rejected_by_lokayukt == 0
-                        ? "Received - Record Section"
+                      {complaintData.approved_rejected_by_lokayukt === 1
+                        ? "In Motion – With UpLokayukta"
                         : "In Motion – With Lokayukta"}
                     </span>
 
@@ -505,7 +592,7 @@ const ViewAllComplaint = () => {
                     "No detailed description available for this complaint."}
                 </span>
               </p>
-{/* 
+              {/* 
               <p className="text-[14px] text-black font-semibold uppercase mb-1">
               
                 विलंब का कारण:{"  "}
@@ -515,122 +602,135 @@ const ViewAllComplaint = () => {
               </p> */}
 
               {/* ===== DETAILS GRID (Hindi) ===== */}
-                      <div className="space-y-3 mb-6">
-  
-  {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
-  <div>
-    <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
-      मुख्य परिवादी का विवरण 
-    </h3>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Name */}
-      <div>
-        <p className="text-[14px] text-black font-semibold uppercase mb-1">
-           नाम
-        </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_name) || "N/A"}
-        </p>
-      </div>
+              <div className="space-y-3 mb-6">
+                {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
+                <div>
+                  <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
+                    मुख्य परिवादी का विवरण
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Name */}
+                    <div>
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                        नाम
+                      </p>
+                      <p className="text-gray-800 text-sm">
+                        {capitalizeFirstLetter(
+                          complaintData.main_complainant_name
+                        ) || "N/A"}
+                      </p>
+                    </div>
 
-      {/* Father's Name */}
-      <div>
-        <p className="text-[14px] text-black font-semibold uppercase mb-1">
-          पिता का नाम
-        </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_father) || "N/A"}
-        </p>
-      </div>
+                    {/* Father's Name */}
+                    <div>
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                        पिता का नाम
+                      </p>
+                      <p className="text-gray-800 text-sm">
+                        {capitalizeFirstLetter(
+                          complaintData.main_complainant_father
+                        ) || "N/A"}
+                      </p>
+                    </div>
 
-      {/* District */}
-      <div>
-        <p className="text-[14px] text-black font-semibold uppercase mb-1">
-        जिला
-        </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_district) || "N/A"}
-        </p>
-      </div>
-    </div>
-  </div>
+                    {/* District */}
+                    <div>
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                        जिला
+                      </p>
+                      <p className="text-gray-800 text-sm">
+                        {capitalizeFirstLetter(
+                          complaintData.main_complainant_district
+                        ) || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-  {/* ----------------- मुख्य प्रतिवादी का विवरण ----------------- */}
-  <div>
-    <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
-      मुख्य प्रतिवादी का विवरण
-    </h3>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Name */}
-      <div>
-        <p className="text-[14px] text-black font-semibold uppercase mb-1">
-          नाम
-        </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondent_name) || "N/A"}
-        </p>
-      </div>
+                {/* ----------------- मुख्य प्रतिवादी का विवरण ----------------- */}
+                <div>
+                  <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
+                    मुख्य प्रतिवादी का विवरण
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Name */}
+                    <div>
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                        नाम
+                      </p>
+                      <p className="text-gray-800 text-sm">
+                        {capitalizeFirstLetter(
+                          complaintData.main_respondent_name
+                        ) || "N/A"}
+                      </p>
+                    </div>
 
-      {/* Designation */}
-      <div>
-        <p className="text-[14px] text-black font-semibold uppercase mb-1">
-         पद
-        </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondent_designation) || "N/A"}
-        </p>
-      </div>
+                    {/* Designation */}
+                    <div>
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                        पद
+                      </p>
+                      <p className="text-gray-800 text-sm">
+                        {capitalizeFirstLetter(
+                          complaintData.main_respondent_designation
+                        ) || "N/A"}
+                      </p>
+                    </div>
 
-      {/* District */}
-      <div>
-        <p className="text-[14px] text-black font-semibold uppercase mb-1">
-         जिला
-        </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondant_district) || "N/A"}
-        </p>
-      </div>
-    </div>
-  </div>
+                    {/* District */}
+                    <div>
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                        जिला
+                      </p>
+                      <p className="text-gray-800 text-sm">
+                        {capitalizeFirstLetter(
+                          complaintData.main_respondant_district
+                        ) || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-  {/* ----------------- अन्य विवरण ----------------- */}
-  <div>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Relation */}
-      <div>
-        <p className="text-[14px] text-black font-semibold uppercase mb-1">
-          व्यक्ति से संबंध
-        </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.relation_with_person) || "NA"}
-        </p>
-      </div>
+                {/* ----------------- अन्य विवरण ----------------- */}
+                <div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Relation */}
+                    <div>
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                        व्यक्ति से संबंध
+                      </p>
+                      <p className="text-gray-800 text-sm">
+                        {capitalizeFirstLetter(
+                          complaintData.relation_with_person
+                        ) || "NA"}
+                      </p>
+                    </div>
 
-      {/* Cause Date */}
-      {complaintData.dob && (
-        <div>
-          <p className="text-[14px] text-black font-semibold uppercase mb-1">
-            कार्यवाही तिथि
-          </p>
-          <p className="text-gray-800 text-sm">
-            {capitalizeFirstLetter(complaintData.cause_date) || "NA"}
-          </p>
-        </div>
-      )}
+                    {/* Cause Date */}
+                    {complaintData.dob && (
+                      <div>
+                        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                          कार्यवाही तिथि
+                        </p>
+                        <p className="text-gray-800 text-sm">
+                          {capitalizeFirstLetter(complaintData.cause_date) ||
+                            "NA"}
+                        </p>
+                      </div>
+                    )}
 
-      {/* Category */}
-      <div>
-        <p className="text-[14px] text-black font-semibold uppercase mb-1">
-          श्रेणी
-        </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.category) || "N/A"}
-        </p>
-      </div>
-    </div>
-  </div>
-
-</div>
+                    {/* Category */}
+                    <div>
+                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                        श्रेणी
+                      </p>
+                      <p className="text-gray-800 text-sm">
+                        {capitalizeFirstLetter(complaintData.category) || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
               {/* Fee Status and Fee Type Section (Hindi) */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
@@ -641,7 +741,13 @@ const ViewAllComplaint = () => {
                   }`}
                 >
                   शुल्क का प्रकार:{" "}
-                  {complaintData.fee_exempted == 0 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "NA"}
+                  {complaintData.fee_exempted == 0
+                    ? "Exempted"
+                    : complaintData.fee_exempted == 2
+                    ? "Partial"
+                    : complaintData.fee_exempted == 1
+                    ? "Paid"
+                    : "NA"}
                 </span>
                 <span
                   className={`px-3 py-1.5 rounded text-xs border ${
@@ -651,8 +757,10 @@ const ViewAllComplaint = () => {
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                                         स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
-
+                  स्थिति:{" "}
+                  {complaintData.fee_approved_by_lokayukt == 1
+                    ? "Approved"
+                    : "Awaiting approval"}
                 </span>
                 {complaintData.challan_no && (
                   <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200">
@@ -713,84 +821,76 @@ const ViewAllComplaint = () => {
               </div>
             </div>
 
-
-
-{/* Mobile Phone View */}
-            {
-              complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ?
-                <div className="md:hidden border-b bg-white">
-              <div className="flex flex-col">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => {
-                      setActiveTab(tab);
-                      setShowMobileTabs(false);
-                    }}
-                    className={`py-3 px-4 text-left text-sm font-medium ${
-                      activeTab === tab
-                        ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    {tab === "fee" && "Fee Verification"}
-                    {tab === "documents" && "Documents"}
-                    {tab === "notings" && "Notes / Notings"}
-                    {tab === "movement" && "Movement History"}
-                  </button>
-                ))}
-              </div>
-            </div>
-            :
-            <div>
-
-            </div>
-            }
-
-{/* Desktop View */}
-   {
-     complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ?
-    <div className="hidden md:flex border-b px-6">
-              <div className="flex gap-6 overflow-x-auto">
-                {["fee","documents", "notings", "movement"].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`pb-3 pt-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
-                      activeTab === tab
-                        ? "text-blue-600"
-                        : "text-gray-600 hover:text-gray-800"
-                    }`}
-                  >
+            {/* Mobile Phone View */}
+            {complaintData.assign_to_ps == UserID ||
+            complaintData.assign_to_ps == null ? (
+              <div className="md:hidden border-b bg-white">
+                <div className="flex flex-col">
+                  {["fee", "documents", "notings", "movement"].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => {
+                        setActiveTab(tab);
+                        setShowMobileTabs(false);
+                      }}
+                      className={`py-3 px-4 text-left text-sm font-medium ${
+                        activeTab === tab
+                          ? "bg-blue-50 text-blue-600 border-r-4 border-blue-600"
+                          : "text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
                       {tab === "fee" && "Fee Verification"}
-                    {tab === "documents" && "Documents"}
-                    {tab === "notings" && "Notes / Notings"}
-                    {tab === "movement" && "Movement History"}
-                    {activeTab === tab && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-                    )}
-                  </button>
-                ))}
+                      {tab === "documents" && "Documents"}
+                      {tab === "notings" && "Notes / Notings"}
+                      {tab === "movement" && "Movement History"}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-            :
-            <div>
+            ) : (
+              <div>
+                <HideModule />
+              </div>
+            )}
 
-            </div>
-
-   }
-          
-
-      
-      
+            {/* Desktop View */}
+            {complaintData.assign_to_ps == UserID ||
+            complaintData.assign_to_ps == null ? (
+              <div className="hidden md:flex border-b px-6">
+                <div className="flex gap-6 overflow-x-auto">
+                  {["fee", "documents", "notings", "movement"].map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`pb-3 pt-3 text-sm font-medium transition-colors relative whitespace-nowrap ${
+                        activeTab === tab
+                          ? "text-blue-600"
+                          : "text-gray-600 hover:text-gray-800"
+                      }`}
+                    >
+                      {tab === "fee" && "Fee Verification"}
+                      {tab === "documents" && "Documents"}
+                      {tab === "notings" && "Notes / Notings"}
+                      {tab === "movement" && "Movement History"}
+                      {activeTab === tab && (
+                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div>{/* <HideModule/> */}</div>
+            )}
 
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
-
-              {activeTab === "fee" && (
-    <Fees complaint={complaintData} />
-  )}
-
+              {complaintData.assign_to_ps == UserID ||
+              complaintData.assign_to_ps == null ? (
+                activeTab === "fee" && <Fees complaint={complaintData} />
+              ) : (
+                <div></div>
+              )}
 
               {activeTab === "documents" && (
                 <Documents complaint={complaintData} />
@@ -803,72 +903,64 @@ const ViewAllComplaint = () => {
 
             {/* Footer Buttons */}
 
-
-            {
-              complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ?
-
-               <div className="border-t p-4">
-              <div className="flex flex-col sm:flex-row gap-3 justify-between">
-                <div>
-                  <button
-                    onClick={handlePullBack}
-                    className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
-                  >
-                    Pull Back
-                  </button>
-
-                  {complaintData.assign_to_ps ? (
-                    <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
-                     Assigned
-                    </span>
-                  ) : (
+            {complaintData.assign_to_ps == UserID ||
+            complaintData.assign_to_ps == null ? (
+              <div className="border-t p-4">
+                <div className="flex flex-col sm:flex-row gap-3 justify-between">
+                  <div>
                     <button
-                      onClick={handleAssignToSelf}
-                      className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
+                      onClick={handlePullBack}
+                      className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                     >
-                      Assigned To My Self
+                      Pull Back
                     </button>
-                  )}
-                </div>
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleMarkAsReceived}
-                    disabled={returnWithRemarksMutation.isPending}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {returnWithRemarksMutation.isPending
-                      ? "Processing..."
-                      : "Return with Remarks"}
-                  </button>
+                    {complaintData.assign_to_ps ? (
+                      <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                        Assigned
+                      </span>
+                    ) : (
+                      <button
+                        onClick={handleAssignToSelf}
+                        className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
+                      >
+                        Take File in Hand
+                      </button>
+                    )}
+                  </div>
 
-                  {complaintData.approved_rejected_by_ps == "1" ? (
-                    <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
-                      Forwarded
-                    </span>
-                  ) : (
+                  <div className="flex gap-2">
                     <button
-                      onClick={handleforwardphysical}
-                      disabled={forwardComplaintMutation.isPending}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handleMarkAsReceived}
+                      disabled={returnWithRemarksMutation.isPending}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {forwardComplaintMutation.isPending
+                      {returnWithRemarksMutation.isPending
                         ? "Processing..."
-                        : "Send / Mark"}
+                        : "Return with Remarks"}
                     </button>
-                  )}
+
+                    {complaintData.approved_rejected_by_ps == "1" ? (
+                      <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                        Forwarded
+                      </span>
+                    ) : (
+                      <button
+                        onClick={handleforwardphysical}
+                        disabled={forwardComplaintMutation.isPending}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {forwardComplaintMutation.isPending
+                          ? "Processing..."
+                          : "Send / Mark"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-            :
-            <div>
-
-            </div>
-            
-              
-
-            }
-           
+            ) : (
+              <div></div>
+            )}
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-center text-gray-500">
@@ -899,11 +991,11 @@ const ViewAllComplaint = () => {
             {/* Title */}
             <h3 className="text-lg font-semibold mb-4 pr-8">
               {confirmConfig.type === "receive"
-                ? "Mark as Received?"
+                ? "Return with Remarks?"
                 : confirmConfig.type === "forward"
                 ? "Send"
                 : confirmConfig.type === "pullback"
-                ? "Pull Back Complaint?"
+                ? "Are you sure you want to pull back?"
                 : "Assign to Yourself?"}
             </h3>
 
@@ -957,6 +1049,20 @@ const ViewAllComplaint = () => {
                     Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
                     Officer <span className="text-red-500">*</span>
                   </label>
+
+                  {confirmConfig.type === "forward" && (
+                    <label className="flex items-center gap-2 cursor-pointer mt-2">
+                      <input
+                        type="checkbox"
+                        checked={sent_through_rk}
+                        onChange={(e) => setSentThroughRK(e.target.checked)} // ✅ CORRECT
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm">
+                        Checkbox If Send through RC
+                      </span>
+                    </label>
+                  )}
 
                   {isLoadingOptions || isFetchingOptions ? (
                     <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50 text-sm">
@@ -1104,7 +1210,7 @@ const ViewAllComplaint = () => {
                 )}
               </div>
             )} */}
-  {viewModalConfig.type === "correspondence" && (
+            {viewModalConfig.type === "correspondence" && (
               <div className="w-full">
                 {" "}
                 {/* यहाँ w-full और overflow handling */}
@@ -1222,7 +1328,6 @@ const ViewAllComplaint = () => {
                 )}
               </div>
             )}
-
 
             {/* {viewModalConfig.type === 'respondent' && (
               // Respondent Details View
@@ -1366,7 +1471,7 @@ const ViewAllComplaint = () => {
               </div>
             )} */}
 
-          {viewModalConfig.type === "support" && (
+            {viewModalConfig.type === "support" && (
               <div className="w-full">
                 {complaintData.support && complaintData.support.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
@@ -1454,7 +1559,7 @@ const ViewAllComplaint = () => {
               </div>
             )} */}
 
-           {viewModalConfig.type === "witness" && (
+            {viewModalConfig.type === "witness" && (
               <div className="w-full">
                 {complaintData.witness && complaintData.witness.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
@@ -1523,4 +1628,4 @@ const ViewAllComplaint = () => {
   );
 };
 
-export default ViewAllComplaint;
+export default ViewApprovedComplaints;
