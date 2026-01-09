@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// import { ToastContainer, toast } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
+import { toast, Toaster } from "react-hot-toast";
+
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -990,7 +992,7 @@ const handleMainRespondent = (id) => {
 
   return (
     <div className="min-h-screen bg-white rounded-md py-8">
-      <ToastContainer />
+      <Toaster position="top-right" />
       <div className="max-w-6xl mx-auto">
         {/* Form Header */}
         <div className="bg-white rounded-lg shadow-md p-8 mb-6">
