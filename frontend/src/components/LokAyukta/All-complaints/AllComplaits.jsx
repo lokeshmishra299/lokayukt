@@ -515,13 +515,13 @@ const AllComplaints = () => {
                               }
                             `}
                           >
-                            {complaint.fee_exempted === 0
+                            {complaint.fee_exempted === 3
                               ? "Exempted"
                               : complaint.fee_exempted === 1
                               ? "Paid"
                               : complaint.fee_exempted === 2
                               ? "Partial"
-                              : ""}
+                              : "Pending"}
                           </span>
                         </div>
                         <div className="flex gap-2 w-full sm:w-auto">

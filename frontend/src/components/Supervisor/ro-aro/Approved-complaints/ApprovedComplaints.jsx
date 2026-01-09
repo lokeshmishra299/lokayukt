@@ -38,57 +38,49 @@ const ApprovedComplaints = () => {
   const [selectedCaseType, setSelectedCaseType] = useState("");
 
   const [uploadList, setUploadList] = useState([]);
-const [selectedUpload, setSelectedUpload] = useState("");
-const [isSending, setIsSending] = useState(false);
+  const [selectedUpload, setSelectedUpload] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
+  useEffect(() => {
+    if (isConfirmModalOpen) {
+      api
+        .get("/supervisor/get-upsupervisor")
+        .then((res) => {
+          setUploadList(res.data);
+        })
+        .catch((err) => {
+          console.error("Upload type API error:", err);
+        });
+    }
+  }, [isConfirmModalOpen]);
 
+  const handleSend = async () => {
+    if (!selectedUpload || !complaintToApprove) return;
 
-useEffect(() => {
-  if (isConfirmModalOpen) {
-    api
-      .get("/supervisor/get-upsupervisor")
-      .then((res) => {
-        setUploadList(res.data);
-      })
-      .catch((err) => {
-        console.error("Upload type API error:", err);
-      });
-  }
-}, [isConfirmModalOpen]);
+    try {
+      setIsSending(true);
 
+      await api.post(
+        `/supervisor/forward-to-supervisor/${complaintToApprove.id}`,
+        {
+          forward_to: selectedUpload, 
+        }
+      );
 
+      toast.success("Send To supervisor Successfully!");
 
-const handleSend = async () => {
-  if (!selectedUpload || !complaintToApprove) return;
+      setIsConfirmModalOpen(false);
+      setSelectedUpload("");
+      setComplaintToApprove(null);
 
-  try {
-    setIsSending(true);
-
-    await api.post(
-      `/supervisor/forward-to-upsupervisor/${complaintToApprove.id}`,
-      {
-        forward_to: selectedUpload, 
-      }
-    );
-
-    toast.success("Send To Upsupervisor Successfully!");
-
-    setIsConfirmModalOpen(false);
-    setSelectedUpload("");
-    setComplaintToApprove(null);
-
-    refetch();
-  } catch (error) {
-    console.error("Send error:", error);
-    toast.error("Send failed");
-  } finally {
-    setIsSending(false);
-  }
-};
-
-
-
-
+      refetch();
+    } catch (error) {
+      console.error("Send error:", error);
+      toast.error("Send failed");
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const sortComplaintsByDate = (complaints, order) => {
     return [...complaints].sort((a, b) => {
@@ -103,23 +95,33 @@ const handleSend = async () => {
     });
   };
 
-
   const getAllComplaints = async () => {
     const res = await api.get("/supervisor/all-approved-complaints");
-    console.log("Data he", res.data.data)
-    return res.data.data;
+    console.log("Full API Response:", res.data);
+    
+    // DEBUG: Check all available properties
+    console.log("Available properties in response:");
+    Object.keys(res.data).forEach(key => {
+      console.log(`${key}:`, res.data[key]);
+    });
+    
+    return res.data; // Return complete response
   };
 
-  const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["all-approved-complaints", location.pathname],
+  const { data: apiResponse, isLoading, isError, error, refetch } = useQuery({
+    queryKey: ["all-complaints", location.pathname],
     queryFn: getAllComplaints,
   });
 
-  
+  // Extract statistics and complaints data from API response
   const stats = {
-  overdue: data?.older7DaysCount || 0,
-  receivedToday: data?.todayCount || 0,
-};
+    older7DaysCount: apiResponse?.older7DaysCount || 0,
+    older7DaysDueCount: apiResponse?.older7DaysDueCount || 0,
+    todayCount: apiResponse?.todayCount || 0,
+    feePending: apiResponse?.feePending || 0
+  };
+
+  const complaintsData = apiResponse?.data || [];
 
   const getDistrict = async () => {
     const res = await api.get("/supervisor/all-district");
@@ -129,7 +131,6 @@ const handleSend = async () => {
   const { data: districtData, isLoading: districtLoading } = useQuery({
     queryKey: ["district-api"],
     queryFn: getDistrict,
-
   });
 
   const getComplaintTypes = async () => {
@@ -140,16 +141,15 @@ const handleSend = async () => {
   const { data: complaintTypesData, isLoading: typesLoading } = useQuery({
     queryKey: ["complaint-types"],
     queryFn: getComplaintTypes,
-
   });
 
   useEffect(() => {
-    if (data) {
-      setAllComplaints(data);
-      const sorted = sortComplaintsByDate(data, sortOrder);
+    if (complaintsData) {
+      setAllComplaints(complaintsData);
+      const sorted = sortComplaintsByDate(complaintsData, sortOrder);
       setFilteredComplaints(sorted);
     }
-  }, [data, sortOrder]);
+  }, [complaintsData, sortOrder]);
 
   useEffect(() => {
     if (allComplaints.length === 0) return;
@@ -185,7 +185,7 @@ const handleSend = async () => {
 
     if (selectedFeeStatus !== "") {
       filtered = filtered.filter((complaint) => {
-        return complaint.fee_status === selectedFeeStatus;
+          return complaint.fee_exempted?.toString() === selectedFeeStatus;
       });
     }
 
@@ -233,7 +233,7 @@ const handleSend = async () => {
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Send To Upsupervisor Successfully!", {
+        toast.success("Send To supervisor Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -275,36 +275,15 @@ const handleSend = async () => {
     return complaint.approved_rejected_by_supervisor === 1;
   };
 
-  const getStatistics = () => {
-    const overdueCount = allComplaints.filter((c) => c.status === "overdue")
-      .length;
-    const receivedToday = allComplaints.filter((c) => {
-      const today = new Date().toDateString();
-      const complaintDate = new Date(c.created_at).toDateString();
-      return today === complaintDate;
-    }).length;
-
-    return {
-      total: allComplaints.length,
-      overdue: overdueCount,
-      receivedToday: receivedToday,
-    };
-  };
-
-
   const getDaysDifference = (date) => {
-  const created = new Date(date);
-  const today = new Date();
+    const created = new Date(date);
+    const today = new Date();
 
-  const diffTime = today - created; 
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const diffTime = today - created; 
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  return diffDays;
-};
-
-
-
-
+    return diffDays;
+  };
 
   return (
     <>
@@ -326,28 +305,35 @@ const handleSend = async () => {
         <div className="w-full bg-white flex flex-col overflow-hidden">
           <div className="px-3 sm:px-4 py-3 border-b flex-shrink-0 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900">Sent</h2>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">Inbox</h2>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
-                {/* <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
+                <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
                   Inbox: {filteredComplaints.length}
-                </span> */}
-                {/* <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded-full font-medium whitespace-nowrap">
-                  Over 7 days: {stats.overdue}
+                </span>
+                <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded-full font-medium whitespace-nowrap">
+                  Over 7 days: {stats.older7DaysCount}
                 </span>
                 <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium whitespace-nowrap">
-                  Received today: {stats.receivedToday}
-                </span> */}
+                  Received today: {stats.todayCount}
+                </span>
               </div>
             </div>
 
-          <div className="flex gap-2 mb-3">
-              {/* <div className="flex flex-col ">
-              <button className=" flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
-                <IoMdTime className="text-rose-500 text-sm " /> Overdue &gt; 7 days ({stats.overdue})
-              </button></div> */}
-              {/* <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
-                ₹ Fee Pending (0)
-              </button> */}
+            <div className="flex gap-2 mb-3">
+              <div className="flex flex-col">
+                <button className="flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
+                  <IoMdTime className="text-rose-500 text-sm" /> Overdue &gt; 7 days ({stats.older7DaysDueCount})
+                </button>
+                {/* Optional: Show older7DaysDueCount if needed */}
+                {/* {stats.older7DaysDueCount > 0 && (
+                  <button className="mt-1 flex items-center gap-1 px-2.5 py-1 bg-purple-50 border border-purple-200 rounded text-purple-600 hover:bg-purple-100 transition-colors text-xs font-medium">
+                    <IoMdTime className="text-purple-500 text-sm" /> Due Cases ({stats.older7DaysDueCount})
+                  </button>
+                )} */}
+              </div>
+              <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
+                ₹ Fee Pending ({stats.feePending})
+              </button>
             </div>
 
             <div className="relative mb-3">
@@ -369,12 +355,12 @@ const handleSend = async () => {
                   onChange={(e) => setSelectedStatus(e.target.value)}
                 >
                   <option value="">Status: All</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="disposed">Disposed Accepted</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="investigating">Under Investigation</option>
-                  <option value="pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Disposed Accepted">Disposed Accepted</option>
+                  <option value="Resolved">Resolved</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Under Investigation">Under Investigation</option>
+                  <option value="Pending">Pending</option>
                 </select>
 
                 <select
@@ -390,25 +376,29 @@ const handleSend = async () => {
                     </option>
                   ))}
                 </select>
-                <select className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
+                <select 
+                  className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedFeeStatus}
                   onChange={(e) => setSelectedFeeStatus(e.target.value)}
                 >
                   <option value="">Fee Status: All</option>
-                  <option value="paid">Paid</option>
-                  <option value="pending">Pending</option>
-                  <option value="exempted">Exempted</option>
+                  <option value="0">Pending</option>
+                  <option value="2">Partial</option>
+                  <option value="1">Paid</option>
+                  <option value="3">Exempted</option>
                 </select>
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   disabled={typesLoading}
                   value={selectedCaseType}
-                  onChange={(e) => setSelectedCaseType(e.target.value)}               >
+                  onChange={(e) => setSelectedCaseType(e.target.value)}
+                >
                   <option value="">Case Type: All</option>
                   {complaintTypesData?.map((type) => (
                     <option key={type.id} value={type.id}>
                       {type.name}
-                    </option> ))}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="flex items-center gap-2">
@@ -416,33 +406,26 @@ const handleSend = async () => {
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={sortOrder}
-                  onChange={handleSortChange}>
-                <option value="desc">Received Date </option> 
-                <option value="asc">Ascending Order</option> 
-                <option value="desc">Decending Order</option>
-                 {/* <option value="desc">Newest First</option>
-                  <option value="asc">Oldest First</option> */}
+                  onChange={handleSortChange}
+                >
+                  <option value="desc">Received Date</option> 
+                  <option value="asc">Ascending Order</option> 
+                  <option value="desc">Decending Order</option>
                 </select>
               </div>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
-             {
-               isLoading ? (
-                 <div className="flex items-center justify-center h-full">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">Loading...</h1>
               </div>
-            )
-            
-            
-             :
-             
-             data?.length == 0 ? (
+            ) :
+            complaintsData?.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
-            )
-            :
+            ) : 
             isError ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-red-500 text-sm">Error: {error.message}</p>
@@ -459,24 +442,24 @@ const handleSend = async () => {
                         <p className="text-sm font-semibold text-gray-900 mb-1">
                           File No. {complaint.complain_no}
                         </p>
-                       <p className="text-xs text-gray-700 mb-1">
+                        <p className="text-xs text-gray-700 mb-1">
                           Description: {complaint.complaint_description ||
                             "No description available"}
                         </p>
-                       <div className="text-[11px] text-gray-600 mb-1">
+                        <div className="text-[11px] text-gray-600 mb-1">
                           <span className="text-gray-500">
-                            Cause Date
-                            :</span>
+                            Cause Date:
+                          </span>
                           <span className="ml-1">{complaint.cause_date || "NA"}</span>
                           <span className="mx-1 text-gray-400">•</span>
                           <span className="text-gray-500">
-                            Category
-                            :</span>
+                            Category:
+                          </span>
                           <span className="ml-1">
                             {complaint.category || "NA"}
                           </span>
                         </div>
-                         <div className="text-[10px] text-gray-400">
+                        <div className="text-[10px] text-gray-400">
                           Received:{" "}
                           {new Date(complaint.created_at).toLocaleDateString(
                             "en-GB",
@@ -497,80 +480,81 @@ const handleSend = async () => {
                           )}
                         </div>
                       </div>
-                     <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
+                      <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
                         <div className="flex gap-1.5">
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
                             New Case
                           </span>
                           {/* {complaint.fee_exempted === 1 && ( */}
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                               {complaint.approved_rejected_by_lokayukt === 1
+                              {complaint.approved_rejected_by_lokayukt === 1
                               ? " With UpLokayukta"
                               : "With Lokayukta"}
                             </span>
                           {/* )} */}
                         </div>
-                         <div className="flex gap-1.5">
-                         <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-                      {getDaysDifference(complaint.created_at)}d</span>
-                                                             <span
-  className={`
-    px-2 py-0.5 rounded text-[11px] font-medium
-    ${
-      complaint.fee_exempted === 0
-        ? "bg-green-50 text-blue-600"    
-        : complaint.fee_exempted === 1
-        ?
-        "bg-orange-50 text-orange-600"     
-        : complaint.fee_exempted === 2
-        ? "bg-blue-50 text-orange-400" 
-        : ""
-    }
-  `}
->
-  {complaint.fee_exempted === 0
-    ? "Exempted"
-    : complaint.fee_exempted === 1
-    ? "Paid"
-    : complaint.fee_exempted === 2
-    ? "Partial"
-    : ""}
-</span>
+                        <div className="flex gap-1.5">
+                          <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
+                            {getDaysDifference(complaint.created_at)}d
+                          </span>
+                          <span
+                            className={`
+                              px-2 py-0.5 rounded text-[11px] font-medium
+                              ${
+                                complaint.fee_exempted === 0
+                                  ? "bg-green-50 text-blue-600"    
+                                  : complaint.fee_exempted === 1
+                                  ? "bg-orange-50 text-orange-600"     
+                                  : complaint.fee_exempted === 2
+                                  ? "bg-blue-50 text-orange-400" 
+                                  : ""
+                              }
+                            `}
+                          >
+                           {complaint.fee_exempted === 0
+  ? "Pending"
+  : complaint.fee_exempted === 1
+  ? "Partial"
+  : complaint.fee_exempted === 2
+  ? "Paid"
+  : complaint.fee_exempted === 3
+  ? "Exempted"
+  : ""
+}
+                          </span>
                         </div>
-                     <div className="flex gap-2 w-full sm:w-auto">
+                        <div className="flex gap-2 w-full sm:w-auto">
                           <button
                             onClick={(e) => handleViewDetails(e, complaint.id)}
-                            className="flex-1 sm:flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap">
+                            className="flex-1 sm:flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap"
+                          >
                             View Details
                           </button>
-                        {isApprovedByRO(complaint) ? (
+                          {isApprovedByRO(complaint) ? (
                             <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
-                            <svg
-                              className="w-3 h-3"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                            Send 
-                          </span>
+                              <svg
+                                className="w-3 h-3"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              Send 
+                            </span>
                           ) : (
+                            // Uncomment if you need the Send To supervisor button
                             // <button
-                            //   onClick={(e) =>
-                            //     handleApproveClick(e, complaint)
-                            //   }
+                            //   onClick={(e) => handleApproveClick(e, complaint)}
                             //   className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
                             // >
-                              
-                            //   Send To UPsupervisor
+                            //   Send To supervisor
                             // </button>
-                            <>
-                            </>
-                          )} 
+                            <></>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -590,70 +574,62 @@ const handleSend = async () => {
         </div>
       </div>
 
+      {isConfirmModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center">
+          <div className="bg-white rounded-xl shadow-2xl w-[440px] relative">
+            <button
+              onClick={() => {
+                setIsConfirmModalOpen(false);
+                setSelectedUpload("");
+                setComplaintToApprove(null);
+              }}
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full 
+                         bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition"
+              aria-label="Close"
+            >
+              ✕
+            </button>
 
-{isConfirmModalOpen && (
-  <div className="fixed inset-0 z-50 bg-black/40 flex justify-center items-center">
-    <div className="bg-white rounded-xl shadow-2xl w-[440px] relative">
+            <div className="px-6 py-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-800">
+                Send to supervisor?
+              </h3>
+            </div>
 
-      {/* Close Button */}
-      <button
-        onClick={() => {
-          setIsConfirmModalOpen(false);
-          setSelectedUpload("");
-          setComplaintToApprove(null);
-        }}
-        className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full 
-                   bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition"
-        aria-label="Close"
-      >
-        ✕
-      </button>
+            <div className="px-6 py-5 space-y-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  supervisor
+                </label>
+                <select
+                  value={selectedUpload}
+                  onChange={(e) => setSelectedUpload(e.target.value)}
+                  className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg 
+                           focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select option</option>
+                  {uploadList.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-      {/* Header */}
-      <div className="px-6 py-4 border-b">
-        <h3 className="text-lg font-semibold text-gray-800">
-          Send to UPsupervisor?
-        </h3>
-      </div>
-
-      {/* Body */}
-      <div className="px-6 py-5 space-y-5">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            UPsupervisor
-          </label>
-          <select
-            value={selectedUpload}
-            onChange={(e) => setSelectedUpload(e.target.value)}
-            className="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg 
-                       focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Select option</option>
-            {uploadList.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            ))}
-          </select>
+            <div className="flex justify-end px-6 py-4 bg-gray-50 rounded-b-xl">
+              <button
+                onClick={handleSend}
+                disabled={isSending || !selectedUpload}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-2.5 rounded-lg 
+                         disabled:opacity-50 transition"
+              >
+                {isSending ? "Sending..." : "Send"}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="flex justify-end px-6 py-4 bg-gray-50 rounded-b-xl">
-        <button
-          onClick={handleSend}
-          disabled={isSending || !selectedUpload}
-          className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-6 py-2.5 rounded-lg 
-                     disabled:opacity-50 transition"
-        >
-          {isSending ? "Sending..." : "Send"}
-        </button>
-      </div>
-
-    </div>
-  </div>
-)}
-
+      )}
     </>
   );
 };

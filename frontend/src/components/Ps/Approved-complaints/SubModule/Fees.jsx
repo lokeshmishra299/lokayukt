@@ -71,7 +71,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
   };
   return (
     <>
-      {complaint.fee_approved_by_lokayukt == 1 ? (
+      {complaint.fee_approved_by_lokayukt == 1  ? (
         <div className="w-full flex items-center gap-4 p-6 bg-green-50 border border-green-300 rounded-xl shadow-sm">
           <FaCheckCircle className="text-green-600" size={28} />
           <div>

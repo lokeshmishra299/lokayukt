@@ -74,7 +74,7 @@ const ViewApprovedComplaints = () => {
     queryKey: ["operator-options"],
     queryFn: async () => {
       try {
-        const res = await api.get("/operator/get-lokayukt");
+        const res = await api.get("/operator/get-users");
         if (Array.isArray(res.data)) {
           return res.data;
         } else if (res.data && Array.isArray(res.data.data)) {
@@ -621,7 +621,7 @@ const ViewApprovedComplaints = () => {
                     >
                       {markAsReceivedMutation.isPending
                         ? "Processing..."
-                        : "Mark As Received"}
+                        : "Received Physically"}
                     </button>
                   )}
                 </div>
@@ -642,7 +642,7 @@ const ViewApprovedComplaints = () => {
                     >
                       {forwardPhysicallyMutation.isPending
                         ? "Processing..."
-                        : "Forward File Physically Electronically"}
+                        : "Send"}
                     </button>
                   )}
                 </div>
@@ -700,7 +700,7 @@ const ViewApprovedComplaints = () => {
               {confirmConfig.type === "receive"
                 ? "Return with Remarks?"
                 : confirmConfig.type === "pullback"
-                ? "Pull Back Complaint?"
+                ? "Are you sure you want to pull back?"
                 : "Forward File Physically Electronically?"}
             </h3>
 

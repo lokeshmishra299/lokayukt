@@ -63,7 +63,7 @@ const ApprovedComplaints = () => {
       await api.post(
         `/supervisor/forward-to-supervisor/${complaintToApprove.id}`,
         {
-          forward_to: selectedUpload, 
+          forward_to: selectedUpload,
         }
       );
 
@@ -96,19 +96,25 @@ const ApprovedComplaints = () => {
   };
 
   const getAllComplaints = async () => {
-    const res = await api.get("/supervisor/all-complaints");
+    const res = await api.get("/supervisor/all-approved-complaints");
     console.log("Full API Response:", res.data);
-    
+
     // DEBUG: Check all available properties
     console.log("Available properties in response:");
-    Object.keys(res.data).forEach(key => {
+    Object.keys(res.data).forEach((key) => {
       console.log(`${key}:`, res.data[key]);
     });
-    
+
     return res.data; // Return complete response
   };
 
-  const { data: apiResponse, isLoading, isError, error, refetch } = useQuery({
+  const {
+    data: apiResponse,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["all-complaints", location.pathname],
     queryFn: getAllComplaints,
   });
@@ -118,7 +124,7 @@ const ApprovedComplaints = () => {
     older7DaysCount: apiResponse?.older7DaysCount || 0,
     older7DaysDueCount: apiResponse?.older7DaysDueCount || 0,
     todayCount: apiResponse?.todayCount || 0,
-    feePending: apiResponse?.feePending || 0
+    feePending: apiResponse?.feePending || 0,
   };
 
   const complaintsData = apiResponse?.data || [];
@@ -173,7 +179,10 @@ const ApprovedComplaints = () => {
 
     if (selectedDistrict !== "") {
       filtered = filtered.filter((complaint) => {
-        return complaint.district_name?.toLowerCase() === selectedDistrict.toLowerCase();
+        return (
+          complaint.district_name?.toLowerCase() ===
+          selectedDistrict.toLowerCase()
+        );
       });
     }
 
@@ -185,7 +194,7 @@ const ApprovedComplaints = () => {
 
     if (selectedFeeStatus !== "") {
       filtered = filtered.filter((complaint) => {
-        return complaint.fee_status === selectedFeeStatus;
+        return complaint.fee_exempted?.toString() === selectedFeeStatus;
       });
     }
 
@@ -279,7 +288,7 @@ const ApprovedComplaints = () => {
     const created = new Date(date);
     const today = new Date();
 
-    const diffTime = today - created; 
+    const diffTime = today - created;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays;
@@ -305,8 +314,10 @@ const ApprovedComplaints = () => {
         <div className="w-full bg-white flex flex-col overflow-hidden">
           <div className="px-3 sm:px-4 py-3 border-b flex-shrink-0 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900">Sent</h2>
-              {/* <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">
+                Inbox
+              </h2>
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                 <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
                   Inbox: {filteredComplaints.length}
                 </span>
@@ -316,13 +327,14 @@ const ApprovedComplaints = () => {
                 <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium whitespace-nowrap">
                   Received today: {stats.todayCount}
                 </span>
-              </div> */}
+              </div>
             </div>
 
             <div className="flex gap-2 mb-3">
               <div className="flex flex-col">
                 <button className="flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
-                  <IoMdTime className="text-rose-500 text-sm" /> Overdue &gt; 7 days ({stats.older7DaysDueCount})
+                  <IoMdTime className="text-rose-500 text-sm" /> Overdue &gt; 7
+                  days ({stats.older7DaysDueCount})
                 </button>
                 {/* Optional: Show older7DaysDueCount if needed */}
                 {/* {stats.older7DaysDueCount > 0 && (
@@ -331,9 +343,9 @@ const ApprovedComplaints = () => {
                   </button>
                 )} */}
               </div>
-              {/* <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
+              <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
                 ₹ Fee Pending ({stats.feePending})
-              </button> */}
+              </button>
             </div>
 
             <div className="relative mb-3">
@@ -355,12 +367,14 @@ const ApprovedComplaints = () => {
                   onChange={(e) => setSelectedStatus(e.target.value)}
                 >
                   <option value="">Status: All</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="disposed">Disposed Accepted</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="investigating">Under Investigation</option>
-                  <option value="pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Disposed Accepted">Disposed Accepted</option>
+                  <option value="Resolved">Resolved</option>
+                  <option value="Rejected">Rejected</option>
+                  <option value="Under Investigation">
+                    Under Investigation
+                  </option>
+                  <option value="Pending">Pending</option>
                 </select>
 
                 <select
@@ -376,15 +390,16 @@ const ApprovedComplaints = () => {
                     </option>
                   ))}
                 </select>
-                <select 
+                <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedFeeStatus}
                   onChange={(e) => setSelectedFeeStatus(e.target.value)}
                 >
                   <option value="">Fee Status: All</option>
-                  <option value="paid">Paid</option>
-                  <option value="pending">Pending</option>
-                  <option value="exempted">Exempted</option>
+                  <option value="0">Pending</option>
+                  <option value="2">Partial</option>
+                  <option value="1">Paid</option>
+                  <option value="3">Exempted</option>
                 </select>
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
@@ -401,14 +416,16 @@ const ApprovedComplaints = () => {
                 </select>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-gray-600 text-xs whitespace-nowrap">Sort by:</span>
+                <span className="text-gray-600 text-xs whitespace-nowrap">
+                  Sort by:
+                </span>
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={sortOrder}
                   onChange={handleSortChange}
                 >
-                  <option value="desc">Received Date</option> 
-                  <option value="asc">Ascending Order</option> 
+                  <option value="desc">Received Date</option>
+                  <option value="asc">Ascending Order</option>
                   <option value="desc">Decending Order</option>
                 </select>
               </div>
@@ -419,13 +436,11 @@ const ApprovedComplaints = () => {
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">Loading...</h1>
               </div>
-            ) :
-            complaintsData?.length === 0 ? (
+            ) : complaintsData?.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
-            ) : 
-            isError ? (
+            ) : isError ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-red-500 text-sm">Error: {error.message}</p>
               </div>
@@ -442,18 +457,17 @@ const ApprovedComplaints = () => {
                           File No. {complaint.complain_no}
                         </p>
                         <p className="text-xs text-gray-700 mb-1">
-                          Description: {complaint.complaint_description ||
+                          Description:{" "}
+                          {complaint.complaint_description ||
                             "No description available"}
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
-                          <span className="text-gray-500">
-                            Cause Date:
+                          <span className="text-gray-500">Cause Date:</span>
+                          <span className="ml-1">
+                            {complaint.cause_date || "NA"}
                           </span>
-                          <span className="ml-1">{complaint.cause_date || "NA"}</span>
                           <span className="mx-1 text-gray-400">•</span>
-                          <span className="text-gray-500">
-                            Category:
-                          </span>
+                          <span className="text-gray-500">Category:</span>
                           <span className="ml-1">
                             {complaint.category || "NA"}
                           </span>
@@ -486,9 +500,12 @@ const ApprovedComplaints = () => {
                           </span>
                           {/* {complaint.fee_exempted === 1 && ( */}
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                              {complaint.approved_rejected_by_lokayukt === 1
-                              ? " With UpLokayukta"
-                              : "With Lokayukta"}
+                              {complaint.approved_rejected_by_rk === 1 &&
+                              complaint.approved_rejected_by_lokayukt === 1
+                                ? "With UpLokayukta"
+                                : complaint.approved_rejected_by_rk === 1
+                                ? "With Lokayukta"
+                                : "With Lokayukta"}
                             </span>
                           {/* )} */}
                         </div>
@@ -501,22 +518,22 @@ const ApprovedComplaints = () => {
                               px-2 py-0.5 rounded text-[11px] font-medium
                               ${
                                 complaint.fee_exempted === 0
-                                  ? "bg-green-50 text-blue-600"    
+                                  ? "bg-green-50 text-blue-600"
                                   : complaint.fee_exempted === 1
-                                  ? "bg-orange-50 text-orange-600"     
+                                  ? "bg-orange-50 text-orange-600"
                                   : complaint.fee_exempted === 2
-                                  ? "bg-blue-50 text-orange-400" 
+                                  ? "bg-blue-50 text-orange-400"
                                   : ""
                               }
                             `}
                           >
-                            {complaint.fee_exempted === 0
+                            {complaint.fee_exempted === 3
                               ? "Exempted"
                               : complaint.fee_exempted === 1
                               ? "Paid"
                               : complaint.fee_exempted === 2
                               ? "Partial"
-                              : ""}
+                              : "Pending"}
                           </span>
                         </div>
                         <div className="flex gap-2 w-full sm:w-auto">
@@ -539,7 +556,7 @@ const ApprovedComplaints = () => {
                                   clipRule="evenodd"
                                 />
                               </svg>
-                              Send 
+                              Send
                             </span>
                           ) : (
                             // Uncomment if you need the Send To supervisor button
@@ -560,7 +577,11 @@ const ApprovedComplaints = () => {
             ) : (
               <div className="flex items-center justify-center h-full">
                 <p className="text-gray-500 text-sm">
-                  {searchQuery || selectedDistrict || selectedStatus || selectedFeeStatus || selectedCaseType
+                  {searchQuery ||
+                  selectedDistrict ||
+                  selectedStatus ||
+                  selectedFeeStatus ||
+                  selectedCaseType
                     ? "No results found"
                     : ""}
                 </p>

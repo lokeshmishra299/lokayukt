@@ -29,7 +29,11 @@ const Documents = ({ complaint }) => {
     file: null,
   });
 
+  // Backend Errors State
+  const [errors, setErrors] = useState({});
+
   const handleAddDocuments = () => {
+    setErrors({});
     setopenAddDocuments(true);
   };
 
@@ -72,7 +76,7 @@ const Documents = ({ complaint }) => {
         }
       }
     } catch (err) {
-      alert("PDF नहीं खुल पाया");
+      // alert("PDF nahi khul paya");
     } finally {
       setLoadingDoc(null);
     }
@@ -82,18 +86,21 @@ const Documents = ({ complaint }) => {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setNewDoc({ ...newDoc, file: e.target.files[0] });
+      // Clear file error locally when user selects file
+      if (errors.file) setErrors({ ...errors, file: null });
     }
   };
 
   // -- Handle Form Submit --
   const handleSubmitDocument = async () => {
-    if (!newDoc.title || !newDoc.type || !newDoc.file) {
-      alert("Please fill all fields and select a file.");
-      return;
-    }
+    // 1. Reset Errors
+    setErrors({});
+
+    // 2. CHECK REMOVED: Maine wo code hata diya jo empty fields ko rok raha tha.
+    // Ab request seedha backend pe jayegi chahe fields khali hon.
 
     if (!complaint?.id) {
-      alert("Complaint ID is missing.");
+      toast.error("Complaint ID missing");
       return;
     }
 
@@ -101,9 +108,12 @@ const Documents = ({ complaint }) => {
     try {
       const formData = new FormData();
       
-      formData.append("file", newDoc.file);
-      formData.append("type", newDoc.type);
-      formData.append("title", newDoc.title);
+      // Agar file null hai toh bhi backend bhej rahe hain taaki backend error de
+      if(newDoc.file) {
+          formData.append("file", newDoc.file);
+      }
+      formData.append("type", newDoc.type || ""); // Empty string agar khali ho
+      formData.append("title", newDoc.title || ""); 
       formData.append("complain_id", complaint.id);
 
       await api.post("/supervisor/upload-document", formData, {
@@ -112,12 +122,20 @@ const Documents = ({ complaint }) => {
 
       toast.success("Document uploaded successfully!");
       setopenAddDocuments(false);
-      setNewDoc({ title: "", type: "Letter", file: null }); 
-      refetch(); 
+      setNewDoc({ title: "", type: "Letter", file: null });
+      setErrors({});
+      refetch();
     } catch (error) {
       console.error("Upload failed", error);
-      const msg = error.response?.data?.message || "Failed to upload document.";
-      toast.error(msg);
+      
+      // -- Backend Errors Capture --
+      if (error.response && error.response.data && error.response.data.errors) {
+        // Backend se aaye errors ko state me set kar rahe hain
+        setErrors(error.response.data.errors);
+      } else {
+        const msg = error.response?.data?.message || "Failed to upload document.";
+        toast.error(msg);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -226,30 +244,44 @@ const Documents = ({ complaint }) => {
                   type="text"
                   placeholder="Enter Document Title"
                   value={newDoc.title}
-                  onChange={(e) =>
-                    setNewDoc({ ...newDoc, title: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  onChange={(e) => {
+                    setNewDoc({ ...newDoc, title: e.target.value });
+                    if(errors.title) setErrors({...errors, title: null});
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${
+                    errors.title ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                  }`}
                 />
+                {/* --- BACKEND ERROR FOR TITLE --- */}
+                {errors.title && (
+                  <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+                )}
               </div>
 
-              {/* Document Type (UPDATED TO DROPDOWN) */}
+              {/* Document Type */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Correspondence Type <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={newDoc.type}
-                  onChange={(e) =>
-                    setNewDoc({ ...newDoc, type: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+                  onChange={(e) => {
+                    setNewDoc({ ...newDoc, type: e.target.value });
+                    if(errors.type) setErrors({...errors, type: null});
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none transition-all bg-white ${
+                    errors.type ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                  }`}
                 >
                   <option value="Letter">Letter</option>
                   <option value="Reminder">Reminder</option>
                   <option value="RTI Reply">RTI Reply</option>
                   <option value="Counter Order">Counter Order</option>
                 </select>
+                {/* --- BACKEND ERROR FOR TYPE --- */}
+                {errors.type && (
+                  <p className="text-xs text-red-500 mt-1">{errors.type}</p>
+                )}
               </div>
 
               {/* File Upload Area */}
@@ -257,7 +289,11 @@ const Documents = ({ complaint }) => {
                 <label className="text-sm font-medium text-gray-700">
                   Upload File <span className="text-red-500">*</span>
                 </label>
-                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group">
+                <div 
+                  className={`relative border-2 border-dashed rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group ${
+                    errors.file ? "border-red-400 bg-red-50" : "border-gray-300"
+                  }`}
+                >
                   <input
                     type="file"
                     onChange={handleFileChange}
@@ -277,8 +313,8 @@ const Documents = ({ complaint }) => {
                       </>
                     ) : (
                       <>
-                        <FaCloudUploadAlt className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                        <span className="text-sm text-gray-500">
+                        <FaCloudUploadAlt className={`w-8 h-8 transition-colors ${errors.file ? "text-red-400" : "text-gray-400 group-hover:text-blue-500"}`} />
+                        <span className={`text-sm ${errors.file ? "text-red-500" : "text-gray-500"}`}>
                           Click to browse or drag file here
                         </span>
                         <span className="text-xs text-gray-400">
@@ -288,6 +324,10 @@ const Documents = ({ complaint }) => {
                     )}
                   </div>
                 </div>
+                {/* --- BACKEND ERROR FOR FILE --- */}
+                {errors.file && (
+                  <p className="text-xs text-red-500 mt-1">{errors.file}</p>
+                )}
               </div>
             </div>
 
@@ -313,7 +353,7 @@ const Documents = ({ complaint }) => {
         </div>
       )}
 
-      {/* PDF View Modal (Existing) */}
+      {/* PDF View Modal */}
       {pdfViewUrl && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">

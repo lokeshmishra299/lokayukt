@@ -14,9 +14,11 @@ import draftToHtml from "draftjs-to-html";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import EditDraft from "./EditDraft";
+// import image from '../public/Lokimage.png' 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
+const subrole = localStorage.getItem("subrole");
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -31,6 +33,8 @@ const DraftLetter = ({ complaint }) => {
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedDraftId, setSelectedDraftId] = useState(null);
+  const [selectedComplaintId, setSelectedComplaintId] = useState(null);
   
   // -- Add Document State --
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,35 +52,29 @@ const DraftLetter = ({ complaint }) => {
   const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
   const [loadingPdf, setLoadingPdf] = useState(false);
+  
+  // -- Validation Errors State --
   const [errors, setErrors] = useState({});
   const [draftTitle, setDraftTitle] = useState(""); 
 
-  const [selectedDraftId, setSelectedDraftId] = useState(null);
-const [editDraftPopup, setEditDraftPopup] = useState(false);
-
+  const [editDraftPopup, setEditDraftPopup] = useState(false);
 
   // Refs for Print/Preview
   const popupRef = useRef(null);
 
-  // -- EDIT DRAFT POPUP STATE --
-  // const [editDraftPopup, setEditDraftPopup] = useState(false);
-  // OPTIONAL: Agar aapko specific ID edit karni hai to state bhi rakho
-  // const [selectedDraftId, setSelectedDraftId] = useState(null);
-
   const handleAddDocuments = () => {
+    setErrors({}); // Reset errors when opening modal
     setopenAddDocuments(true);
   };
 
-  // ✅ Updated Handle Edit: Opens popup correctly
-const handleEditDraft = (draftId) => {
-  setSelectedDraftId(draftId);
-  setEditDraftPopup(true);
-};
+  const handleEditDraft = (draftId, complaintId) => {
+    setSelectedDraftId(draftId);
+    setSelectedComplaintId(complaintId);
+    setEditDraftPopup(true);
+  };
 
-  // ✅ New Function to Close Popup properly
   const closeEditDraft = () => {
     setEditDraftPopup(false);
-    // setSelectedDraftId(null);
   };
 
   // -- Note Modal Functions --
@@ -84,6 +82,12 @@ const handleEditDraft = (draftId) => {
     setEditorState(editorState);
     const content = draftToHtml(convertToRaw(editorState.getCurrentContent()));
     setNote(content);
+    
+    // Clear content error on type
+    const contentState = editorState.getCurrentContent();
+    if (contentState.hasText() && errors.draft_note) {
+         setErrors(prev => ({...prev, draft_note: null}));
+    }
   };
 
   const handleSelectDoc = async (fileName) => {
@@ -111,18 +115,32 @@ const handleEditDraft = (draftId) => {
     }
   };
 
-  // 1. Updated: Just opens the Preview Popup
+  // 1. Updated: Added Static Validation Logic Here
   const handleSubmitNote = () => {
-    setErrors({});
-    
-    // Simple Validation
-    const contentState = editorState.getCurrentContent();
-    if (!contentState.hasText()) {
-      toast.error("Please enter some content.");
-      return;
+    setErrors({}); // Clear previous errors
+    const newErrors = {};
+    let hasError = false;
+
+    // Check Title
+    if (!draftTitle || !draftTitle.trim()) {
+        newErrors.title = ["Title is required."]; // Array format to match backend style
+        hasError = true;
     }
 
-    // Close Editor, Open Preview
+    // Check Editor Content
+    const contentState = editorState.getCurrentContent();
+    if (!contentState.hasText()) {
+      newErrors.draft_note = ["Draft content is required."];
+      hasError = true;
+    }
+
+    // If Error exists, set state and stop
+    if (hasError) {
+        setErrors(newErrors);
+        return;
+    }
+
+    // If Success
     setOpenNoteModal(false);
     setShowSuccess(true);
   };
@@ -131,23 +149,18 @@ const handleEditDraft = (draftId) => {
   const handleFinalSubmit = async () => {
     if (!popupRef.current) return;
 
-    // A. Generate PDF Blob from Preview
     try {
-      // Hide buttons for screenshot
       const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
       elementsToHide.forEach((el) => (el.style.display = "none"));
 
-      // Capture Screenshot
       const canvas = await html2canvas(popupRef.current, {
         scale: 2,
         backgroundColor: "#ffffff",
         useCORS: true,
       });
 
-      // Show buttons back
       elementsToHide.forEach((el) => (el.style.display = "flex"));
 
-      // Create PDF
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
 
@@ -156,38 +169,29 @@ const handleEditDraft = (draftId) => {
 
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
-      // Get Binary Blob
       const pdfBlob = pdf.output("blob");
 
-      // B. Create FormData Payload
       const formData = new FormData();
       formData.append("complaint_id", complaint.id);
       formData.append("draft_note", note);
       formData.append("title", draftTitle);
-      // Append generated PDF as 'file'
       formData.append("file", pdfBlob, `Draft_${complaint?.file_number || "File"}.pdf`);
 
-      // C. Send API Request
       const res = await api.post("/supervisor/create-draft", formData, {
         headers: {
-          "Content-Type": "multipart/form-data", // Important for file upload
+          "Content-Type": "multipart/form-data", 
         },
       });
 
       if (res.data.status) {
         toast.success("Draft Added Successfully!");
-        setShowSuccess(false); // Close Preview
+        setShowSuccess(false); 
         setDraftTitle(""); 
         setNote("");
         setEditorState(EditorState.createEmpty());
-
-        setNote("");
-        setEditorState(EditorState.createEmpty());
-        setSelectedDoc("");
-        setPageRanges([{ from: "", to: "" }]);
-        setPdfPreviewUrl(null);
+        setErrors({});
+        refetch(); 
       } else if (res.data.errors) {
-        // If error, reopen editor to fix
         setShowSuccess(false);
         setOpenNoteModal(true);
         setErrors(res.data.errors);
@@ -196,7 +200,6 @@ const handleEditDraft = (draftId) => {
         });
       }
     } catch (err) {
-      // Restore buttons if something crashed mid-way
       const elementsToHide = popupRef.current?.querySelectorAll(".pdf-hide-section");
       if(elementsToHide) elementsToHide.forEach((el) => (el.style.display = "flex"));
 
@@ -206,24 +209,16 @@ const handleEditDraft = (draftId) => {
       }
       console.error(err);
     }
-
-    if (!draftTitle.trim()) {
-      toast.error("Title is required.");
-      return; // exit if empty
-    }
   };
 
-  // Print/Download Placeholders
   const handlePrint = () => {
     window.print();
   };
   
   const handleDownloadPdf = async () => {
     if (!popupRef.current) return;
-
     try {
-      const elementsToHide =
-        popupRef.current.querySelectorAll(".pdf-hide-section");
+      const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
       elementsToHide.forEach((el) => (el.style.display = "none"));
 
       const canvas = await html2canvas(popupRef.current, {
@@ -236,7 +231,6 @@ const handleEditDraft = (draftId) => {
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
-
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
@@ -295,22 +289,16 @@ const handleEditDraft = (draftId) => {
     }
   };
 
-  // -- Handle File Selection --
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setNewDoc({ ...newDoc, file: e.target.files[0] });
+      if (errors.file) setErrors({ ...errors, file: null });
     }
   };
 
-  // -- Handle Form Submit (File Upload) --
   const handleSubmitDocument = async () => {
-    setErrors({}); // Reset errors
+    setErrors({}); 
     
-    if (!newDoc.title || !newDoc.type || !newDoc.file) {
-      toast.error("Please fill all fields and select a file.");
-      return;
-    }
-
     if (!complaint?.id) {
       toast.error("Complaint ID is missing.");
       return;
@@ -319,17 +307,15 @@ const handleEditDraft = (draftId) => {
     setIsSubmitting(true);
     try {
       const formData = new FormData();
-      
-      formData.append("file", newDoc.file);
-      formData.append("type", newDoc.type);
-      formData.append("title", newDoc.title);
+      if (newDoc.file) formData.append("file", newDoc.file);
+      formData.append("type", newDoc.type || "");
+      formData.append("title", newDoc.title || "");
       formData.append("complain_id", complaint.id);
 
       const response = await api.post("/supervisor/upload-draft-letter", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // Check if response has errors
       if (response.data.status === false) {
         setErrors(response.data.errors || {});
         toast.error("Upload failed!");
@@ -339,14 +325,12 @@ const handleEditDraft = (draftId) => {
       toast.success("Document uploaded successfully!");
       setopenAddDocuments(false);
       setNewDoc({ title: "", type: "", file: null }); 
+      setErrors({});
       refetch(); 
     } catch (error) {
       console.error("Upload failed", error);
-      
-      // Handle backend validation errors
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
-        toast.error("Validation error!");
       } else {
         const msg = error.response?.data?.message || "Failed to upload document.";
         toast.error(msg);
@@ -380,7 +364,10 @@ const handleEditDraft = (draftId) => {
         <div className="flex items-center gap-2">
           <button
             className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
-            onClick={() => setOpenNoteModal(true)}
+            onClick={() => {
+                setErrors({}); 
+                setOpenNoteModal(true);
+            }}
           >
             Create Draft
           </button>
@@ -419,7 +406,6 @@ const handleEditDraft = (draftId) => {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {/* View Button */}
                 <button
                   onClick={() => handleViewPdf(doc.file)}
                   disabled={loadingDoc === doc.file}
@@ -432,33 +418,32 @@ const handleEditDraft = (draftId) => {
                   )}
                   View
                 </button>
-
-                {/* Edit Button (Opens Popup) */}
-            <button
-  onClick={() => handleEditDraft(doc.id)}   
-  className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50"
->
-  <RiEditBoxLine className="w-4 h-4" />
-  Edit
-</button>
+                <button
+                onClick={() => handleEditDraft(doc.id, doc.complain_id)}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50"
+                >
+                <RiEditBoxLine className="w-4 h-4" />
+                Edit
+                </button>
               </div>
             </div>
           ))
         )}
       </div>
 
-      {/* ✅ Edit Draft Popup (Pass closeModal) */}
-     {editDraftPopup && (
-  <EditDraft
-    draftId={selectedDraftId}
-    closeModal={() => {
-      setEditDraftPopup(false);
-      setSelectedDraftId(null);
-    }}
-  />
-)}
+      {editDraftPopup && (
+        <EditDraft
+          draftId={selectedDraftId}
+          complaintId={selectedComplaintId}
+          closeModal={() => {
+            setEditDraftPopup(false);
+            setSelectedDraftId(null);
+            setSelectedComplaintId(null);
+          }}
+        />
+      )}
 
-      {/* Add Document Modal */}
+      {/* Add Document Modal (Backend Validation) */}
       {openAddDocuments && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
           <div className="bg-white rounded-xl w-full max-w-lg flex flex-col shadow-2xl animate-fade-in-up">
@@ -474,6 +459,7 @@ const handleEditDraft = (draftId) => {
               </button>
             </div>
             <div className="p-6 space-y-5">
+              {/* Draft Title */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Draft Title <span className="text-red-500">*</span>
@@ -482,32 +468,50 @@ const handleEditDraft = (draftId) => {
                   type="text"
                   placeholder="Enter Draft Title"
                   value={newDoc.title}
-                  onChange={(e) =>
-                    setNewDoc({ ...newDoc, title: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  onChange={(e) => {
+                    setNewDoc({ ...newDoc, title: e.target.value });
+                    if(errors.title) setErrors({...errors, title: null});
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${
+                    errors.title ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                  }`}
                 />
+                {errors.title && (
+                  <p className="text-xs text-red-500 mt-1">{errors.title}</p>
+                )}
               </div>
+
+              {/* Correspondence Type */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Correspondence Type <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={newDoc.type}
-                  onChange={(e) =>
-                    setNewDoc({ ...newDoc, type: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
+                  onChange={(e) => {
+                    setNewDoc({ ...newDoc, type: e.target.value });
+                    if(errors.type) setErrors({...errors, type: null});
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none transition-all bg-white ${
+                    errors.type ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                  }`}
                 >
                   <option value="">Select Type</option>
                   <option value="Draft Letter">Draft Letter</option>
                 </select>
+                {errors.type && (
+                  <p className="text-xs text-red-500 mt-1">{errors.type}</p>
+                )}
               </div>
+
+              {/* File Upload */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Upload File <span className="text-red-500">*</span>
                 </label>
-                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group">
+                <div className={`relative border-2 border-dashed rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group ${
+                    errors.file ? "border-red-400 bg-red-50" : "border-gray-300"
+                  }`}>
                   <input
                     type="file"
                     onChange={handleFileChange}
@@ -532,8 +536,8 @@ const handleEditDraft = (draftId) => {
                       </>
                     ) : (
                       <>
-                        <FaCloudUploadAlt className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                        <span className="text-sm text-gray-500">
+                        <FaCloudUploadAlt className={`w-8 h-8 transition-colors ${errors.file ? "text-red-400" : "text-gray-400 group-hover:text-blue-500"}`} />
+                        <span className={`text-sm ${errors.file ? "text-red-500" : "text-gray-500"}`}>
                           Click to browse or drag file here
                         </span>
                         <span className="text-xs text-gray-400">
@@ -543,11 +547,8 @@ const handleEditDraft = (draftId) => {
                     )}
                   </div>
                 </div>
-                
-                {errors && errors.file && errors.file[0] && (
-                  <div className="text-red-500 text-xs mt-1 p-2 bg-red-50 border border-red-200 rounded">
-                     {errors.file[0]}
-                  </div>
+                {errors.file && (
+                  <p className="text-xs text-red-500 mt-1">{errors.file}</p>
                 )}
               </div>
             </div>
@@ -572,7 +573,7 @@ const handleEditDraft = (draftId) => {
         </div>
       )}
 
-      {/* Add Note/Noting Modal (EDITOR) */}
+      {/* Add Note/Noting Modal (EDITOR) With Static Validation */}
       {openNoteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 md:p-0">
           <div className="bg-white w-full md:w-11/12 h-full md:h-[70vh] shadow-xl relative flex flex-col md:flex-row rounded-md overflow-hidden">
@@ -590,12 +591,23 @@ const handleEditDraft = (draftId) => {
               type="text"
               name="title"
               id="title"
-              value={draftTitle}   // bind karo state
-              onChange={(e) => setDraftTitle(e.target.value)} // update state on change
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+              value={draftTitle}  
+              onChange={(e) => {
+                  setDraftTitle(e.target.value);
+                  if(errors.title) setErrors({...errors, title: null}); // Clear static error
+              }}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm ${
+                  errors.title ? "border-red-500" : "border-gray-300"
+              }`}
             />
+            {/* Show Static Error for Title */}
+            {errors.title && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.title[0]}
+                </p>
+            )}
 
-              <h2 className="text-lg font-semibold mb-4 md:mb-6">Create Draft</h2>
+              <h2 className="text-lg font-semibold mb-4 md:mb-6 mt-4">Create Draft</h2>
               <label className="block text-sm font-medium mb-2">
                 Draft Content <span className="text-red-500">*</span>
               </label>
@@ -628,6 +640,7 @@ const handleEditDraft = (draftId) => {
                   }}
                 />
               </div>
+              {/* Show Static Error for Editor */}
               {errors.draft_note && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.draft_note[0]}
@@ -636,7 +649,7 @@ const handleEditDraft = (draftId) => {
               <div className="flex justify-end mt-24"> 
                 <button
                   className="bg-blue-600 text-white px-3 py-3 rounded-lg hover:bg-blue-700 transition text-md"
-                  onClick={handleSubmitNote} // THIS OPENS THE POPUP
+                  onClick={handleSubmitNote} // Validates locally first
                 >
                  Submit
                 </button>
@@ -678,6 +691,37 @@ const handleEditDraft = (draftId) => {
                   </button>
                 </div>
               </div>
+
+ <div className="mt-5 py-5 px-6 w-full flex justify-between items-start font-[Mangal] text-black">
+  <div className="w-1/3"></div>
+  <div className="w-1/3 text-center">
+    <h1 className="text-xl font-bold">लोक आयुक्त</h1>
+    <h2 className="text-md font-bold mt-1">उत्तर प्रदेश</h2>
+
+    <div className="mt-1 mx-auto w-25 h-25  rounded-full flex items-center justify-center overflow-hidden">
+      <img
+        src="/public/images/ChatGPTImage .png"
+        alt="Lok Ayukt"
+        className="w-full h-full object-cover"
+      />
+    </div>
+  </div>
+
+  <div className="w-1/3 text-[15px] font-bold leading-6 text-right">
+    <p>पोस्ट बाक्स नं 172 (जी.पी.ओ.)</p>
+    <p>टी.सी. 46/बी-1, विभूति खण्ड</p>
+    <p>गोमती नगर</p>
+    <p>लखनऊ-226 010</p>
+
+    <div className="mt-1">
+      <p>दूरभाष : 2728660</p>
+      <p className="pr-0">2306717</p>
+    </div>  
+
+    <p className="mt-1">फैक्स : (0522) 2306647</p>
+  </div>
+</div>
+
               <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
                 <p className="text-sm text-center font-semibold text-gray-800">
                   File No: {complaint?.file_number || complaint?.complain_no}
@@ -696,7 +740,7 @@ const handleEditDraft = (draftId) => {
                     <p className="font-semibold mt-1 text-gray-800">
                       Shri Sanjay Mishra
                     </p>
-                    <p>PS Name...</p>
+                    <p>{subrole}</p>
                   </div>
                 </div>
               </div>
@@ -709,7 +753,7 @@ const handleEditDraft = (draftId) => {
                 </button>
                 <button
                   className="px-6 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
-                  onClick={handleFinalSubmit} // THIS CALLS THE API WITH PDF BINARY
+                  onClick={handleFinalSubmit} 
                 >
                   Submit
                 </button>
@@ -719,7 +763,6 @@ const handleEditDraft = (draftId) => {
         </div>
       )}
 
-      {/* PDF View Modal */}
       {pdfViewUrl && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">
@@ -728,7 +771,6 @@ const handleEditDraft = (draftId) => {
               <button
                 onClick={() => setPdfViewUrl(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
-                
               >
                 <FaTimes className="w-5 h-5" />
               </button>

@@ -61,12 +61,16 @@ const Notes = ({ complaint }) => {
   const fetchNotes = async () => {
     if (!complaint?.id) return;
     try {
+       setLoading(true);
       const res = await api.get(`/supervisor/get-notes/${complaint.id}`);
       if (res.data.status) {
         setNotesList(res.data.data);
       }
     } catch (err) {
       console.log("Notes fetch error:", err);
+    }
+    finally{
+       setLoading(false);
     }
   };
 
@@ -306,7 +310,14 @@ const Notes = ({ complaint }) => {
             viewDocUrl ? "w-full md:w-1/2 h-[600px]" : "w-full max-h-[600px]"
           }`}
         >
-          {notesList.length === 0 ? (
+          {
+             loading?
+          (
+            <p className="text-sm text-gray-500 text-center py-4">
+              Loading...
+            </p>
+          ) :
+          notesList.length === 0 ? (
             <p className="text-sm text-gray-500 text-center py-4">
               No notes available.
             </p>
