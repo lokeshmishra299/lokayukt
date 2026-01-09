@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes, FaCloudUploadAlt, FaFileAlt, FaSpinner } from "react-icons/fa";
 import axios from "axios";
-import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query"; 
+import { toast, Toaster } from "react-hot-toast";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -15,7 +15,6 @@ const api = axios.create({
   },
 });
 
-
 const EditDraft = ({ closeModal, draftId, complaintId  }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -25,6 +24,8 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
 
   const [existingFile, setExistingFile] = useState(null); 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // State to hold backend errors
   const [errors, setErrors] = useState({});
 
   const { data: draftData, isLoading, isError } = useQuery({
@@ -54,25 +55,27 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setFormData({ ...formData, file: e.target.files[0] });
+      // Clear error when user selects a new file
+      if(errors.file) setErrors(prev => ({...prev, file: null}));
     }
   };
 
   const handleSubmit = async () => {
-    setErrors({});
+    setErrors({}); // Clear previous errors
 
-    if (!formData.title) {
-      toast.error("Title is required.");
-      return;
-    }
+    // Client-side validation (optional)
+    // if (!formData.title) {
+    //   toast.error("Title is required.");
+    //   return;
+    // }
 
     setIsSubmitting(true);
     try {
       const payload = new FormData();
       payload.append("id", draftId); 
-      // payload.append("complain_id",  complaintId); 
-      payload.append("title", formData.title);
-      payload.append("type", formData.type);
-       
+      payload.append("title", formData.title || "");
+      payload.append("type", formData.type || "");
+        
       if(complaintId) {
           payload.append("complain_id", complaintId);
       }
@@ -85,22 +88,20 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-       // ✅ YEH FIX KARO:
-  if (res.data.status) {
-    toast.success(res.data.message || "Draft Updated Successfully!");
-    
-    // ✅ Automatic close ke liye
-    setTimeout(() => {
-      if (closeModal) closeModal(true); // ✅ true pass karo success ka indication
-    }, 1000); // 1 second delay
-    
-  }
-   if (res.data.status) {
-        // toast.success(res.data.message || "Draft Updated Successfully!");
-        if (closeModal) closeModal(); 
+      // --- LOGIC UPDATED HERE ---
+      if (res.data.status) {
+        toast.success(res.data.message || "Draft Updated Successfully!");
+        
+        setTimeout(() => {
+          if (closeModal) closeModal(true); 
+        }, 1000); 
+        
       } else {
+        // Agar status false hai, toh errors check karo
         if (res.data.errors) {
-            setErrors(res.data.errors);
+            setErrors(res.data.errors); // State update karo taaki UI me dikhe
+            
+            // Optional: Pehla error toast me bhi dikha do
             const firstErrorKey = Object.keys(res.data.errors)[0];
             if(firstErrorKey) toast.error(res.data.errors[firstErrorKey][0]);
         } else {
@@ -109,7 +110,13 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
       }
     } catch (error) {
       console.error("Update failed:", error);
-      // toast.error("Server Error while updating.");
+      
+      // Agar API 422 (Unprocessable Entity) ya koi aur error throw kare
+      if (error.response && error.response.data && error.response.data.errors) {
+          setErrors(error.response.data.errors); // Backend errors ko state me set karo
+      } else {
+          toast.error("Server Error while updating.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -118,36 +125,29 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
   if (isLoading) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 md:p-0">
-          <span>Loading...</span>
+          <span className="text-white font-semibold">Loading...</span>
       </div>
     );
   }
 
   return (
+    <>
+      <Toaster position="top-right" />
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 md:p-0">
       <div className="bg-white w-full max-w-lg rounded-xl shadow-2xl relative flex flex-col overflow-hidden animate-fade-in-up">
         
         {/* Header */}
-
-        {
-          isLoading ? (
-            <div>
-              Loading...
-            </div>
-          )
-          :
-
-             <div className="flex items-center justify-between p-5 border-b border-gray-100">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h3 className="text-lg font-bold text-gray-800">Edit Draft</h3>
           <button
-            onClick={closeModal}
+            onClick={() => closeModal(false)}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
           >
             <FaTimes className="w-5 h-5" />
           </button>
         </div>
 
-        /* Content */}
+        {/* Content */}
         <div className="p-6 space-y-5">
           {/* Title Input */}
           <div className="space-y-1.5">
@@ -158,12 +158,16 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
               type="text"
               placeholder="Enter Draft Title"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) => {
+                  setFormData({ ...formData, title: e.target.value });
+                  if(errors.title) setErrors({...errors, title: null});
+              }}
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none transition-all ${
                   errors.title ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-500"
               }`}
             />
-             {errors.title && <p className="text-xs text-red-500">{errors.title[0]}</p>}
+            {/* Show Title Error */}
+            {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title[0]}</p>}
           </div>
 
           {/* File Upload Section */}
@@ -181,7 +185,7 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
             )}
 
             <div className={`relative border-2 border-dashed rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group ${
-                 errors.file ? "border-red-300 bg-red-50" : "border-gray-300"
+                 errors.file ? "border-red-400 bg-red-50" : "border-gray-300"
             }`}>
               <input
                 type="file"
@@ -202,8 +206,8 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
                   </>
                 ) : (
                   <>
-                    <FaCloudUploadAlt className="w-8 h-8 text-gray-400 group-hover:text-blue-500 transition-colors" />
-                    <span className="text-sm text-gray-500">
+                    <FaCloudUploadAlt className={`w-8 h-8 transition-colors ${errors.file ? 'text-red-400' : 'text-gray-400 group-hover:text-blue-500'}`} />
+                    <span className={`text-sm ${errors.file ? 'text-red-500' : 'text-gray-500'}`}>
                       Click to replace existing file
                     </span>
                     <span className="text-xs text-gray-400">
@@ -213,14 +217,22 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
                 )}
               </div>
             </div>
-             {errors.file && <p className="text-xs text-red-500 mt-1">{errors.file[0]}</p>}
+            
+            {/* ✅ BACKEND ERROR DISPLAY FOR FILE */}
+            {errors.file && (
+                <div className="flex items-center gap-1 mt-1 text-red-600">
+                    {/* <FaExclamationCircle className="w-3 h-3" /> */}
+                    <p className="text-xs font-medium">{errors.file[0]}</p>
+                </div>
+            )}
+
           </div>
         </div>
 
         {/* Footer Buttons */}
         <div className="p-5 border-t border-gray-100 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
           <button
-            onClick={closeModal}
+            onClick={() => closeModal(false)}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             disabled={isSubmitting}
           >
@@ -236,9 +248,9 @@ const EditDraft = ({ closeModal, draftId, complaintId  }) => {
           </button>
         </div>
         
-     
       </div>
     </div>
+    </>
   );
 };
 

@@ -2,7 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { FiBell, FiChevronDown, FiLayers } from "react-icons/fi";
 import { FaBars, FaSync, FaSignOutAlt, FaUser } from 'react-icons/fa';
-import { ToastContainer, toast } from "react-toastify";
+// import { ToastContainer, toast } from "react-toastify";
+import { toast, Toaster } from "react-hot-toast";
+
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
@@ -96,7 +98,7 @@ const Header = ({ toggleMobileMenu }) => {
   // ================= UI =================
   return (
     <>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <Toaster position="top-right" />
 
       {/* ✅ FULL WIDTH HEADER */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b shadow-sm z-50">

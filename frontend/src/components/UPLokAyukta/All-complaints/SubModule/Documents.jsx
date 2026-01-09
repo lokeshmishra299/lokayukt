@@ -3,7 +3,9 @@ import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt } from "react-ic
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
+import { toast, Toaster } from "react-hot-toast";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -159,6 +161,7 @@ const Documents = ({ complaint }) => {
 
   return (
     <div className="">
+      <Toaster position="top-right" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Documents</h2>

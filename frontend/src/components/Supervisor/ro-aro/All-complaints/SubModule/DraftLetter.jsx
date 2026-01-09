@@ -3,7 +3,9 @@ import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt, FaPrint, FaDown
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
+import { toast, Toaster } from "react-hot-toast";
+
 import { RiEditBoxLine } from "react-icons/ri";
 
 // Import Editor components
@@ -358,6 +360,7 @@ const DraftLetter = ({ complaint }) => {
 
   return (
     <div className="">
+      <Toaster position="top-right" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Draft</h2>

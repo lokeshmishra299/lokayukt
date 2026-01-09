@@ -3,13 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory  from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
+import { toast, Toaster } from "react-hot-toast";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -455,7 +455,7 @@ const markAsReceivedMutation = useMutation({
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <ToastContainer position="top-right"  />
+      <Toaster position="top-right"  />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>

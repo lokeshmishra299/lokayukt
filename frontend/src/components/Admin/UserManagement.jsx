@@ -16,8 +16,10 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Pagination from '../Pagination';
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster } from "react-hot-toast";
+
 import * as XLSX from "xlsx-js-style";
 import { saveAs } from "file-saver";
 
@@ -396,18 +398,9 @@ const UserManagement = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <ToastContainer
+      <Toaster
         position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }}
+      
       />
       
       <div className="p-4 space-y-4">
