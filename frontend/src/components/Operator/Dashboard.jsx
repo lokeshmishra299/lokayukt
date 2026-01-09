@@ -572,9 +572,14 @@ const Dashboard = ({ userRole = "operator" }) => {
                 )}
       
                 {/*  Refresh Button */}
-                <Button variant="outline" size="sm" onClick={handleRefresh}>
+                  <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => window.location.reload()} // Yeh poora page refresh karega
+                  className="flex items-center cursor-pointer"
+                >
                   <FaChartLine className="h-4 w-4 mr-2 text-green-500" />
-                  Refresh
+                  Refresh 
                 </Button>
               </div>
             </div>

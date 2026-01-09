@@ -475,7 +475,7 @@ function takefile(){
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} closeButton={true} draggable={false} pauseOnHover={true}  />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
