@@ -3,7 +3,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { ToastContainer, toast } from "react-toastify";
+import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdTime } from "react-icons/io";
 
@@ -263,18 +263,8 @@ useEffect(() => {
 
   return (
     <>
-      <ToastContainer
+      <Toaster 
         position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }}
       />
 
       <div className="w-full h-screen flex bg-gray-50 rounded-md overflow-hidden">

@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster } from "react-hot-toast";
+
+// import "react-toastify/dist/ReactToastify.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
@@ -260,29 +261,36 @@ const ViewAllComplaint = () => {
       staleTime: 0,
     });
 
-  const markAsReceivedMutation = useMutation({
-    mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post(`/lokayukt/return-complain-by-lokayukt/${id}`, {
-        complaint_id: complaintId,
-        remark: remarkData,
-        sent_through_rk: sent_through_rk ? 1 : 0
+const markAsReceivedMutation = useMutation({
+  mutationFn: async ({ complaintId, remarkData }) => {
+    const res = await api.get(
+      `/lokayukt/return-complain-by-lokayukt/${id}`,{ params: { complaint_id: complaintId,
+          remark: remarkData,
+          sent_through_rk: sent_through_rk ? 1 : 0,
+        },
+      }
+    );
+    return res.data;
+  },
 
-      });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || "Marked as received successfully");
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-       setThroughRC(false);
-      setRemark("");
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to mark as received"
-      );
-    },
-  });
+  onSuccess: (data) => {
+    toast.success("Marked as received successfully");
+    queryClient.invalidateQueries({
+      queryKey: ["complaint-details", id],
+    });
+
+    setThroughRC(false);
+    setRemark("");
+    setConfirmConfig({ open: false, type: null });
+  },
+
+  onError: (error) => {
+    toast.error(
+      error?.response?.data?.message || "Failed to mark as received"
+    );
+  },
+});
+
 
   const dispose = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
@@ -448,8 +456,9 @@ const ViewAllComplaint = () => {
   }
 
   return (
+    <>
+      <Toaster position="top-right"  />
     <div className="w-full min-h-screen bg-gray-50">
-      <ToastContainer position="top-right" autoClose={3000} />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
@@ -652,7 +661,7 @@ const ViewAllComplaint = () => {
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${
                     complaintData.fee_exempted === 1
-                      ? "bg-green-50 text-green-700 border-green-200"
+                    ? "bg-green-50 text-green-700 border-green-200"
                       : "bg-gray-50 text-gray-700 border-gray-200"
                   }`}
                 >
@@ -840,7 +849,7 @@ const ViewAllComplaint = () => {
 
                   
                   <button
-                    onClick={handleforwardphysical}
+                  onClick={handleforwardphysical}
                     disabled={forwardComplaintMutation.isPending}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -959,14 +968,14 @@ const ViewAllComplaint = () => {
                         </div>
                       ) : (
                         <SearchableDropdown
-                          options={
-                            Array.isArray(forwardOptionsData)
-                              ? forwardOptionsData
-                              : []
-                          }
-                          value={selectedForwardTo}
-                          onChange={(val) => setSelectedForwardTo(val)}
-                          placeholder="Select Officer..."
+                        options={
+                          Array.isArray(forwardOptionsData)
+                          ? forwardOptionsData
+                          : []
+                        }
+                        value={selectedForwardTo}
+                        onChange={(val) => setSelectedForwardTo(val)}
+                        placeholder="Select Officer..."
                         />
                       )}
 
@@ -1001,7 +1010,7 @@ const ViewAllComplaint = () => {
                           rows={4}
                           placeholder="Enter your remark here..."
                           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                        />
+                          />
                       </div>
                     </>
                   )}
@@ -1102,7 +1111,7 @@ const ViewAllComplaint = () => {
               complaintId: id,
               remarkData: remark,
             });
-
+            
             setshowDispatch(false);
           }}
           disabled={dispose.isPending || !remark.trim()}
@@ -1147,19 +1156,19 @@ const ViewAllComplaint = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
-                      Name
+                  <p className="text-xs text-gray-500 uppercase font-semibold">
+                  Name
                     </p>
                     <p className="text-gray-800 font-medium">
                       {complaintData.complainants?.[0]?.complainant_name ||
                         "N/A"}
-                    </p>
+                        </p>
                   </div>
 
                   <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
-                      Father Name
-                    </p>
+                  <p className="text-xs text-gray-500 uppercase font-semibold">
+                  Father Name
+                  </p>
                     <p className="text-gray-800 font-medium">
                       {complaintData.complainants?.[0]?.father_name || "N/A"}
                     </p>
@@ -1176,15 +1185,15 @@ const ViewAllComplaint = () => {
                   </div>
 
                   <div className="p-3 bg-gray-50 rounded border border-gray-100">
-                    <p className="text-xs text-gray-500 uppercase font-semibold">
+                  <p className="text-xs text-gray-500 uppercase font-semibold">
                       Occupation
                     </p>
                     <p className="text-gray-800 font-medium">
                       {complaintData.complainants?.[0]?.occupation || "N/A"}
-                    </p>
-                  </div>
+                      </p>
+                      </div>
                 </div>
-              </div>
+                </div>
             )} */}
 
               
@@ -1270,7 +1279,7 @@ const ViewAllComplaint = () => {
                                     ? "bg-green-100 text-green-800"
                                     : "bg-gray-100 text-gray-600"
                                 }`}
-                              >
+                                >
                                 {comp.is_public_servant || "-"}
                               </span>
                             </td>
@@ -1318,7 +1327,7 @@ const ViewAllComplaint = () => {
                       <div className="flex justify-between items-center mb-3 border-b border-gray-200 pb-2">
                         <h4 className="text-sm font-bold text-gray-700">
                           Respondent #{idx + 1}
-                        </h4>
+                          </h4>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                         <div>
@@ -1326,28 +1335,28 @@ const ViewAllComplaint = () => {
                             NAME
                           </p>
                           <p className="text-sm text-gray-800">
-                            {resp?.respondent_name || "N/A"}
+                          {resp?.respondent_name || "N/A"}
                           </p>
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 font-semibold">
-                            DESIGNATION
+                          DESIGNATION
                           </p>
                           <p className="text-sm text-gray-800">
-                            {resp?.designation || "N/A"}
+                          {resp?.designation || "N/A"}
                           </p>
-                        </div>
+                          </div>
 
-                        <div className="sm:col-span-2">
+                          <div className="sm:col-span-2">
                           <p className="text-xs text-gray-500 font-semibold">
-                            ADDRESS
+                          ADDRESS
                           </p>
                           <p className="text-sm text-gray-800">
                             {resp?.current_address || "N/A"}
-                          </p>
+                            </p>
                         </div>
                       </div>
-                    </div>
+                      </div>
                   ))
                 ) : (
                   <div className="text-center py-8 bg-gray-50 rounded border border-dashed border-gray-300">
@@ -1355,7 +1364,7 @@ const ViewAllComplaint = () => {
                       No respondent data available.
                     </p>
                   </div>
-                )}
+                  )}
               </div>
             )} */}
 
@@ -1455,7 +1464,7 @@ const ViewAllComplaint = () => {
                       <tbody className="bg-white divide-y divide-gray-200">
                         {complaintData.support.map((item, idx) => (
                           <tr
-                            key={idx}
+                          key={idx}
                             className="hover:bg-blue-50 transition-colors"
                           >
                             <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
@@ -1483,7 +1492,7 @@ const ViewAllComplaint = () => {
             )}
 
   {viewModalConfig.type === "witness" && (
-              <div className="w-full">
+    <div className="w-full">
                 {complaintData.witness && complaintData.witness.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
                     <table className="min-w-full divide-y divide-gray-200">
@@ -1543,6 +1552,7 @@ const ViewAllComplaint = () => {
         </div>
       )}
     </div>
+      </>
   );
 };
 

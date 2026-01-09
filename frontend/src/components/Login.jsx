@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaUser, FaLock, FaBalanceScale, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { ToastContainer, toast } from "react-toastify";
+import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Footer from './Footer';
@@ -279,17 +279,7 @@ const Login = () => {
       <Footer />
 
       {/* ToastContainer for react-toastify */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
+      <Toaster position="top-right"
       />
     </div>
   );
