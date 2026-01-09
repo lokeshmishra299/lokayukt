@@ -257,6 +257,7 @@ class PSComplaintsController extends Controller
       $complainDetails->actions =  DB::table('complaint_actions')
     ->where('complaint_id', $id)
     ->where('status','Forwarded')
+     ->orderBy('id','desc')
     //  ->where(function($q){
     //                         $q->where('status','Forwarded');
                                      

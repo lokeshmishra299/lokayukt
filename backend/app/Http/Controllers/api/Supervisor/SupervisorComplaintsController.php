@@ -416,7 +416,7 @@ class SupervisorComplaintsController extends Controller
      ->where(function($q){
                             $q->where('status','Verified')
                             ->Orwhere('status', 'Forwarded');               
-                         })
+                         }) ->orderBy('id','desc')
     ->get();
 
            

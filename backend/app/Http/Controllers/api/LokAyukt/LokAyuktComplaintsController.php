@@ -155,6 +155,7 @@ class LokAyuktComplaintsController extends Controller
                             $q->where('status','Verified')
                             ->Orwhere('status', 'Forwarded');               
                          })
+                         ->orderBy('id','desc')
     ->get();
 
            

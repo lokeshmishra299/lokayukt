@@ -272,7 +272,7 @@ $complainDetails->actions = DB::table('complaint_actions')
     ->where(function ($q) {
         $q->where('status', 'Verified')
           ->orWhere('status', 'Forwarded');
-    })
+    })->orderBy('id','desc')
     ->get();
 
 
