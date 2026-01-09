@@ -1107,7 +1107,7 @@ class LokAyuktComplaintsController extends Controller
         //         'errors' => $validation->errors()
         //     ], 422);
         // }
-        if(isset($complainId) && $request->isMethod('post')){
+        if(isset($complainId) && $request->isMethod('get')){
 
              $cmp =  Complaint::findOrFail($complainId);
              
