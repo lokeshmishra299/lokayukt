@@ -163,6 +163,7 @@ class OperatorComplaintsController extends Controller
         if ($authorizationDocument) {
             DB::table('complaints_documents')->insert([
                 'complain_id' => $complaintId,
+                'type'        => 'authorizationDocument',
                 'file'        => $authorizationDocument
             ]);
         }
@@ -170,6 +171,7 @@ class OperatorComplaintsController extends Controller
         if ($challanFile) {
             DB::table('complaints_documents')->insert([
                 'complain_id' => $complaintId,
+                'type'        => 'challan',
                 'file'        => $challanFile
             ]);
         }
@@ -177,6 +179,7 @@ class OperatorComplaintsController extends Controller
         if ($attached_documents) {
             DB::table('complaints_documents')->insert([
                 'complain_id' => $complaintId,
+                'type'        => 'attached',
                 'file'        => $attached_documents
             ]);
         }
