@@ -253,6 +253,22 @@ const ViewApprovedComplaints = () => {
     staleTime: 0,
   });
 
+
+  // --- PULL BACK API (UpLokayukt) ---
+  const pullBackMutation = useMutation({
+    mutationFn: async ({ complaintId }) => {
+      return api.post(`/uplokayukt/pull-back-by-uplokayukt/${complaintId}`);
+    },
+    onSuccess: (res) => {
+      toast.success("Complaint pulled back successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Pull back failed");
+    },
+  });
+
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
       const res = await api.post(
@@ -348,8 +364,9 @@ const ViewApprovedComplaints = () => {
         remarkData: remark,
       });
     } else if (confirmConfig.type === "pullback") {
-      // toast.success("Complaint Pulled Back Successfully");
-      setConfirmConfig({ open: false, type: null });
+      pullBackMutation.mutate({
+        complaintId: id,
+      });
     }
   };
 
@@ -983,6 +1000,7 @@ const ViewApprovedComplaints = () => {
                 disabled={
                   markAsReceivedMutation.isPending ||
                   forwardComplaintMutation.isPending ||
+                  pullBackMutation.isPending || 
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
                     (!remark.trim() ||
@@ -993,12 +1011,13 @@ const ViewApprovedComplaints = () => {
                 className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 {markAsReceivedMutation.isPending ||
-                forwardComplaintMutation.isPending
-                  ? "Sending..."
+                forwardComplaintMutation.isPending ||
+                pullBackMutation.isPending // ✅ Ye check add kiya
+                  ? "Processing..."
                   : confirmConfig.type === "assign" ||
                     confirmConfig.type === "pullback"
                   ? "Yes"
-                  : "Sent"}
+                  : "Send"}
               </button>
             </div>
           </div>

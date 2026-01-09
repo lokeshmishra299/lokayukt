@@ -246,7 +246,7 @@ const ViewAllComplaint = () => {
       return res.data;
     },
     onSuccess: (data) => {
-      toast.success(data.message || "Assigned to yourself successfully");
+      toast.success("Assigned to yourself successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setConfirmConfig({ open: false, type: null });
     },

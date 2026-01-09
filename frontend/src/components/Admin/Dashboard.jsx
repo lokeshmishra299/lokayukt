@@ -569,13 +569,17 @@ const Dashboard = ({ userRole = "Administrator" }) => {
   `;
 
   return (
-    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+    <div className="space-y-2 bg-gray-50 min-h-screen">
       {/* Add styles for chart cursor pointer */}
       <style>{chartStyles}</style>
       
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
+          {/* <h1 className="text-3xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1> */}
+              <div>
+            <h1 className="text-xl font-bold text-gray-900">Dashboard </h1>
+            <p className="text-sm text-gray-600">डैशबोर्ड</p>
+          </div>
           <p className="text-gray-600">
             Welcome back, {userRole} • Last updated: {new Date().toLocaleString()}
           </p>

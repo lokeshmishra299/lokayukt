@@ -317,7 +317,7 @@ useEffect(() => {
         <div className="w-full bg-white flex flex-col overflow-hidden">
           <div className="px-3 sm:px-4 py-3 border-b flex-shrink-0 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900">Inbox</h2>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">Sent</h2>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                 <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
                   Inbox: {filteredComplaints.length}

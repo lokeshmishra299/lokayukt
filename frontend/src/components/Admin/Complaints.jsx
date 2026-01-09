@@ -612,7 +612,7 @@ const [isCompareClicked, setIsCompareClicked] = useState(false);
 
       {/* Header with buttons */}
       <div className="mb-4 sm:mb-6">
-        <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+        <div className="flex flex-col  sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Complaint Entry</h1>
             <p className="text-xs sm:text-sm text-gray-600">शिकायत प्रविष्टि फॉर्म</p>

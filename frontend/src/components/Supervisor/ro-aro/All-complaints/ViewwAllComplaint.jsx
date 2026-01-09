@@ -244,6 +244,21 @@ function takefile(){
   // });
 
 
+  // --- PULL BACK API (Supervisor) ---
+  const pullBackMutation = useMutation({
+    mutationFn: async ({ complaintId }) => {
+      return api.post(`/supervisor/pull-back-by-ro-aro/${complaintId}`);
+    },
+    onSuccess: (res) => {
+      toast.success("Complaint pulled back successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Pull back failed");
+    },
+  });
+
     const assignToSelfMutation = useMutation({
       mutationFn: async ({ complaintId }) => {
         const res = await api.post(`/supervisor/assign-by-ro-aro/${complaintId}`);
@@ -402,9 +417,10 @@ function takefile(){
         forwardTo: selectedForwardTo,
         remarkData: remark,
       });
-    } else if (confirmConfig.type === "pullback") {
-      // toast.success("Complaint Pulled Back Successfully");
-      setConfirmConfig({ open: false, type: null });
+    }  else if (confirmConfig.type === "pullback") {
+      pullBackMutation.mutate({
+        complaintId: id,
+      });
     }
   };
 
@@ -949,14 +965,14 @@ function takefile(){
           No
         </button>
 
-       <button
+  <button
   onClick={() =>
     assignToSelfMutation.mutate({ complaintId: id })
   }
-  className="px-5 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
-  disabled={assignToSelfMutation.isLoading}
+  className="px-5 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+  disabled={assignToSelfMutation.isPending} 
 >
-  {assignToSelfMutation.isLoading ? "Processing..." : "Yes"}
+  {assignToSelfMutation.isPending ? "Processing..." : "Yes"}
 </button>
 
       </div>
@@ -1126,27 +1142,31 @@ function takefile(){
                   </button>
     
                   <button
-                    onClick={handleConfirmYes}
-                    disabled={
-                      markAsReceivedMutation.isPending ||
-                     forwardComplaintMutation.isPending ||
-                      (confirmConfig.type === "receive" && !remark.trim()) ||
-                      (confirmConfig.type === "forward" &&
-                        (!remark.trim() ||
-                          !selectedForwardTo ||
-                          isLoadingOptions ||
-                          isFetchingOptions))
-                    }
-                    className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                  >
-                    {markAsReceivedMutation.isPending ||
-                   forwardComplaintMutation.isPending
-                      ? "Sending..."
-                      : confirmConfig.type === "assign" ||
-                        confirmConfig.type === "pullback"
-                      ? "Yes"
-                      : "Send"}
-                  </button>
+                onClick={handleConfirmYes}
+                disabled={
+                  markAsReceivedMutation.isPending ||
+                  forwardComplaintMutation.isPending ||
+                  assignToSelfMutation.isPending || 
+                  pullBackMutation.isPending || 
+                  (confirmConfig.type === "receive" && !remark.trim()) ||
+                  (confirmConfig.type === "forward" &&
+                    (!remark.trim() ||
+                      !selectedForwardTo ||
+                      isLoadingOptions ||
+                      isFetchingOptions))
+                }
+                className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              >
+                {markAsReceivedMutation.isPending ||
+                forwardComplaintMutation.isPending ||
+                assignToSelfMutation.isPending ||
+                pullBackMutation.isPending 
+                  ? "Processing..."
+                  : confirmConfig.type === "assign" ||
+                    confirmConfig.type === "pullback"
+                  ? "Yes"
+                  : "Send"}
+              </button>
                 </div>
               </div>
             </div>
