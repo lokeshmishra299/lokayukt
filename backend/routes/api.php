@@ -402,6 +402,7 @@ Route::middleware('auth:sanctum')->group(function(){
          Route::get('/get-lokayukt-uplokayukt',[PSComplaintsController::class,'getUsers']);
         Route::get('/get-users',[PSComplaintsController::class,'getSubROleUsers']);
         Route::get('/get-document/{id}',[PSComplaintsController::class,'getUploadDoc']);
+         Route::post('/upload-document',[PSComplaintsController::class,'uploadDocument']);
         Route::get('/get-notes/{id}',[PSComplaintsController::class,'getNotes']);
         Route::post('/add-notes',[PSComplaintsController::class,'addNotes']);
         Route::get('/get-file-preview/{id}',[PSComplaintsController::class,'getFilePreview']);
@@ -521,7 +522,7 @@ Route::middleware('auth:sanctum')->group(function(){
            Route::post('/return-complain-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'returnComplainByUpLokayukt']);
           Route::post('/forward-by-uplokayukt/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyUplokayukt']);
           Route::get('/get-file-preview/{id}',[UpLokAyuktComplaintsController::class,'getFilePreview']);
-          
+          Route::post('/add-notes',[UpLokAyuktComplaintsController::class,'addNotes']);
           // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/request-report/{complainId}',[UpLokAyuktReportController::class,'requestReport']);
