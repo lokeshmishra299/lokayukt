@@ -1216,10 +1216,13 @@ class SupervisorComplaintsController extends Controller
                         $apcAction->forward_by_sec = $userId;
                         // $apcAction->approved_rejected_by_ro_aro = $userId;
 
-                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt'])) {
+                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','dispatch'])) {
 
                             if ($roleFwd === 'lok-ayukt') {
                                 $apcAction->forward_to_lokayukt = $request->forward_to;
+                            }elseif($roleFwd === 'dispatch'){
+                                 $apcAction->forward_to_dispatch = $request->forward_to;
+
                             } else {
                                 $apcAction->forward_to_uplokayukt = $request->forward_to;
                             }
@@ -1692,17 +1695,36 @@ class SupervisorComplaintsController extends Controller
 
 
    public function getUpLokayuktUsers(){
-    $usersByRole = User::with('role')
-     ->whereNotNull('role_id')
-        ->get()
-        ->groupBy(fn ($user) => $user->role->name);
-        if(!empty($usersByRole['up-lok-ayukt'])){
+    // $usersByRole = User::with('role')
+    //  ->whereNotNull('role_id')
+    //     ->get()
+    //     ->groupBy(fn ($user) => $user->role->name);
+    //     if(!empty($usersByRole['up-lok-ayukt'])){
 
-            return response()->json($usersByRole['up-lok-ayukt']);
-        }else{
+    //         return response()->json($usersByRole['up-lok-ayukt']);
+    //     }else{
 
-            return response()->json(["message"=>"Data Not Found"]);
+    //         return response()->json(["message"=>"Data Not Found"]);
+    //     }
+
+
+     $usersByRole = User::with('role')
+            ->whereNotNull('role_id')
+            ->get()
+            ->groupBy(fn ($user) => $user->role->name);
+
+        // lok-ayukt + ps users merge
+        $users = collect()
+            ->merge($usersByRole['up-lok-ayukt'] ?? collect())
+            ->merge($usersByRole['dispatch'] ?? collect());
+
+        if ($users->isNotEmpty()) {
+            return response()->json($users->values());
         }
+
+        return response()->json([
+            "message" => "Data Not Found"
+        ]);
        
    }
 
