@@ -37,7 +37,7 @@ class PSComplaintsController extends Controller
                     if ($roleParent === 'lok-ayukt') {
                         //  $q->where('rep.forward_to_lokayukt', $parentId);      
                     } elseif ($roleParent === 'up-lok-ayukt') {
-                        $q->where('rep.forward_to_uplokayukt', $parentId);
+                        // $q->where('rep.forward_to_uplokayukt', $parentId);
                     } else {
                         // 🔥 fallback (safe)
                         $q->where('rep.forward_to_lokayukt', $parentId)
@@ -63,11 +63,16 @@ class PSComplaintsController extends Controller
         )
         ->where('complaints.form_status', 1)
         ->where('complaints.approved_rejected_by_rk', 1)
+      
         ->groupBy('complaints.id','complaints.complaint_description','complaints.complain_no','complaints.cause_date','complaints.category','complaints.fee_exempted',
          'complaints.approved_rejected_by_rk',
             'complaints.approved_rejected_by_ps',
             'complaints.approved_rejected_by_lokayukt',
             'complaints.created_at','complaints.updated_at','dd.district_name');   // 🔥 distinct complaints
+
+        // if ($roleParent === 'up-lok-ayukt') {
+        //                $query->where('complaints.approved_rejected_by_lokayukt', 1);
+        //  }
 
     $records = $query->get();
 
