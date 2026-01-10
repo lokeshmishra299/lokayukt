@@ -1113,7 +1113,7 @@ class SupervisorComplaintsController extends Controller
         // $user = Auth::user()->id;
         // dd($usersubrole);
 
-        $userRole = User::with('role')->where('id',$request->forward_to)->get();
+         $userRole = User::with('role')->where('id',$request->forward_to)->get();
 
         
             $roleFwd = $userRole[0]->role->name ?? null;
