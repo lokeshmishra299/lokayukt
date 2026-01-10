@@ -289,7 +289,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/add-dispatch',[LokAyuktComplaintsController::class,'addDispachLeters']);
         Route::get('/all-complain-ids',[LokAyuktComplaintsController::class,'allComplainsId']);
         Route::get('/all-dispatch-letters',[LokAyuktComplaintsController::class,'allDispatchLetters']);
-        
+          Route::post('/upload-document',[LokAyuktComplaintsController::class,'uploadDocument']);
        
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyda']);
@@ -312,6 +312,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/complain-report',[LokAyuktReportController::class,'complainReports']);
         Route::get('/current-report',[LokAyuktReportController::class,'current_report']);
         Route::get('/analytic-report',[LokAyuktReportController::class,'analytics']);
+        
         // Route::get('/detail-by-complaintype',[LokAyuktReportController::class,'complainComplaintypeWise']);
          Route::get('/all-complains',[LokAyuktReportController::class,'allComplains']);
         Route::get('/district-wise-complaint',[LokAyuktReportController::class,'complainDistrictWise']);
@@ -468,9 +469,11 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/pull-back-by-ps/{complainId}',[DispatchComplaintsController::class,'pullBackByPs']);
         Route::post('forward-complain-by-ps/{complainId}',[DispatchComplaintsController::class,'forwardComplaintbyPS']);
         Route::post('assign-by-ps/{complainId}',[DispatchComplaintsController::class,'assignToPs']);
+          Route::post('/add-dispatch',[DispatchComplaintsController::class,'addDispachLeters']);
+        Route::get('/all-complain-ids',[DispatchComplaintsController::class,'allComplainsId']);
+        Route::get('/all-dispatch-letters',[DispatchComplaintsController::class,'allDispatchLetters']);
       
-      
-       
+        
         // Route::post('/forward-by-ds-js/{complainId}',[PSComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[PSComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-ps/{complainId}',[DispatchComplaintsController::class,'forwardComplaintbyPS']);
