@@ -126,6 +126,54 @@ class UpLokAyuktComplaintsController extends Controller
 
 }
 
+     public function uploadDocument(Request $request)
+    {
+        
+        // $user = $request->user()->id;
+        $added_by = Auth::user()->id;
+    
+        $validation = Validator::make($request->all(), [
+            
+            'complain_id' => 'required|numeric',
+            'type' => 'required|string',
+            'title' => 'required|string',
+            'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+        ], [
+            'complain_id.required' => 'Complaint Id is required.',
+            'type.required' => 'Complaint description is required.',
+            'title.required' => 'Letter Subject is Required',
+            'file.required' => 'File is Required',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        if(isset($request->complain_id)){    
+                $compDoc = new ComplainDocuments();
+                $compDoc->complain_id = $request->complain_id;
+                $compDoc->added_by = $added_by;
+                $compDoc->type = $request->type;
+                $compDoc->title = $request->title;
+                
+                $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
+                $filePath = $request->file('file')->storeAs('Document', $file, 'public');
+                $compDoc->file = $file;
+                
+                $compDoc->save();
+              
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Document Added successfully.',
+                    'data' => $compDoc
+                ], 201);
+        }
+
+    }
+
   public function getFilePreview($id){
         $cmp = Complaint::findOrFail($id);
         $cmpDetail = ComplainDocuments::where('complain_id',$cmp->id)->get();
