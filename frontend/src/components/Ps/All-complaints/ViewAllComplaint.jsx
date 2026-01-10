@@ -162,6 +162,12 @@ const ViewAllComplaint = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
+     const [showModal, setShowModal] = useState(false);
+          
+      const handleReject = () => {
+    console.log("Rejected!");
+    setShowModal(false); // close modal after action
+  };
 
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
@@ -932,6 +938,14 @@ const ViewAllComplaint = () => {
                   </div>
 
                   <div className="flex gap-2">
+
+                      <button
+        className="px-4 py-2 bg-red-600 border border-red-600 text-white rounded hover:bg-red-700 text-sm"
+        onClick={() => setShowModal(true)}
+      >
+        Reject
+      </button>
+
                     <button
                       onClick={handleMarkAsReceived}
                       disabled={returnWithRemarksMutation.isPending}
@@ -941,6 +955,8 @@ const ViewAllComplaint = () => {
                         ? "Processing..."
                         : "Return with Remarks"}
                     </button>
+
+
 
                     {complaintData.approved_rejected_by_ps == "1" ? (
                       <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
@@ -973,6 +989,29 @@ const ViewAllComplaint = () => {
           </div>
         )}
       </div>
+
+      {showModal && (
+  <div className="fixed inset-0 flex items-center justify-center  pt-20 bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
+      <h2 className="text-lg font-semibold mb-4">Confirm Rejection</h2>
+      <p className="mb-4">Are you sure you want to reject this?</p>
+      <div className="flex justify-end gap-2">
+        <button
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          onClick={() => setShowModal(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          onClick={handleReject}
+        >
+          Reject
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       {confirmConfig.open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

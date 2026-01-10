@@ -143,13 +143,6 @@ const ViewApprovedComplaints = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  
-
-
-
-  
-
-
     const capitalizeFirstLetter = (text = "") => {
   if (!text) return "N/A";
   return text.charAt(0).toUpperCase() + text.slice(1);
@@ -163,6 +156,12 @@ const ViewApprovedComplaints = () => {
   const [showMobileTabs, setShowMobileTabs] = useState(false);
   const [showDispatch, setshowDispatch] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
+   const [showModal, setShowModal] = useState(false);
+
+   const handleReject = () => {
+    console.log("Rejected!");
+    setShowModal(false); // close modal after action
+  };
 
   function diposeShow (){
     setshowDispatch(true)
@@ -821,7 +820,7 @@ const markAsReceivedMutation = useMutation({
             {/* Footer Buttons */}
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
-                <div>
+                <div className="flex gap-3">
                   <button
                     onClick={() => {
                       setConfirmConfig({ open: true, type: "pullback" });
@@ -830,6 +829,12 @@ const markAsReceivedMutation = useMutation({
                   >
                     Pull Back
                   </button>
+ <button
+        className="px-4 py-2 bg-red-600 border border-red-600 text-white rounded hover:bg-red-700 text-sm"
+        onClick={() => setShowModal(true)}
+      >
+        Reject
+      </button>
                 </div>
 
 
@@ -892,14 +897,30 @@ const markAsReceivedMutation = useMutation({
         )}
       </div>
 
+{showModal && (
+  <div className="fixed inset-0 flex items-center justify-center  pt-20 bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
+      <h2 className="text-lg font-semibold mb-4">Confirm Rejection</h2>
+      <p className="mb-4">Are you sure you want to reject this?</p>
+      <div className="flex justify-end gap-2">
+        <button
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          onClick={() => setShowModal(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          onClick={handleReject}
+        >
+          Reject
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
-      {/* {
-        showDispatch && (
-          <div>
-            <h1>djudjdjj</h1>
-          </div>
-        )
-      } */}
+  
 
      {confirmConfig.open && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">

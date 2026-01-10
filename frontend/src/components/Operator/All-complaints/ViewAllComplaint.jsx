@@ -272,9 +272,15 @@ const ViewAllComplaint = () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_operator == 0
-                      ? "Received - Record Section"
-                      : "Received - Record Section"}
+                    { complaintData.approved_rejected_by_rk === 0 && complaintData.approved_rejected_by_lokayukt === 0 ? "Received - Record Section"
+                   :
+                   complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt != 1 ?  "In Motion - With Lokayukt"
+                   :
+                   complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt === 1 ? "In Motion - With UpLokayukt" 
+                   : "Received - Record Section"
+
+
+                   }
                   </span>
                 </div>
               </div>
@@ -301,9 +307,20 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                      {complaintData.approved_rejected_by_operator == 0
+                      {/* {complaintData.approved_rejected_by_operator == 0
                         ? "Received - Record Section"
-                        : "Received - Record Section"}
+                        : "In Motion - With Lokayukt"} */}
+
+                   { complaintData.approved_rejected_by_rk === 0 && complaintData.approved_rejected_by_lokayukt === 0 ? "Received - Record Section"
+                   :
+                   complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt != 1 ?  "In Motion - With Lokayukt"
+                   :
+                   complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt === 1 ? "In Motion - With UpLokayukt" 
+                   : "Received - Record Section"
+
+
+                   }
+
                     </span>
 
                     <button

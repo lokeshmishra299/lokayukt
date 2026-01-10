@@ -879,7 +879,7 @@ function takefile(){
 
                    
 
-                  <button
+                  {/* <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -887,7 +887,7 @@ function takefile(){
                     {markAsReceivedMutation.isPending
                       ? "Processing..."
                       : "Return with Remarks"}
-                  </button>
+                  </button> */}
 
                     {complaintData.approved_rejected_by_ro_aro == "1" ? (
                     <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">

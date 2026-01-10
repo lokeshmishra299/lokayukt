@@ -1261,8 +1261,8 @@ const handleMainRespondent = (id) => {
                 परिवादी का नाम <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                type="text" placeholder='परिवादी का नाम दर्ज करें' 
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                   errors.complainant_name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={complainant.name || ''}
@@ -1274,8 +1274,8 @@ const handleMainRespondent = (id) => {
                 पिता का नाम <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                type="text" placeholder=' पिता का नाम दर्ज करें' 
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                   errors.father_name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={complainant.fatherName || ''}
@@ -1291,8 +1291,8 @@ const handleMainRespondent = (id) => {
                 व्यवसाय (क) <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                type="text" placeholder='व्यवसाय का प्रकार दर्ज करें'
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                   errors.occupation ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={complainant.occupation || ''}
@@ -1328,8 +1328,8 @@ const handleMainRespondent = (id) => {
                 (ग) डाकघर या पुलिस थाना <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                type="text" placeholder='संबंधित डाकघर / पुलिस थाना का नाम'
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                   errors.permanent_post_office ? 'border-red-500' : 'border-gray-300'
                 }`}
                 // ✅ Fixed: Using complainant.postOffice
@@ -1367,8 +1367,8 @@ const handleMainRespondent = (id) => {
               (ख) स्थान <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+              type="text" placeholder='स्थान का नाम'
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all placeholder:text-xs duration-200  ${
                 errors.permanent_place ? 'border-red-500' : 'border-gray-300'
               }`}
               // ✅ Fixed: Using complainant.place
@@ -1468,8 +1468,8 @@ const handleMainRespondent = (id) => {
                   (क) नाम <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  type="text" placeholder='नाम दर्ज करें'
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                     errors.correspondence_name ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={formData.correspondenceAddress.name}
@@ -1486,8 +1486,8 @@ const handleMainRespondent = (id) => {
                   (ख) स्थान <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  type="text" placeholder='स्थान दर्ज करें'
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                     errors.correspondence_place ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={formData.correspondenceAddress.place}
@@ -1506,8 +1506,8 @@ const handleMainRespondent = (id) => {
                   (ग) डाकघर या पुलिस थाना <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="text"
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                  type="text" placeholder='संबंधित डाकघर / पुलिस थाना का नाम'
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                     errors.correspondence_post_office ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={formData.correspondenceAddress.postOffice}
@@ -1677,8 +1677,8 @@ const handleMainRespondent = (id) => {
               अधिकारी का नाम: <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+              type="text" placeholder='अधिकारी का नाम दर्ज करें'
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all placeholder:text-xs duration-200"
               value={person.name || ''}
               onChange={(e) => updatePerson(person.id, 'name', e.target.value)}
             />
@@ -1688,9 +1688,9 @@ const handleMainRespondent = (id) => {
             <label className="block text-gray-700 text-sm font-medium mb-2">
             वर्तमान पता (यदि ज्ञात हो): <span className="text-red-500">*</span>
             </label>
-            <textarea
+            <textarea placeholder='वर्तमान पता दर्ज करें'
               rows="3"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-xs "
               value={person.currentAddress || ''}
               onChange={(e) => updatePerson(person.id, 'currentAddress', e.target.value)}
             />
@@ -1762,9 +1762,9 @@ const handleMainRespondent = (id) => {
     <label className="block text-gray-700 text-sm font-medium mb-2">
       (3) यदि परिवाद धारा 8 (4) के अधीन समय व्यतीत हो जाने पर किया गया है तो विलम्ब का कारण : <span className="text-red-500">*</span>
     </label>
-    <textarea
+    <textarea placeholder='विलम्ब का कारण दर्ज करें'
       rows="4"
-      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y ${
+      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-xs ${
         errors.delay_reason ? 'border-red-500' : 'border-gray-300'
       }`}
       value={formData.delayReason}
@@ -1997,7 +1997,7 @@ const handleMainRespondent = (id) => {
                             <input
                             type="text"
                             placeholder="नाम दर्ज करें"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs"
                             value={item.name}
                             onChange={(e) => {
                                 const updated = [...formData.supportingPersons];
@@ -2015,7 +2015,7 @@ const handleMainRespondent = (id) => {
                             <textarea
                             rows="1"
                             placeholder="पूरा पता लिखें"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none placeholder:text-xs "
                             value={item.address}
                             onChange={(e) => {
                                 const updated = [...formData.supportingPersons];
@@ -2083,7 +2083,7 @@ const handleMainRespondent = (id) => {
                         <input
                         type="text"
                         placeholder="नाम दर्ज करें"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs"
                         value={item.name}
                         onChange={(e) => {
                             const updated = [...formData.otherPersons];
@@ -2101,7 +2101,7 @@ const handleMainRespondent = (id) => {
                         <textarea
                         rows="1"
                         placeholder="पूरा पता लिखें"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none placeholder:text-xs"
                         value={item.address}
                         onChange={(e) => {
                             const updated = [...formData.otherPersons];
@@ -2131,7 +2131,7 @@ const handleMainRespondent = (id) => {
             <textarea
               placeholder="दस्तावेज क्रमवार लिखें (वैकल्पिक). वास्तविक फाइल नीचे अपलोड करें।"
               rows="3"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y mb-3"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y mb-3 placeholder:text-xs"
               value={formData.attachedDocuments}
               onChange={(e) => handleFormDataChange('attachedDocuments', e.target.value)}
             />
@@ -2171,7 +2171,7 @@ const handleMainRespondent = (id) => {
             <textarea
               placeholder="सम्पूर्ण विवरण स्पष्ट एवं संक्षेप में लिखें"
               rows="8"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y ${
+              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-xs ${
                 errors.complaint_description ? 'border-red-500' : 'border-gray-300'
               }`}
               value={formData.complaintDescription}
