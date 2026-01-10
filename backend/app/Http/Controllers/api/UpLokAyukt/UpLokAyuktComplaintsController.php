@@ -881,7 +881,8 @@ $complainDetails->actions = DB::table('complaint_actions')
              $cmp =  Complaint::findOrFail($complainId);
              
             if($cmp){
-                $cmp->approved_rejected_by_rk = 0;
+                $cmp->approved_rejected_by_rk = 1;
+                $cmp->approved_rejected_by_lokayukt = 0;
                
                 if($cmp->save()){
                     $apcAction = new ComplaintAction();
