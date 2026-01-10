@@ -871,6 +871,35 @@ $complainDetails->actions = DB::table('complaint_actions')
 
     }
 
+      public function pullBackByupLokayukt(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+       
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->approved_rejected_by_rk = 0;
+                $cmp->approved_rejected_by_lokayukt = 0;
+                $cmp->save(); 
+            }
+          
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Pull Back Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+
           public function returnComplainByUpLokayukt(Request $request,$complainId){
         //    dd($request->all());
         $user = Auth::user()->id;

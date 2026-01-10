@@ -1185,6 +1185,33 @@ class LokAyuktComplaintsController extends Controller
         }
 
     }
+    public function rejectComplaintByLokayukt(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+       
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->status = 'Rejected';
+                $cmp->save(); 
+            }
+          
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Reject Complaint Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
 
     public function approvedFeeByLokayukt(Request $request, $complaint_id){
 
