@@ -1276,6 +1276,7 @@ class DispatchComplaintsController extends Controller
             'letter_type'  => $request->letter_type,
             'subject'      => $request->subject,
             'file'         => $filePath,
+            'status'       => 1,
         ]);
 
         $year = date('Y');
@@ -1308,7 +1309,7 @@ class DispatchComplaintsController extends Controller
         // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
         // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
         // ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id')
-        // ->leftJoin('complaint_actions as rep', 'complaints.id', '=', 'rep.complaint_id')
+        ->join('complaint_actions as rep', 'complaints.id', '=', 'rep.complaint_id')
         ->select(
             'complaints.id as id',
             'complaints.complain_no as compNo',
@@ -1319,7 +1320,8 @@ class DispatchComplaintsController extends Controller
 
      $query->where('form_status', 1)
                 //   ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_rk', 1);
+                  ->where('approved_rejected_by_rk', 1)
+                  ->where('rep.forward_to_dispatch', $user);
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)
                     //         ->Orwhere('approved_rejected_by_ds_js', 1);               
@@ -1338,7 +1340,11 @@ class DispatchComplaintsController extends Controller
 }
 
     public function allDispatchLetters(Request $request){
-           $records = DB::table('dispach_letters')->get();
+          $user = Auth::user()->id;
+          $records = DB::table('dispach_letters')
+                    // ->join('complaint_actions as rep', 'complaints.id', '=', 'rep.complaint_id')
+                    // ->where('rep.forward_to_dispatch', $user)
+                    ->get();
       
 
     return response()->json([

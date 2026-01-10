@@ -30,6 +30,8 @@ use App\Http\Controllers\api\Supervisor\SupervisorDashboardController;
 use App\Http\Controllers\api\Supervisor\SupervisorReportController;
 use App\Http\Controllers\api\UpLokAyukt\UpLokAyuktDashboardController;
 use App\Http\Controllers\api\UpLokAyukt\UpLokAyuktCommonController;
+use App\Http\Controllers\api\Dispatch\DispatchComplaintsController;
+
 use App\Http\Controllers\api\UserManagement;
 use Illuminate\Support\Facades\Route;
 // use App\Http\Middleware\AuthMiddleware;
@@ -284,6 +286,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-file-preview/{id}',[LokAyuktComplaintsController::class,'getFilePreview']);
         Route::get('/return-complain-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'returnComplainByLokayukt']);
         Route::post('/pull-back-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'pullBackByLokayukt']);
+        Route::post('/rejectComplaintByLokayukt/{id}',[LokAyuktComplaintsController::class,'rejectComplaintByLokayukt']);
         Route::post('/fee-exempted/{complaint_id}',[LokAyuktComplaintsController::class,'approvedFeeByLokayukt']);
         Route::post('/forward-to-uplokayukt/{complaint_id}',[LokAyuktComplaintsController::class,'approvedByLokayukt']);
         Route::post('/add-dispatch',[LokAyuktComplaintsController::class,'addDispachLeters']);
@@ -526,6 +529,7 @@ Route::middleware('auth:sanctum')->group(function(){
           Route::post('/forward-by-uplokayukt/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyUplokayukt']);
           Route::get('/get-file-preview/{id}',[UpLokAyuktComplaintsController::class,'getFilePreview']);
           Route::post('/add-notes',[UpLokAyuktComplaintsController::class,'addNotes']);
+          Route::post('/pull-back-by-lokayukt/{id}',[UpLokAyuktComplaintsController::class,'pullBackByupLokayukt']);
           // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/request-report/{complainId}',[UpLokAyuktReportController::class,'requestReport']);
