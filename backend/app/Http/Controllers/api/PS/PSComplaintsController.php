@@ -1005,7 +1005,7 @@ class PSComplaintsController extends Controller
      $complainDetails->where('form_status', 1)
             // ->where('approved_rejected_by_ro', 1)
             //             ->where('approved_rejected_by_d_a',1)
-                        ->where('approved_rejected_by_lokayukt',1);
+                        ->where('approved_rejected_by_lokayukt', 1);
             //              ->where(function($q){
             //                 $q->where('approved_rejected_by_so_us',1)
             //                 ->Orwhere('approved_rejected_by_ds_js', 1);               
@@ -1013,7 +1013,7 @@ class PSComplaintsController extends Controller
     $complainDetails = $complainDetails
                       
                         // ->toSql();
-                        ->where('approved_rejected_by_ps',1)
+                        ->where('approved_rejected_by_ps', 1 )
                         ->distinct('cm.id')
                       ->get();
 

@@ -107,6 +107,12 @@ class StoreComplaintRequest extends FormRequest
             'is_public_servant'           => 'required|array|min:1',
             'is_public_servant.*'         => 'required|in:yes,no',
 
+        //  'is_main_c'   => 'required|array|min:1',
+        // 'is_main_c.0' => 'present|in:1',
+
+        // 'is_main_r'   => 'required|array|min:1',
+        // 'is_main_r.0' => 'present|in:1',
+
 
             /*----------------------------------------------------
             | MULTIPLE RESPONDENTS (Required)
@@ -219,6 +225,8 @@ class StoreComplaintRequest extends FormRequest
             'witness_address.required' => 'At least one Witness address is required.',
             'witness_address.*.required' => 'Witness address is required.',
 
+            // 'is_main_c.0.in' => 'First complainant must be marked as Main (value must be 1).',
+            // 'is_main_r.0.in' => 'First respondent must be marked as Main (value must be 1).',
 
 
             /* -----------------------------------------

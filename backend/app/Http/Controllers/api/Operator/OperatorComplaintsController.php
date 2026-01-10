@@ -1898,6 +1898,18 @@ class OperatorComplaintsController extends Controller
         }
     }
     public function makedforwardbyRk(Request $request){
+        
+         $userRole = User::with('role')->where('id',$request->forward_to)->get();
+
+        
+            $roleFwd = $userRole[0]->role->name ?? null;
+        // dd($roleFwd);
+        
+          $user = User::with('role','subrole')->where('id',$request->forward_to)->get();
+            $subroleFwd = '';
+            
+            $subroleFwd = $user[0]->subrole->name ?? null;
+
            $user = Auth::user()->id;
         if($request->isMethod('post')){
            
@@ -1923,7 +1935,44 @@ class OperatorComplaintsController extends Controller
               $apcAction = new ComplaintAction();
                     $apcAction->complaint_id = $request->complaint_id;
                     $apcAction->forward_by_rk = $user;
-                    $apcAction->forward_to_lokayukt = $request->forward_to;
+                    // $apcAction->forward_to_lokayukt = $request->forward_to;
+                    
+                    if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','dispatch'])) {
+
+                            if ($roleFwd === 'lok-ayukt') {
+                                $apcAction->forward_to_lokayukt = $request->forward_to;
+                            }elseif($roleFwd === 'dispatch'){
+                                 $apcAction->forward_to_dispatch = $request->forward_to;
+
+                            } else {
+                                $apcAction->forward_to_uplokayukt = $request->forward_to;
+                            }
+
+                        } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
+
+                            switch ($subroleFwd) {
+                                case 'ds-js':
+                                    $apcAction->forward_to_ds_js = $request->forward_to;
+                                    break;
+
+                                case 'sec':
+                                    $apcAction->forward_to_sec = $request->forward_to;
+                                    break;
+
+                                case 'cio-io':
+                                    $apcAction->forward_to_cio_io = $request->forward_to;
+                                    break;
+
+                                case 'so-us':
+                                    $apcAction->forward_to_so_us = $request->forward_to;
+                                    break;
+                               
+                                    case 'ro-aro':
+                                    $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    break;
+                            }
+                        }
+
                     $apcAction->remarks = $request->remark;
                     $apcAction->status = 'Forwarded';
                     $apcAction->save();
@@ -1935,6 +1984,44 @@ class OperatorComplaintsController extends Controller
             ], 200); 
         }
     }
+    // public function makedforwardbyRk(Request $request){
+    //        $user = Auth::user()->id;
+    //     if($request->isMethod('post')){
+           
+    //          $validation = Validator::make($request->all(), [
+    //             'complaint_id' => 'required',
+    //             'forward_to' => 'required',
+    //             'remark' => 'required',
+    //             ], [
+    //                 'forward_to.required' => 'Forward To is required.',
+    //                 'remark.required' => 'Remark is required.',
+    //             ]);
+
+    //     if ($validation->fails()) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'errors' => $validation->errors()
+    //         ], 422);
+    //     }
+    //        $cmp = Complaint::findOrFail($request->complaint_id);
+    //       $cmp->forward_physical = 1;
+          
+    //        if($cmp->save()){
+    //           $apcAction = new ComplaintAction();
+    //                 $apcAction->complaint_id = $request->complaint_id;
+    //                 $apcAction->forward_by_rk = $user;
+    //                 $apcAction->forward_to_lokayukt = $request->forward_to;
+    //                 $apcAction->remarks = $request->remark;
+    //                 $apcAction->status = 'Forwarded';
+    //                 $apcAction->save();
+    //        }
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Forwarded Successfully',
+    //             'data' => $cmp
+    //         ], 200); 
+    //     }
+    // }
 
        public function getLokayuktUsers(){
      
