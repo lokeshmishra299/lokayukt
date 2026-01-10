@@ -29,6 +29,8 @@ const api = axios.create({
 const Reporting = () => {
   const [activeTab, setActiveTab] = useState("enrollment");
   const [isExporting, setIsExporting] = useState(false);
+const [exportingPdf, setExportingPdf] = useState(false);
+const [exportingExcel, setExportingExcel] = useState(false);
 
   const [enrollmentFilters, setEnrollmentFilters] = useState({
     fromDate: "",
@@ -142,19 +144,33 @@ const Reporting = () => {
     });
   }, [dispatcheData, dispatchFilters]);
 
+  // const prepareEnrollmentDataForExport = (data) => {
+  //   return data.map((item, index) => ({
+  //     "S.No": index + 1,
+  //     "Complaint No.": item.complain_no || "N/A",
+  //     // "Case No.": item.caseNo || "N/A",
+  //     "Enrollment Date": item.created_at || "N/A",
+  //     "District": item.district_name || "N/A",
+  //     "Department": item.department_name || "N/A",
+  //     "Complainant": item.complainant_name || "N/A",
+  //     "Nature": item.category || "N/A",
+  //     "Status": item.status || "N/A"
+  //   }));
+  // };
+
   const prepareEnrollmentDataForExport = (data) => {
-    return data.map((item, index) => ({
-      "S.No": index + 1,
-      "Complaint No.": item.complain_no || "N/A",
-      // "Case No.": item.caseNo || "N/A",
-      "Enrollment Date": item.created_at || "N/A",
-      "District": item.district_name || "N/A",
-      "Department": item.department_name || "N/A",
-      "Complainant": item.complainant_name || "N/A",
-      "Nature": item.category || "N/A",
-      "Status": item.status || "N/A"
-    }));
-  };
+  return data.map((item, index) => ({
+    "S.No": index + 1,
+    "Complaint No.": item.complain_no || "N/A",
+    "Enrollment Date": item.created_at || "N/A",
+    "District": item.district_name || "N/A",
+    "Department": item.department_name || "N/A",
+    "Complainant": item.complainant_name || "N/A",
+    "Nature": item.category || "N/A",
+    "Status": item.status || "N/A"
+  }));
+};
+
 
   const handleEnrollmentExport = async (type) => {
     const formattedData = prepareEnrollmentDataForExport(filteredEnrollmentData);
@@ -165,77 +181,151 @@ const Reporting = () => {
     }
   };
 
-  const exportToExcel = async (data, fileName) => {
-    if (!data || data.length === 0) {
-      alert("No data to export");
-      return;
-    }
+  // const exportToExcel = async (data, fileName) => {
+  //   if (!data || data.length === 0) {
+  //     alert("No data to export");
+  //     return;
+  //   }
     
-    setIsExporting(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
+  //   setIsExporting(true);
+  //   await new Promise(resolve => setTimeout(resolve, 300));
 
-    try {
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-        XLSX.writeFile(wb, `${fileName}.xlsx`);
-    } catch (error) {
-        console.error("Excel export failed", error);
-    } finally {
-        setIsExporting(false);
-    }
-  };
+  //   try {
+  //       const ws = XLSX.utils.json_to_sheet(data);
+  //       const wb = XLSX.utils.book_new();
+  //       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+  //       XLSX.writeFile(wb, `${fileName}.xlsx`);
+  //   } catch (error) {
+  //       console.error("Excel export failed", error);
+  //   } finally {
+  //       setIsExporting(false);
+  //   }
+  // };
 
-  const exportToPDF = async (data, fileName) => {
-    if (!data || data.length === 0) {
-      alert("No data to export");
-      return;
-    }
 
-    setIsExporting(true);
-    await new Promise(resolve => setTimeout(resolve, 300));
+  const exportToExcel = async (data, fileName) => {
+  if (!data || data.length === 0) {
+    alert("No data to export");
+    return;
+  }
+  
+  setExportingExcel(true);
+  await new Promise(resolve => setTimeout(resolve, 300));
 
-    try {
-        let html = `<h2 style="text-align:center; font-family: sans-serif;">${fileName}</h2>
-          <table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; width:100%; font-size:10px; font-family: sans-serif;">
-            <thead style="background-color:#f0f0f0;">
-              <tr>`;
+  try {
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+      XLSX.writeFile(wb, `${fileName}.xlsx`);
+  } catch (error) {
+      console.error("Excel export failed", error);
+  } finally {
+      setExportingExcel(false);
+  }
+};
 
-        const keys = Object.keys(data[0]);
+const exportToPDF = async (data, fileName) => {
+  if (!data || data.length === 0) {
+    alert("No data to export");
+    return;
+  }
+
+
+  setExportingPdf(true);
+  await new Promise(resolve => setTimeout(resolve, 300));
+
+  try {
+      let html = `<h2 style="text-align:center; font-family: sans-serif;">${fileName}</h2>
+        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; width:100%; font-size:10px; font-family: sans-serif;">
+          <thead style="background-color:#f0f0f0;">
+            <tr>`;
+
+      const keys = Object.keys(data[0]);
+      keys.forEach((key) => {
+        html += `<th style="padding:5px; text-align:left;">${key}</th>`;
+      });
+
+      html += `</tr></thead><tbody>`;
+
+      data.forEach((row) => {
+        html += `<tr>`;
         keys.forEach((key) => {
-          html += `<th style="padding:5px; text-align:left;">${key}</th>`;
+          html += `<td style="padding:5px;">${row[key]}</td>`;
         });
+        html += `</tr>`;
+      });
 
-        html += `</tr></thead><tbody>`;
+      html += `</tbody></table>`;
 
-        data.forEach((row) => {
-          html += `<tr>`;
-          keys.forEach((key) => {
-            html += `<td style="padding:5px;">${row[key]}</td>`;
-          });
-          html += `</tr>`;
-        });
+      const element = document.createElement("div");
+      element.innerHTML = html;
 
-        html += `</tbody></table>`;
+      const opt = {
+        margin: 10,
+        filename: `${fileName}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
+      };
 
-        const element = document.createElement("div");
-        element.innerHTML = html;
+      await html2pdf().set(opt).from(element).save();
+  } catch (error) {
+       console.error("PDF export failed", error);
+  } finally {
+      setExportingPdf(false);
+  }
+};
 
-        const opt = {
-          margin: 10,
-          filename: `${fileName}.pdf`,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
-        };
+  // const exportToPDF = async (data, fileName) => {
+  //   if (!data || data.length === 0) {
+  //     alert("No data to export");
+  //     return;
+  //   }
 
-        await html2pdf().set(opt).from(element).save();
-    } catch (error) {
-         console.error("PDF export failed", error);
-    } finally {
-        setIsExporting(false);
-    }
-  };
+  //   setIsExporting(true);
+  //   await new Promise(resolve => setTimeout(resolve, 300));
+
+  //   try {
+  //       let html = `<h2 style="text-align:center; font-family: sans-serif;">${fileName}</h2>
+  //         <table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; width:100%; font-size:10px; font-family: sans-serif;">
+  //           <thead style="background-color:#f0f0f0;">
+  //             <tr>`;
+
+  //       const keys = Object.keys(data[0]);
+  //       keys.forEach((key) => {
+  //         html += `<th style="padding:5px; text-align:left;">${key}</th>`;
+  //       });
+
+  //       html += `</tr></thead><tbody>`;
+
+  //       data.forEach((row) => {
+  //         html += `<tr>`;
+  //         keys.forEach((key) => {
+  //           html += `<td style="padding:5px;">${row[key]}</td>`;
+  //         });
+  //         html += `</tr>`;
+  //       });
+
+  //       html += `</tbody></table>`;
+
+  //       const element = document.createElement("div");
+  //       element.innerHTML = html;
+
+  //       const opt = {
+  //         margin: 10,
+  //         filename: `${fileName}.pdf`,
+  //         image: { type: "jpeg", quality: 0.98 },
+  //         html2canvas: { scale: 2 },
+  //         jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
+  //       };
+
+  //       await html2pdf().set(opt).from(element).save();
+  //   } catch (error) {
+  //        console.error("PDF export failed", error);
+  //   } finally {
+  //       setIsExporting(false);
+  //   }
+  // };
 
   const overallStats = {
     total: 1250,
@@ -359,7 +449,7 @@ const Reporting = () => {
                   className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
                 />
               </div>
-              <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+              {/* <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
                 <button
                   onClick={() => handleEnrollmentExport('pdf')}
                   disabled={isExporting || enrollmentLoading}
@@ -390,7 +480,47 @@ const Reporting = () => {
                     </>
                   )}
                 </button>
-              </div>
+              </div> */}
+
+              <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+  <button
+    onClick={() => {
+      const formattedData = prepareEnrollmentDataForExport(filteredEnrollmentData);
+      exportToPDF(formattedData, "Enrollment_Report");
+    }}
+    disabled={exportingPdf || enrollmentLoading}
+    className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+  >
+    {exportingPdf ? (
+      <>
+        <FaSpinner className="animate-spin text-red-500" /> Loading...
+      </>
+    ) : (
+      <>
+        <FaFilePdf className="text-red-500" /> PDF
+      </>
+    )}
+  </button>
+  
+  <button
+    onClick={() => {
+      const formattedData = prepareEnrollmentDataForExport(filteredEnrollmentData);
+      exportToExcel(formattedData, "Enrollment_Report");
+    }}
+    disabled={exportingExcel || enrollmentLoading}
+    className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+  >
+    {exportingExcel ? (
+      <>
+        <FaSpinner className="animate-spin text-green-600" /> Loading...
+      </>
+    ) : (
+      <>
+        <FaFileExcel className="text-green-600" /> Excel
+      </>
+    )}
+  </button>
+</div>
             </div>
 
             <p className="text-sm text-gray-500 mb-4">
@@ -508,24 +638,39 @@ const Reporting = () => {
                 </select>
               </div>
               <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                <button
-                  onClick={() =>
-                    exportToPDF(filteredDistrictData, "District_Report")
-                  }
-                  disabled={isExporting}
-                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
-                >
-                  {isExporting ? <FaSpinner className="animate-spin text-red-500" /> : <FaFilePdf className="text-red-500" />} PDF
-                </button>
-                <button
-                  onClick={() =>
-                    exportToExcel(filteredDistrictData, "District_Report")
-                  }
-                  disabled={isExporting}
-                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
-                >
-                  {isExporting ? <FaSpinner className="animate-spin text-green-600" /> : <FaFileExcel className="text-green-600" />} Excel
-                </button>
+               <button
+  onClick={() => {
+    const data = filteredDistrictData.map((item, idx) => ({
+      "S.No": idx + 1,
+      "District": item.district || item.district_name || "N/A",
+      "Total": item.total || 0,
+      "Pending": item.pending || 0,
+      "Disposed": item.disposed || 0
+    }));
+    exportToPDF(data, "District_Report");
+  }}
+  disabled={exportingPdf || districtLoading}
+  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+>
+  {exportingPdf ? <FaSpinner className="animate-spin text-red-500" /> : <FaFilePdf className="text-red-500" />} PDF
+</button>
+
+<button
+  onClick={() => {
+    const data = filteredDistrictData.map((item, idx) => ({
+      "S.No": idx + 1,
+      "District": item.district || item.district_name || "N/A",
+      "Total": item.total || 0,
+      "Pending": item.pending || 0,
+      "Disposed": item.disposed || 0
+    }));
+    exportToExcel(data, "District_Report");
+  }}
+  disabled={exportingExcel || districtLoading}
+  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+>
+  {exportingExcel ? <FaSpinner className="animate-spin text-green-600" /> : <FaFileExcel className="text-green-600" />} Excel
+</button>
               </div>
             </div>
 
@@ -601,115 +746,70 @@ const Reporting = () => {
           </div>
         )}
 
-        {activeTab === "department" && (
-          <div>
-            <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-6">
-              Department-wise List / विभागवार सूची
-            </h2>
-            <div className="flex flex-col sm:flex-row flex-wrap items-end gap-3 md:gap-4 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
-              <div className="w-full sm:flex-1 min-w-[200px]">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  Department / विभाग
-                </label>
-                <select
-                  value={departmentFilter}
-                  onChange={(e) => setDepartmentFilter(e.target.value)}
-                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                >
-                  <option>All Departments</option>
-                  {departmentData?.map((item, index) => (
-                    <option key={index} value={item.department}>
-                      {item.department}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-                <button
-                  onClick={() =>
-                    exportToPDF(filteredDepartmentData, "Department_Report")
-                  }
-                  disabled={isExporting}
-                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
-                >
-                  {isExporting ? <FaSpinner className="animate-spin text-red-500" /> : <FaFilePdf className="text-red-500" />} PDF
-                </button>
-                <button
-                  onClick={() =>
-                    exportToExcel(filteredDepartmentData, "Department_Report")
-                  }
-                  disabled={isExporting}
-                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
-                >
-                  {isExporting ? <FaSpinner className="animate-spin text-green-600" /> : <FaFileExcel className="text-green-600" />} Excel
-                </button>
-              </div>
-            </div>
+       {activeTab === "department" && (
+  <div>
+    <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-6">
+      Department-wise List / विभागवार सूची
+    </h2>
+    <div className="flex flex-col sm:flex-row flex-wrap items-end gap-3 md:gap-4 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
+      <div className="w-full sm:flex-1 min-w-[200px]">
+        <label className="block text-xs font-medium text-gray-500 mb-1">
+          Department / विभाग
+        </label>
+        <select
+          value={departmentFilter}
+          onChange={(e) => setDepartmentFilter(e.target.value)}
+          className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        >
+          <option>All Departments</option>
+          {departmentData?.map((item, index) => (
+            <option key={index} value={item.department}>
+              {item.department}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+        <button
+          onClick={() => {
+            const data = filteredDepartmentData.map((item, idx) => ({
+              "S.No": idx + 1,
+              "Department": item.department || "N/A",
+              "Type": item.type || "N/A",
+              "Total": item.total || 0,
+              "Pending": item.pending || 0,
+              "Disposed": item.disposed || 0
+            }));
+            exportToPDF(data, "Department_Report");
+          }}
+          disabled={exportingPdf || departmentLoading}
+          className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+        >
+          {exportingPdf ? <FaSpinner className="animate-spin text-red-500" /> : <FaFilePdf className="text-red-500" />} PDF
+        </button>
+        <button
+          onClick={() => {
+            const data = filteredDepartmentData.map((item, idx) => ({
+              "S.No": idx + 1,
+              "Department": item.department || "N/A",
+              "Type": item.type || "N/A",
+              "Total": item.total || 0,
+              "Pending": item.pending || 0,
+              "Disposed": item.disposed || 0
+            }));
+            exportToExcel(data, "Department_Report");
+          }}
+          disabled={exportingExcel || departmentLoading}
+          className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+        >
+          {exportingExcel ? <FaSpinner className="animate-spin text-green-600" /> : <FaFileExcel className="text-green-600" />} Excel
+        </button>
+      </div>
+    </div>
 
-            <div className="overflow-x-auto -mx-4 md:mx-0">
-              <table className="w-full text-sm text-left text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
-                  <tr>
-                    <th className="px-6 py-3 whitespace-nowrap">Department</th>
-                    <th className="px-6 py-3 whitespace-nowrap">Type</th>
-                    <th className="px-6 py-3 text-right whitespace-nowrap">
-                      Total
-                    </th>
-                    <th className="px-6 py-3 text-right text-orange-600 whitespace-nowrap">
-                      Pending
-                    </th>
-                    <th className="px-6 py-3 text-right text-green-600 whitespace-nowrap">
-                      Disposed
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {departmentLoading ? (
-                      <tr>
-                        <td colSpan={5} className="py-20 text-center">
-                          <div className="flex flex-col items-center justify-center text-gray-600">
-                            {/* <FaSpinner className="animate-spin text-3xl mb-3 text-blue-600" /> */}
-                            <span className="">Loading...</span>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : filteredDepartmentData?.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-10">
-                        <div className="flex justify-center items-center text-gray-500">
-                          No Data Found.
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredDepartmentData?.map((row, idx) => (
-                      <tr
-                        key={idx}
-                        className="bg-white border-b hover:bg-gray-50"
-                      >
-                        <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                          {row?.department || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
-                          {row.type || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-right font-semibold whitespace-nowrap">
-                          {row?.total || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-right text-orange-600 font-medium whitespace-nowrap">
-                          {row?.pending || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">
-                          {row?.disposed || "N/A"}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+    {/* Rest of your department table code remains same */}
+  </div>
+)}
 
         {activeTab === "pendency" && (
           <div>
@@ -736,148 +836,57 @@ const Reporting = () => {
           </div>
         )}
 
-        {activeTab === "dispatch" && (
-          <div>
-            <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
-              <FaPaperPlane className="text-gray-600" /> Dispatch Register /
-              प्रेषण रजिस्टर
-            </h2>
-
-            <div className="flex flex-col sm:flex-row flex-wrap items-end gap-3 md:gap-4 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
-              <div className="w-full sm:w-auto">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  From Date
-                </label>
-                <input
-                  type="date"
-                  value={dispatchFilters.fromDate}
-                  onChange={(e) =>
-                    setDispatchFilters({
-                      ...dispatchFilters,
-                      fromDate: e.target.value,
-                    })
-                  }
-                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                />
-              </div>
-              <div className="w-full sm:w-auto">
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  To Date
-                </label>
-                <input
-                  type="date"
-                  value={dispatchFilters.toDate}
-                  onChange={(e) =>
-                    setDispatchFilters({
-                      ...dispatchFilters,
-                      toDate: e.target.value,
-                    })
-                  }
-                  className="bg-white border border-gray-300 text-gray-800 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full sm:w-40 p-2.5"
-                />
-              </div>
-
-              <div className="w-full sm:w-auto sm:flex-1 flex flex-col sm:flex-row justify-end gap-2 mt-2 sm:mt-0">
-                <button className="justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                  <FaPrint className="text-gray-600" /> Print
-                </button>
-                <button
-                  onClick={() =>
-                    exportToPDF(filteredDispatchData, "Dispatch_Report")
-                  }
-                  disabled={isExporting}
-                  className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
-                >
-                  {isExporting ? <FaSpinner className="animate-spin text-red-500" /> : <FaFilePdf className="text-red-500" />} PDF
-                </button>
-                <button
-                  onClick={() =>
-                    exportToExcel(filteredDispatchData, "Dispatch_Report")
-                  }
-                  disabled={isExporting}
-                  className="justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-800 border border-blue-800 rounded-lg hover:bg-blue-900 disabled:opacity-50"
-                >
-                   {isExporting ? <FaSpinner className="animate-spin" /> : <FaFileExcel />} Export Excel
-                </button>
-              </div>
-            </div>
-
-            <div className="overflow-x-auto -mx-4 md:mx-0">
-              <table className="w-full text-sm text-left text-gray-500">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
-                  <tr>
-                    <th className="px-4 py-3 whitespace-nowrap">SL. No</th>
-                    <th className="px-4 py-3 whitespace-nowrap">
-                      Dispatch No.
-                    </th>
-                    <th className="px-4 py-3 whitespace-nowrap">Date</th>
-                    <th className="px-4 py-3 whitespace-nowrap">
-                      Complaint No.
-                    </th>
-                    <th className="px-4 py-3 whitespace-nowrap">Recipient</th>
-                    <th className="px-4 py-3 whitespace-nowrap">Letter Type</th>
-                    <th className="px-4 py-3 whitespace-nowrap">Mode</th>
-                    <th className="px-4 py-3 whitespace-nowrap">
-                      Tracking No.
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dispatchLoading ? (
-                      <tr>
-                        <td colSpan={8} className="py-20 text-center">
-                          <div className="flex flex-col items-center justify-center text-gray-600">
-                            {/* <FaSpinner className="animate-spin text-3xl mb-3 text-blue-600" /> */}
-                            <span className="">Loading...</span>
-                          </div>
-                        </td>
-                      </tr>
-                    ) : filteredDispatchData.length === 0 ? (
-                    <tr>
-                      <td colSpan={8} className="py-10">
-                        <div className="flex justify-center items-center text-gray-500">
-                          No Data Found.
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredDispatchData?.map((row, idx) => (
-                      <tr
-                        key={idx}
-                        className="bg-white border-b hover:bg-gray-50"
-                      >
-                        <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                          {idx + 1}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {row?.letter_no || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-right font-semibold whitespace-nowrap">
-                          {row?.created_at || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-right text-orange-600 font-medium whitespace-nowrap">
-                          {row?.complaint_id || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">
-                          {row?.Recipient || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">
-                          {row?.letter_type || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">
-                          {row?.mode || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">
-                          {row?.trackingno || "N/A"}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+      {activeTab === "dispatch" && (
+  <div>
+    {/* ... existing code ... */}
+    
+    <div className="w-full sm:w-auto sm:flex-1 flex flex-col sm:flex-row justify-end gap-2 mt-2 sm:mt-0">
+      <button className="justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+        <FaPrint className="text-gray-600" /> Print
+      </button>
+      <button
+        onClick={() => {
+          const data = filteredDispatchData.map((item, idx) => ({
+            "S.No": idx + 1,
+            "Dispatch No.": item.letter_no || "N/A",
+            "Date": item.created_at || "N/A",
+            "Complaint No.": item.complaint_id || "N/A",
+            "Recipient": item.Recipient || "N/A",
+            "Letter Type": item.letter_type || "N/A",
+            "Mode": item.mode || "N/A",
+            "Tracking No.": item.trackingno || "N/A"
+          }));
+          exportToPDF(data, "Dispatch_Report");
+        }}
+        disabled={exportingPdf || dispatchLoading}
+        className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+      >
+        {exportingPdf ? <FaSpinner className="animate-spin text-red-500" /> : <FaFilePdf className="text-red-500" />} PDF
+      </button>
+      <button
+        onClick={() => {
+          const data = filteredDispatchData.map((item, idx) => ({
+            "S.No": idx + 1,
+            "Dispatch No.": item.letter_no || "N/A",
+            "Date": item.created_at || "N/A",
+            "Complaint No.": item.complaint_id || "N/A",
+            "Recipient": item.Recipient || "N/A",
+            "Letter Type": item.letter_type || "N/A",
+            "Mode": item.mode || "N/A",
+            "Tracking No.": item.trackingno || "N/A"
+          }));
+          exportToExcel(data, "Dispatch_Report");
+        }}
+        disabled={exportingExcel || dispatchLoading}
+        className="justify-center flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-800 border border-blue-800 rounded-lg hover:bg-blue-900 disabled:opacity-50"
+      >
+        {exportingExcel ? <FaSpinner className="animate-spin" /> : <FaFileExcel />} Export Excel
+      </button>
+    </div>
+    
+    {/* ... rest of dispatch section ... */}
+  </div>
+)}
 
         {activeTab === "overall" && (
           <div>

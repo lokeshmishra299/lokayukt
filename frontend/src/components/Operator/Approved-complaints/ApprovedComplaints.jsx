@@ -468,7 +468,16 @@ useEffect(() => {
                           </span>
                           {/* {complaint.fee_exempted === 1 && ( */}
                             <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                              With Lokayukta
+                             {
+                                complaint.approved_rejected_by_rk === 0 && complaint.approved_rejected_by_lokayukt === 0? "Record Section"
+                                :  complaint.approved_rejected_by_rk === 1 && 
+                                complaint.approved_rejected_by_lokayukt != 1 
+                                ? "With Lokayukta"
+                                : 
+                                complaint.approved_rejected_by_rk === 1 && complaint.
+                                approved_rejected_by_lokayukt === 1 ? "  With UpLokayukta"
+                                : "Record Section"
+                              } 
                             </span>
                           {/* )} */}
                         </div>
