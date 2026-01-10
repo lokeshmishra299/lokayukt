@@ -529,7 +529,7 @@ Route::middleware('auth:sanctum')->group(function(){
           Route::post('/forward-by-uplokayukt/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyUplokayukt']);
           Route::get('/get-file-preview/{id}',[UpLokAyuktComplaintsController::class,'getFilePreview']);
           Route::post('/add-notes',[UpLokAyuktComplaintsController::class,'addNotes']);
-          Route::post('/pull-back-by-lokayukt/{id}',[UpLokAyuktComplaintsController::class,'pullBackByupLokayukt']);
+          Route::post('/pull-back-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'pullBackByupLokayukt']);
           // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/request-report/{complainId}',[UpLokAyuktReportController::class,'requestReport']);
