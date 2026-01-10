@@ -527,6 +527,7 @@ Route::middleware('auth:sanctum')->group(function(){
           Route::get('/get-document/{id}',[UpLokAyuktComplaintsController::class,'getUploadDoc']);
            Route::post('/return-complain-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'returnComplainByUpLokayukt']);
           Route::post('/forward-by-uplokayukt/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyUplokayukt']);
+         Route::post('/upload-document',[UpLokAyuktComplaintsController::class,'uploadDocument']);
           Route::get('/get-file-preview/{id}',[UpLokAyuktComplaintsController::class,'getFilePreview']);
           Route::post('/add-notes',[UpLokAyuktComplaintsController::class,'addNotes']);
           Route::post('/pull-back-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'pullBackByupLokayukt']);
