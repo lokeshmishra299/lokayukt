@@ -38,8 +38,9 @@ class UpLokAyuktComplaintsController extends Controller
 
      $query->where('form_status', 1)
                     ->distinct('complaints.id')
-                  ->where('rep.forward_to_uplokayukt', $user)
-                  ->where('approved_rejected_by_rk', 1);
+                    ->where('complaints.approved_rejected_by_lokayukt' ,'<>', 0)
+                    ->where('rep.forward_to_uplokayukt', $user)
+                    ->where('approved_rejected_by_rk', 1);
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)
                     //         ->Orwhere('approved_rejected_by_ds_js', 1);               
