@@ -1304,7 +1304,7 @@ const handleMainRespondent = (id) => {
                 क्या आप लोक सेवक हैं या नहीं (ख) <span className="text-red-500">*</span>
               </label>
               <select
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200  ${
                   errors.is_public_servant ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={complainant.isPublicServant || ''}
