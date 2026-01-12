@@ -32,17 +32,27 @@ class OperatorComplaintsController extends Controller
         /*--------------------------------------------
         | 1. Upload Files
         |--------------------------------------------*/
-        $authorizationDocument = $request->hasFile('authorization_document')
-            ? $request->file('authorization_document')->store('Document', 'public')
-            : null;
+        // $authorizationDocument = $request->hasFile('authorization_document')
+        //     ? $request->file('authorization_document')->store('Document', 'public')
+        //     : null;
 
-        $challanFile = $request->hasFile('challan_file')
-            ? $request->file('challan_file')->store('Document', 'public')
-            : null;
+             $fileAd = 'doc_' . uniqid() . '.' . $request->file('authorization_document')->getClientOriginalExtension();
+             $filePath = $request->file('authorization_document')->storeAs('Document', $fileAd, 'public');
+            
+             $fileCf = 'doc_' . uniqid() . '.' . $request->file('challan_file')->getClientOriginalExtension();
+             $filePath = $request->file('challan_file')->storeAs('Document', $fileCf, 'public');
+           
+             $fileAttach = 'doc_' . uniqid() . '.' . $request->file('attached_documents')->getClientOriginalExtension();
+             $filePath = $request->file('attached_documents')->storeAs('Document', $fileAttach, 'public');
+               
 
-        $attached_documents = $request->hasFile('attached_documents')
-            ? $request->file('attached_documents')->store('Document', 'public')
-            : null;
+        // $challanFile = $request->hasFile('challan_file')
+        //     ? $request->file('challan_file')->store('Document', 'public')
+        //     : null;
+
+        // $attached_documents = $request->hasFile('attached_documents')
+        //     ? $request->file('attached_documents')->store('Document', 'public')
+        //     : null;
 
         /*--------------------------------------------
         | 2. Create Main Complaint Entry
@@ -50,7 +60,7 @@ class OperatorComplaintsController extends Controller
 
         $complaintId = DB::table('complaints')->insertGetId([
             'relation_with_person'        => $request->relation_with_person,
-            'authorization_document'      => $authorizationDocument,
+            'authorization_document'      => $fileAd,
             'correspondence_name'         => $request->correspondence_name,
             'correspondence_place'        => $request->correspondence_place,
             'correspondence_post_office'  => $request->correspondence_post_office,
@@ -62,10 +72,10 @@ class OperatorComplaintsController extends Controller
             'category'                    => $request->category,
             'challan_number'              => $request->challan_number,
             'challan_date'                => $request->challan_date,
-            'challan_file'                => $challanFile,
+            'challan_file'                => $fileCf,
             'added_by'                    => $added_by,
             'attached_documents_description' => $request->attached_documents_description,
-            'attached_documents'          => $attached_documents,
+            'attached_documents'          => $fileAttach,
             'complaint_description'       => $request->complaint_description,
         ]);
 
@@ -160,27 +170,33 @@ class OperatorComplaintsController extends Controller
         /*--------------------------------------------
         | 8. Insert Documents Table
         |--------------------------------------------*/
-        if ($authorizationDocument) {
+        if ($fileAd) {
             DB::table('complaints_documents')->insert([
                 'complain_id' => $complaintId,
+                'added_by'        => $added_by,
+                'title'        => 'Authorization Document',
                 'type'        => 'authorizationDocument',
-                'file'        => $authorizationDocument
+                'file'        => $fileAd
             ]);
         }
 
-        if ($challanFile) {
+        if ($fileCf) {
             DB::table('complaints_documents')->insert([
                 'complain_id' => $complaintId,
+                'added_by'        => $added_by,
+                'title'        => 'Challan',
                 'type'        => 'challan',
-                'file'        => $challanFile
+                'file'        => $fileCf
             ]);
         }
 
-        if ($attached_documents) {
+        if ($fileAttach) {
             DB::table('complaints_documents')->insert([
                 'complain_id' => $complaintId,
+                'added_by'        => $added_by,
+                'title'        => 'Attached',
                 'type'        => 'attached',
-                'file'        => $attached_documents
+                'file'        => $fileAttach
             ]);
         }
 
