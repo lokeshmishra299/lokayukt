@@ -843,14 +843,14 @@ function takefile(){
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
                 <div>
-                  <button
+                  {/* <button
                     onClick={() => {
                       setConfirmConfig({ open: true, type: "pullback" });
                     }}
                     className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                   >
                     Pull Back
-                  </button>
+                  </button> */}
                   
                  
                     <button
