@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 // import { ToastContainer, toast } from "react-toastify";
-import { toast, Toaster } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
 import "react-toastify/dist/ReactToastify.css";
 import { FaCheckCircle } from "react-icons/fa";
@@ -189,10 +189,10 @@ const Fees = ({ complaint, onFeeApproved }) => {
             </div>
           </div>
           {/* Toast Container Configured exactly like Login.js */}
-          <Toaster
+          {/* <Toaster
             position="top-right"
   
-          />
+          /> */}
         </div>
       )}
     </>

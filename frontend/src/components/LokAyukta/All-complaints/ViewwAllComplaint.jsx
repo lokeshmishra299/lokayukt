@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import { toast, Toaster } from "react-hot-toast";
+import { toast, Toaster  } from "react-hot-toast";
 
 // import "react-toastify/dist/ReactToastify.css";
 
@@ -289,14 +289,17 @@ const markAsReceivedMutation = useMutation({
   },
 
   onSuccess: (data) => {
-    toast.success("Marked as received successfully");
-    queryClient.invalidateQueries({
-      queryKey: ["complaint-details", id],
-    });
+    
+    // setTimeout(()=>{
+      toast.success("Return With Remarked Successfully");
 
+    // }, 2000)
     setThroughRC(false);
     setRemark("");
     setConfirmConfig({ open: false, type: null });
+      queryClient.invalidateQueries({
+      queryKey: ["complaint-details", id],
+    });
   },
 
   onError: (error) => {
@@ -473,9 +476,9 @@ const markAsReceivedMutation = useMutation({
   }
 
   return (
-    <>
-      <Toaster position="top-right"  />
+    // <>
     <div className="w-full min-h-screen bg-gray-50">
+      <Toaster position="top-right"  />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
@@ -1593,7 +1596,7 @@ const markAsReceivedMutation = useMutation({
         </div>
       )}
     </div>
-      </>
+      // </>
   );
 };
 
