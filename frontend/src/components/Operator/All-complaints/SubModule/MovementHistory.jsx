@@ -57,7 +57,7 @@ const MovementHistory = ({ complaint }) => {
     }
 
    
-    return `${recordSection} → Record Section`;
+    return `${record} → Record Section`;
   };
 
   return (
@@ -89,20 +89,20 @@ const MovementHistory = ({ complaint }) => {
 
                 
                 <p className="text-[12px] text-gray-500 mt-1">
-                  {item.created_at || "No time"}
+                  {item?.created_at || ""}
                 </p>
 
                 
                 <p className="text-[13px] text-gray-600 mt-1 leading-snug">
                   <span className="font-semibold text-gray-700 mr-1">Remark:</span>
-                  {item.remarks || "NA"}
+                  {item?.remarks || "NA"}
                 </p>
               </div>
 
               
               <div className="flex flex-col items-start sm:items-end gap-1.5 min-w-fit">
                 <span className="text-[11px] sm:text-[12px] bg-blue-100 text-blue-600 px-2 py-1 rounded-md whitespace-nowrap">
-                  {item.status || "Forwarded"}
+                  {item?.status || "Forwarded"}
                 </span>
               </div>
 
