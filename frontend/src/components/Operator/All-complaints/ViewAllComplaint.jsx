@@ -716,7 +716,7 @@ const ViewAllComplaint = () => {
 
             <h3 className="text-lg font-semibold mb-4 pr-8">
               {confirmConfig.type === "receive"
-                ? "Return with Remarks?"
+                ? "Received Physically?"
                 : confirmConfig.type === "pullback"
                 ? "Are you sure you want to pull back?"
                 : "Forward File Physically Electronically?"}
