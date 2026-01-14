@@ -257,6 +257,15 @@ useEffect(() => {
   };
 
 
+  function limitTo50Words(text) {
+  const words = text.trim().split(/\s+/);
+
+  if (words.length <= 30) {
+    return text;
+  }
+
+  return words.slice(0, 30).join(" ") + " ...";
+}
 
 
 
@@ -420,7 +429,7 @@ useEffect(() => {
                           File No. {complaint.complain_no}
                         </p>
                         <p className="text-xs text-gray-700 mb-1">
-                          Description: {complaint.complaint_description ||
+                          Description: {limitTo50Words(complaint.complaint_description) ||
                             "No description available"}
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
