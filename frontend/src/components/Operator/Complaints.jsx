@@ -2239,14 +2239,14 @@ const handleMainRespondent = (id) => {
               </button>
 
 
-               <button
+               {/* <button
                 type="button"
                
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200"
                 disabled={isSubmitting}
               >
                 ड्राफ्ट सेव करें
-              </button>
+              </button> */}
 
               <button
                 type="button"
