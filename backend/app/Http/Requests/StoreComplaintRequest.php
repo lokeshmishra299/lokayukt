@@ -176,9 +176,9 @@ class StoreComplaintRequest extends FormRequest
             /* -----------------------------------------
             | Challan
             ----------------------------------------- */
-            'challan_number.required' => 'Challan number is required.',
-            'challan_date.required' => 'Challan date is required.',
-            'challan_file.required' => 'Challan file is required.',
+            // 'challan_number.required' => 'Challan number is required.',
+            // 'challan_date.required' => 'Challan date is required.',
+            // 'challan_file.required' => 'Challan file is required.',
             'challan_file.mimes' => 'Challan file must be a PDF or image.',
             'challan_file.max' => 'Challan file size cannot exceed 2MB.',
 

@@ -36,14 +36,28 @@ class OperatorComplaintsController extends Controller
         //     ? $request->file('authorization_document')->store('Document', 'public')
         //     : null;
 
-             $fileAd = 'doc_' . uniqid() . '.' . $request->file('authorization_document')->getClientOriginalExtension();
-             $filePath = $request->file('authorization_document')->storeAs('Document', $fileAd, 'public');
+                 $fileAd = null;
+        $fileCf = null;
+        $fileAttach = null;
+
+
+            if ($request->hasFile('authorization_document')) {
+
+                $fileAd = 'doc_' . uniqid() . '.' . $request->file('authorization_document')->getClientOriginalExtension();
+                $filePath = $request->file('authorization_document')->storeAs('Document', $fileAd, 'public');
+            }
+
             
-             $fileCf = 'doc_' . uniqid() . '.' . $request->file('challan_file')->getClientOriginalExtension();
-             $filePath = $request->file('challan_file')->storeAs('Document', $fileCf, 'public');
-           
-             $fileAttach = 'doc_' . uniqid() . '.' . $request->file('attached_documents')->getClientOriginalExtension();
-             $filePath = $request->file('attached_documents')->storeAs('Document', $fileAttach, 'public');
+            if ($request->hasFile('challan_file')) {
+                $fileCf = 'doc_' . uniqid() . '.' . $request->file('challan_file')->getClientOriginalExtension();
+                $filePath = $request->file('challan_file')->storeAs('Document', $fileCf, 'public');
+            }
+
+           if ($request->hasFile('attached_documents')) {
+
+               $fileAttach = 'doc_' . uniqid() . '.' . $request->file('attached_documents')->getClientOriginalExtension();
+               $filePath = $request->file('attached_documents')->storeAs('Document', $fileAttach, 'public');
+            }
                
 
         // $challanFile = $request->hasFile('challan_file')
@@ -219,6 +233,217 @@ class OperatorComplaintsController extends Controller
     }
 }
 
+        public function saveAsDraft(StoreComplaintRequest $request)
+{
+     $added_by = Auth::user()->id;
+
+    DB::beginTransaction();
+
+    try {
+        /*--------------------------------------------
+        | 1. Upload Files
+        |--------------------------------------------*/
+        // $authorizationDocument = $request->hasFile('authorization_document')
+        //     ? $request->file('authorization_document')->store('Document', 'public')
+        //     : null;
+
+                 $fileAd = null;
+        $fileCf = null;
+        $fileAttach = null;
+
+
+            if ($request->hasFile('authorization_document')) {
+
+                $fileAd = 'doc_' . uniqid() . '.' . $request->file('authorization_document')->getClientOriginalExtension();
+                $filePath = $request->file('authorization_document')->storeAs('Document', $fileAd, 'public');
+            }
+
+            
+            if ($request->hasFile('challan_file')) {
+                $fileCf = 'doc_' . uniqid() . '.' . $request->file('challan_file')->getClientOriginalExtension();
+                $filePath = $request->file('challan_file')->storeAs('Document', $fileCf, 'public');
+            }
+
+           if ($request->hasFile('attached_documents')) {
+
+               $fileAttach = 'doc_' . uniqid() . '.' . $request->file('attached_documents')->getClientOriginalExtension();
+               $filePath = $request->file('attached_documents')->storeAs('Document', $fileAttach, 'public');
+            }
+               
+
+        // $challanFile = $request->hasFile('challan_file')
+        //     ? $request->file('challan_file')->store('Document', 'public')
+        //     : null;
+
+        // $attached_documents = $request->hasFile('attached_documents')
+        //     ? $request->file('attached_documents')->store('Document', 'public')
+        //     : null;
+
+        /*--------------------------------------------
+        | 2. Create Main Complaint Entry
+        |--------------------------------------------*/
+
+        $complaintId = DB::table('complaints')->insertGetId([
+            'relation_with_person'        => $request->relation_with_person,
+            'authorization_document'      => $fileAd,
+            'correspondence_name'         => $request->correspondence_name,
+            'correspondence_place'        => $request->correspondence_place,
+            'correspondence_post_office'  => $request->correspondence_post_office,
+            'correspondence_district'     => $request->correspondence_district,
+            'cause_date'                  => $request->cause_date,
+            'delay_reason'                => $request->delay_reason,
+            'previously_submitted'        => $request->previously_submitted,
+            'previously_submitted_details'=> $request->previously_submitted_details,
+            'category'                    => $request->category,
+            'challan_number'              => $request->challan_number,
+            'challan_date'                => $request->challan_date,
+            'challan_file'                => $fileCf,
+            'added_by'                    => $added_by,
+            'attached_documents_description' => $request->attached_documents_description,
+            'attached_documents'          => $fileAttach,
+            'complaint_description'       => $request->complaint_description,
+            'in_draft'                    => 1,
+        ]);
+
+        /*--------------------------------------------
+        | 3. Generate Complaint No
+        |--------------------------------------------*/
+        $year = date('Y');
+        $complaintNo = str_pad($complaintId, 6, '0', STR_PAD_LEFT) . '/' . $year;
+
+        DB::table('complaints')->where('id', $complaintId)
+            ->update(['complain_no' => $complaintNo]);
+
+        /*--------------------------------------------
+        | 4. Insert Multiple Complainants
+        |--------------------------------------------*/
+        if ($request->has('complainant_name')) {
+
+            foreach ($request->complainant_name as $i => $name) {
+
+                // SKIP EMPTY complainant rows
+                if (!isset($name) || trim($name) === '') {
+                    continue;
+                }
+
+                DB::table('complainants')->insert([
+                    'complaint_id'          => $complaintId,
+                    'complainant_name'      => trim($name),
+                    'is_main'               => $request->is_main_c[$i] ?? '',
+                    'father_name'           => $request->father_name[$i] ?? '',
+                    'occupation'            => $request->occupation[$i] ?? '',
+                    'is_public_servant'     => $request->is_public_servant[$i] ?? 'no',
+                    'permanent_place'       => $request->permanent_place[$i] ?? '',
+                    'permanent_post_office' => $request->permanent_post_office[$i] ?? '',
+                    'permanent_district'    => $request->permanent_district[$i] ?? null,
+                ]);
+            }
+        }
+
+        /*--------------------------------------------
+        | 5. Insert Supporters (Support_name)
+        |--------------------------------------------*/
+        if ($request->has('support_name')) {
+            foreach ($request->support_name as $i => $support_name) {
+
+                if (trim($support_name) === '') continue;
+
+                DB::table('complaint_supporting')->insert([
+                    'complaint_id'    => $complaintId,
+                    'support_name'    => trim($support_name),
+                    'support_address' => $request->support_address[$i] ?? '',
+                ]);
+            }
+        }
+
+        /*--------------------------------------------
+        | 6. Insert Witnesses
+        |--------------------------------------------*/
+        if ($request->has('witness_name')) {
+            foreach ($request->witness_name as $i => $witness_name) {
+
+                if (trim($witness_name) === '') continue;
+
+                DB::table('complaint_witness')->insert([
+                    'complaint_id'     => $complaintId,
+                    'witness_name'     => trim($witness_name),
+                    'witness_address'  => $request->witness_address[$i] ?? '',
+                ]);
+            }
+        }
+
+        /*--------------------------------------------
+        | 7. Insert Respondents
+        |--------------------------------------------*/
+        if ($request->has('respondent_name')) {
+            foreach ($request->respondent_name as $i => $name) {
+
+                if (trim($name) === '') continue;
+
+                DB::table('respondents')->insert([
+                    'complaint_id'        => $complaintId,
+                    'respondent_name'     => trim($name),
+                    'designation'         => $request->designation[$i] ?? '',
+                    'officer_category'    => $request->officer_category[$i] ?? '',
+                    'department_name'     => $request->department_name[$i] ?? '',
+                    'current_address'     => $request->current_address[$i] ?? '',
+                    'is_main'             => $request->is_main_r[$i] ?? '',
+                    'respondent_district' => $request->respondent_district[$i] ?? null,
+                ]);
+            }
+        }
+
+        /*--------------------------------------------
+        | 8. Insert Documents Table
+        |--------------------------------------------*/
+        if ($fileAd) {
+            DB::table('complaints_documents')->insert([
+                'complain_id' => $complaintId,
+                'added_by'        => $added_by,
+                'title'        => 'Authorization Document',
+                'type'        => 'authorizationDocument',
+                'file'        => $fileAd
+            ]);
+        }
+
+        if ($fileCf) {
+            DB::table('complaints_documents')->insert([
+                'complain_id' => $complaintId,
+                'added_by'        => $added_by,
+                'title'        => 'Challan',
+                'type'        => 'challan',
+                'file'        => $fileCf
+            ]);
+        }
+
+        if ($fileAttach) {
+            DB::table('complaints_documents')->insert([
+                'complain_id' => $complaintId,
+                'added_by'        => $added_by,
+                'title'        => 'Attached',
+                'type'        => 'attached',
+                'file'        => $fileAttach
+            ]);
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Complaint submitted successfully!',
+            'complaint_id' => $complaintId
+        ]);
+
+    } catch (\Exception $e) {
+        DB::rollback();
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Error occurred',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
     //  public function store(StoreComplaintRequest $request)
     // {
