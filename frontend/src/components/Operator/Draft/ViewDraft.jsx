@@ -8,7 +8,8 @@ import {
   FaEye,
 } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import { toast, ToastContainer } from "react-toastify";
+// import { toast, ToastContainer } from "react-toastify";
+import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
@@ -74,7 +75,7 @@ const ViewDraft = () => {
     queryKey: ["operator-options"],
     queryFn: async () => {
       try {
-        const res = await api.get("/operator/get-lokayukt");
+        const res = await api.get("/operator/get-users");
         if (Array.isArray(res.data)) {
           return res.data;
         } else if (res.data && Array.isArray(res.data.data)) {
@@ -247,7 +248,7 @@ const ViewDraft = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <Toaster position="top-right"  />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
@@ -271,9 +272,15 @@ const ViewDraft = () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_operator == 0
-                      ? "Received - Record Section"
-                      : "Received - Record Section"}
+                    { complaintData.approved_rejected_by_rk === 0 && complaintData.approved_rejected_by_lokayukt === 0 ? "Received - Record Section"
+                   :
+                   complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt != 1 ?  "In Motion - With Lokayukt"
+                   :
+                   complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt === 1 ? "In Motion - With UpLokayukt" 
+                   : "Received - Record Section"
+
+
+                   }
                   </span>
                 </div>
               </div>
@@ -300,9 +307,20 @@ const ViewDraft = () => {
                         complaintData.status
                       )}`}
                     >
-                      {complaintData.approved_rejected_by_operator == 0
+                      {/* {complaintData.approved_rejected_by_operator == 0
                         ? "Received - Record Section"
-                        : "Received - Record Section"}
+                        : "In Motion - With Lokayukt"} */}
+
+                   { complaintData.approved_rejected_by_rk === 0 && complaintData.approved_rejected_by_lokayukt === 0 ? "Received - Record Section"
+                   :
+                   complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt != 1 ?  "In Motion - With Lokayukt"
+                   :
+                   complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt === 1 ? "In Motion - With UpLokayukt" 
+                   : "Received - Record Section"
+
+
+                   }
+
                     </span>
 
                     <button
@@ -621,7 +639,7 @@ const ViewDraft = () => {
                     >
                       {markAsReceivedMutation.isPending
                         ? "Processing..."
-                        : "Mark As Received"}
+                        : "Received Physically"}
                     </button>
                   )}
                 </div>
@@ -642,7 +660,7 @@ const ViewDraft = () => {
                     >
                       {forwardPhysicallyMutation.isPending
                         ? "Processing..."
-                        : "Forward File Physically Electronically"}
+                        : "Send"}
                     </button>
                   )}
                 </div>
@@ -698,9 +716,9 @@ const ViewDraft = () => {
 
             <h3 className="text-lg font-semibold mb-4 pr-8">
               {confirmConfig.type === "receive"
-                ? "Return with Remarks?"
+                ? "Received Physically?"
                 : confirmConfig.type === "pullback"
-                ? "Pull Back Complaint?"
+                ? "Are you sure you want to pull back?"
                 : "Forward File Physically Electronically?"}
             </h3>
 
@@ -796,7 +814,7 @@ const ViewDraft = () => {
                   ? "Processing..."
                   : confirmConfig.type === "pullback"
                   ? "Yes"
-                  : "Sent"}
+                  : "Send"}
               </button>
             </div>
           </div>
