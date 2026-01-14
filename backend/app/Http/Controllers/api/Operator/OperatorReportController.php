@@ -499,7 +499,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
         $cmpDetail = ComplainDetails::where('complain_id',$cmp->id)->get();
         foreach($cmpDetail as $c){
 
-            $path[] = Storage::url('letters/' . $c->file); 
+            $path[] = Storage::url('Document/' . $c->file); 
             $cmp->filepath = $path;
         }
            return response()->json([
