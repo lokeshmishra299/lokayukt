@@ -407,6 +407,7 @@ const handleMainRespondent = (id) => {
   const [showPreview, setShowPreview] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+  const [DraftLoader,setDrfatLoader] = useState(false)
 
   const handleDownloadPDF = async () => {
     setIsDownloadingPDF(true);
@@ -782,6 +783,171 @@ const handleMainRespondent = (id) => {
     setErrors({});
     setShowPreview(true);
   };
+
+  const resetAll = () => {
+  setComplainants([
+    {
+      id: 1,
+      name: '',
+      fatherName: '',
+      occupation: '',
+      isPublicServant: 'चुनें',
+      place: '',
+      postOffice: '',
+      district: '',
+      isMain: 0,
+    }
+  ]);
+  setPersons([
+    {
+      id: 1,
+      name: '',
+      designation: '',
+      currentAddress: '',
+      district: '',
+      departmentNature: '',
+      officerCategory: '',
+      isMain: 0,
+    }
+  ]);
+  setFormData({
+    relation: '',
+    authorizationFile: null,
+    correspondenceAddress: {
+      name: '',
+      place: '',
+      postOffice: '',
+      district: '',
+    },
+    complaintDate: '',
+    delayReason: '',
+    previousComplaint: '',
+    previousComplaintDetails: '',
+    complaintType: '',
+    challanNumber: '',
+    challanDate: '',
+    challanFile: null,
+    supportingPersons: [{ name: '', address: '' }],
+    otherPersons: [{ name: '', address: '' }],
+    attachedDocuments: '',
+    attachedDocumentsFile: null,
+    complaintDescription: '',
+  });
+  setShowComplainants({ 1: true });
+  setShowPersons({ 1: true });
+  setErrors({});
+};
+
+
+  const handleSaveDraft = async () => {
+  try {
+    setDrfatLoader(true);
+    setErrors({});
+
+    const draftData = new FormData();
+
+    // 1️⃣ Complainants
+    complainants.forEach((c, index) => {
+      draftData.append(`complainant_name[${index}]`, c.name || '');
+      draftData.append(`father_name[${index}]`, c.fatherName || '');
+      draftData.append(`occupation[${index}]`, c.occupation || '');
+      draftData.append(`is_public_servant[${index}]`,
+        c.isPublicServant === 'हाँ' ? 'yes' :
+        c.isPublicServant === 'नहीं' ? 'no' : ''
+      );
+
+      draftData.append(`permanent_place[${index}]`, c.place || '');
+      draftData.append(`permanent_post_office[${index}]`, c.postOffice || '');
+      draftData.append(`permanent_district[${index}]`, c.district || '');
+      draftData.append(`is_main_c[${index}]`, c.isMain ? 1 : 0);
+    });
+
+    // 2️⃣ Respondents
+    persons.forEach((p, index) => {
+      draftData.append(`respondent_name[${index}]`, p.name || '');
+      draftData.append(`designation[${index}]`, p.designation || '');
+      draftData.append(`current_address[${index}]`, p.currentAddress || '');
+      draftData.append(`respondent_district[${index}]`, p.district || '');
+      draftData.append(`department_name[${index}]`, p.departmentNature || '');
+      draftData.append(`officer_category[${index}]`, p.officerCategory || '');
+      draftData.append(`is_main_r[${index}]`, p.isMain ? 1 : 0);
+    });
+
+    // 3️⃣ Relation + Auth
+    draftData.append('relation_with_person', formData.relation || '');
+    if (formData.authorizationFile) {
+      draftData.append('authorization_document', formData.authorizationFile);
+    }
+
+    // 4️⃣ Correspondence Address
+    draftData.append('correspondence_name', formData.correspondenceAddress.name || '');
+    draftData.append('correspondence_place', formData.correspondenceAddress.place || '');
+    draftData.append('correspondence_post_office', formData.correspondenceAddress.postOffice || '');
+    draftData.append('correspondence_district', formData.correspondenceAddress.district || '');
+
+    // 5️⃣ Complaint Info
+    draftData.append('cause_date', formData.complaintDate || '');
+    draftData.append('delay_reason', formData.delayReason || '');
+
+    const prev =
+      formData.previousComplaint === 'हाँ' ? 'yes' :
+      formData.previousComplaint === 'नहीं' ? 'no' : '';
+    draftData.append('previously_submitted', prev);
+    draftData.append('previously_submitted_details', formData.previousComplaintDetails || '');
+
+    // 6️⃣ Category
+    draftData.append(
+      'category',
+      formData.complaintType === 'अभिकथन'
+        ? 'assertion'
+        : formData.complaintType === 'शिकायत'
+        ? 'complaint'
+        : ''
+    );
+
+    // 7️⃣ Support Persons
+    formData.supportingPersons?.forEach((p, i) => {
+      draftData.append(`support_name[${i}]`, p.name || '');
+      draftData.append(`support_address[${i}]`, p.address || '');
+    });
+
+    // 8️⃣ Witness
+    formData.otherPersons?.forEach((p, i) => {
+      draftData.append(`witness_name[${i}]`, p.name || '');
+      draftData.append(`witness_address[${i}]`, p.address || '');
+    });
+
+    // 9️⃣ Documents
+    draftData.append('attached_documents_description', formData.attachedDocuments || '');
+    if (formData.attachedDocumentsFile) {
+      draftData.append('attached_documents', formData.attachedDocumentsFile);
+    }
+
+    draftData.append('complaint_description', formData.complaintDescription || '');
+
+    // 🔥 DRAFT API CALL
+    await api.post('/operator/save-draft-complaint', draftData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    toast.success('ड्राफ्ट सफलतापूर्वक सेव हो गया ✅');
+    setShowPreview(false);
+    resetAll()
+
+  } catch (error) {
+    console.error("Draft Error:", error);
+
+    if (error.response?.data?.errors) {
+      setErrors(error.response.data.errors);
+      toast.error(error.response.data.message || 'ड्राफ्ट सेव नहीं हुआ');
+    } else {
+      toast.error('कुछ गलत हो गया');
+    }
+  } finally {
+    setDrfatLoader(false);
+  }
+};
+
 
   const handleSubmit = async (e) => {
     // 1. Prevent Default Check
@@ -2241,11 +2407,13 @@ const handleMainRespondent = (id) => {
 
                <button
                 type="button"
-               
+                onClick={handleSaveDraft}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200"
-                disabled={isSubmitting}
+                // disabled={isSubmitting}
+                
               >
-                ड्राफ्ट सेव करें
+                {DraftLoader ? "ड्राफ्ट सेविंग...": "ड्राफ्ट सेव करें"}
+                
               </button>
 
               <button
