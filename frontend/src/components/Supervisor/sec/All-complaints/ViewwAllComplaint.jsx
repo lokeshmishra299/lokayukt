@@ -10,6 +10,7 @@ import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
+import DraftLetter from "./SubModule/DraftLetter";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -418,7 +419,7 @@ setCurrentDate(
           }
   
           //  Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
-          const res = await api.get("/supervisor/get-upsupervisor");
+          const res = await api.get("/supervisor/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
   
@@ -939,7 +940,7 @@ const forwardComplaintMutation = useMutation({
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {["fee", "documents", "notings", "movement", "draft"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -957,6 +958,8 @@ const forwardComplaintMutation = useMutation({
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
+                    {tab === "draft" && "Draft"}
+
                   </button>
                 ))}
               </div>
@@ -965,7 +968,7 @@ const forwardComplaintMutation = useMutation({
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {["fee", "documents", "notings", "movement", "draft"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -979,9 +982,8 @@ const forwardComplaintMutation = useMutation({
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
-                    {activeTab === tab && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-                    )}
+                    {tab === "draft" && "Draft"}
+
                   </button>
                 ))}
               </div>
@@ -1009,6 +1011,9 @@ const forwardComplaintMutation = useMutation({
               {activeTab === "movement" && (
                 <MovementHistory complaint={complaintData} />
               )}
+
+                            {activeTab === "draft" && <DraftLetter complaint={complaintData} />}
+              
 
               
             </div>
