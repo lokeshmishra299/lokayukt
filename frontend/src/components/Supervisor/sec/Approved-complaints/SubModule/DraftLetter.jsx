@@ -704,7 +704,7 @@ const DraftLetter = ({ complaint }) => {
 
     <div className="mt-1 mx-auto w-25 h-25  rounded-full flex items-center justify-center overflow-hidden">
       <img
-        src="/public/images/ChatGPTImage .png"
+        src="/images/ChatGPTImage.png"
         alt="Lok Ayukt"
         className="w-full h-full object-cover"
       />
@@ -742,7 +742,7 @@ const DraftLetter = ({ complaint }) => {
                   <div className="text-right text-xs text-gray-600">
                     <p className="uppercase tracking-wide">Noting By</p>
                     <p className="font-semibold mt-1 text-gray-800">
-                      Shri Sanjay Mishra
+                      Hon' Lokayukt Shri Sanjay Mishra
                     </p>
                     <p>{subrole}</p>
                   </div>
