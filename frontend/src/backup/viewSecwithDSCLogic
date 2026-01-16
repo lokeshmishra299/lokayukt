@@ -1,16 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  FaFileAlt,
-  FaExclamationTriangle,
-  FaTimes,
-  FaEye,
-  FaChevronDown,
-} from "react-icons/fa";
+import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-// import { toast, ToastContainer } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
 import { toast, Toaster } from "react-hot-toast";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -18,7 +10,6 @@ import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
-import DraftLetter from "./SubModule/DraftLetter";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -32,6 +23,8 @@ const api = axios.create({
   },
 });
 
+
+
 const SearchableDropdown = ({
   options,
   value,
@@ -42,6 +35,7 @@ const SearchableDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
+  
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -145,22 +139,431 @@ const SearchableDropdown = ({
 };
 
 const ViewAllComplaint = () => {
+
+
+
+// Dsc Import 
+// const signWithDSC = () => {
+//   try {
+//     //  if (!window.ActiveXObject) {
+//     //   alert("Please use Internet Explorer for Digital Signature");
+//     //   return false;
+//     // }
+
+//     const CAPICOM_CURRENT_USER_STORE = 2;
+//     const CAPICOM_STORE_OPEN_READ_ONLY = 0;
+//     const CAPICOM_CERTIFICATE_FIND_KEY_USAGE = 12;
+//     const CAPICOM_DIGITAL_SIGNATURE_KEY_USAGE = 0x00000080;
+//     const CAPICOM_CERTIFICATE_FIND_TIME_VALID = 9;
+//     const CAPICOM_CERTIFICATE_FIND_EXTENDED_PROPERTY = 6;
+//     const CERT_KEY_SPEC_PROP_ID = 6;
+//     const CAPICOM_AUTHENTICATED_ATTRIBUTE_SIGNING_TIME = 0;
+//     const CAPICOM_ENCODE_BASE64 = 0;
+//     const CAPICOM_INFO_SUBJECT_SIMPLE_NAME = 0;
+
+//     const store = new window.ActiveXObject("CAPICOM.Store");
+//     store.Open(
+//       CAPICOM_CURRENT_USER_STORE,
+//       "My",
+//       CAPICOM_STORE_OPEN_READ_ONLY
+//     );
+
+//     let certificates = store.Certificates
+//       .Find(CAPICOM_CERTIFICATE_FIND_KEY_USAGE, CAPICOM_DIGITAL_SIGNATURE_KEY_USAGE)
+//       .Find(CAPICOM_CERTIFICATE_FIND_TIME_VALID)
+//       .Find(CAPICOM_CERTIFICATE_FIND_EXTENDED_PROPERTY, CERT_KEY_SPEC_PROP_ID);
+
+//     if (certificates.Count < 1) {
+//       alert("No valid Digital Signature Certificate found");
+//       return false;
+//     }
+
+//     const selectedCerts = certificates.Select();
+//     const cert = selectedCerts.Item(1);
+
+//     const today = new Date();
+//     const validTo = new Date(cert.ValidToDate);
+//     if (validTo < today) {
+//       alert("Digital Signature Certificate expired");
+//       return false;
+//     }
+
+//     setCertSubject(cert.GetInfo(CAPICOM_INFO_SUBJECT_SIMPLE_NAME));
+//     setCertThumbprint(cert.Thumbprint);
+//     setCertSerialNo(cert.SerialNumber);
+//     setDigitalId(cert.GetInfo(CAPICOM_INFO_SUBJECT_SIMPLE_NAME));
+//     setCstInfo(cert.SubjectName);
+
+//     const from = new Date(cert.ValidFromDate);
+//     const to = new Date(cert.ValidToDate);
+
+//     const formatDate = (d) =>
+//       `${String(d.getMonth() + 1).padStart(2, "0")}/${String(
+//         d.getDate()
+//       ).padStart(2, "0")}/${d.getFullYear()}`;
+
+//     setValidFrom(formatDate(from));
+//     setValidTo(formatDate(to));
+
+//     const contentToSign = "00"; 
+//     setPlainText(contentToSign);
+
+//     const signedData = new window.ActiveXObject("CAPICOM.SignedData");
+//     const signer = new window.ActiveXObject("CAPICOM.Signer");
+//     const timeAttr = new window.ActiveXObject("CAPICOM.Attribute");
+
+//     signedData.Content = contentToSign;
+//     signer.Certificate = cert;
+
+//     timeAttr.Name = CAPICOM_AUTHENTICATED_ATTRIBUTE_SIGNING_TIME;
+//     timeAttr.Value = new Date().getVarDate();
+//     signer.AuthenticatedAttributes.Add(timeAttr);
+
+//     const signature = signedData.Sign(signer, true, CAPICOM_ENCODE_BASE64);
+
+//     setSignatureData(signature);
+
+//     return true; 
+//   } catch (err) {
+//     console.error("DSC Error:", err);
+//     alert("Error while signing using Digital Signature");
+//     return false;
+//   }
+// };
+
+
+
+
+//  DSC LOGIC
+// NIC DSCSigner (ya NIC Digital Signer Service, emSigner (eMudhra), Signer.Digital (Private) 
+
+
+// Signer	Port ->	Certificate API
+// NIC DSCSigner ->	55101	/getSignerCertificate
+// eMudhra emSigner ->	1585	/getCert
+// Sify	2095 ->	/listCert
+// Capricorn	different	different
+// const signWithDSC = async () => {
+//   try {
+//     const dscPort = 55101; 
+//     const dscUrl = `https://127.0.0.1:${dscPort}`;
+//     console.log("Connecting...", dscUrl);
+
+//     try {
+//       await axios.get(`${dscUrl}/`, { timeout: 2000 });
+//     } catch (e) {
+//       toast.error("DSC Signer not running! Start NIC DSCSigner.");
+//       return null; 
+//     }
+
+//     const response = await axios.post(`${dscUrl}/getSignerCertificate`, { "action": "list" }, {
+//       headers: { "Content-Type": "application/json" }
+//     });
+
+//     if (response.data && response.data.status === "success") {
+//        const cert = response.data.certificateData || response.data;
+       
+//        // UI Update (Optional but good for display)
+//        setCertSubject(cert.subject || "");
+       
+//        // Prepare Data Object
+//        const dscData = {
+//           signatureData: "SIGNED_" + new Date().getTime() + "_" + (cert.serialNumber || ""),
+//           plainText: "00",
+//           certThumbprint: cert.thumbprint || cert.Thumbprint || "",
+//           certSubject: cert.subject || cert.Subject || "",
+//           certSerialNo: cert.serialNumber || cert.SerialNumber || "",
+//           validFrom: cert.validFrom || "",
+//           validTo: cert.validTo || "",
+//           digitalId: cert.subject || cert.Subject || "",
+//           cstInfo: cert.issuer || cert.Issuer || ""
+//        };
+
+//        toast.success("DSC Connected Successfully! ✅");
+//        return dscData; 
+//     } else {
+//        toast.error("DSC Token not found.");
+//        return null;
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     toast.error("DSC Connection Failed.");
+//     return null;
+//   }
+// };
+
+
+// ===============================================
+// CHANGE 1: New Function for HyperPKI WebSigner
+// ===============================================
+
+// const signWithHyperPKI = async () => {
+//   try {
+//     // HyperPKI Port usually: 20202 (HTTPS) or 20201 (HTTP)
+//     const dscUrl = "http://127.0.0.1:20202"; 
+    
+//     console.log("Connecting to HyperPKI Service...", dscUrl);
+
+//     try {
+//         await axios.get(`${dscUrl}/`, { timeout: 3000 });
+//     } catch (e) {
+//         toast.error("HyperPKI WebSigner is not running! Please start the service.");
+//         return null;
+//     }
+
+//     const listPayload = { action: "list" }; 
+    
+//     const listRes = await axios.post(`${dscUrl}/api/list`, listPayload, {
+//         headers: { "Content-Type": "application/json" }
+//     });
+
+//     if (!listRes.data || listRes.data.length === 0 || (listRes.data.status && listRes.data.status !== 0)) {
+//         toast.error("No USB Token Found or No Certificates Available.");
+//         return null;
+//     }
+
+//     const cert = listRes.data.certificates ? listRes.data.certificates[0] : listRes.data[0];
+
+//     console.log("Selected Cert:", cert);
+
+//     const contentToSign = "00"; 
+//     const contentBase64 = btoa(contentToSign); 
+
+//     const signPayload = {
+//         action: "sign",
+//         thumbprint: cert.thumbprint, 
+//         data: contentBase64 
+//     };
+
+//     const signRes = await axios.post(`${dscUrl}/api/sign`, signPayload);
+
+//     if (signRes.data && signRes.data.signature) {
+        
+//         setCertSubject(cert.subject || "");
+//         setCertThumbprint(cert.thumbprint || "");
+//         setCertSerialNo(cert.serialNumber || "");
+        
+//         const dscData = {
+//             signatureData: signRes.data.signature, 
+//             plainText: contentToSign,
+//             certThumbprint: cert.thumbprint || "",
+//             certSubject: cert.subject || "",
+//             certSerialNo: cert.serialNumber || "",
+//             validFrom: cert.notBefore || "", 
+//             validTo: cert.notAfter || "",
+//             digitalId: cert.subject || "",
+//             cstInfo: cert.issuer || ""
+//         };
+
+//         toast.success("Signed Successfully with HyperPKI! ✅");
+//         return dscData;
+//     } else {
+//         toast.error("Signature Failed or Cancelled by User.");
+//         return null;
+//     }
+
+//   } catch (err) {
+//     console.error("HyperPKI Error:", err);
+//     toast.error("Connection Error: Check if Token is plugged in.");
+//     return null;
+//   }
+// };
+
+// =========================================================
+// UPDATED FUNCTION: Works on both Localhost & Live
+// =========================================================
+// const signWithHyperPKI = async () => {
+//   try {
+
+//     // Localhost par ye 'http:' uthayega.
+//     // Live SSL par 'https:' uthayega.
+//     // Live IP (http://34....) par 'http:' uthayega.
+//     const protocol = window.location.protocol; 
+    
+//     const dscUrl = `${protocol}//127.0.0.1:20202`; 
+    
+//     console.log("Connecting to HyperPKI via:", dscUrl);
+
+ 
+//     try {
+//         await axios.get(`${dscUrl}/`, { timeout: 3000 });
+//     } catch (e) {
+//         console.error(e);
+//         if (protocol === 'https:') {
+//              toast.error("DSC Service not found! Ensure HyperPKI is running & SSL certificate is trusted.");
+//         } else {
+//              toast.error("HyperPKI WebSigner is not running! Please start the service.");
+//         }
+//         return null;
+//     }
+
+
+//     const listPayload = { action: "list" }; 
+    
+//     const listRes = await axios.post(`${dscUrl}/api/list`, listPayload, {
+//         headers: { "Content-Type": "application/json" }
+//     });
+
+//     if (!listRes.data || listRes.data.length === 0 || (listRes.data.status && listRes.data.status !== 0)) {
+//         toast.error("No USB Token Found or No Certificates Available.");
+//         return null;
+//     }
+
+//     const cert = listRes.data.certificates ? listRes.data.certificates[0] : listRes.data[0];
+
+//     console.log("Selected Cert:", cert);
+
+ 
+//     const contentToSign = "00"; 
+//     const contentBase64 = btoa(contentToSign); 
+
+//     const signPayload = {
+//         action: "sign",
+//         thumbprint: cert.thumbprint, 
+//         data: contentBase64 
+//     };
+
+//     const signRes = await axios.post(`${dscUrl}/api/sign`, signPayload);
+
+//     if (signRes.data && signRes.data.signature) {
+        
+//         // Update State
+//         setCertSubject(cert.subject || "");
+//         setCertThumbprint(cert.thumbprint || "");
+//         setCertSerialNo(cert.serialNumber || "");
+        
+//         // Prepare Response Object
+//         const dscData = {
+//             signatureData: signRes.data.signature, 
+//             plainText: contentToSign,
+//             certThumbprint: cert.thumbprint || "",
+//             certSubject: cert.subject || "",
+//             certSerialNo: cert.serialNumber || "",
+//             validFrom: cert.notBefore || "", 
+//             validTo: cert.notAfter || "",
+//             digitalId: cert.subject || "",
+//             cstInfo: cert.issuer || ""
+//         };
+
+//         toast.success("Signed Successfully with HyperPKI!");
+//         return dscData;
+//     } else {
+//         toast.error("Signature Failed or Cancelled by User.");
+//         return null;
+//     }
+
+//   } catch (err) {
+//     console.error("HyperPKI Error:", err);
+//     toast.error("Connection Error: Check if Token is plugged in or Driver settings allow the site.");
+//     return null;
+//   }
+// };
+
+// =========================================================
+// UPDATED FUNCTION: Auto-detects Port for Hyp2003/HyperPKI
+// =========================================================
+const signWithHyperPKI = async () => {
+  try {
+    const protocol = window.location.protocol; // http: or https:
+    
+    // Hyp2003 aur HyperPKI alag-alag ports use karte hain.
+    // Hum sabko check karenge.
+    const ports = [20202, 4848, 55100, 55101]; 
+    let activeUrl = null;
+
+    console.log("Scanning for DSC Service on ports:", ports);
+
+
+    for (const port of ports) {
+        const testUrl = `${protocol}//127.0.0.1:${port}`;
+        try {
+            await axios.get(`${testUrl}/`, { timeout: 1500 });
+            console.log(`✅ Service found on port: ${port}`);
+            activeUrl = testUrl;
+            break; 
+        } catch (e) {
+            // Next port try karo
+        }
+    }
+
+    if (!activeUrl) {
+        toast.error("DSC Bridge not found! Please start 'HyperPKI WebSigner' or 'ePass2003 Bridge'.");
+        return null;
+    }
+
+    const listPayload = { action: "list" }; 
+    
+    const listRes = await axios.post(`${activeUrl}/api/list`, listPayload, {
+        headers: { "Content-Type": "application/json" }
+    });
+
+    if (!listRes.data || listRes.data.length === 0 || (listRes.data.status && listRes.data.status !== 0)) {
+        toast.error("USB Token Connected but No Certificate Found.");
+        return null;
+    }
+
+    const cert = listRes.data.certificates ? listRes.data.certificates[0] : listRes.data[0];
+    console.log("Selected Cert:", cert);
+
+
+    const contentToSign = "00"; 
+    const contentBase64 = btoa(contentToSign); 
+
+    const signPayload = {
+        action: "sign",
+        thumbprint: cert.thumbprint, 
+        data: contentBase64 
+    };
+
+    const signRes = await axios.post(`${activeUrl}/api/sign`, signPayload);
+
+    if (signRes.data && signRes.data.signature) {
+        
+        if (typeof setCertSubject === 'function') setCertSubject(cert.subject || "");
+        if (typeof setCertThumbprint === 'function') setCertThumbprint(cert.thumbprint || "");
+        if (typeof setCertSerialNo === 'function') setCertSerialNo(cert.serialNumber || "");
+        
+        // Data Formatting
+        const dscData = {
+            signatureData: signRes.data.signature, 
+            plainText: contentToSign,
+            certThumbprint: cert.thumbprint || "",
+            certSubject: cert.subject || "",
+            certSerialNo: cert.serialNumber || "",
+            validFrom: cert.notBefore || "", 
+            validTo: cert.notAfter || "",
+            digitalId: cert.subject || "",
+            cstInfo: cert.issuer || ""
+        };
+
+        toast.success("Signed Successfully! ");
+        return dscData;
+    } else {
+        toast.error("Signing Failed or Cancelled.");
+        return null;
+    }
+
+  } catch (err) {
+    console.error("DSC Error:", err);
+    toast.error("Error connecting to Token. Please reconnect USB.");
+    return null;
+  }
+};
+
+
+
+
+
+  
   const navigate = useNavigate();
   const { id } = useParams();
+    const [sent_through_rk, setThroughRC] = useState(false);
 
-  const [Takefile, setTakefile] = useState(false);
 
-  function takefile() {
-    setTakefile(true);
-  }
-
-  //  const handleTakeFile = () =>
-  //     setTakeFileConfirmConfig({ open: true, type: "assign" });
-
-  const capitalizeFirstLetter = (text = "") => {
-    if (!text) return "N/A";
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  };
+    const capitalizeFirstLetter = (text = "") => {
+  if (!text) return "N/A";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
 
   const queryClient = useQueryClient();
 
@@ -168,21 +571,37 @@ const ViewAllComplaint = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
-  const [showDispatch, setshowDispatch] = useState(false);
-  const [sent_through_rk, setThroughRC] = useState(false);
 
-  function diposeShow() {
-    setshowDispatch(true);
-  }
-  function closePoup() {
-    setshowDispatch(false);
-  }
 
+  const [currentDate, setCurrentDate] = useState("");
+  const [signatureData, setSignatureData] = useState("");
+const [plainText, setPlainText] = useState("");
+const [certSubject, setCertSubject] = useState("");
+const [certThumbprint, setCertThumbprint] = useState("");
+const [certSerialNo, setCertSerialNo] = useState("");
+const [validFrom, setValidFrom] = useState("");
+const [validTo, setValidTo] = useState("");
+const [digitalId, setDigitalId] = useState("");
+const [cstInfo, setCstInfo] = useState("");
+
+
+useEffect(() => {
+  const now = new Date();
+setCurrentDate(
+  `${String(now.getMonth() + 1).padStart(2, "0")}/${String(
+    now.getDate()
+  ).padStart(2, "0")}/${now.getFullYear()}`
+);
+})
+
+
+  // Single config for Action modals (Receive, Forward, Pullback)
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
     type: null,
   });
 
+  // Config for Data View Modal (Correspondence / Respondent)
   const [viewModalConfig, setViewModalConfig] = useState({
     open: false,
     type: null,
@@ -214,10 +633,10 @@ const ViewAllComplaint = () => {
   //   isFetching: isFetchingOptions,
   //   error: forwardOptionsError,
   // } = useQuery({
-  //   queryKey: ["lokayukt-options"],
+  //   queryKey: ["supervisor-options"],
   //   queryFn: async () => {
   //     try {
-  //       const res = await api.get("/lokayukt/get-lokayukt");
+  //       const res = await api.get("/supervisor/get-supervisor");
   //       if (Array.isArray(res.data)) {
   //         return res.data;
   //       } else if (res.data && Array.isArray(res.data.data)) {
@@ -240,98 +659,47 @@ const ViewAllComplaint = () => {
   //   retry: 2,
   // });
 
-  // --- PULL BACK API (Supervisor) ---
-  const pullBackMutation = useMutation({
-    mutationFn: async ({ complaintId }) => {
-      return api.post(`/supervisor/pull-back-by-ro-aro/${complaintId}`);
-    },
-    onSuccess: (res) => {
-      toast.success("Complaint pulled back successfully");
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Pull back failed");
-    },
-  });
 
-  const assignToSelfMutation = useMutation({
-    mutationFn: async ({ complaintId }) => {
-      const res = await api.post(`/supervisor/assign-by-ro-aro/${complaintId}`);
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || "Assigned to yourself successfully");
-      setTakefile(false);
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to assign");
-    },
-  });
-
-  const {
-    data: forwardOptionsData,
-    isLoading: isLoadingOptions,
-    isFetching: isFetchingOptions,
-    error: forwardOptionsError,
-  } = useQuery({
-    queryKey: ["lokayukt-options", forwardType], //
-    queryFn: async () => {
-      try {
-        //  Send To My Pool  API: /lokayukt/get-users
-        if (forwardType === "self") {
-          const res = await api.get("/supervisor/get-users");
-          return res.data?.data || res.data || [];
+   const {
+      data: forwardOptionsData,
+      isLoading: isLoadingOptions,
+      isFetching: isFetchingOptions,
+      error: forwardOptionsError,
+    } = useQuery({
+      queryKey: ["supervisor-options", forwardType], // 
+      queryFn: async () => {
+        try {
+          //  Send To My Pool  API: /supervisor/get-users
+          if (forwardType === "self") {
+            const res = await api.get("/supervisor/get-users");
+            return res.data?.data || res.data || [];
+          }
+  
+          //  Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
+          const res = await api.get("/supervisor/get-upsupervisor");
+          const raw = res.data?.data || res.data || [];
+          const flatList = Array.isArray(raw) ? raw.flat() : [];
+  
+          return flatList;
+        } catch (error) {
+          throw error;
         }
-
-        const res = await api.get("/supervisor/get-uplokayukt");
-        const raw = res.data?.data || res.data || [];
-        const flatList = Array.isArray(raw) ? raw.flat() : [];
-
-        return flatList;
-      } catch (error) {
-        throw error;
-      }
-    },
-    enabled: confirmConfig.open && confirmConfig.type === "forward",
-    staleTime: 0,
-  });
+      },
+      enabled: confirmConfig.open && confirmConfig.type === "forward",
+      staleTime: 0,
+    });
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
       const res = await api.post("/supervisor/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
-        sent_through_rk: sent_through_rk ? 1 : 0,
+
       });
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data.message || "Marked as received successfully");
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setThroughRC(false);
-      setRemark("");
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(
-        error?.response?.data?.message || "Failed to mark as received"
-      );
-    },
-  });
-
-  const dispose = useMutation({
-    mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post(`/supervisor/dispose-complain/${id}`, {
-        complaint_id: complaintId,
-        remark: remarkData,
-      });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success("Dispose successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setRemark("");
       setConfirmConfig({ open: false, type: null });
@@ -345,7 +713,7 @@ const ViewAllComplaint = () => {
 
   // const forwardComplaintMutation = useMutation({
   //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-  //     const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
+  //     const res = await api.post(`/supervisor/forward-by-supervisor/${complaintId}`, {
   //       forward_to: forwardTo,
   //       remark: remarkData,
   //     });
@@ -363,30 +731,36 @@ const ViewAllComplaint = () => {
   //   },
   // });
 
-  const forwardComplaintMutation = useMutation({
-    mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-      const res = await api.post(
-        `/supervisor/forward-by-ro-aro/${complaintId}`,
-        {
-          forward_to: forwardTo,
-          remark: remarkData,
-          sent_through_rk: sent_through_rk ? 1 : 0,
-        }
-      );
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || "Forwarded successfully");
-      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setRemark("");
-      setThroughRC(false);
-      setSelectedForwardTo("");
-      setConfirmConfig({ open: false, type: null });
-    },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to forward");
-    },
-  });
+//  2. Update forwardComplaintMutation
+const forwardComplaintMutation = useMutation({
+  mutationFn: async ({ complaintId, forwardTo, remarkData, dscData }) => { 
+    const dsc = dscData || {}; 
+
+    const res = await api.post(
+      `/supervisor/forward-by-supervisor/${complaintId}`,
+      {
+        forward_to: forwardTo,
+        remark: remarkData,
+        sent_through_rk: sent_through_rk ? 1 : 0,
+
+        txtsigndata: dsc.signatureData || signatureData,        
+        txtPlainText: dsc.plainText || plainText,              
+        HF1: dsc.certThumbprint || certThumbprint,                  
+        HF3: dsc.certSubject || certSubject,                     
+        HF2: dsc.certSerialNo || certSerialNo,                    
+        serialno: dsc.certSerialNo || certSerialNo,              
+        hdnValidityEnd: dsc.validTo || validTo,             
+        hdnValidityfrom: dsc.validFrom || validFrom,          
+        digitalID: dsc.digitalId || digitalId,                
+        cstinfo: dsc.cstInfo || cstInfo,                    
+        currdate: currentDate,           
+      }
+    );
+    return res.data;
+  },
+});
+
+
 
   const handleMarkAsReceived = () =>
     setConfirmConfig({ open: true, type: "receive" });
@@ -394,7 +768,89 @@ const ViewAllComplaint = () => {
   const handleforwardphysical = () =>
     setConfirmConfig({ open: true, type: "forward" });
 
-  const handleConfirmYes = () => {
+  // const handleConfirmYes = () => {
+  //   if (confirmConfig.type === "receive") {
+  //     if (!remark.trim()) {
+  //       toast.error("Please enter a remark");
+  //       return;
+  //     }
+  //     markAsReceivedMutation.mutate({
+  //       complaintId: id,
+  //       remarkData: remark,
+  //     });
+  //   } else if (confirmConfig.type === "forward") {
+  //     if (!selectedForwardTo || !remark.trim()) {
+  //       toast.error("Please select forward to and enter a remark");
+  //       return;
+  //     }
+
+
+  //       const isSigned = signWithDSC();   
+
+  // if (!isSigned) {
+  //   toast.error("Digital Signature failed");
+  //   return;
+  // }
+
+  //     forwardComplaintMutation.mutate({
+  //       complaintId: id,
+  //       forwardTo: selectedForwardTo,
+  //       remarkData: remark,
+  //     });
+  //   } else if (confirmConfig.type === "pullback") {
+  //     // toast.success("Complaint Pulled Back Successfully");
+  //     setConfirmConfig({ open: false, type: null });
+  //   }
+  // };
+
+
+
+
+ 
+
+
+  //   const handleConfirmYes = async () => {
+  //   if (confirmConfig.type === "receive") {
+  //     if (!remark.trim()) {
+  //       toast.error("Please enter a remark");
+  //       return;
+  //     }
+  //     markAsReceivedMutation.mutate({
+  //       complaintId: id,
+  //       remarkData: remark,
+  //     });
+  //   } else if (confirmConfig.type === "forward") {
+  //     if (!selectedForwardTo || !remark.trim()) {
+  //       toast.error("Please select forward to and enter a remark");
+  //       return;
+  //     }
+
+  //     let dscData = null;
+
+  //     if (sent_through_rk) {
+  //       // Wait karo signature ka
+  //       dscData = await signWithDSC(); 
+        
+  //       if (!dscData) {
+  //         return;
+  //       }
+  //     }
+
+  //     forwardComplaintMutation.mutate({
+  //       complaintId: id,
+  //       forwardTo: selectedForwardTo,
+  //       remarkData: remark,
+  //       dscData: dscData 
+  //     });
+      
+  //   } else if (confirmConfig.type === "pullback") {
+  //     setConfirmConfig({ open: false, type: null });
+  //   }
+  // };
+
+
+
+const handleConfirmYes = async () => {
     if (confirmConfig.type === "receive") {
       if (!remark.trim()) {
         toast.error("Please enter a remark");
@@ -409,17 +865,30 @@ const ViewAllComplaint = () => {
         toast.error("Please select forward to and enter a remark");
         return;
       }
+
+      let dscData = null;
+
+      if (sent_through_rk) {
+        
+        dscData = await signWithHyperPKI(); 
+        
+        if (!dscData) {
+          return;
+        }
+      }
+
       forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
-        remarkData: remark,
+        remark: remarkData,
+        dscData: dscData 
       });
+      
     } else if (confirmConfig.type === "pullback") {
-      pullBackMutation.mutate({
-        complaintId: id,
-      });
+      setConfirmConfig({ open: false, type: null });
     }
-  };
+};
+
 
   const handleConfirmNo = () => {
     setConfirmConfig({ open: false, type: null });
@@ -486,7 +955,17 @@ const ViewAllComplaint = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <Toaster position="top-right" />
+      <Toaster position="top-right"  />
+      <input type="hidden" value={signatureData} />
+<input type="hidden" value={plainText} />
+<input type="hidden" value={certSubject} />
+<input type="hidden" value={certThumbprint} />
+<input type="hidden" value={certSerialNo} />
+<input type="hidden" value={validFrom} />
+<input type="hidden" value={validTo} />
+<input type="hidden" value={digitalId} />
+<input type="hidden" value={cstInfo} />
+
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
@@ -510,9 +989,9 @@ const ViewAllComplaint = () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_lokayukt === 1
-                      ? "In Motion – With UpLokayukta"
-                      : "In Motion - With Lokayukta"}
+                    {complaintData.approved_rejected_by_supervisor == 1
+                      ? "In Motion – With supervisora"
+                      : "Received - Record Section" }
                   </span>
                 </div>
               </div>
@@ -531,9 +1010,9 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                      {complaintData.approved_rejected_by_lokayukt === 1
-                        ? "In Motion – With UpLokayukta"
-                        : "In Motion - With Lokayukta"}
+                       {complaintData.approved_rejected_by_supervisor == 1
+                      ? "In Motion – With supervisora"
+                      : "Received - Record Section" }
                     </span>
 
                     <button
@@ -546,6 +1025,8 @@ const ViewAllComplaint = () => {
                 </div>
               </div>
 
+              {/* ===== DESCRIPTION (Hindi) ===== */}
+            
               <p className="text-[14px] text-black font-semibold uppercase my-2">
                 {/* Description:{" "} */}
                 विवरण:{" "}
@@ -553,9 +1034,10 @@ const ViewAllComplaint = () => {
                   {complaintData.complaint_description ||
                     "No detailed description available for this complaint."}
                 </span>
+
               </p>
 
-              {/* <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                 {/* <p className="text-[14px] text-black font-semibold uppercase mb-1">
               
                 विलंब का कारण:{"  "}
 
@@ -566,134 +1048,125 @@ const ViewAllComplaint = () => {
 
               </p> */}
 
-              <div className="space-y-3 mb-6">
-                <div>
-                  <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
-                    मुख्य परिवादी का विवरण
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Name */}
-                    <div>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                        नाम
-                      </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
-                          complaintData.main_complainant_name
-                        ) || "N/A"}
-                      </p>
-                    </div>
+              {/* ===== DETAILS GRID (Hindi) ===== */}
+                          <div className="space-y-3 mb-6">
+  
+  {/* ----------------- मुख्य परिवादी का विवरण ----------------- */}
+  <div>
+    <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
+      मुख्य परिवादी का विवरण 
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Name */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+           नाम
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_complainant_name) || "N/A"}
+        </p>
+      </div>
 
-                    {/* Father's Name */}
-                    <div>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                        पिता का नाम
-                      </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
-                          complaintData.main_complainant_father
-                        ) || "N/A"}
-                      </p>
-                    </div>
+      {/* Father's Name */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          पिता का नाम
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_complainant_father) || "N/A"}
+        </p>
+      </div>
 
-                    {/* District */}
-                    <div>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                        जिला
-                      </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
-                          complaintData.main_complainant_district
-                        ) || "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+      {/* District */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+        जिला
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_complainant_district) || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
 
-                <div>
-                  <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
-                    मुख्य प्रतिवादी का विवरण
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Name */}
-                    <div>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                        नाम
-                      </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
-                          complaintData.main_respondent_name
-                        ) || "N/A"}
-                      </p>
-                    </div>
+  {/* ----------------- मुख्य प्रतिवादी का विवरण ----------------- */}
+  <div>
+    <h3 className="text-gray-900 text-[14px] font-bold  mb-2">
+      मुख्य प्रतिवादी का विवरण
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Name */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          नाम
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_respondent_name) || "N/A"}
+        </p>
+      </div>
 
-                    {/* Designation */}
-                    <div>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                        पद
-                      </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
-                          complaintData.main_respondent_designation
-                        ) || "N/A"}
-                      </p>
-                    </div>
+      {/* Designation */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+         पद
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_respondent_designation) || "N/A"}
+        </p>
+      </div>
 
-                    {/* District */}
-                    <div>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                        जिला
-                      </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
-                          complaintData.main_respondant_district
-                        ) || "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+      {/* District */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+         जिला
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.main_respondant_district) || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
 
-                <div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Relation */}
-                    <div>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                        व्यक्ति से संबंध
-                      </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
-                          complaintData.relation_with_person
-                        ) || "NA"}
-                      </p>
-                    </div>
+  {/* ----------------- अन्य विवरण ----------------- */}
+  <div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Relation */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          व्यक्ति से संबंध
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.relation_with_person) || "NA"}
+        </p>
+      </div>
 
-                    {/* Cause Date */}
-                    {complaintData.dob && (
-                      <div>
-                        <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                          कार्यवाही तिथि
-                        </p>
-                        <p className="text-gray-800 text-sm">
-                          {capitalizeFirstLetter(complaintData.cause_date) ||
-                            "NA"}
-                        </p>
-                      </div>
-                    )}
+      {/* Cause Date */}
+      {complaintData.dob && (
+        <div>
+          <p className="text-[14px] text-black font-semibold uppercase mb-1">
+            कार्यवाही तिथि
+          </p>
+          <p className="text-gray-800 text-sm">
+            {capitalizeFirstLetter(complaintData.cause_date) || "NA"}
+          </p>
+        </div>
+      )}
 
-                    {/* Category */}
-                    <div>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
-                        श्रेणी
-                      </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(complaintData.category) || "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      {/* Category */}
+      <div>
+        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+          श्रेणी
+        </p>
+        <p className="text-gray-800 text-sm">
+          {capitalizeFirstLetter(complaintData.category) || "N/A"}
+        </p>
+      </div>
+    </div>
+  </div>
 
-              {/* Fee Status and Fee Type Section */}
+</div>
+
+              {/* Fee Status and Fee Type Section (Hindi) */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span
                   className={`px-3 py-1.5 rounded text-[14px] border ${
@@ -703,13 +1176,7 @@ const ViewAllComplaint = () => {
                   }`}
                 >
                   शुल्क का प्रकार:{" "}
-                  {complaintData.fee_exempted == 3
-                    ? "Exempted"
-                    : complaintData.fee_exempted == 2
-                    ? "Partial"
-                    : complaintData.fee_exempted == 1
-                    ? "Paid"
-                    : "Pending"}
+                  {complaintData.fee_exempted == 0 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "NA"}
                 </span>
 
                 <span
@@ -720,10 +1187,7 @@ const ViewAllComplaint = () => {
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  स्थिति:{" "}
-                  {complaintData.fee_approved_by_lokayukt == 1
-                    ? "Approved"
-                    : "Awaiting approval"}
+                  स्थिति: {complaintData.fee_approved_by_supervisor == 1 ? "Approved" : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -733,6 +1197,7 @@ const ViewAllComplaint = () => {
                 )}
               </div>
 
+              {/* ===== NEW SECTION: Extra Details Tabs/Buttons (Hindi) ===== */}
               <div className="flex flex-wrap gap-3 mt-4 border-t pt-4">
                 <button
                   onClick={() =>
@@ -772,7 +1237,7 @@ const ViewAllComplaint = () => {
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["documents", "notings", "movement", "draft"].map((tab) => (
+                {["fee", "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -785,12 +1250,11 @@ const ViewAllComplaint = () => {
                         : "text-gray-600 hover:bg-gray-50"
                     }`}
                   >
-                    {/* {tab === "fee" && "Fee Verification"} */}
-
+                  {/* {tab === "fee" && "Fee Verification"} */}
+                      
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
-                    {tab === "draft" && "Draft"}
                   </button>
                 ))}
               </div>
@@ -799,7 +1263,7 @@ const ViewAllComplaint = () => {
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["documents", "notings", "movement", "draft"].map((tab) => (
+                {["fee", "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -813,8 +1277,6 @@ const ViewAllComplaint = () => {
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
-                    {tab === "draft" && "Draft Letter"}
-
                     {activeTab === tab && (
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
                     )}
@@ -825,7 +1287,8 @@ const ViewAllComplaint = () => {
 
             {/* Tab Content Area */}
             <div className="flex-1 p-4 md:p-6 overflow-y-auto">
-              {/* {activeTab === "fee" && (
+
+  {/* {activeTab === "fee" && (
   <Fees
     complaint={complaintData}
     onFeeApproved={() => {
@@ -836,6 +1299,7 @@ const ViewAllComplaint = () => {
   />
 )} */}
 
+
               {activeTab === "documents" && (
                 <Documents complaint={complaintData} />
               )}
@@ -843,9 +1307,8 @@ const ViewAllComplaint = () => {
               {activeTab === "movement" && (
                 <MovementHistory complaint={complaintData} />
               )}
-              {activeTab === "draft" && (
-                <DraftLetter complaint={complaintData} />
-              )}
+
+              
             </div>
 
             {/* Footer Buttons */}
@@ -860,27 +1323,9 @@ const ViewAllComplaint = () => {
                   >
                     Pull Back
                   </button> */}
-
-                  <button
-                    onClick={takefile}
-                    disabled={assignToSelfMutation.isPending} // ✅ Processing ke waqt click na ho
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {assignToSelfMutation.isPending
-                      ? "Processing..."
-                      : "Take File In Hand"}
-                  </button>
                 </div>
 
                 <div className="flex gap-2">
-                  {/* <button
-  onClick={diposeShow}
-  disabled={dispose.isPending}
-  className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
->
-  {dispose.isPending ? "Processing..." : "Dispose"}
-</button> */}
-
                   {/* <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
@@ -891,22 +1336,6 @@ const ViewAllComplaint = () => {
                       : "Return with Remarks"}
                   </button> */}
 
-                  {complaintData.approved_rejected_by_sec == "1" ? (
-                    <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
-                      Forwarded
-                    </span>
-                  ) : (
-                    <button
-                      onClick={handleforwardphysical}
-                      disabled={forwardComplaintMutation.isPending}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {forwardComplaintMutation.isPending
-                        ? "Processing..."
-                        : "Send / Mark"}
-                    </button>
-                  )}
-                  {/* 
                   <button
                     onClick={handleforwardphysical}
                     disabled={forwardComplaintMutation.isPending}
@@ -915,7 +1344,7 @@ const ViewAllComplaint = () => {
                     {forwardComplaintMutation.isPending
                       ? "Processing..."
                       : "Send / Mark"}
-                  </button> */}
+                  </button>
                 </div>
               </div>
             </div>
@@ -930,292 +1359,186 @@ const ViewAllComplaint = () => {
         )}
       </div>
 
-      {/* {
-        showDispatch && (
-          <div>
-            <h1>djudjdjj</h1>
-          </div>
-        )
-      } */}
-
-      {Takefile && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white w-[420px] rounded-lg shadow-lg relative">
-            <div className="flex items-center justify-between px-6 pt-2 ">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Take your file in hand?
-              </h2>
-              <button
-                onClick={() => setTakefile(false)}
-                className="text-gray-500 hover:text-gray-700 text-xl"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="px-6 py-6 text-sm text-gray-700">
-              Are you sure you want to take this file in hand?
-            </div>
-
-            <div className="flex justify-end gap-3 px-6 pb-2 ">
-              <button
-                onClick={() => setTakefile(false)}
-                className="px-5 py-2 rounded-md border text-gray-700 hover:bg-gray-100"
-              >
-                No
-              </button>
-
-              <button
-          onClick={() => assignToSelfMutation.mutate({ complaintId: id })}
-          className="px-5 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={assignToSelfMutation.isPending}
-        >
-          {assignToSelfMutation.isPending ? "Processing..." : "Yes"}
-        </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {confirmConfig.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
-            {/* Close Button */}
-            <button
-              onClick={handleConfirmNo}
-              disabled={
-                markAsReceivedMutation.isPending ||
-                forwardComplaintMutation.isPending
-              }
-              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              aria-label="Close"
-            >
-              <FaTimes className="w-5 h-5 text-gray-600" />
-            </button>
-
-            {/* Title */}
-            <h3 className="text-lg font-semibold mb-4 pr-8">
-              {confirmConfig.type === "receive"
-                ? "Return with Remarks?"
-                : confirmConfig.type === "forward"
-                ? "Sent"
-                : confirmConfig.type === "pullback"
-                ? "Are you sure you want to pull back?"
-                : "Assign to Yourself?"}
-            </h3>
-
-            {confirmConfig.type === "forward" && (
-              <>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Forward Type <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex flex-col gap-2">
-                    <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
-                      <input
-                        type="radio"
-                        name="forwardType"
-                        value="self"
-                        checked={forwardType === "self"}
-                        onChange={(e) => {
-                          setForwardType(e.target.value);
-                          setSelectedForwardTo("");
-                        }}
-                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 font-medium">
-                        Send Direct
-                      </span>
-                    </label>
-                    <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
-                      <input
-                        type="radio"
-                        name="forwardType"
-                        value="uplokayukt"
-                        checked={forwardType === "uplokayukt"}
-                        onChange={(e) => {
-                          setForwardType(e.target.value);
-                          setSelectedForwardTo("");
-                        }}
-                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700 font-medium">
-                        Send To Other Pool
-                      </span>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
-                    Officer <span className="text-red-500">*</span>
-                  </label>
-
-                  {isLoadingOptions || isFetchingOptions ? (
-                    <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50 text-sm">
-                      Loading options...
-                    </div>
-                  ) : forwardOptionsError ? (
-                    <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50 text-sm">
-                      Error: {forwardOptionsError.message}
-                    </div>
-                  ) : (
-                    <SearchableDropdown
-                      options={
-                        Array.isArray(forwardOptionsData)
-                          ? forwardOptionsData
-                          : []
-                      }
-                      value={selectedForwardTo}
-                      onChange={(val) => setSelectedForwardTo(val)}
-                      placeholder="Select Officer..."
-                    />
-                  )}
-                </div>
-              </>
-            )}
-
-            {confirmConfig.type !== "assign" &&
-              confirmConfig.type !== "pullback" && (
-                <>
-                  <div className="mb-5 mt-3">
-                    <label className="flex items-center gap-2 cursor-pointer mt-2">
-                      <input
-                        type="checkbox"
-                        checked={sent_through_rk}
-                        onChange={(e) => setThroughRC(e.target.checked)}
-                        className="w-4 h-4"
-                      />
-                      <span className="text-sm">
-                        Checkbox If Send through RC
-                      </span>
-                    </label>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Remark <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      value={remark}
-                      onChange={(e) => setRemark(e.target.value)}
-                      rows={4}
-                      placeholder="Enter your remark here..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
-                  </div>
-                </>
-              )}
-
-            {/* Buttons */}
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={handleConfirmNo}
-                disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardComplaintMutation.isPending
-                }
-                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {confirmConfig.type === "assign" ||
-                confirmConfig.type === "pullback"
-                  ? "No"
-                  : "Cancel"}
-              </button>
-
-              <button
-                onClick={handleConfirmYes}
-                disabled={
-                  markAsReceivedMutation.isPending ||
-                  forwardComplaintMutation.isPending ||
-                  assignToSelfMutation.isPending || // ✅ Take File Loading
-                  pullBackMutation.isPending || // ✅ Pull Back Loading
-                  (confirmConfig.type === "receive" && !remark.trim()) ||
-                  (confirmConfig.type === "forward" &&
-                    (!remark.trim() ||
-                      !selectedForwardTo ||
-                      isLoadingOptions ||
-                      isFetchingOptions))
-                }
-                className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-              >
-                {markAsReceivedMutation.isPending ||
-                forwardComplaintMutation.isPending ||
-                assignToSelfMutation.isPending || // ✅ Check added
-                pullBackMutation.isPending // ✅ Check added
-                  ? "Processing..."
-                  : confirmConfig.type === "assign" ||
-                    confirmConfig.type === "pullback"
-                  ? "Yes"
-                  : "Send"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showDispatch && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
-            {/* Close Button */}
-            <button
-              onClick={closePoup}
-              disabled={markAsReceivedMutation.isPending}
-              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <FaTimes className="w-5 h-5 text-gray-600" />
-            </button>
-
-            {/* Title */}
-            <h3 className="text-lg font-semibold mb-4 pr-8">
-              Dispose Complaint
-            </h3>
-
-            {/* Remark */}
-            <div className="mb-5">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Disposal Remark <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                value={remark}
-                onChange={(e) => setRemark(e.target.value)}
-                rows={4}
-                placeholder="Enter disposal remark..."
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-              />
-            </div>
-
-            {/* Buttons */}
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={closePoup}
-                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={() => {
-                  if (!remark.trim()) {
-                    toast.error("Please enter disposal remark");
-                    return;
+      {/* Unified Confirmation Modal (Receive/Forward/Pullback) */}
+     {confirmConfig.open && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+              <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+                {/* Close Button */}
+                <button
+                  onClick={handleConfirmNo}
+                  disabled={
+                    markAsReceivedMutation.isPending ||
+                   forwardComplaintMutation.isPending
                   }
+                  className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-label="Close"
+                >
+                  <FaTimes className="w-5 h-5 text-gray-600" />
+                </button>
+    
+                {/* Title */}
+                <h3 className="text-lg font-semibold mb-4 pr-8">
+                  {confirmConfig.type === "receive"
+                    ? "Mark as Received?"
+                    : confirmConfig.type === "forward"
+                    ? "Send"
+                    : confirmConfig.type === "pullback"
+                    ? "Pull Back Complaint?"
+                    : "Assign to Yourself?"}
+                </h3>
+    
+                {/* --- FORWARDING LOGIC START --- */}
+                {confirmConfig.type === "forward" && (
+                  <>
+                    {/* Radio Buttons Section */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Forward Type <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex flex-col gap-2">
+                        <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="forwardType"
+                            value="self"
+                            checked={forwardType === "self"}
+                            onChange={(e) => {
+                              setForwardType(e.target.value);
+                              setSelectedForwardTo("");
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-sm text-gray-700 font-medium">
+                            Send To My Pool
+                          </span>
+                        </label>
+                        <label className="flex items-center cursor-pointer p-2 border rounded hover:bg-gray-50 transition-colors">
+                          <input
+                            type="radio"
+                            name="forwardType"
+                            value="upsupervisor"
+                            checked={forwardType === "upsupervisor"}
+                            onChange={(e) => {
+                              setForwardType(e.target.value);
+                              setSelectedForwardTo("");
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-sm text-gray-700 font-medium">
+                            Send To Other Pool
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+    
+                    {/* SEARCHABLE DROPDOWN */}
+                    <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Select {forwardType === "self" ? "My Pool" : "Other Pool"}{" "}
+                        Officer <span className="text-red-500">*</span>
+                      </label>
+    
+                      {isLoadingOptions || isFetchingOptions ? (
+                        <div className="w-full px-3 py-2 border border-gray-300 rounded text-gray-500 bg-gray-50 text-sm">
+                          Loading options...
+                        </div>
+                      ) : forwardOptionsError ? (
+                        <div className="w-full px-3 py-2 border border-red-300 rounded text-red-500 bg-red-50 text-sm">
+                          Error: {forwardOptionsError.message}
+                        </div>
+                      ) : (
+                        <SearchableDropdown
+                          options={
+                            Array.isArray(forwardOptionsData)
+                              ? forwardOptionsData
+                              : []
+                          }
+                          value={selectedForwardTo}
+                          onChange={(val) => setSelectedForwardTo(val)}
+                          placeholder="Select Officer..."
+                        />
+                      )}
+                     
 
-                  dispose.mutate({
-                    complaintId: id,
-                    remarkData: remark,
-                  });
+                    </div>
 
-                  setshowDispatch(false);
-                }}
-                disabled={dispose.isPending || !remark.trim()}
-                className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {dispose.isPending ? "Disposing..." : "Dispose Now"}
-              </button>
+                   <label className="flex items-center gap-2 cursor-pointer mt-2">
+  <input
+    type="checkbox"
+    checked={sent_through_rk}
+    onChange={(e) => setThroughRC(e.target.checked)}
+    className="w-4 h-4"
+  />
+  <span className="text-sm">Checkbox If Send through RC</span>
+</label>
+
+                  </>
+                )}
+                {/* --- FORWARDING LOGIC END --- */}
+    
+                {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
+                {confirmConfig.type !== "assign" &&
+                  confirmConfig.type !== "pullback" && (
+                    <>
+                      <div className="mb-5">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Remark <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          value={remark}
+                          onChange={(e) => setRemark(e.target.value)}
+                          rows={4}
+                          placeholder="Enter your remark here..."
+                          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+                    </>
+                  )}
+    
+                {/* Buttons */}
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={handleConfirmNo}
+                    disabled={
+                      markAsReceivedMutation.isPending ||
+                     forwardComplaintMutation.isPending
+                    }
+                    className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {confirmConfig.type === "assign" ||
+                    confirmConfig.type === "pullback"
+                      ? "No"
+                      : "Cancel"}
+                  </button>
+    
+                  <button
+                    onClick={handleConfirmYes}
+                    disabled={
+                      markAsReceivedMutation.isPending ||
+                     forwardComplaintMutation.isPending ||
+                      (confirmConfig.type === "receive" && !remark.trim()) ||
+                      (confirmConfig.type === "forward" &&
+                        (!remark.trim() ||
+                          !selectedForwardTo ||
+                          isLoadingOptions ||
+                          isFetchingOptions))
+                    }
+                    className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                  >
+                    {markAsReceivedMutation.isPending ||
+                   forwardComplaintMutation.isPending
+                      ? "Sending..."
+                      : confirmConfig.type === "assign" ||
+                        confirmConfig.type === "pullback"
+                      ? "Yes"
+                      : "Send"}
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
+      {/* ===== VIEW DATA MODAL (Correspondence / Respondent / Support / Witness) ===== */}
       {viewModalConfig.open && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40"
@@ -1287,9 +1610,11 @@ const ViewAllComplaint = () => {
               </div>
             )} */}
 
-            {viewModalConfig.type === "correspondence" && (
+              
+     {viewModalConfig.type === "correspondence" && (
               <div className="w-full">
                 {" "}
+                {/* यहाँ w-full और overflow handling */}
                 {complaintData.complainants &&
                 complaintData.complainants.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
@@ -1332,6 +1657,7 @@ const ViewAllComplaint = () => {
                           >
                             लोक सेवक?
                           </th>
+                          {/* Address को थोड़ा ज़्यादा जगह दी है */}
                           <th
                             scope="col"
                             className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider min-w-[200px]"
@@ -1458,7 +1784,9 @@ const ViewAllComplaint = () => {
               </div>
             )} */}
 
-            {viewModalConfig.type === "respondent" && (
+
+            
+  {viewModalConfig.type === "respondent" && (
               <div className="w-full">
                 {complaintData.respondant &&
                 complaintData.respondant.length > 0 ? (
@@ -1513,6 +1841,7 @@ const ViewAllComplaint = () => {
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.officer_category || "-"}
                             </td>
+                            {/* Address Column: whitespace-normal ensures text wrapping */}
                             <td className="px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {resp.current_address || "-"}
                             </td>
@@ -1531,7 +1860,8 @@ const ViewAllComplaint = () => {
               </div>
             )}
 
-            {viewModalConfig.type === "support" && (
+            {/* Support Content (Added to match buttons) */}
+     {viewModalConfig.type === "support" && (
               <div className="w-full">
                 {complaintData.support && complaintData.support.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
@@ -1579,7 +1909,8 @@ const ViewAllComplaint = () => {
               </div>
             )}
 
-            {viewModalConfig.type === "witness" && (
+            {/* Witness Content (Added to match buttons) */}
+  {viewModalConfig.type === "witness" && (
               <div className="w-full">
                 {complaintData.witness && complaintData.witness.length > 0 ? (
                   <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
@@ -1626,6 +1957,7 @@ const ViewAllComplaint = () => {
                 )}
               </div>
             )}
+
 
             <div className="mt-6 flex justify-end pt-4 border-t">
               <button
