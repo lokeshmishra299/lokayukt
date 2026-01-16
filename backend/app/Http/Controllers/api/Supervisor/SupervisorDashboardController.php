@@ -186,11 +186,15 @@ class SupervisorDashboardController extends Controller
             break;
 
         case "sec":
-           $query->where('cmp.form_status', 1)
-                  ->where('cmp.approved_rejected_by_rk', 1)
-                //   ->where('cmp.approved_rejected_by_sec', 0)
-                  ->distinct('cmp.id')
-                  ->where('rep.forward_to_sec',$user);
+           $query->where('rep.status', 'Forwarded')
+                                ->whereNotNull('rep.forward_to_sec')
+                                ->distinct('cmp.id')
+                                 ->where('rep.forward_to_sec',$user);
+        //    ->where('cmp.form_status', 1)
+        //           ->where('cmp.approved_rejected_by_rk', 1)
+        //         //   ->where('cmp.approved_rejected_by_sec', 0)
+        //           ->distinct('cmp.id')
+        //           ->where('rep.forward_to_sec',$user);
             
             $queryDay = $queryDay->where('cmp.form_status', 1)
               ->where('cmp.approved_rejected_by_rk', 1)
@@ -199,9 +203,12 @@ class SupervisorDashboardController extends Controller
                 // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
                 // ->where('cmp.status', 2)
                 // ->where('cmp.district_id', $user_district_code)
-                ->orderByDesc('cmp.id');
+                ->orderByDesc('cmp.id')
+                 ->distinct('cmp.id')
+                 ->where('rep.forward_to_sec',$user);
             
             $query1 = $query1->where('cmp.form_status', 1)
+            
                 ->where('cmp.approved_rejected_by_rk', 1)
                 ->where('cmp.approved_rejected_by_sec', 0)
                 ->whereYear('cmp.created_at', $date->year)
