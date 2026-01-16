@@ -62,8 +62,7 @@ class PSComplaintsController extends Controller
             DB::raw('MIN(rep.id) as action_id') // 🔥 avoid duplicates
         )
         ->where('complaints.form_status', 1)
-        ->where('complaints.approved_rejected_by_rk', 1)
-      
+        ->where('complaints.approved_rejected_by_rk', 1)      
         ->groupBy('complaints.id','complaints.complaint_description','complaints.complain_no','complaints.cause_date','complaints.category','complaints.fee_exempted',
          'complaints.approved_rejected_by_rk',
             'complaints.approved_rejected_by_ps',
@@ -73,6 +72,12 @@ class PSComplaintsController extends Controller
         // if ($roleParent === 'up-lok-ayukt') {
         //                $query->where('complaints.approved_rejected_by_lokayukt', 1);
         //  }
+
+        if($roleParent === 'lok-ayukt'){
+            $query->where('complaints.approved_rejected_by_lokayukt', 0);
+        }else if($roleParent === 'up-lok-ayukt'){
+            $query->where('complaints.approved_rejected_by_lokayukt', 1);
+        }
 
     $records = $query->get();
 
@@ -612,7 +617,7 @@ class PSComplaintsController extends Controller
 
                                             $apcAction->forward_to_so_us = $request->forward_to;
                                             
-                                    }elseif($subroleFwd ==="ro-aro"){
+                                    }elseif($subroleFwd === "ro-aro"){
 
                                             $apcAction->forward_to_ro_aro = $request->forward_to;
                                             
