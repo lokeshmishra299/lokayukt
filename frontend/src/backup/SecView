@@ -3,13 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import { toast, Toaster } from "react-hot-toast";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
+import DraftLetter from "./SubModule/DraftLetter";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -243,218 +244,51 @@ const ViewAllComplaint = () => {
 // eMudhra emSigner ->	1585	/getCert
 // Sify	2095 ->	/listCert
 // Capricorn	different	different
-// const signWithDSC = async () => {
-//   try {
-//     const dscPort = 55101; 
-//     const dscUrl = `https://127.0.0.1:${dscPort}`;
-//     console.log("Connecting...", dscUrl);
-
-//     try {
-//       await axios.get(`${dscUrl}/`, { timeout: 2000 });
-//     } catch (e) {
-//       toast.error("DSC Signer not running! Start NIC DSCSigner.");
-//       return null; 
-//     }
-
-//     const response = await axios.post(`${dscUrl}/getSignerCertificate`, { "action": "list" }, {
-//       headers: { "Content-Type": "application/json" }
-//     });
-
-//     if (response.data && response.data.status === "success") {
-//        const cert = response.data.certificateData || response.data;
-       
-//        // UI Update (Optional but good for display)
-//        setCertSubject(cert.subject || "");
-       
-//        // Prepare Data Object
-//        const dscData = {
-//           signatureData: "SIGNED_" + new Date().getTime() + "_" + (cert.serialNumber || ""),
-//           plainText: "00",
-//           certThumbprint: cert.thumbprint || cert.Thumbprint || "",
-//           certSubject: cert.subject || cert.Subject || "",
-//           certSerialNo: cert.serialNumber || cert.SerialNumber || "",
-//           validFrom: cert.validFrom || "",
-//           validTo: cert.validTo || "",
-//           digitalId: cert.subject || cert.Subject || "",
-//           cstInfo: cert.issuer || cert.Issuer || ""
-//        };
-
-//        toast.success("DSC Connected Successfully! ✅");
-//        return dscData; 
-//     } else {
-//        toast.error("DSC Token not found.");
-//        return null;
-//     }
-//   } catch (err) {
-//     console.error(err);
-//     toast.error("DSC Connection Failed.");
-//     return null;
-//   }
-// };
-
-
-// ===============================================
-// CHANGE 1: New Function for HyperPKI WebSigner
-// ===============================================
-
-// const signWithHyperPKI = async () => {
-//   try {
-//     // HyperPKI Port usually: 20202 (HTTPS) or 20201 (HTTP)
-//     const dscUrl = "http://127.0.0.1:20202"; 
-    
-//     console.log("Connecting to HyperPKI Service...", dscUrl);
-
-//     try {
-//         await axios.get(`${dscUrl}/`, { timeout: 3000 });
-//     } catch (e) {
-//         toast.error("HyperPKI WebSigner is not running! Please start the service.");
-//         return null;
-//     }
-
-//     const listPayload = { action: "list" }; 
-    
-//     const listRes = await axios.post(`${dscUrl}/api/list`, listPayload, {
-//         headers: { "Content-Type": "application/json" }
-//     });
-
-//     if (!listRes.data || listRes.data.length === 0 || (listRes.data.status && listRes.data.status !== 0)) {
-//         toast.error("No USB Token Found or No Certificates Available.");
-//         return null;
-//     }
-
-//     const cert = listRes.data.certificates ? listRes.data.certificates[0] : listRes.data[0];
-
-//     console.log("Selected Cert:", cert);
-
-//     const contentToSign = "00"; 
-//     const contentBase64 = btoa(contentToSign); 
-
-//     const signPayload = {
-//         action: "sign",
-//         thumbprint: cert.thumbprint, 
-//         data: contentBase64 
-//     };
-
-//     const signRes = await axios.post(`${dscUrl}/api/sign`, signPayload);
-
-//     if (signRes.data && signRes.data.signature) {
-        
-//         setCertSubject(cert.subject || "");
-//         setCertThumbprint(cert.thumbprint || "");
-//         setCertSerialNo(cert.serialNumber || "");
-        
-//         const dscData = {
-//             signatureData: signRes.data.signature, 
-//             plainText: contentToSign,
-//             certThumbprint: cert.thumbprint || "",
-//             certSubject: cert.subject || "",
-//             certSerialNo: cert.serialNumber || "",
-//             validFrom: cert.notBefore || "", 
-//             validTo: cert.notAfter || "",
-//             digitalId: cert.subject || "",
-//             cstInfo: cert.issuer || ""
-//         };
-
-//         toast.success("Signed Successfully with HyperPKI! ✅");
-//         return dscData;
-//     } else {
-//         toast.error("Signature Failed or Cancelled by User.");
-//         return null;
-//     }
-
-//   } catch (err) {
-//     console.error("HyperPKI Error:", err);
-//     toast.error("Connection Error: Check if Token is plugged in.");
-//     return null;
-//   }
-// };
-
-// =========================================================
-// UPDATED FUNCTION: Works on both Localhost & Live
-// =========================================================
-const signWithHyperPKI = async () => {
+const signWithDSC = async () => {
   try {
+    const dscPort = 55101; 
+    const dscUrl = `https://127.0.0.1:${dscPort}`;
+    console.log("Connecting...", dscUrl);
 
-    // Localhost par ye 'http:' uthayega.
-    // Live SSL par 'https:' uthayega.
-    // Live IP (http://34....) par 'http:' uthayega.
-    const protocol = window.location.protocol; 
-    
-    const dscUrl = `${protocol}//127.0.0.1:20202`; 
-    
-    console.log("Connecting to HyperPKI via:", dscUrl);
-
- 
     try {
-        await axios.get(`${dscUrl}/`, { timeout: 3000 });
+      await axios.get(`${dscUrl}/`, { timeout: 2000 });
     } catch (e) {
-        console.error(e);
-        if (protocol === 'https:') {
-             toast.error("DSC Service not found! Ensure HyperPKI is running & SSL certificate is trusted.");
-        } else {
-             toast.error("HyperPKI WebSigner is not running! Please start the service.");
-        }
-        return null;
+      toast.error("DSC Signer not running! Start NIC DSCSigner.");
+      return null; 
     }
 
-
-    const listPayload = { action: "list" }; 
-    
-    const listRes = await axios.post(`${dscUrl}/api/list`, listPayload, {
-        headers: { "Content-Type": "application/json" }
+    const response = await axios.post(`${dscUrl}/getSignerCertificate`, { "action": "list" }, {
+      headers: { "Content-Type": "application/json" }
     });
 
-    if (!listRes.data || listRes.data.length === 0 || (listRes.data.status && listRes.data.status !== 0)) {
-        toast.error("No USB Token Found or No Certificates Available.");
-        return null;
-    }
+    if (response.data && response.data.status === "success") {
+       const cert = response.data.certificateData || response.data;
+       
+       // UI Update (Optional but good for display)
+       setCertSubject(cert.subject || "");
+       
+       // Prepare Data Object
+       const dscData = {
+          signatureData: "SIGNED_" + new Date().getTime() + "_" + (cert.serialNumber || ""),
+          plainText: "00",
+          certThumbprint: cert.thumbprint || cert.Thumbprint || "",
+          certSubject: cert.subject || cert.Subject || "",
+          certSerialNo: cert.serialNumber || cert.SerialNumber || "",
+          validFrom: cert.validFrom || "",
+          validTo: cert.validTo || "",
+          digitalId: cert.subject || cert.Subject || "",
+          cstInfo: cert.issuer || cert.Issuer || ""
+       };
 
-    const cert = listRes.data.certificates ? listRes.data.certificates[0] : listRes.data[0];
-
-    console.log("Selected Cert:", cert);
-
- 
-    const contentToSign = "00"; 
-    const contentBase64 = btoa(contentToSign); 
-
-    const signPayload = {
-        action: "sign",
-        thumbprint: cert.thumbprint, 
-        data: contentBase64 
-    };
-
-    const signRes = await axios.post(`${dscUrl}/api/sign`, signPayload);
-
-    if (signRes.data && signRes.data.signature) {
-        
-        // Update State
-        setCertSubject(cert.subject || "");
-        setCertThumbprint(cert.thumbprint || "");
-        setCertSerialNo(cert.serialNumber || "");
-        
-        // Prepare Response Object
-        const dscData = {
-            signatureData: signRes.data.signature, 
-            plainText: contentToSign,
-            certThumbprint: cert.thumbprint || "",
-            certSubject: cert.subject || "",
-            certSerialNo: cert.serialNumber || "",
-            validFrom: cert.notBefore || "", 
-            validTo: cert.notAfter || "",
-            digitalId: cert.subject || "",
-            cstInfo: cert.issuer || ""
-        };
-
-        toast.success("Signed Successfully with HyperPKI!");
-        return dscData;
+       toast.success("DSC Connected Successfully! ✅");
+       return dscData; 
     } else {
-        toast.error("Signature Failed or Cancelled by User.");
-        return null;
+       toast.error("DSC Token not found.");
+       return null;
     }
-
   } catch (err) {
-    console.error("HyperPKI Error:", err);
-    toast.error("Connection Error: Check if Token is plugged in or Driver settings allow the site.");
+    console.error(err);
+    toast.error("DSC Connection Failed.");
     return null;
   }
 };
@@ -585,7 +419,7 @@ setCurrentDate(
           }
   
           //  Send To Other Pool  API: /supervisor/get-supervisor-upsupervisor
-          const res = await api.get("/supervisor/get-upsupervisor");
+          const res = await api.get("/supervisor/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
   
@@ -718,48 +552,7 @@ const forwardComplaintMutation = useMutation({
  
 
 
-  //   const handleConfirmYes = async () => {
-  //   if (confirmConfig.type === "receive") {
-  //     if (!remark.trim()) {
-  //       toast.error("Please enter a remark");
-  //       return;
-  //     }
-  //     markAsReceivedMutation.mutate({
-  //       complaintId: id,
-  //       remarkData: remark,
-  //     });
-  //   } else if (confirmConfig.type === "forward") {
-  //     if (!selectedForwardTo || !remark.trim()) {
-  //       toast.error("Please select forward to and enter a remark");
-  //       return;
-  //     }
-
-  //     let dscData = null;
-
-  //     if (sent_through_rk) {
-  //       // Wait karo signature ka
-  //       dscData = await signWithDSC(); 
-        
-  //       if (!dscData) {
-  //         return;
-  //       }
-  //     }
-
-  //     forwardComplaintMutation.mutate({
-  //       complaintId: id,
-  //       forwardTo: selectedForwardTo,
-  //       remarkData: remark,
-  //       dscData: dscData 
-  //     });
-      
-  //   } else if (confirmConfig.type === "pullback") {
-  //     setConfirmConfig({ open: false, type: null });
-  //   }
-  // };
-
-
-
-const handleConfirmYes = async () => {
+    const handleConfirmYes = async () => {
     if (confirmConfig.type === "receive") {
       if (!remark.trim()) {
         toast.error("Please enter a remark");
@@ -778,8 +571,8 @@ const handleConfirmYes = async () => {
       let dscData = null;
 
       if (sent_through_rk) {
-        
-        dscData = await signWithHyperPKI(); 
+        // Wait karo signature ka
+        dscData = await signWithDSC(); 
         
         if (!dscData) {
           return;
@@ -789,14 +582,15 @@ const handleConfirmYes = async () => {
       forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
-        remark: remarkData,
+        remarkData: remark,
         dscData: dscData 
       });
       
     } else if (confirmConfig.type === "pullback") {
       setConfirmConfig({ open: false, type: null });
     }
-};
+  };
+
 
 
   const handleConfirmNo = () => {
@@ -864,7 +658,7 @@ const handleConfirmYes = async () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <Toaster position="top-right"  />
+      <ToastContainer position="top-right" autoClose={3000} />
       <input type="hidden" value={signatureData} />
 <input type="hidden" value={plainText} />
 <input type="hidden" value={certSubject} />
@@ -898,9 +692,12 @@ const handleConfirmYes = async () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
-                      : "Received - Record Section" }
+                  
+
+                        {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                   </span>
                 </div>
               </div>
@@ -919,9 +716,10 @@ const handleConfirmYes = async () => {
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
-                      : "Received - Record Section" }
+                        {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                     </span>
 
                     <button
@@ -1085,7 +883,7 @@ const handleConfirmYes = async () => {
                   }`}
                 >
                   शुल्क का प्रकार:{" "}
-                  {complaintData.fee_exempted == 0 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "NA"}
+                  {complaintData.fee_exempted == 3 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "Pending"}
                 </span>
 
                 <span
@@ -1096,7 +894,7 @@ const handleConfirmYes = async () => {
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  स्थिति: {complaintData.fee_approved_by_supervisor == 1 ? "Approved" : "Awaiting approval"}
+                  स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -1146,7 +944,7 @@ const handleConfirmYes = async () => {
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {["fee", "documents", "notings", "movement", "draft"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -1164,6 +962,8 @@ const handleConfirmYes = async () => {
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
+                    {tab === "draft" && "Draft"}
+
                   </button>
                 ))}
               </div>
@@ -1172,7 +972,7 @@ const handleConfirmYes = async () => {
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {["fee", "documents", "notings", "movement", "draft"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -1186,9 +986,8 @@ const handleConfirmYes = async () => {
                     {tab === "documents" && "Documents"}
                     {tab === "notings" && "Notes / Notings"}
                     {tab === "movement" && "Movement History"}
-                    {activeTab === tab && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-                    )}
+                    {tab === "draft" && "Draft"}
+
                   </button>
                 ))}
               </div>
@@ -1216,6 +1015,9 @@ const handleConfirmYes = async () => {
               {activeTab === "movement" && (
                 <MovementHistory complaint={complaintData} />
               )}
+
+                            {activeTab === "draft" && <DraftLetter complaint={complaintData} />}
+              
 
               
             </div>
