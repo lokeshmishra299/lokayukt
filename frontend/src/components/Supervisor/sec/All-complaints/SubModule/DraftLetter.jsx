@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 // import { toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
 
-
 import { RiEditBoxLine } from "react-icons/ri";
 
 // Import Editor components
@@ -149,6 +148,73 @@ const DraftLetter = ({ complaint }) => {
   };
 
   // 2. Updated: Generate PDF Blob and Send as Binary
+  // const handleFinalSubmit = async () => {
+  //   if (!popupRef.current) return;
+
+  //   try {
+  //     const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
+  //     elementsToHide.forEach((el) => (el.style.display = "none"));
+
+  //     const canvas = await html2canvas(popupRef.current, {
+  //       scale: 2,
+  //       backgroundColor: "#ffffff",
+  //       useCORS: true,
+  //     });
+
+  //     elementsToHide.forEach((el) => (el.style.display = "flex"));
+
+  //     const imgData = canvas.toDataURL("image/png");
+  //     const pdf = new jsPDF("p", "mm", "a4");
+
+  //     const pdfWidth = pdf.internal.pageSize.getWidth();
+  //     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+  //     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+  //     const pdfBlob = pdf.output("blob");
+  //     console.log("PDF File Size:", pdfBlob.size);
+  //     console.log("PDF File Type:", pdfBlob.type)
+  //     const formData = new FormData();
+  //     formData.append("complaint_id", complaint.id);
+  //     formData.append("draft_note", note);
+  //     formData.append("title", draftTitle);
+  //     formData.append("file", pdfBlob, `Draft_${complaint?.file_number || "File"}.pdf`);
+
+  //     const res = await api.post("/supervisor/create-draft", formData, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data", 
+  //       },
+  //     });
+
+  //     if (res.data.status) {
+  //       toast.success("Draft Added Successfully!");
+  //       setShowSuccess(false); 
+  //       setDraftTitle(""); 
+  //       setNote("");
+  //       setEditorState(EditorState.createEmpty());
+  //       setErrors({});
+  //       refetch(); 
+  //     } else if (res.data.errors) {
+  //       setShowSuccess(false);
+  //       setOpenNoteModal(true);
+  //       setErrors(res.data.errors);
+  //       Object.values(res.data.errors).forEach((msgArr) => {
+  //         toast.error(msgArr[0]);
+  //       });
+  //     }
+  //   } catch (err) {
+  //     const elementsToHide = popupRef.current?.querySelectorAll(".pdf-hide-section");
+  //     if(elementsToHide) elementsToHide.forEach((el) => (el.style.display = "flex"));
+
+  //     toast.error("Server Error!");
+  //     if (err.response && err.response.data) {
+  //         setErrors(err.response.data);
+  //     }
+  //     console.error(err);
+  //   }
+  // };
+
+  // 2. Updated: Generate Compressed PDF Blob and Send
   const handleFinalSubmit = async () => {
     if (!popupRef.current) return;
 
@@ -156,23 +222,32 @@ const DraftLetter = ({ complaint }) => {
       const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
       elementsToHide.forEach((el) => (el.style.display = "none"));
 
+      // Canvas Scale 2 ही रखें ताकि टेक्स्ट साफ दिखे
       const canvas = await html2canvas(popupRef.current, {
-        scale: 2,
+        scale: 2, 
         backgroundColor: "#ffffff",
         useCORS: true,
+        logging: false,
       });
 
       elementsToHide.forEach((el) => (el.style.display = "flex"));
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
+      // --- CHANGE 1: PNG की जगह JPEG और Quality 0.6 (60%) ---
+      const imgData = canvas.toDataURL("image/jpeg", 0.6); 
+
+      // --- CHANGE 2: jsPDF में last parameter 'true' पास करें (Compression ON) ---
+      const pdf = new jsPDF("p", "mm", "a4", true); 
 
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      // --- CHANGE 3: Image add करते समय 'FAST' compression use करें ---
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
 
       const pdfBlob = pdf.output("blob");
+
+      // Console में चेक करें, अब साइज 1MB से भी कम होगा
+      console.log("Original Size was ~5MB, New Compressed Size:", pdfBlob.size); 
 
       const formData = new FormData();
       formData.append("complaint_id", complaint.id);
@@ -180,11 +255,13 @@ const DraftLetter = ({ complaint }) => {
       formData.append("title", draftTitle);
       formData.append("file", pdfBlob, `Draft_${complaint?.file_number || "File"}.pdf`);
 
-      const res = await api.post("/supervisor/create-draft", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", 
-        },
-      });
+      // Header हटा दें, Axios खुद handle करेगा
+     const res = await api.post("/supervisor/create-draft", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+
 
       if (res.data.status) {
         toast.success("Draft Added Successfully!");
@@ -206,7 +283,7 @@ const DraftLetter = ({ complaint }) => {
       const elementsToHide = popupRef.current?.querySelectorAll(".pdf-hide-section");
       if(elementsToHide) elementsToHide.forEach((el) => (el.style.display = "flex"));
 
-      toast.error("Server Error!");
+      toast.error("Server Error or Upload Failed!");
       if (err.response && err.response.data) {
           setErrors(err.response.data);
       }
@@ -218,34 +295,36 @@ const DraftLetter = ({ complaint }) => {
     window.print();
   };
   
-  const handleDownloadPdf = async () => {
-    if (!popupRef.current) return;
-    try {
-      const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
-      elementsToHide.forEach((el) => (el.style.display = "none"));
+    const handleDownloadPdf = async () => {
+      if (!popupRef.current) return;
+      try {
+        const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
+        elementsToHide.forEach((el) => (el.style.display = "none"));
 
-      const canvas = await html2canvas(popupRef.current, {
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true,
-      });
+        const canvas = await html2canvas(popupRef.current, {
+          scale: 2,
+          backgroundColor: "#ffffff",
+          useCORS: true,
+        });
 
-      elementsToHide.forEach((el) => (el.style.display = "flex"));
+        elementsToHide.forEach((el) => (el.style.display = "flex"));
 
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Noting_${complaint?.file_number || "File"}.pdf`);
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Noting_${complaint?.file_number || "File"}.pdf`);
 
-      toast.success("PDF Downloaded successfully!");
-    } catch (err) {
-      console.error("PDF Generation Error:", err);
-      toast.error("Failed to generate PDF");
-    }
-  };
+        toast.success("PDF Downloaded successfully!");
+      } catch (err) {
+        console.error("PDF Generation Error:", err);
+        toast.error("Failed to generate PDF");
+      }
+    };
+
+    
 
   const normalizePath = (filePath) => {
     if (!filePath) return "";
@@ -742,7 +821,7 @@ const DraftLetter = ({ complaint }) => {
                   <div className="text-right text-xs text-gray-600">
                     <p className="uppercase tracking-wide">Noting By</p>
                     <p className="font-semibold mt-1 text-gray-800">
-                      Hon' Lokayukt Shri Sanjay Mishra
+                     Hon' Lokayukt Shri Sanjay Mishra
                     </p>
                     <p>{name}</p>
                   </div>

@@ -1,11 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt, FaPrint, FaDownload } from "react-icons/fa";
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-// import { toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
-
 import { RiEditBoxLine } from "react-icons/ri";
 
 // Import Editor components
@@ -16,7 +14,6 @@ import draftToHtml from "draftjs-to-html";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import EditDraft from "./EditDraft";
-// import image from '../public/Lokimage.png' 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -38,6 +35,10 @@ const DraftLetter = ({ complaint }) => {
   const [selectedDraftId, setSelectedDraftId] = useState(null);
   const [selectedComplaintId, setSelectedComplaintId] = useState(null);
   
+  // Preview States
+  const [previewImages, setPreviewImages] = useState([]); 
+  const [generatingPreview, setGeneratingPreview] = useState(false); 
+  
   // -- Add Document State --
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newDoc, setNewDoc] = useState({
@@ -51,7 +52,6 @@ const DraftLetter = ({ complaint }) => {
   const [note, setNote] = useState("");
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
   const [selectedDoc, setSelectedDoc] = useState("");
-  const [pageRanges, setPageRanges] = useState([{ from: "", to: "" }]);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
   const [loadingPdf, setLoadingPdf] = useState(false);
   
@@ -65,7 +65,7 @@ const DraftLetter = ({ complaint }) => {
   const popupRef = useRef(null);
 
   const handleAddDocuments = () => {
-    setErrors({}); // Reset errors when opening modal
+    setErrors({});
     setopenAddDocuments(true);
   };
 
@@ -75,104 +75,193 @@ const DraftLetter = ({ complaint }) => {
     setEditDraftPopup(true);
   };
 
-  const closeEditDraft = () => {
-    setEditDraftPopup(false);
-  };
-
-  // -- Note Modal Functions --
-  const onEditorStateChange = (editorState) => {
-    setEditorState(editorState);
-    const content = draftToHtml(convertToRaw(editorState.getCurrentContent()));
-    setNote(content);
-    
-    // Clear content error on type
-    const contentState = editorState.getCurrentContent();
-    if (contentState.hasText() && errors.draft_note) {
-         setErrors(prev => ({...prev, draft_note: null}));
-    }
-  };
-
-  const handleSelectDoc = async (fileName) => {
-    setSelectedDoc(fileName);
-    setPdfPreviewUrl(null);
-
-    if (!fileName) return;
-
-    try {
-      setLoadingPdf(true);
-      const res = await api.get(`/supervisor/get-file-preview/${complaint.id}`);
-      if (res.data.status && res.data.data.length > 0) {
-        const match = res.data.data.find((p) => p.includes(fileName));
-        if (match) {
-          const url = makeFileUrl(match);
-          setPdfPreviewUrl(url);
-        } else {
-          toast.error("PDF path not found");
-        }
-      }
-    } catch {
-      toast.error("PDF नहीं खुल पाया");
-    } finally {
-      setLoadingPdf(false);
-    }
-  };
-
-  // 1. Updated: Added Static Validation Logic Here
-  const handleSubmitNote = () => {
-    setErrors({}); // Clear previous errors
-    const newErrors = {};
-    let hasError = false;
-
-    // Check Title
-    if (!draftTitle || !draftTitle.trim()) {
-        newErrors.title = ["Title is required."]; // Array format to match backend style
-        hasError = true;
-    }
-
-    // Check Editor Content
-    const contentState = editorState.getCurrentContent();
-    if (!contentState.hasText()) {
-      newErrors.draft_note = ["Draft content is required."];
-      hasError = true;
-    }
-
-    // If Error exists, set state and stop
-    if (hasError) {
-        setErrors(newErrors);
-        return;
-    }
-
-    // If Success
-    setOpenNoteModal(false);
-    setShowSuccess(true);
-  };
-
-  // 2. Updated: Generate PDF Blob and Send as Binary
-  const handleFinalSubmit = async () => {
+  // --- PREVIEW GENERATOR FOR SCREEN ---
+  const generatePreview = async () => {
     if (!popupRef.current) return;
+    
+    setGeneratingPreview(true);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     try {
-      const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
-      elementsToHide.forEach((el) => (el.style.display = "none"));
-
       const canvas = await html2canvas(popupRef.current, {
         scale: 2,
         backgroundColor: "#ffffff",
         useCORS: true,
+        logging: false,
+        windowHeight: popupRef.current.scrollHeight + 100,
       });
 
+      const imgData = canvas.toDataURL("image/jpeg", 0.8);
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const pageHeight = (imgWidth * 297) / 210; 
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+      const pages = [];
+
+      pages.push({ image: imgData, position: 0 });
+      heightLeft -= pageHeight;
+      
+      let pageCount = 1;
+      while (heightLeft > 0) {
+        position = - (pageHeight * pageCount);
+        pages.push({ image: imgData, position: position });
+        heightLeft -= pageHeight;
+        pageCount++;
+      }
+
+      setPreviewImages(pages);
+    } catch (error) {
+      console.error("Preview Generation Failed", error);
+      toast.error("Preview generate नहीं हो पाया");
+    } finally {
+      setGeneratingPreview(false);
+    }
+  };
+
+  // --- 1. SMART SPLIT HELPER (टेक्स्ट कटने से बचाता है) ---
+  const getSafeSplitY = (ctx, width, startY, pageHeightPx, totalHeight) => {
+    const proposedSplit = Math.min(startY + pageHeightPx, totalHeight);
+    if (proposedSplit >= totalHeight) return totalHeight;
+
+    // 100px ऊपर तक स्कैन करें
+    const scanRange = 100;
+    const imageData = ctx.getImageData(0, proposedSplit - scanRange, width, scanRange);
+    const data = imageData.data;
+
+    for (let y = scanRange - 1; y >= 0; y--) {
+      let isRowWhite = true;
+      for (let x = 0; x < width; x += 10) {
+        const idx = (y * width + x) * 4;
+        // अगर पिक्सल डार्क है (टेक्स्ट है)
+        if (data[idx] < 240 || data[idx + 1] < 240 || data[idx + 2] < 240) {
+          isRowWhite = false;
+          break;
+        }
+      }
+      if (isRowWhite) return (proposedSplit - scanRange) + y;
+    }
+    return proposedSplit;
+  };
+
+  // --- 2. MASTER PDF GENERATOR (Print, Download & Submit के लिए कॉमन फंक्शन) ---
+  const generatePdfDocument = async () => {
+    if (!popupRef.current) return null;
+
+    try {
+      // बटन छुपाएं
+      const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
+      elementsToHide.forEach((el) => (el.style.display = "none"));
+
+      // Canvas बनाएँ
+      const canvas = await html2canvas(popupRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        logging: false,
+        windowHeight: popupRef.current.scrollHeight + 50,
+        onclone: (document) => {
+          // बॉर्डर और शैडो हटाएं (काली लाइन रोकने के लिए)
+          const el = document.getElementById("pdf-content-div");
+          if (el) {
+            el.style.border = "none";
+            el.style.boxShadow = "none";
+            el.style.margin = "0";
+          }
+        },
+      });
+
+      // बटन वापस दिखाएं
       elementsToHide.forEach((el) => (el.style.display = "flex"));
 
-      const imgData = canvas.toDataURL("image/png");
+      // PDF Setup
+      const ctx = canvas.getContext("2d");
       const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = 210;
+      const pageHeight = 297;
+      const marginTop = 10;     // पैडिंग (ऊपर)
+      const marginBottom = 10;  // पैडिंग (नीचे)
+      const printableHeight = pageHeight - marginTop - marginBottom;
+      
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const printableHeightPx = (imgWidth * printableHeight) / pdfWidth;
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      let currentY = 0;
+      let pageCount = 0;
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      while (currentY < imgHeight) {
+        if (pageCount > 0) pdf.addPage();
 
+        // सेफ कट पॉइंट ढूंढें
+        const splitY = getSafeSplitY(ctx, imgWidth, currentY, printableHeightPx, imgHeight);
+        const sliceHeight = splitY - currentY;
+
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = imgWidth;
+        tempCanvas.height = sliceHeight;
+        const tempCtx = tempCanvas.getContext("2d");
+        
+        // स्लाइस काटें
+        tempCtx.drawImage(canvas, 0, currentY, imgWidth, sliceHeight, 0, 0, imgWidth, sliceHeight);
+
+        const sliceImgData = tempCanvas.toDataURL("image/png");
+        const pdfSliceHeight = (sliceHeight * pdfWidth) / imgWidth;
+
+        // PDF में डालें (Margin के साथ)
+        pdf.addImage(sliceImgData, "PNG", 0, marginTop, pdfWidth, pdfSliceHeight);
+
+        currentY = splitY;
+        pageCount++;
+      }
+      return pdf;
+
+    } catch (err) {
+      console.error("PDF Generation Error:", err);
+      // एरर आए तो बटन वापस दिखाएं
+      const elementsToHide = popupRef.current?.querySelectorAll(".pdf-hide-section");
+      if(elementsToHide) elementsToHide.forEach((el) => (el.style.display = "flex"));
+      return null;
+    }
+  };
+
+  // --- 3. HANDLE PRINT (FIXED) ---
+  const handlePrint = async () => {
+    const pdf = await generatePdfDocument();
+    if (pdf) {
+      // PDF को सीधे प्रिंट मोड में खोलें (Browser Print नहीं)
+      pdf.autoPrint(); 
+      const blobUrl = pdf.output("bloburl");
+      window.open(blobUrl, "_blank");
+    } else {
+      toast.error("Failed to prepare Print document");
+    }
+  };
+
+  // --- 4. HANDLE DOWNLOAD ---
+  const handleDownloadPdf = async () => {
+    const pdf = await generatePdfDocument();
+    if (pdf) {
+      pdf.save(`Noting_${complaint?.file_number || "File"}.pdf`);
+      toast.success("PDF Downloaded Successfully!");
+    } else {
+      toast.error("Failed to Download PDF");
+    }
+  };
+
+  // --- 5. HANDLE SUBMIT (Using same High-Quality Logic) ---
+  const handleFinalSubmit = async () => {
+    const pdf = await generatePdfDocument();
+    
+    if (!pdf) {
+        toast.error("Error creating document for submission");
+        return;
+    }
+
+    try {
       const pdfBlob = pdf.output("blob");
-
+      
       const formData = new FormData();
       formData.append("complaint_id", complaint.id);
       formData.append("draft_note", note);
@@ -180,98 +269,52 @@ const DraftLetter = ({ complaint }) => {
       formData.append("file", pdfBlob, `Draft_${complaint?.file_number || "File"}.pdf`);
 
       const res = await api.post("/supervisor/create-draft", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", 
-        },
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       if (res.data.status) {
         toast.success("Draft Added Successfully!");
-        setShowSuccess(false); 
-        setDraftTitle(""); 
+        setShowSuccess(false);
+        setDraftTitle("");
         setNote("");
         setEditorState(EditorState.createEmpty());
         setErrors({});
-        refetch(); 
+        refetch();
       } else if (res.data.errors) {
         setShowSuccess(false);
         setOpenNoteModal(true);
         setErrors(res.data.errors);
         Object.values(res.data.errors).forEach((msgArr) => {
-          toast.error(msgArr[0]);
+           toast.error(msgArr[0]);
         });
       }
     } catch (err) {
-      const elementsToHide = popupRef.current?.querySelectorAll(".pdf-hide-section");
-      if(elementsToHide) elementsToHide.forEach((el) => (el.style.display = "flex"));
-
       toast.error("Server Error!");
-      if (err.response && err.response.data) {
-          setErrors(err.response.data);
-      }
       console.error(err);
     }
   };
 
-  const handlePrint = () => {
-    window.print();
+  useEffect(() => {
+    if (showSuccess) {
+      setPreviewImages([]); 
+      generatePreview();
+    }
+  }, [showSuccess]);
+
+  const closeEditDraft = () => {
+    setEditDraftPopup(false);
   };
-  
-  const handleDownloadPdf = async () => {
-    if (!popupRef.current) return;
-    try {
-      const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
-      elementsToHide.forEach((el) => (el.style.display = "none"));
 
-      const canvas = await html2canvas(popupRef.current, {
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true,
-      });
-
-      elementsToHide.forEach((el) => (el.style.display = "flex"));
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Noting_${complaint?.file_number || "File"}.pdf`);
-
-      toast.success("PDF Downloaded successfully!");
-    } catch (err) {
-      console.error("PDF Generation Error:", err);
-      toast.error("Failed to generate PDF");
+  const onEditorStateChange = (editorState) => {
+    setEditorState(editorState);
+    const content = draftToHtml(convertToRaw(editorState.getCurrentContent()));
+    setNote(content);
+    
+    const contentState = editorState.getCurrentContent();
+    if (contentState.hasText() && errors.draft_note) {
+         setErrors(prev => ({...prev, draft_note: null}));
     }
   };
-
-  const normalizePath = (filePath) => {
-    if (!filePath) return "";
-    let fp = filePath.replace(/^\//, "");
-    fp = fp.replace("storage/", "storage/Document/");
-    return fp;
-  };
-
-  const makeFileUrl = (filePath) => {
-    const root = BASE_URL.replace("/api", "");
-    const fixedPath = normalizePath(filePath);
-    return `${root}/${fixedPath}`;
-  };
-
-  const {
-    data: documents = [],
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["documents", complaint?.id],
-    queryFn: async () => {
-      const res = await api.get(`/supervisor/get-draft-letter/${complaint.id}`);
-      return res.data.status ? res.data.data : [];
-    },
-    enabled: !!complaint?.id,
-  });
 
   const handleViewPdf = async (filename) => {
     try {
@@ -285,7 +328,7 @@ const DraftLetter = ({ complaint }) => {
         }
       }
     } catch (err) {
-      alert("PDF नहीं खुल पाया");
+      toast.error("PDF नहीं खुल पाया");
     } finally {
       setLoadingDoc(null);
     }
@@ -341,6 +384,58 @@ const DraftLetter = ({ complaint }) => {
       setIsSubmitting(false);
     }
   };
+
+  const handleSubmitNote = () => {
+    setErrors({});
+    const newErrors = {};
+    let hasError = false;
+
+    if (!draftTitle || !draftTitle.trim()) {
+        newErrors.title = ["Title is required."];
+        hasError = true;
+    }
+
+    const contentState = editorState.getCurrentContent();
+    if (!contentState.hasText()) {
+      newErrors.draft_note = ["Draft content is required."];
+      hasError = true;
+    }
+
+    if (hasError) {
+        setErrors(newErrors);
+        return;
+    }
+
+    setOpenNoteModal(false);
+    setShowSuccess(true);
+  };
+
+  const normalizePath = (filePath) => {
+    if (!filePath) return "";
+    let fp = filePath.replace(/^\//, "");
+    fp = fp.replace("storage/", "storage/Document/");
+    return fp;
+  };
+
+  const makeFileUrl = (filePath) => {
+    const root = BASE_URL.replace("/api", "");
+    const fixedPath = normalizePath(filePath);
+    return `${root}/${fixedPath}`;
+  };
+
+  const {
+    data: documents = [],
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["documents", complaint?.id],
+    queryFn: async () => {
+      const res = await api.get(`/supervisor/get-draft-letter/${complaint.id}`);
+      return res.data.status ? res.data.data : [];
+    },
+    enabled: !!complaint?.id,
+  });
 
   if (isLoading) {
     return (
@@ -446,7 +541,7 @@ const DraftLetter = ({ complaint }) => {
         />
       )}
 
-      {/* Add Document Modal (Backend Validation) */}
+      {/* Add Document Modal */}
       {openAddDocuments && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
           <div className="bg-white rounded-xl w-full max-w-lg flex flex-col shadow-2xl animate-fade-in-up">
@@ -576,7 +671,7 @@ const DraftLetter = ({ complaint }) => {
         </div>
       )}
 
-      {/* Add Note/Noting Modal (EDITOR) With Static Validation */}
+      {/* Add Note/Noting Modal */}
       {openNoteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 md:p-0">
           <div className="bg-white w-full md:w-11/12 h-full md:h-[70vh] shadow-xl relative flex flex-col md:flex-row rounded-md overflow-hidden">
@@ -597,13 +692,12 @@ const DraftLetter = ({ complaint }) => {
               value={draftTitle}  
               onChange={(e) => {
                   setDraftTitle(e.target.value);
-                  if(errors.title) setErrors({...errors, title: null}); // Clear static error
+                  if(errors.title) setErrors({...errors, title: null}); 
               }}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm ${
                   errors.title ? "border-red-500" : "border-gray-300"
               }`}
             />
-            {/* Show Static Error for Title */}
             {errors.title && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.title[0]}
@@ -619,12 +713,21 @@ const DraftLetter = ({ complaint }) => {
                   errors.draft_note ? "border-red-500" : "border-gray-300"
                 }`}
               >
+
+              <style>{`
+                  .public-DraftStyleDefault-block {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                  }
+                `}</style>
+                
                 <Editor
                   editorState={editorState}
                   onEditorStateChange={onEditorStateChange}
                   toolbarClassName="toolbarClassName"
                   wrapperClassName="wrapperClassName"
                   editorClassName="editorClassName px-3 min-h-[120px] md:min-h-[150px]"
+                  editorStyle={{ lineHeight: '1.2', minHeight: '150px' }}
                   placeholder="Enter your note here..."
                   toolbar={{
                     options: [
@@ -643,7 +746,6 @@ const DraftLetter = ({ complaint }) => {
                   }}
                 />
               </div>
-              {/* Show Static Error for Editor */}
               {errors.draft_note && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.draft_note[0]}
@@ -652,7 +754,7 @@ const DraftLetter = ({ complaint }) => {
               <div className="flex justify-end mt-24"> 
                 <button
                   className="bg-blue-600 text-white px-3 py-3 rounded-lg hover:bg-blue-700 transition text-md"
-                  onClick={handleSubmitNote} // Validates locally first
+                  onClick={handleSubmitNote}
                 >
                  Submit
                 </button>
@@ -666,7 +768,29 @@ const DraftLetter = ({ complaint }) => {
       {showSuccess && (
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl my-auto">
-            <div ref={popupRef} className="bg-white rounded-lg overflow-hidden">
+            {/* --- IMPORTANT: Added ID here --- */}
+            <div 
+                ref={popupRef} 
+                id="pdf-content-div"  
+                className="bg-white rounded-lg overflow-hidden"
+            >
+
+            <style>{`
+                .draft-preview-content ol {
+                  list-style-type: decimal !important;
+                  padding-left: 20px !important;
+                  margin-bottom: 10px;
+                }
+                .draft-preview-content ul {
+                  list-style-type: disc !important;
+                  padding-left: 20px !important;
+                  margin-bottom: 10px;
+                }
+                .draft-preview-content li {
+                  margin-bottom: 4px;
+                }
+              `}</style>
+
               <div className="px-4 py-3 md:px-6 md:py-4 border-b flex flex-wrap justify-between items-center bg-gray-100 pdf-hide-section gap-2">
                 <p className="text-sm font-semibold text-gray-800">
                   Preview Note
@@ -695,35 +819,35 @@ const DraftLetter = ({ complaint }) => {
                 </div>
               </div>
 
- <div className="mt-5 py-5 px-6 w-full flex justify-between items-start font-[Mangal] text-black">
-  <div className="w-1/3"></div>
-  <div className="w-1/3 text-center">
-    <h1 className="text-xl font-bold">लोक आयुक्त</h1>
-    <h2 className="text-md font-bold mt-1">उत्तर प्रदेश</h2>
+                <div className="mt-5 py-5 px-6 w-full flex justify-between items-start font-[Mangal] text-black">
+                  <div className="w-1/3"></div>
+                  <div className="w-1/3 text-center">
+                    <h1 className="text-xl font-bold">लोक आयुक्त</h1>
+                    <h2 className="text-md font-bold mt-1">उत्तर प्रदेश</h2>
 
-    <div className="mt-1 mx-auto w-25 h-25  rounded-full flex items-center justify-center overflow-hidden">
-      <img
-        src="/images/ChatGPTImage.png"
-        alt="Lok Ayukt"
-        className="w-full h-full object-cover"
-      />
-    </div>
-  </div>
+                    <div className="mt-1 mx-auto w-25 h-25  rounded-full flex items-center justify-center overflow-hidden">
+                      <img
+                        src="/images/ChatGPTImage.png"
+                        alt="Lok Ayukt"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
 
-  <div className="w-1/3 text-[15px] font-bold leading-6 text-right">
-    <p>पोस्ट बाक्स नं 172 (जी.पी.ओ.)</p>
-    <p>टी.सी. 46/बी-1, विभूति खण्ड</p>
-    <p>गोमती नगर</p>
-    <p>लखनऊ-226 010</p>
+                  <div className="w-1/3 text-[15px] font-bold leading-6 text-right">
+                    <p>पोस्ट बाक्स नं 172 (जी.पी.ओ.)</p>
+                    <p>टी.सी. 46/बी-1, विभूति खण्ड</p>
+                    <p>गोमती नगर</p>
+                    <p>लखनऊ-226 010</p>
 
-    <div className="mt-1">
-      <p>दूरभाष : 2728660</p>
-      <p className="pr-0">2306717</p>
-    </div>  
+                    <div className="mt-1">
+                      <p>दूरभाष : 2728660</p>
+                      <p className="pr-0">2306717</p>
+                    </div>  
 
-    <p className="mt-1">फैक्स : (0522) 2306647</p>
-  </div>
-</div>
+                    <p className="mt-1">फैक्स : (0522) 2306647</p>
+                  </div>
+                </div>
 
               <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
                 <p className="text-sm text-center font-semibold text-gray-800">
@@ -733,15 +857,15 @@ const DraftLetter = ({ complaint }) => {
                   Date: {new Date().toLocaleDateString()}
                 </p>
                 <div
-                  className="rounded-md bg-white px-2 py-2 md:px-5 md:py-4 min-h-[200px] md:min-h-[260px] whitespace-pre-wrap"
-                  dangerouslySetInnerHTML={{ __html: note }}
-                />
+  className="rounded-md bg-white   min-h-[200px] md:min-h-[260px] draft-preview-content"
+  dangerouslySetInnerHTML={{ __html: note }}
+/>
                 <div className="flex justify-between pt-4">
                   <div />
                   <div className="text-right text-xs text-gray-600">
                     <p className="uppercase tracking-wide">Noting By</p>
                     <p className="font-semibold mt-1 text-gray-800">
-                     Hon' Lokayukt Shri Sanjay Mishra
+                      Hon' Lokayukt Shri Sanjay Mishra
                     </p>
                     <p>{name}</p>
                   </div>

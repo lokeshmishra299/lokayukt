@@ -692,9 +692,12 @@ const forwardComplaintMutation = useMutation({
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
-                      : "Received - Record Section" }
+                  
+
+                        {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                   </span>
                 </div>
               </div>
@@ -713,9 +716,10 @@ const forwardComplaintMutation = useMutation({
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_supervisor == 1
-                      ? "In Motion – With supervisora"
-                      : "Received - Record Section" }
+                        {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                     </span>
 
                     <button
@@ -879,7 +883,7 @@ const forwardComplaintMutation = useMutation({
                   }`}
                 >
                   शुल्क का प्रकार:{" "}
-                  {complaintData.fee_exempted == 0 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "NA"}
+                  {complaintData.fee_exempted == 3 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "Pending"}
                 </span>
 
                 <span
@@ -890,7 +894,7 @@ const forwardComplaintMutation = useMutation({
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  स्थिति: {complaintData.fee_approved_by_supervisor == 1 ? "Approved" : "Awaiting approval"}
+                  स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -1022,18 +1026,18 @@ const forwardComplaintMutation = useMutation({
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
                 <div>
-                  <button
+                  {/* <button
                     onClick={() => {
                       setConfirmConfig({ open: true, type: "pullback" });
                     }}
                     className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                   >
                     Pull Back
-                  </button>
+                  </button> */}
                 </div>
 
                 <div className="flex gap-2">
-                  <button
+                  {/* <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1041,7 +1045,7 @@ const forwardComplaintMutation = useMutation({
                     {markAsReceivedMutation.isPending
                       ? "Processing..."
                       : "Return with Remarks"}
-                  </button>
+                  </button> */}
 
                   <button
                     onClick={handleforwardphysical}
