@@ -556,29 +556,37 @@ const Notes = ({ complaint }) => {
             <div ref={popupRef} id="pdf-content-div" className="bg-white rounded-lg overflow-hidden">
               
               {/* --- FIX 2: PREVIEW CSS FOR NO GAP & NO HIDDEN CONTENT --- */}
-              <style>{`
-                .draft-preview-content * {
-                  margin-top: 0 !important;
-                  margin-bottom: 0 !important;
-                  padding-top: 0 !important;
-                  padding-bottom: 0 !important;
-                  line-height: 1.15 !important;
-                }
-                .draft-preview-content ol, 
-                .draft-preview-content ul {
-                  padding-left: 25px !important;
-                  list-style-position: outside !important;
-                  margin-bottom: 4px !important;
-                }
-                .draft-preview-content li {
-                  display: list-item !important;
-                  margin-bottom: 2px !important;
-                }
-                .draft-preview-content p {
-                   min-height: 1em;
-                   margin-bottom: 4px !important;
-                }
-              `}</style>
+             <style>{`
+          .draft-preview-content * {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            line-height: 1.15 !important;
+          }
+          /* NUMBERS (1, 2, 3...) KE LIYE - YE LINE ZAROORI HAI */
+          .draft-preview-content ol {
+            list-style-type: decimal !important;
+            padding-left: 25px !important;
+            list-style-position: outside !important;
+            margin-bottom: 4px !important;
+          }
+          /* DOTS (•) KE LIYE - YE LINE ZAROORI HAI */
+          .draft-preview-content ul {
+            list-style-type: disc !important;
+            padding-left: 25px !important;
+            list-style-position: outside !important;
+            margin-bottom: 4px !important;
+          }
+          .draft-preview-content li {
+            display: list-item !important;
+            margin-bottom: 2px !important;
+          }
+          .draft-preview-content p {
+             min-height: 1em;
+             margin-bottom: 4px !important;
+          }
+        `}</style>
 
               <div className="px-4 py-3 md:px-6 md:py-4 border-b flex flex-wrap justify-between items-center bg-gray-100 pdf-hide-section gap-2">
                 <p className="text-sm font-semibold text-gray-800">Preview Note</p>
@@ -625,7 +633,7 @@ const Notes = ({ complaint }) => {
         </div>
       )}
 
-      <Toaster position="top-right" />
+      {/* <Toaster position="top-right" /> */}
     </div>
   );
 };
