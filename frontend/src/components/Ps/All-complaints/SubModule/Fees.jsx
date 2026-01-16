@@ -189,10 +189,10 @@ const Fees = ({ complaint, onFeeApproved }) => {
             </div>
           </div>
           {/* Toast Container Configured exactly like Login.js */}
-          <Toaster
+          {/* <Toaster
             position="top-right"
        
-          />
+          /> */}
         </div>
       )}
     </>
