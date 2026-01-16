@@ -749,13 +749,7 @@ const ViewApprovedComplaints = () => {
                   }`}
                 >
                   शुल्क का प्रकार:{" "}
-                  {complaintData.fee_exempted == 0
-                    ? "Exempted"
-                    : complaintData.fee_exempted == 2
-                    ? "Partial"
-                    : complaintData.fee_exempted == 1
-                    ? "Paid"
-                    : "NA"}
+                  {complaintData.fee_exempted == 3 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "Pending"}
                 </span>
                 <span
                   className={`px-3 py-1.5 rounded text-xs border ${
@@ -766,9 +760,7 @@ const ViewApprovedComplaints = () => {
                   }`}
                 >
                   स्थिति:{" "}
-                  {complaintData.fee_approved_by_lokayukt == 1
-                    ? "Approved"
-                    : "Awaiting approval"}
+                 {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
                 </span>
                 {complaintData.challan_no && (
                   <span className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded text-xs border border-blue-200">

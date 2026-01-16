@@ -517,9 +517,10 @@ function takefile(){
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_lokayukt == 1
-                      ? "In Motion – With Lokayukta"
-                      : "Received - Record Section" }
+                    {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                   </span>
                 </div>
               </div>
@@ -538,9 +539,10 @@ function takefile(){
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_lokayukt == 1
-                      ? "In Motion – With Lokayukta"
-                      : "Received - Record Section" }
+                         {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                     </span>
 
                     <button
@@ -699,7 +701,7 @@ function takefile(){
                   }`}
                 >
                   शुल्क का प्रकार:{" "}
-                  {complaintData.fee_exempted == 0 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "NA"}
+                  {complaintData.fee_exempted == 3 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "Pending"}
                 </span>
 
                 <span
@@ -853,12 +855,18 @@ function takefile(){
                   </button> */}
                   
                  
-                    <button
-                      onClick={takefile}
-                      className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
-                    >
-                       Take File In Hand
-                    </button>
+                   {complaintData.assign_to_ro ? (
+                      <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                        Assigned
+                      </span>
+                    ) : (
+                      <button
+                        onClick={takefile}
+                        className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
+                      >
+                        Take File in Hand
+                      </button>
+                    )}
               
 
                 </div>
