@@ -396,7 +396,7 @@ const AllComplaints = () => {
                   onChange={(e) => setSelectedFeeStatus(e.target.value)}
                 >
                   <option value="">Fee Status: All</option>
-                  <option value="0">Pending</option>
+                 <option value="0">Pending</option>
                   <option value="2">Partial</option>
                   <option value="1">Paid</option>
                   <option value="3">Exempted</option>
@@ -524,15 +524,13 @@ const AllComplaints = () => {
                               }
                             `}
                           >
-                            {complaint.fee_exempted === 0
-                              ? "Pending"
-                              : complaint.fee_exempted === 1
-                              ? "Partial"
-                              : complaint.fee_exempted === 2
-                              ? "Paid"
-                              : complaint.fee_exempted === 3
-                              ? "Exempted"
-                              : ""}
+                            {complaint.fee_exempted === 3
+    ? "Exempted"
+    : complaint.fee_exempted === 1
+    ? "Paid"
+    : complaint.fee_exempted === 2
+    ? "Partial"
+    : "Pending"}
                           </span>
                         </div>
                         <div className="flex gap-2 w-full sm:w-auto">

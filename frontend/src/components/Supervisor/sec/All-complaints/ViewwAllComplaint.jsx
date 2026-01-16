@@ -372,48 +372,140 @@ const ViewAllComplaint = () => {
 // =========================================================
 // UPDATED FUNCTION: Works on both Localhost & Live
 // =========================================================
-const signWithHyperPKI = async () => {
-  try {
+// const signWithHyperPKI = async () => {
+//   try {
 
-    // Localhost par ye 'http:' uthayega.
-    // Live SSL par 'https:' uthayega.
-    // Live IP (http://34....) par 'http:' uthayega.
-    const protocol = window.location.protocol; 
+//     // Localhost par ye 'http:' uthayega.
+//     // Live SSL par 'https:' uthayega.
+//     // Live IP (http://34....) par 'http:' uthayega.
+//     const protocol = window.location.protocol; 
     
-    const dscUrl = `${protocol}//127.0.0.1:20202`; 
+//     const dscUrl = `${protocol}//127.0.0.1:20202`; 
     
-    console.log("Connecting to HyperPKI via:", dscUrl);
+//     console.log("Connecting to HyperPKI via:", dscUrl);
 
  
-    try {
-        await axios.get(`${dscUrl}/`, { timeout: 3000 });
-    } catch (e) {
-        console.error(e);
-        if (protocol === 'https:') {
-             toast.error("DSC Service not found! Ensure HyperPKI is running & SSL certificate is trusted.");
-        } else {
-             toast.error("HyperPKI WebSigner is not running! Please start the service.");
+//     try {
+//         await axios.get(`${dscUrl}/`, { timeout: 3000 });
+//     } catch (e) {
+//         console.error(e);
+//         if (protocol === 'https:') {
+//              toast.error("DSC Service not found! Ensure HyperPKI is running & SSL certificate is trusted.");
+//         } else {
+//              toast.error("HyperPKI WebSigner is not running! Please start the service.");
+//         }
+//         return null;
+//     }
+
+
+//     const listPayload = { action: "list" }; 
+    
+//     const listRes = await axios.post(`${dscUrl}/api/list`, listPayload, {
+//         headers: { "Content-Type": "application/json" }
+//     });
+
+//     if (!listRes.data || listRes.data.length === 0 || (listRes.data.status && listRes.data.status !== 0)) {
+//         toast.error("No USB Token Found or No Certificates Available.");
+//         return null;
+//     }
+
+//     const cert = listRes.data.certificates ? listRes.data.certificates[0] : listRes.data[0];
+
+//     console.log("Selected Cert:", cert);
+
+ 
+//     const contentToSign = "00"; 
+//     const contentBase64 = btoa(contentToSign); 
+
+//     const signPayload = {
+//         action: "sign",
+//         thumbprint: cert.thumbprint, 
+//         data: contentBase64 
+//     };
+
+//     const signRes = await axios.post(`${dscUrl}/api/sign`, signPayload);
+
+//     if (signRes.data && signRes.data.signature) {
+        
+//         // Update State
+//         setCertSubject(cert.subject || "");
+//         setCertThumbprint(cert.thumbprint || "");
+//         setCertSerialNo(cert.serialNumber || "");
+        
+//         // Prepare Response Object
+//         const dscData = {
+//             signatureData: signRes.data.signature, 
+//             plainText: contentToSign,
+//             certThumbprint: cert.thumbprint || "",
+//             certSubject: cert.subject || "",
+//             certSerialNo: cert.serialNumber || "",
+//             validFrom: cert.notBefore || "", 
+//             validTo: cert.notAfter || "",
+//             digitalId: cert.subject || "",
+//             cstInfo: cert.issuer || ""
+//         };
+
+//         toast.success("Signed Successfully with HyperPKI!");
+//         return dscData;
+//     } else {
+//         toast.error("Signature Failed or Cancelled by User.");
+//         return null;
+//     }
+
+//   } catch (err) {
+//     console.error("HyperPKI Error:", err);
+//     toast.error("Connection Error: Check if Token is plugged in or Driver settings allow the site.");
+//     return null;
+//   }
+// };
+
+// =========================================================
+// UPDATED FUNCTION: Auto-detects Port for Hyp2003/HyperPKI
+// =========================================================
+const signWithHyperPKI = async () => {
+  try {
+    const protocol = window.location.protocol; // http: or https:
+    
+    // Hyp2003 aur HyperPKI alag-alag ports use karte hain.
+    // Hum sabko check karenge.
+    const ports = [20202, 4848, 55100, 55101]; 
+    let activeUrl = null;
+
+    console.log("Scanning for DSC Service on ports:", ports);
+
+
+    for (const port of ports) {
+        const testUrl = `${protocol}//127.0.0.1:${port}`;
+        try {
+            await axios.get(`${testUrl}/`, { timeout: 1500 });
+            console.log(`✅ Service found on port: ${port}`);
+            activeUrl = testUrl;
+            break; 
+        } catch (e) {
+            // Next port try karo
         }
+    }
+
+    if (!activeUrl) {
+        toast.error("DSC Bridge not found! Please start 'HyperPKI WebSigner' or 'ePass2003 Bridge'.");
         return null;
     }
 
-
     const listPayload = { action: "list" }; 
     
-    const listRes = await axios.post(`${dscUrl}/api/list`, listPayload, {
+    const listRes = await axios.post(`${activeUrl}/api/list`, listPayload, {
         headers: { "Content-Type": "application/json" }
     });
 
     if (!listRes.data || listRes.data.length === 0 || (listRes.data.status && listRes.data.status !== 0)) {
-        toast.error("No USB Token Found or No Certificates Available.");
+        toast.error("USB Token Connected but No Certificate Found.");
         return null;
     }
 
     const cert = listRes.data.certificates ? listRes.data.certificates[0] : listRes.data[0];
-
     console.log("Selected Cert:", cert);
 
- 
+
     const contentToSign = "00"; 
     const contentBase64 = btoa(contentToSign); 
 
@@ -423,16 +515,15 @@ const signWithHyperPKI = async () => {
         data: contentBase64 
     };
 
-    const signRes = await axios.post(`${dscUrl}/api/sign`, signPayload);
+    const signRes = await axios.post(`${activeUrl}/api/sign`, signPayload);
 
     if (signRes.data && signRes.data.signature) {
         
-        // Update State
-        setCertSubject(cert.subject || "");
-        setCertThumbprint(cert.thumbprint || "");
-        setCertSerialNo(cert.serialNumber || "");
+        if (typeof setCertSubject === 'function') setCertSubject(cert.subject || "");
+        if (typeof setCertThumbprint === 'function') setCertThumbprint(cert.thumbprint || "");
+        if (typeof setCertSerialNo === 'function') setCertSerialNo(cert.serialNumber || "");
         
-        // Prepare Response Object
+        // Data Formatting
         const dscData = {
             signatureData: signRes.data.signature, 
             plainText: contentToSign,
@@ -445,16 +536,16 @@ const signWithHyperPKI = async () => {
             cstInfo: cert.issuer || ""
         };
 
-        toast.success("Signed Successfully with HyperPKI!");
+        toast.success("Signed Successfully! ");
         return dscData;
     } else {
-        toast.error("Signature Failed or Cancelled by User.");
+        toast.error("Signing Failed or Cancelled.");
         return null;
     }
 
   } catch (err) {
-    console.error("HyperPKI Error:", err);
-    toast.error("Connection Error: Check if Token is plugged in or Driver settings allow the site.");
+    console.error("DSC Error:", err);
+    toast.error("Error connecting to Token. Please reconnect USB.");
     return null;
   }
 };
