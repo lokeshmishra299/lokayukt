@@ -667,7 +667,7 @@ const Notes = ({ complaint }) => {
       )}
 
       {/* TOAST */}
-      <Toaster position="top-right" />
+      {/* <Toaster position="top-right" /> */}
     </div>
   );
 };
