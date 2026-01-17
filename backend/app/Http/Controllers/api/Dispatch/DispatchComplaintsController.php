@@ -37,9 +37,7 @@ class DispatchComplaintsController extends Controller
         );
 
 
-     $query->where('form_status', 1)
-                //   ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_rk', 1)
+     $query->where('rep.status', 'Forwarded')
                   ->where('rep.forward_to_dispatch', $user);
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)
@@ -1256,6 +1254,7 @@ class DispatchComplaintsController extends Controller
         $request->validate([
             'complaint_id' => 'required|integer',
             'letter_type'  => 'required|string|max:50',
+            'medium'      => 'required|string|max:150',
             'subject'      => 'required|string|max:255',
             'file'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
@@ -1274,6 +1273,7 @@ class DispatchComplaintsController extends Controller
       $letter =  Letter::create([
             'complaint_id' => $request->complaint_id,
             'letter_type'  => $request->letter_type,
+            'medium'      => $request->medium,
             'subject'      => $request->subject,
             'file'         => $filePath,
             'status'       => 1,
@@ -1318,9 +1318,7 @@ class DispatchComplaintsController extends Controller
         );
 
 
-     $query->where('form_status', 1)
-                //   ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_rk', 1)
+     $query->where('rep.status', 'Forwarded')
                   ->where('rep.forward_to_dispatch', $user);
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)

@@ -13,6 +13,7 @@ class Letter extends Model
     protected $fillable = [
         'complaint_id',
         'letter_type',
+        'medium',
         'subject',
         'file',
         'letter_no',
