@@ -160,6 +160,8 @@ const ViewApprovedComplaints = () => {
   const [showMobileTabs, setShowMobileTabs] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
      const [showModal, setShowModal] = useState(false);
+        const [Rejectedloading,setRejectedloading] = useState(false)
+     
    
       const handleReject = () => {
     console.log("Rejected!");
@@ -258,6 +260,33 @@ const ViewApprovedComplaints = () => {
     enabled: confirmConfig.open && confirmConfig.type === "forward",
     staleTime: 0,
   });
+
+   
+   const {
+        mutate: rejectComplaint,
+        isPending,
+      } = useMutation({
+        mutationFn: async ({ complaintId }) => {
+          const res = await api.post(
+            `/uplokayukt/reject-complaint-by-uplokayukt/${complaintId}`
+          );
+          return res.data;
+        },
+        onSuccess: () => {
+          toast.success("Rejected successfully");
+          queryClient.invalidateQueries({
+            queryKey: ["complaint-details", id],
+          });
+          setConfirmConfig({ open: false, type: null });
+          setShowModal(false);
+        },
+        onError: (error) => {
+          toast.error(
+            error?.response?.data?.message || "Failed to Reject"
+          );
+        },
+      });
+  
 
 
   // --- PULL BACK API (UpLokayukt) ---
@@ -676,7 +705,7 @@ const ViewApprovedComplaints = () => {
                   }`}
                 >
                   स्थिति:{" "}
-                  {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
+                  {complaintData.fee_approved_by_lokayukt === 1 ? "Approved" : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -849,7 +878,7 @@ const ViewApprovedComplaints = () => {
         )}
       </div>
 
-           {showModal && (
+          {showModal && (
   <div className="fixed inset-0 flex items-center justify-center  pt-20 bg-black bg-opacity-50 z-50">
     <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
       <h2 className="text-lg font-semibold mb-4">Confirm Rejection</h2>
@@ -861,12 +890,16 @@ const ViewApprovedComplaints = () => {
         >
           Cancel
         </button>
-        <button
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          onClick={handleReject}
-        >
-          Reject
-        </button>
+       <button
+  onClick={() => rejectComplaint({ complaintId: id })}
+  disabled={isPending}
+  className={`px-4 py-2 rounded text-white
+    ${isPending ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}
+  `}
+>
+  {isPending ? "Rejecting..." : "Reject"}
+</button>
+
       </div>
     </div>
   </div>

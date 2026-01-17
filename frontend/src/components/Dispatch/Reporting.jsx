@@ -16,6 +16,8 @@ import {
 const Reporting = () => {
   const [activeTab, setActiveTab] = useState("enrollment");
 
+ 
+
   // Mock Data
   const enrollmentData = [
     {
@@ -441,6 +443,7 @@ const Reporting = () => {
                 Overall Complaint Status / कुल शिकायत स्थिति
               </h2>
               <button className="flex items-center gap-2 px-3 md:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                
                 <FaPrint /> <span className="hidden sm:inline">Print Summary</span>
               </button>
             </div>

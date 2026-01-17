@@ -280,7 +280,7 @@ const Sidebar = ({
 
 
 {/* Scane Latter */}
-                             <li>
+                             {/* <li>
                           <Link
                             to="/lokayukt/scane-letter"
                             onClick={handleLinkClick}
@@ -301,7 +301,7 @@ const Sidebar = ({
                               </div>
                             )}
                           </Link>
-                        </li>
+                        </li> */}
 
 
 

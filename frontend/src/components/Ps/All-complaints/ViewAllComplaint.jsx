@@ -163,11 +163,9 @@ const ViewAllComplaint = () => {
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
      const [showModal, setShowModal] = useState(false);
-          
-      const handleReject = () => {
-    console.log("Rejected!");
-    setShowModal(false); // close modal after action
-  };
+     const [Rejectedloading,setRejectedloading] = useState(false)
+  
+
 
   const [confirmConfig, setConfirmConfig] = useState({
     open: false,
@@ -230,6 +228,33 @@ const ViewAllComplaint = () => {
     enabled: confirmConfig.open && confirmConfig.type === "forward",
     staleTime: 0,
   });
+
+
+    const {
+  mutate: rejectComplaint,
+  isPending,
+} = useMutation({
+  mutationFn: async ({ complaintId }) => {
+    const res = await api.post(
+      `/ps/reject-complaint-by-ps/${complaintId}`
+    );
+    return res.data;
+  },
+  onSuccess: () => {
+    toast.success("Rejected successfully");
+    queryClient.invalidateQueries({
+      queryKey: ["complaint-details", id],
+    });
+    setConfirmConfig({ open: false, type: null });
+    setShowModal(false);
+  },
+  onError: (error) => {
+    toast.error(
+      error?.response?.data?.message || "Failed to Reject"
+    );
+  },
+});
+
 
   const pullBackMutation = useMutation({
     mutationFn: async ({ complaintId }) => {
@@ -410,6 +435,16 @@ const ViewAllComplaint = () => {
     const fileUrl = `${APP_URL}${filePath}`;
     window.open(fileUrl, "_blank");
   };
+
+          
+      const handleOpenTab = () => {
+      console.log("Rejected!");
+    (false); 
+  };
+
+
+
+
 
   if (isLoading) {
     return (
@@ -931,7 +966,7 @@ const ViewAllComplaint = () => {
 
                   <div className="flex gap-2">
 
-                      <button
+         <button
         className="px-4 py-2 bg-red-600 border border-red-600 text-white rounded hover:bg-red-700 text-sm"
         onClick={() => setShowModal(true)}
       >
@@ -994,12 +1029,16 @@ const ViewAllComplaint = () => {
         >
           Cancel
         </button>
-        <button
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          onClick={handleReject}
-        >
-          Reject
-        </button>
+       <button
+  onClick={() => rejectComplaint({ complaintId: id })}
+  disabled={isPending}
+  className={`px-4 py-2 rounded text-white
+    ${isPending ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}
+  `}
+>
+  {isPending ? "Rejecting..." : "Reject"}
+</button>
+
       </div>
     </div>
   </div>
