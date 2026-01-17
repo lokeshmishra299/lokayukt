@@ -85,6 +85,8 @@ const Login = () => {
           else if (userRole === "ps") {
             window.open("/ps/dashboard", "_self");
             localStorage.setItem("UserID", response.data.data.user.id);
+            localStorage.setItem('name', response?.data?.data?.user?.name);
+
           }
           else if (userRole === "dispatch") {
             window.open("/dispatch/dashboard", "_self");
