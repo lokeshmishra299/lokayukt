@@ -1090,6 +1090,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
         '=', 
         DB::raw('respon.department_name COLLATE utf8mb4_unicode_ci')
     )
+      ->join('complaint_actions as ca', DB::raw("cmp.id"), '=', DB::raw("ca.complaint_id"))
     ->selectRaw("
         COUNT(*) as total,
 
@@ -1098,6 +1099,8 @@ $complainDetails->details = DB::table('complaints_details as cd')
         SUM(CASE WHEN cmp.status = 'Under Investigation' THEN 1 ELSE 0 END) as under_investigation,
 
         SUM(CASE WHEN cmp.status = 'Disposed - Accepted' THEN 1 ELSE 0 END) as disposed,
+        
+        SUM(CASE WHEN ca.status = 'Final Decision' THEN 1 ELSE 0 END) as final_submit,
 
         SUM(CASE WHEN cmp.status = 'Rejected' THEN 1 ELSE 0 END) as rejected,
 
