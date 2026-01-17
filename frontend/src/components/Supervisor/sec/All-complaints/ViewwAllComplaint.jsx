@@ -860,7 +860,7 @@ const ViewAllComplaint = () => {
                   >
                     Pull Back
                   </button> */}
-
+{/* 
                   <button
                     onClick={takefile}
                     disabled={assignToSelfMutation.isPending} // ✅ Processing ke waqt click na ho
@@ -869,7 +869,7 @@ const ViewAllComplaint = () => {
                     {assignToSelfMutation.isPending
                       ? "Processing..."
                       : "Take File In Hand"}
-                  </button>
+                  </button> */}
                 </div>
 
                 <div className="flex gap-2">
