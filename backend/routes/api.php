@@ -287,7 +287,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-file-preview/{id}',[LokAyuktComplaintsController::class,'getFilePreview']);
         Route::get('/return-complain-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'returnComplainByLokayukt']);
         Route::post('/pull-back-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'pullBackByLokayukt']);
-        Route::post('/reject-omplaint-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'rejectComplaintByLokayukt']);
+        Route::post('/reject-complaint-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'rejectComplaintByLokayukt']);
         Route::post('/fee-exempted/{complaint_id}',[LokAyuktComplaintsController::class,'approvedFeeByLokayukt']);
         Route::post('/forward-to-uplokayukt/{complaint_id}',[LokAyuktComplaintsController::class,'approvedByLokayukt']);
         Route::post('/add-dispatch',[LokAyuktComplaintsController::class,'addDispachLeters']);
@@ -417,7 +417,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('assign-by-ps/{complainId}',[PSComplaintsController::class,'assignToPs']);
         Route::post('/fee-exempted/{complaint_id}',[PSComplaintsController::class,'approvedFeeByPS']);
         Route::post('/forward-to-uplokayukt/{complaint_id}',[PSComplaintsController::class,'approvedByupLokayukt']);
-        Route::post('/reject-omplaint-by-ps/{id}',[PSComplaintsController::class,'rejectComplaintByPs']);
+        Route::post('/reject-complaint-by-ps/{id}',[PSComplaintsController::class,'rejectComplaintByPs']);
         // Route::post('/forward-by-ds-js/{complainId}',[PSComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[PSComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-ps/{complainId}',[PSComplaintsController::class,'forwardComplaintbyPS']);
@@ -532,7 +532,7 @@ Route::middleware('auth:sanctum')->group(function(){
           Route::get('/get-file-preview/{id}',[UpLokAyuktComplaintsController::class,'getFilePreview']);
           Route::post('/add-notes',[UpLokAyuktComplaintsController::class,'addNotes']);
           Route::post('/pull-back-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'pullBackByupLokayukt']);
-          Route::post('/reject-omplaint-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'rejectComplaintByUpLokayukt']);
+          Route::post('/reject-complaint-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'rejectComplaintByUpLokayukt']);
          
           // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyda']);
