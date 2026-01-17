@@ -1125,6 +1125,8 @@ $complainDetails->details = DB::table('complaints_details as cd')
     'disposed' => $data->total ? round(($data->disposed / $data->total) * 100, 2) : 0,
 
     'rejected' => $data->total ? round(($data->rejected / $data->total) * 100, 2) : 0,
+    
+    'final_submit' => $data->total ? round(($data->final_submit / $data->total) * 100, 2) : 0,
 
 
 ];
