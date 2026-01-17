@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaSpinner, FaDownload, FaPrint } from "react-icons/fa"; // Added FaPrint
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster  } from "react-hot-toast";
+
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -286,6 +286,7 @@ const Notes = ({ complaint }) => {
   return (
     <div className="bg-white rounded-lg w-full p-4">
       {/* HEADER */}
+       <Toaster position="top-right"  />
       <div className="flex justify-between items-center mb-3">
         <p className="text-[16px] font-medium text-gray-800">
           Notes & Notings
@@ -580,7 +581,7 @@ const Notes = ({ complaint }) => {
       )}
 
       {/* TOAST */}
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </div>
   );
 };

@@ -191,7 +191,7 @@ const AllComplaints = () => {
       <div className="w-full bg-white flex flex-col overflow-hidden">
         <div className="px-4 py-3 border-b flex-shrink-0 bg-white">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 gap-2">
-            <h2 className="text-lg font-bold text-gray-900">Send</h2>
+            <h2 className="text-lg font-bold text-gray-900">Sent</h2>
           
           </div>
 
