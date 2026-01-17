@@ -295,13 +295,14 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/all-dispatch-letters',[LokAyuktComplaintsController::class,'allDispatchLetters']);
          Route::post('/upload-document',[LokAyuktComplaintsController::class,'uploadDocument']);
        
+       
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-lokayukt/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbylokayukt']);
         Route::post('/request-report/{complainId}',[LokAyuktReportController::class,'requestReport']);
         Route::get('/request-list/{complainId}',[LokAyuktReportController::class,'requestReportList']);
         Route::get('/request-list-cio/{complainId}',[LokAyuktReportController::class,'requestinvestigationReport']);
-      
+          Route::get('/over-all-status',[LokAyuktReportController::class,'complaintPercentages']);
         /*
          * Forward Report By Subroles
          */
