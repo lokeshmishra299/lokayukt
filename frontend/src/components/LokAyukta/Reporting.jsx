@@ -432,7 +432,7 @@ const Reporting = () => {
       bg: "bg-purple-100",
     },
     {
-      status: "Disposed (Merit)",
+      status: "Disposed",
       count: overallStatusData?.data?.disposed || "N/A",
       percentage: overallStatusData?.percentages?.disposed ?? "N/A",
 
@@ -991,8 +991,10 @@ const Reporting = () => {
                           <th className="px-6 py-3 whitespace-nowrap">Complaint No.</th>
                           <th className="px-6 py-3 whitespace-nowrap">Type</th>
                           <th className="px-6 py-3 whitespace-nowrap">Subject</th>
-                          <th className="px-6 py-3 whitespace-nowrap">Pages</th>
-                          <th className="px-6 py-3 whitespace-nowrap">Status</th>
+                       <th className="px-6 py-3 whitespace-nowrap">Medium</th>
+
+                          {/* <th className="px-6 py-3 whitespace-nowrap">Pages</th>
+                          <th className="px-6 py-3 whitespace-nowrap">Status</th> */}
                           {/* <th className="px-6 py-3 text-right whitespace-nowrap">
                             Actions
                           </th> */}
@@ -1026,8 +1028,11 @@ const Reporting = () => {
                               <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">
                                 {row.subject || "NA"}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap">NA</td>
-                              <td className="px-6 py-4 whitespace-nowrap">NA</td>
+                               <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">
+                                {row.Medium|| "NA"}
+                              </td>
+                              {/* <td className="px-6 py-4 whitespace-nowrap">NA</td> */}
+                              {/* <td className="px-6 py-4 whitespace-nowrap">NA</td> */}
                               {/* <td className="px-6 py-4 whitespace-nowrap text-right flex justify-end items-center gap-3">
                                 <button className="text-gray-500 hover:text-gray-700 p-2">
                                   <FaFilePdf />
