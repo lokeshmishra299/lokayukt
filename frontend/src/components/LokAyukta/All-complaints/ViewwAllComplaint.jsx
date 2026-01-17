@@ -157,6 +157,8 @@ const ViewAllComplaint = () => {
   const [showDispatch, setshowDispatch] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
    const [showModal, setShowModal] = useState(false);
+   const [Rejectedloading,setRejectedloading] = useState(false)
+   
 
    const handleReject = () => {
     console.log("Rejected!");
@@ -259,6 +261,31 @@ const ViewAllComplaint = () => {
       },
       enabled: confirmConfig.open && confirmConfig.type === "forward",
       staleTime: 0,
+    });
+
+      const {
+      mutate: rejectComplaint,
+      isPending,
+    } = useMutation({
+      mutationFn: async ({ complaintId }) => {
+        const res = await api.post(
+          `/lokayukt/reject-complaint-by-lokayukt/${complaintId}`
+        );
+        return res.data;
+      },
+      onSuccess: () => {
+        toast.success("Rejected successfully");
+        queryClient.invalidateQueries({
+          queryKey: ["complaint-details", id],
+        });
+        setConfirmConfig({ open: false, type: null });
+        setShowModal(false);
+      },
+      onError: (error) => {
+        toast.error(
+          error?.response?.data?.message || "Failed to Reject"
+        );
+      },
     });
 
     // Pull backe he ye
@@ -900,7 +927,7 @@ const markAsReceivedMutation = useMutation({
         )}
       </div>
 
-{showModal && (
+  {showModal && (
   <div className="fixed inset-0 flex items-center justify-center  pt-20 bg-black bg-opacity-50 z-50">
     <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
       <h2 className="text-lg font-semibold mb-4">Confirm Rejection</h2>
@@ -912,12 +939,16 @@ const markAsReceivedMutation = useMutation({
         >
           Cancel
         </button>
-        <button
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          onClick={handleReject}
-        >
-          Reject
-        </button>
+       <button
+  onClick={() => rejectComplaint({ complaintId: id })}
+  disabled={isPending}
+  className={`px-4 py-2 rounded text-white
+    ${isPending ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}
+  `}
+>
+  {isPending ? "Rejecting..." : "Reject"}
+</button>
+
       </div>
     </div>
   </div>

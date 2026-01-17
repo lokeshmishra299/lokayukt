@@ -314,7 +314,7 @@ const ApprovedComplaints = () => {
                 Sent
               </h2>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
-                <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
+                {/* <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
                   Inbox: {filteredComplaints.length}
                 </span>
                 <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded-full font-medium whitespace-nowrap">
@@ -322,20 +322,20 @@ const ApprovedComplaints = () => {
                 </span>
                 <span className="px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium whitespace-nowrap">
                   Received today: {apiStats.todayCount}
-                </span>
+                </span> */}
               </div>
             </div>
 
             <div className="flex gap-2 mb-3">
               <div className="flex flex-col">
-                <button className="flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
+                {/* <button className="flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
                   <IoMdTime className="text-rose-500 text-sm" /> Overdue &gt; 7
                   days ({apiStats.older7DaysDueCount})
-                </button>
+                </button> */}
               </div>
-              <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
+              {/* <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
                 ₹ Fee Pending ({apiStats.feePending})
-              </button>
+              </button> */}
             </div>
 
             <div className="relative mb-3">
