@@ -11,6 +11,8 @@ import draftToHtml from "draftjs-to-html";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
+const name = localStorage.getItem("name");
+
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -619,7 +621,7 @@ const Notes = ({ complaint }) => {
                   <div className="text-right text-xs text-gray-600">
                     <p className="uppercase tracking-wide">Noting By</p>
                     <p className="font-semibold mt-1 text-gray-800">Shri Sanjay Mishra</p>
-                    <p>PS Name...</p>
+                    <p>{name}</p>
                   </div>
                 </div>
               </div>
