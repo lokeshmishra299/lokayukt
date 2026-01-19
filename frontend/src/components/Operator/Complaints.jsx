@@ -408,6 +408,7 @@ const handleMainRespondent = (id) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
   const [DraftLoader,setDrfatLoader] = useState(false)
+  
 
   const handleDownloadPDF = async () => {
     setIsDownloadingPDF(true);
@@ -1561,6 +1562,7 @@ const handleMainRespondent = (id) => {
                     onChange={() => handleMainComplainant(complainant.id)}
                     className="accent-orange-500"
                   />
+                  
                 </label>
               </div>
               <div className="ml-3 text-sm select-none">
@@ -1569,6 +1571,11 @@ const handleMainRespondent = (id) => {
                 </label>
               </div>
             </div>
+            {errors.is_main_c && (
+    <p className="text-red-500 text-sm mt-1">
+      {errors.is_main_c[0]}
+    </p>
+  )}
           </div>
           {/* END NEW SECTION */}
 
@@ -1898,6 +1905,11 @@ const handleMainRespondent = (id) => {
                 </p>
               </div>
             </div>
+            {errors.is_main_r && (
+    <p className="text-red-500 text-sm mt-1">
+      {errors.is_main_r[0]}
+    </p>
+  )}
           </div>
           {/* --- END NEW SECTION --- */}
 
