@@ -28,7 +28,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
     const feeMap = {
       full: "1",
       partial: "2",
-      exemption: "0",
+      exemption: "3",
     };
     setSelectedFeeOption(value);
     setFessSubmitForm((prev) => ({
