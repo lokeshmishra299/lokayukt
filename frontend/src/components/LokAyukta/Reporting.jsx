@@ -43,6 +43,7 @@ const Reporting = () => {
     toDate: "",
   });
 
+
   const getDistirct = async () => {
     const res = await api.get("/lokayukt/all-district");
     return res.data.data;
@@ -849,6 +850,7 @@ const Reporting = () => {
             </div>
           </div>
         )}
+
 
         {activeTab === "department" && (
           <div>
