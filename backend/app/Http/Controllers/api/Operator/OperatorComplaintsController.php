@@ -2281,4 +2281,33 @@ class OperatorComplaintsController extends Controller
         }
         // dd($usersByRole['lok-ayukt']);
    }
+
+
+       public function sentToInboxDraft(Request $request,$complainId){
+      
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->in_draft = 0;
+                $cmp->save();
+
+            }
+          
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Sent to inbox successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+
 }

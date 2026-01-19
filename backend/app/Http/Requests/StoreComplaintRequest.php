@@ -110,6 +110,26 @@ class StoreComplaintRequest extends FormRequest
         //  'is_main_c'   => 'required|array|min:1',
         // 'is_main_c.0' => 'present|in:1',
 
+             'is_main_c' => [
+                    'required',
+                    'array',
+                    function ($attribute, $value, $fail) {
+                        if (!in_array(1, $value)) {
+                            $fail('Main value required.');
+                        }
+                    }
+                ],
+             'is_main_r' => [
+                    'required',
+                    'array',
+                    function ($attribute, $value, $fail) {
+                        if (!in_array(1, $value)) {
+                            $fail('Main value required.');
+                        }
+                    }
+                ],
+            
+
         // 'is_main_r'   => 'required|array|min:1',
         // 'is_main_r.0' => 'present|in:1',
 
@@ -227,6 +247,12 @@ class StoreComplaintRequest extends FormRequest
 
             // 'is_main_c.0.in' => 'First complainant must be marked as Main (value must be 1).',
             // 'is_main_r.0.in' => 'First respondent must be marked as Main (value must be 1).',
+        
+             'is_main_c.required' => 'Checked atleast one checkbox main.',
+             'is_main_c.array' => 'Main value reuires.',
+          
+             'is_main_r.required' => 'Checked atleast one checkbox main.',
+             'is_main_r.array' => 'Main value reuires.',
 
 
             /* -----------------------------------------
