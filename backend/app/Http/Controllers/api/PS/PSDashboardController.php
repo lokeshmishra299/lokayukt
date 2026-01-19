@@ -381,10 +381,12 @@ class PSDashboardController extends Controller
                   $query = $query->whereYear('cmp.created_at', $date->year)
                 ->whereMonth('cmp.created_at', $date->month)
                 ->where('cmp.approved_rejected_by_rk', 1)
+                ->where('cmp.approved_rejected_by_lokayukt', 0)
                 ->orderByDesc('cmp.id');
            
             $queryDay = $queryDay->where('cmp.form_status', 1)
                         ->where('cmp.approved_rejected_by_rk', 1)
+                        ->where('cmp.approved_rejected_by_lokayukt', 0)
                         ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
                         ->groupBy(DB::raw('DATE(cmp.created_at)'))
                         // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
@@ -403,6 +405,7 @@ class PSDashboardController extends Controller
             $query2=$query2->whereYear('cmp.created_at', $date->year)
                         ->where('cmp.approved_rejected_by_rk', 1)
                         ->where('cmp.approved_rejected_by_ps', 1)
+                          ->where('cmp.approved_rejected_by_lokayukt', 0)
                         ->whereMonth('cmp.created_at', $date->month)
                          ->distinct('cmp.id')
                         ->orderByDesc('cmp.id');
@@ -475,6 +478,7 @@ class PSDashboardController extends Controller
                     })
                     ->whereYear('cmp.created_at', $date->year)
                                 ->where('cmp.approved_rejected_by_ps', 1)
+                                ->where('cmp.approved_rejected_by_lokayukt', 0)
                                 ->whereMonth('cmp.created_at', $date->month)
                                 ->distinct('cmp.id')
                                 ->orderByDesc('cmp.id');
