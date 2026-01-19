@@ -31,6 +31,7 @@ use App\Http\Controllers\api\Supervisor\SupervisorReportController;
 use App\Http\Controllers\api\UpLokAyukt\UpLokAyuktDashboardController;
 use App\Http\Controllers\api\UpLokAyukt\UpLokAyuktCommonController;
 use App\Http\Controllers\api\Dispatch\DispatchComplaintsController;
+use App\Http\Controllers\api\Dispatch\DispatchDashboardController;
 
 use App\Http\Controllers\api\UserManagement;
 use Illuminate\Support\Facades\Route;

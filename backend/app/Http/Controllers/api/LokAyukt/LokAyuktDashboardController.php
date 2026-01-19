@@ -30,17 +30,17 @@ class LokAyuktDashboardController extends Controller
            
 
          
-        $queryDay = DB::table('complaints as cmp')
+        $queryDay = DB::table('complaints as cmp');
             // ->leftJoin('users as u', 'cmp.added_by', '=', 'u.id')
             // ->select('cmp.*', 'u.name as lekhpal_name', 'u.email')
-            ->select('cmp.*');
+            // ->select('cmp.*');
             // ->where('cmp.status', 'In Progress')
             
         
 
-         $query1 = DB::table('complaints as cmp')
+         $query1 = DB::table('complaints as cmp');
             // ->leftJoin('users as u', 'cmp.added_by', '=', 'u.id')
-            ->select(DB::raw('COUNT(cmp.id) as total_complains'),DB::raw('AVG(DATEDIFF(now(), created_at)) as avg_days'));
+            // ->select(DB::raw('COUNT(cmp.id) as total_complains'),DB::raw('AVG(DATEDIFF(now(), created_at)) as avg_days'));
             // ->where('cmp.approved_rejected_by_ri', 1)
             // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
             // ->where('cmp.status', 2)
@@ -260,6 +260,7 @@ class LokAyuktDashboardController extends Controller
           $query = $query->whereYear('cmp.created_at', $date->year)
             ->whereMonth('cmp.created_at', $date->month)
             ->where('cmp.approved_rejected_by_rk', 1)
+            ->where('cmp.approved_rejected_by_lokayukt', 0)
             ->orderByDesc('cmp.id');
             $queryDay = $queryDay->where('cmp.form_status', 1)
               ->where('cmp.approved_rejected_by_rk', 1)
@@ -269,16 +270,17 @@ class LokAyuktDashboardController extends Controller
             // ->where('cmp.status', 2)
             // ->where('cmp.district_id', $user_district_code)
             ->orderByDesc('cmp.id');
-            $query1 = $query1->where('cmp.form_status', 1)
+            $query1 = $query1->where('form_status', 1)
               ->where('cmp.approved_rejected_by_rk', 1)
               ->where('cmp.approved_rejected_by_lokayukt', 0)
              ->whereYear('cmp.created_at', $date->year)
             ->whereMonth('cmp.created_at', $date->month)
-            ->groupBy(groups: 'cmp.status')
+            // ->groupBy(groups: 'cmp.status')
             ->orderByDesc('cmp.id');
-            $query2=$query2->whereYear('cmp.created_at', $date->year)
-              ->where('cmp.approved_rejected_by_lokayukt', 1)
+            $query2=$query2->where('form_status', 1)->whereYear('cmp.created_at', $date->year)
             ->whereMonth('cmp.created_at', $date->month)
+            //   ->where('cmp.approved_rejected_by_rk', 1)
+              ->where('cmp.approved_rejected_by_lokayukt', 1)
             ->orderByDesc('cmp.id');
              $query4 = $query4->where('cmp.status','Rejected')
                      ->where('cmp.form_status', 1)

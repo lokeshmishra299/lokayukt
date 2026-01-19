@@ -343,8 +343,10 @@ class PSDashboardController extends Controller
         
 
          $query1 = DB::table('complaints as cmp')
+          ->join('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id');
             // ->leftJoin('users as u', 'cmp.added_by', '=', 'u.id')
-            ->select(DB::raw('COUNT(cmp.id) as total_complains'),DB::raw('AVG(DATEDIFF(now(), created_at)) as avg_days'));
+            // ->select(DB::raw('COUNT(cmp.id) as total_complains'),
+            // DB::raw('AVG(DATEDIFF(now(), created_at)) as avg_days'));
             // ->where('cmp.approved_rejected_by_ri', 1)
             // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
             // ->where('cmp.status', 2)
@@ -384,7 +386,7 @@ class PSDashboardController extends Controller
                 ->where('cmp.approved_rejected_by_lokayukt', 0)
                 ->orderByDesc('cmp.id');
            
-            $queryDay = $queryDay->where('cmp.form_status', 1)
+            $queryDay = $queryDay
                         ->where('cmp.approved_rejected_by_rk', 1)
                         ->where('cmp.approved_rejected_by_lokayukt', 0)
                         ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
@@ -394,18 +396,17 @@ class PSDashboardController extends Controller
                         // ->where('cmp.district_id', $user_district_code)
                         ->orderByDesc('cmp.id');
 
-            $query1 = $query1->where('cmp.form_status', 1)
-                        ->where('cmp.approved_rejected_by_rk', 1)
-                        ->where('cmp.approved_rejected_by_lokayukt', 0)
-                        ->whereYear('cmp.created_at', $date->year)
-                        ->whereMonth('cmp.created_at', $date->month)
-                        ->groupBy(groups: 'cmp.status')
-                        ->orderByDesc('cmp.id');
+            $query1 = $query1
+                      ->whereYear('cmp.created_at', $date->year)
+                ->whereMonth('cmp.created_at', $date->month)
+                ->where('cmp.approved_rejected_by_rk', 1)
+                ->where('cmp.approved_rejected_by_lokayukt', 0)
+                ->orderByDesc('cmp.id');
 
             $query2=$query2->whereYear('cmp.created_at', $date->year)
                         ->where('cmp.approved_rejected_by_rk', 1)
                         ->where('cmp.approved_rejected_by_ps', 1)
-                          ->where('cmp.approved_rejected_by_lokayukt', 0)
+                          ->where('cmp.approved_rejected_by_lokayukt', 1)
                         ->whereMonth('cmp.created_at', $date->month)
                          ->distinct('cmp.id')
                         ->orderByDesc('cmp.id');
@@ -419,24 +420,16 @@ class PSDashboardController extends Controller
     
             }elseif($roleParent ==="up-lok-ayukt"){
                   $query = $query
-                  ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
-                        $join->on('cmp.id', '=', 'rep.complaint_id')
-                            ->where(function ($q) use ($parentId, $roleParent) {
-
-                               if ($roleParent === 'up-lok-ayukt') {
-                                    $q->where('rep.forward_to_uplokayukt', $parentId);
-                                }
-
-                            });
-                    })
+            
                   ->whereYear('cmp.created_at', $date->year)
                     ->whereMonth('cmp.created_at', $date->month)
                     ->where('cmp.approved_rejected_by_rk', 1)
+                    ->where('cmp.approved_rejected_by_lokayukt', 1)
                     // ->where('rep.forward_to_ps', $userId)
                     ->distinct('cmp.id')
                     ->orderByDesc('cmp.id');
            
-                    $queryDay = $queryDay->where('cmp.form_status', 1)
+                    $queryDay = $queryDay
                                 ->where('cmp.approved_rejected_by_rk', 1)
                                 ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
                                 ->groupBy(DB::raw('DATE(cmp.created_at)'))
@@ -445,40 +438,39 @@ class PSDashboardController extends Controller
                                 // ->where('cmp.district_id', $user_district_code)
                                 ->orderByDesc('cmp.id');
 
-                    $query1 = $query1
-                     ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
-                        $join->on('cmp.id', '=', 'rep.complaint_id')
-                            ->where(function ($q) use ($parentId, $roleParent) {
+                    // $query1 = $query1
+          
+                    //             ->where('cmp.approved_rejected_by_rk', 1)
+                    //             ->where('cmp.approved_rejected_by_lokayukt', 1)
+                    //             ->whereNull('rep.forward_by_ps')
+                    //             // ->where('cmp.approved_rejected_by_lokayukt', 0)
+                    //             ->whereYear('cmp.created_at', $date->year)
+                    //             ->whereMonth('cmp.created_at', $date->month)
+                    //             ->where('rep.forward_by_ps','!=',$userId)
+                    //             ->whereNull('rep.forward_by_ps')
+                    //             // ->groupBy(groups: 'cmp.status')
+                    //             ->distinct('cmp.id')
+                    //             ->orderByDesc('cmp.id');
 
-                               if ($roleParent === 'up-lok-ayukt') {
-                                    $q->where('rep.forward_to_uplokayukt', $parentId);
-                                }
-
-                            });
-                    })
-                    ->where('cmp.form_status', 1)
-                                ->where('cmp.approved_rejected_by_rk', 1)
-                                // ->where('cmp.approved_rejected_by_lokayukt', 0)
-                                ->whereYear('cmp.created_at', $date->year)
-                                ->whereMonth('cmp.created_at', $date->month)
-                                ->groupBy(groups: 'cmp.status')
-                                ->distinct('cmp.id')
-                                ->orderByDesc('cmp.id');
+                  $query1 = $query1
+    ->whereYear('cmp.created_at', $date->year)
+    ->whereMonth('cmp.created_at', $date->month)
+    ->where('cmp.approved_rejected_by_rk', 1)
+    ->where('cmp.approved_rejected_by_lokayukt', 1)
+    ->where('cmp.approved_rejected_by_ps', 0)
+    ->where(function($q) use ($userId) {
+        $q->whereNull('rep.forward_by_ps')
+          ->orWhere('rep.forward_by_ps', '!=', $userId);
+    })
+    ->distinct('cmp.id')
+    ->orderByDesc('cmp.id');
 
                     $query2=$query2
-                     ->join('complaint_actions as rep1', function ($join) use ($parentId, $roleParent) {
-                        $join->on('cmp.id', '=', 'rep1.complaint_id')
-                            ->where(function ($q) use ($parentId, $roleParent) {
-
-                               if ($roleParent === 'up-lok-ayukt') {
-                                    $q->where('rep1.forward_to_uplokayukt', $parentId);
-                                }
-
-                            });
-                    })
+                    
                     ->whereYear('cmp.created_at', $date->year)
                                 ->where('cmp.approved_rejected_by_ps', 1)
                                 ->where('cmp.approved_rejected_by_lokayukt', 0)
+                                ->where('rep.forward_by_ps', $userId)
                                 ->whereMonth('cmp.created_at', $date->month)
                                 ->distinct('cmp.id')
                                 ->orderByDesc('cmp.id');

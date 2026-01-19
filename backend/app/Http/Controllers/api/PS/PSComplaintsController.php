@@ -967,6 +967,7 @@ class PSComplaintsController extends Controller
     }
 
      public function allComplainsapproved(){
+        $user = Auth::user()->id;
     //    $userSubrole = Auth::user()->subrole->name; 
        $parentId = null;
         $parentId = Auth::user()->parent_user_id;
@@ -975,23 +976,23 @@ class PSComplaintsController extends Controller
         $roleParent = $userParentData[0]->role->name;
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
-                ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
-        $join->on('cm.id', '=', 'rep.complaint_id')
-             ->where(function ($q) use ($parentId, $roleParent) {
+    //             ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
+    //     $join->on('cm.id', '=', 'rep.complaint_id')
+    //          ->where(function ($q) use ($parentId, $roleParent) {
 
-                 if ($roleParent === 'lok-ayukt') {
-                    //  $q->where('rep.forward_to_lokayukt', $parentId);      
-                 } elseif ($roleParent === 'up-lok-ayukt') {
-                     $q->where('rep.forward_to_uplokayukt', $parentId);
-                 } else {
-                     // 🔥 fallback (safe)
-                     $q->where('rep.forward_to_lokayukt', $parentId)
-                       ->orWhere('rep.forward_to_uplokayukt', $parentId);
-                 }
+    //              if ($roleParent === 'lok-ayukt') {
+    //                 //  $q->where('rep.forward_to_lokayukt', $parentId);      
+    //              } elseif ($roleParent === 'up-lok-ayukt') {
+    //                  $q->where('rep.forward_to_uplokayukt', $parentId);
+    //              } else {
+    //                  // 🔥 fallback (safe)
+    //                  $q->where('rep.forward_to_lokayukt', $parentId)
+    //                    ->orWhere('rep.forward_to_uplokayukt', $parentId);
+    //              }
 
-             });
-    })
-                // ->join('complaint_actions as rep', 'rep.complaint_id', '=', 'cm.id')
+    //          });
+    // })
+                ->join('complaint_actions as rep', 'rep.complaint_id', '=', 'cm.id')
                 // ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')
@@ -1008,9 +1009,11 @@ class PSComplaintsController extends Controller
 
                 
      $complainDetails->where('form_status', 1)
-            // ->where('approved_rejected_by_ro', 1)
+            ->where('approved_rejected_by_rk', 1)
+            ->where('cm.approved_rejected_by_lokayukt', 1)
+            ->where('rep.forward_by_ps', $user);
             //             ->where('approved_rejected_by_d_a',1)
-                        ->where('approved_rejected_by_lokayukt', 1);
+                        // ->where('approved_rejected_by_lokayukt', 1);
             //              ->where(function($q){
             //                 $q->where('approved_rejected_by_so_us',1)
             //                 ->Orwhere('approved_rejected_by_ds_js', 1);               
