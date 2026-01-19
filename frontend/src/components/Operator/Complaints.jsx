@@ -1484,9 +1484,9 @@ const handleMainRespondent = (id) => {
             </div>
           </div>
 
-          {errors.complainant_name && (
+          {/* {errors.complainant_name && (
             <p className="text-red-500 text-sm mb-4">{errors.complainant_name[0]}</p>
-          )}
+          )} */}
 
           {/* ✅ FIXED SECTION: Address Fields now linked to 'complainant' object */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
