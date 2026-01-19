@@ -5,7 +5,6 @@ import { FaBars, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 // import { ToastContainer, toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
-
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 

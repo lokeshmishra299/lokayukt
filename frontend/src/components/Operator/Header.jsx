@@ -5,7 +5,6 @@ import { FaBars, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 // import { ToastContainer, toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
-
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
@@ -103,13 +102,13 @@ const Header = ({ toggleMobileMenu }) => {
 
   return (
     <>
-      <Toaster
+     <Toaster
         position="top-right"
        
       />
-
       {/* ✅ FIXED Header - stays at top */}
       <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50 h-16">
+       
         <div className="w-full h-full flex items-center justify-between px-6">
           
           {/* LEFT SECTION - Logo + Title */}
