@@ -1546,7 +1546,7 @@ const handleMainRespondent = (id) => {
           </div>
 
           {/* Main Complainant Selection */}
-          <div className="w-full mb-2">
+          {/* <div className="w-full mb-2">
             <div
               className={`flex items-center p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
                 complainant.isMain
@@ -1576,7 +1576,41 @@ const handleMainRespondent = (id) => {
       {errors.is_main_c[0]}
     </p>
   )}
-          </div>
+          </div> */}
+
+
+
+     <div className="w-full mb-2">
+  <div
+    onClick={() => handleMainComplainant(complainant.id)}
+    className={`flex items-center p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
+      complainant.isMain
+        ? "bg-orange-50 border-orange-500 ring-1 ring-orange-500"
+        : "bg-white border-gray-300 hover:bg-gray-50"
+    }`}
+  >
+    <div className="relative flex items-center justify-center">
+      {/* Inner label हटा दिया है क्योंकि पूरा div अब क्लिकेबल है */}
+      <div className="flex items-center p-4 rounded-lg transition-all duration-200">
+        <input
+          type="checkbox"
+          checked={complainant.isMain === 1}
+          onChange={() => {}}
+          className="accent-orange-500 pointer-events-none" // pointer-events-none जरूरी है
+        />
+      </div>
+    </div>
+    <div className="ml-3 text-sm select-none">
+      <label className="font-medium text-gray-900 cursor-pointer pointer-events-none">
+        मुख्य परिवादी (Main Complainant)
+      </label>
+    </div>
+  </div>
+  {errors.is_main_c && (
+    <p className="text-red-500 text-sm mt-1">{errors.is_main_c[0]}</p>
+  )}
+</div>
+
           {/* END NEW SECTION */}
 
         </div>
@@ -1869,7 +1903,10 @@ const handleMainRespondent = (id) => {
             />
           </div>
 
-          <div className="mb-2">
+
+
+
+          {/* <div className="mb-2">
              <div 
                className={`flex items-center p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
                  person.isMain 
@@ -1910,7 +1947,43 @@ const handleMainRespondent = (id) => {
       {errors.is_main_r[0]}
     </p>
   )}
-          </div>
+          </div> */}
+
+             <div className="mb-2">
+  <div
+    onClick={() => handleMainRespondent(person.id)}
+    className={`flex items-center p-4 border rounded-lg transition-all duration-200 cursor-pointer ${
+      person.isMain
+        ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500'
+        : 'bg-white border-gray-300 hover:bg-gray-50'
+    }`}
+  >
+    <div className="relative flex items-center justify-center">
+      <div className="flex items-center p-4 rounded-lg transition-all duration-200">
+        <input
+          type="checkbox"
+          checked={person.isMain === 1}
+          onChange={() => {}}
+          className="accent-orange-500 pointer-events-none"
+        />
+      </div>
+    </div>
+    <div className="ml-3 text-sm select-none">
+      <label className="font-medium text-gray-900 cursor-pointer pointer-events-none">
+        मुख्य उत्तरदाता (Main Respondent)
+      </label>
+      <p className="text-gray-500 text-xs mt-0.5 pointer-events-none">
+        क्या यह मुख्य व्यक्ति/अधिकारी है जिसके विरुद्ध शिकायत है?
+      </p>
+    </div>
+  </div>
+  {errors.is_main_r && (
+    <p className="text-red-500 text-sm mt-1">
+      {errors.is_main_r[0]}
+    </p>
+  )}
+</div>
+
           {/* --- END NEW SECTION --- */}
 
         </div>

@@ -1,7 +1,9 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState, useRef, useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
+// import toast, { Toaster } from "react-hot-toast";
+import { toast, Toaster  } from "react-hot-toast";
+
 import {
   FaFilePdf,
   FaTimes,
@@ -29,9 +31,10 @@ const ScanLetter = () => {
   const [formData, setFormData] = useState({
     complaint_id: "",
     letter_type: "",
-    medium: "",
     subject: "",
+    medium:"",
   });
+
 
   const [errors, setErrors] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -110,8 +113,9 @@ const ScanLetter = () => {
 
     payload.append("complaint_id", formData.complaint_id);
     payload.append("letter_type", formData.letter_type);
-    payload.append("medium", formData.medium);
     payload.append("subject", formData.subject);
+    payload.append("medium", formData.medium);
+
 
     if (selectedFile) {
       payload.append("file", selectedFile);
@@ -134,8 +138,8 @@ const ScanLetter = () => {
       setFormData({
         complaint_id: "",
         letter_type: "",
-        medium: "",
         subject: "",
+        medium: "",
       });
       setSelectedFile(null);
       setIsModalOpen(false);
@@ -181,7 +185,8 @@ const ScanLetter = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Toaster position="top-right"  />
+         <Toaster position="top-right"  />
+         
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
@@ -253,7 +258,7 @@ const ScanLetter = () => {
                       {row.subject || "NA"}
                     </td>
                     {/* <td className="px-6 py-4 whitespace-nowrap">NA</td> */}
-                    <td className="px-6 py-4 whitespace-nowrap">NA</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{row.medium || "NA"}</td>
                     {/* <td className="px-6 py-4 whitespace-nowrap text-right flex justify-end items-center gap-3">
                       <button className="text-gray-500 hover:text-gray-700 p-2">
                         <FaFilePdf />
