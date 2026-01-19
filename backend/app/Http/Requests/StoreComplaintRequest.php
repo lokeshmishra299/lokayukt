@@ -41,7 +41,7 @@ class StoreComplaintRequest extends FormRequest
             'delay_reason'                => 'required|string',
 
             'previously_submitted'        => 'required|in:yes,no',
-            'previously_submitted_details'=> 'required_if:previously_submitted,yes|string',
+            'previously_submitted_details'=> 'required_if:previously_submitted,yes',
 
 
             /*----------------------------------------------------

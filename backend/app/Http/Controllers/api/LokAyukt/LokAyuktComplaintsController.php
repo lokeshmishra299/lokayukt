@@ -1435,7 +1435,10 @@ class LokAyuktComplaintsController extends Controller
 }
 
     public function allDispatchLetters(Request $request){
-           $records = DB::table('dispach_letters')->get();
+           $records = DB::table('dispach_letters as dis')
+            ->join('complaints as cm', 'cm.id', '=', 'dis.complaint_id')
+            ->select('dis.*','cm.complain_no')
+           ->get();
       
 
     return response()->json([
