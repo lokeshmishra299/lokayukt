@@ -460,7 +460,8 @@ const DraftLetter = ({ complaint }) => {
       <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Draft</h2>
         <div className="flex items-center gap-2">
-          <button
+          {documents.approved_rejected_by_ro_aro == "1" && (
+              <button
             className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
             onClick={() => {
                 setErrors({}); 
@@ -469,7 +470,11 @@ const DraftLetter = ({ complaint }) => {
           >
             Create Draft
           </button>
+          )
 
+          }
+         
+         {documents.approved_rejected_by_ro_aro == "1" && (
           <button
             onClick={handleAddDocuments}
             className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
@@ -477,6 +482,10 @@ const DraftLetter = ({ complaint }) => {
             <FaCloudUploadAlt className="w-4 h-4" />
             Add Draft
           </button>
+         )
+
+         }
+         
         </div>
       </div>
 
@@ -516,13 +525,19 @@ const DraftLetter = ({ complaint }) => {
                   )}
                   View
                 </button>
-                <button
+
+                {doc.approved_rejected_by_ro_aro == "1" && (
+                      <button
                 onClick={() => handleEditDraft(doc.id, doc.complain_id)}
                 className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50"
                 >
                 <RiEditBoxLine className="w-4 h-4" />
                 Edit
                 </button>
+                )
+
+                }
+               
               </div>
             </div>
           ))
