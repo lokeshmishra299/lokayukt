@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useState, useMemo, Children } from "react";
+import React, { useState, useMemo, Children, useEffect } from "react";
 import {
   FaCalendarAlt,
   FaMapMarkerAlt,
@@ -12,9 +12,12 @@ import {
   FaFileExcel,
   FaPrint,
   FaSpinner,
+  FaEye, // ✅ Yahaan add karein
+  FaTimes,
 } from "react-icons/fa";
 import * as XLSX from "xlsx";
 import html2pdf from "html2pdf.js";
+import toast from "react-hot-toast";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
@@ -31,6 +34,9 @@ const Reporting = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
   const [exportingExcel, setExportingExcel] = useState(false);
+const [pdfViewUrl, setPdfViewUrl] = useState(null);
+const [loadingDoc, setLoadingDoc] = useState(null);
+
 
   const [enrollmentFilters, setEnrollmentFilters] = useState({
     fromDate: "",
@@ -42,7 +48,6 @@ const Reporting = () => {
     fromDate: "",
     toDate: "",
   });
-
 
   const getDistirct = async () => {
     const res = await api.get("/lokayukt/all-district");
@@ -76,7 +81,7 @@ const Reporting = () => {
 
   const departmentReport = async () => {
     const res = await api.get("/lokayukt/department-wise-report");
-    console.log("department-wise-report",res.data.data)
+    console.log("department-wise-report", res.data.data);
     return res.data.data;
   };
 
@@ -106,21 +111,20 @@ const Reporting = () => {
     queryFn: getoverallStatus,
   });
 
-
   // 2. Fetch All Dispatch Letters
-    const getAllDispatchLetters = async () => {
-      const res = await api.get("/lokayukt/all-dispatch-letters");
-      return res.data;
-    };
-  
-    const { data: dispatchLettersData, isLoading: isLettersLoading } = useQuery({
-      queryKey: ["all-dispatch-letters"],
-      queryFn: getAllDispatchLetters,
-    });
+  const getAllDispatchLetters = async () => {
+    const res = await api.get("/lokayukt/all-dispatch-letters");
+    return res.data;
+  };
+
+  const { data: dispatchLettersData, isLoading: isLettersLoading } = useQuery({
+    queryKey: ["all-dispatch-letters"],
+    queryFn: getAllDispatchLetters,
+  });
 
   const lettersList = dispatchLettersData?.data || [];
 
-   const formatDate = (dateString) => {
+  const formatDate = (dateString) => {
     if (!dateString) return "NA";
     return new Date(dateString).toLocaleDateString("en-IN", {
       day: "numeric",
@@ -129,27 +133,83 @@ const Reporting = () => {
     });
   };
 
-
   const getComplaintNo = (id) => {
     if (!id) return "NA";
     const found = complainList.find((c) => c.id == id);
     return found ? found.compNo : "NA";
   };
 
-    const getAllComplainsID = async () => {
-      const res = await api.get("/lokayukt/all-complain-ids");
-      return res.data;
-    };
-  
-    const { data: complainIdsData } = useQuery({
-      queryKey: ["all-complain-ids"],
-      queryFn: getAllComplainsID,
-    });
-  
+  const getAllComplainsID = async () => {
+    const res = await api.get("/lokayukt/all-complain-ids");
+    return res.data;
+  };
+
+  const { data: complainIdsData } = useQuery({
+    queryKey: ["all-complain-ids"],
+    queryFn: getAllComplainsID,
+  });
 
   const complainList = complainIdsData?.data || [];
 
+  // `makeFileUrl` function se pehle yeh function add karein
+  const normalizePath = (filePath) => {
+  if (!filePath) return "";
+  let fp = filePath.replace(/^\//, "");
+  fp = fp.replace("storage/", "storage/Document/");
+  return fp;
+};
 
+const makeFileUrl = (filePath) => {
+  const root = BASE_URL.replace("/api", "");
+  const fixedPath = normalizePath(filePath);
+  return `${root}/${fixedPath}`;
+};
+
+
+const handleViewPdf = async (filename, complaintId) => {
+  try {
+    setLoadingDoc(filename);
+    setPdfViewUrl(null); // 🔴 RESET first
+
+    const res = await api.get(
+      `/lokayukt/get-file-preview/${complaintId}`
+    );
+
+    if (res.data.status && res.data.data?.length > 0) {
+      // 🔴 filename unreliable hai → first file hi open karo
+      const filePath = res.data.data[0];
+      const url = makeFileUrl(filePath);
+      setPdfViewUrl(url); // ✅ POPUP OPEN
+    } else {
+      toast.error("File not found");
+    }
+  } catch (e) {
+    toast.error("PDF open nahi ho pa raha");
+  } finally {
+    setLoadingDoc(null);
+  }
+};
+
+
+
+
+//  const handleViewPdf = async (filename) => {
+//   try {
+//     setLoadingDoc(filename);
+
+//     const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+
+//     if (res.data.status && res.data.data.length > 0) {
+//       const match = res.data.data.find((p) => p.includes(filename));
+//       if (match) {
+//         const url = makeFileUrl(match);
+//         setPdfViewUrl(url); // ⭐ THIS LINE OPENS MODAL
+//       }
+//     }
+//   } finally {
+//     setLoadingDoc(null);
+//   }
+// };
 
 
   //   const getpercentage = async () => {
@@ -162,6 +222,7 @@ const Reporting = () => {
   //     queryKey: ["over-all-status"],
   //     queryFn: getpercentage,
   //   });
+
 
   const filteredEnrollmentData = useMemo(() => {
     if (!enrolmentDate) return [];
@@ -851,7 +912,6 @@ const Reporting = () => {
           </div>
         )}
 
-
         {activeTab === "department" && (
           <div>
             <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-6">
@@ -924,30 +984,47 @@ const Reporting = () => {
             </div>
 
             {/* Rest of your department table code remains same */}
-              <div className="overflow-x-auto -mx-4 md:mx-0">
-             <table className="w-full text-sm text-left text-gray-500">
-               <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
-                 <tr>
-                   <th className="px-6 py-3 whitespace-nowrap">Department</th>
-                   {/* <th className="px-6 py-3 whitespace-nowrap">Type</th> */}
-                   <th className="px-6 py-3 text-right whitespace-nowrap">Total</th>
-                   <th className="px-6 py-3 text-right text-orange-600 whitespace-nowrap">Pending</th>
-                   <th className="px-6 py-3 text-right text-green-600 whitespace-nowrap">Disposed</th>
-                 </tr>
-               </thead>
-               <tbody>
-                 {departmentData.map((row, idx) => (
-                   <tr key={idx} className="bg-white border-b hover:bg-gray-50">
-                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{row.department}</td>
-                     {/* <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{row.type}</td> */}
-                     <td className="px-6 py-4 text-right font-semibold whitespace-nowrap">{row.total}</td>
-                     <td className="px-6 py-4 text-right text-orange-600 font-medium whitespace-nowrap">{row.pending}</td>
-                     <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">{row.disposed}</td>
-                   </tr>
-                 ))}
-               </tbody>
-             </table>
-           </div>
+            <div className="overflow-x-auto -mx-4 md:mx-0">
+              <table className="w-full text-sm text-left text-gray-500">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-6 py-3 whitespace-nowrap">Department</th>
+                    {/* <th className="px-6 py-3 whitespace-nowrap">Type</th> */}
+                    <th className="px-6 py-3 text-right whitespace-nowrap">
+                      Total
+                    </th>
+                    <th className="px-6 py-3 text-right text-orange-600 whitespace-nowrap">
+                      Pending
+                    </th>
+                    <th className="px-6 py-3 text-right text-green-600 whitespace-nowrap">
+                      Disposed
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {departmentData.map((row, idx) => (
+                    <tr
+                      key={idx}
+                      className="bg-white border-b hover:bg-gray-50"
+                    >
+                      <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                        {row.department}
+                      </td>
+                      {/* <td className="px-6 py-4 text-gray-500 whitespace-nowrap">{row.type}</td> */}
+                      <td className="px-6 py-4 text-right font-semibold whitespace-nowrap">
+                        {row.total}
+                      </td>
+                      <td className="px-6 py-4 text-right text-orange-600 font-medium whitespace-nowrap">
+                        {row.pending}
+                      </td>
+                      <td className="px-6 py-4 text-right text-green-600 font-medium whitespace-nowrap">
+                        {row.disposed}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -980,80 +1057,121 @@ const Reporting = () => {
 
         {activeTab === "dispatch" && (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6 min-h-[500px]">
-                  <h2 className="text-lg font-semibold text-gray-800 mb-4 md:mb-6">
-                    Scan Letters / स्कैन किए गए पत्र
-                  </h2>
-          
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-500 min-w-[800px]">
-                      <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
-                        <tr>
-                          <th className="px-6 py-3 whitespace-nowrap">Scan Date</th>
-                          <th className="px-6 py-3 whitespace-nowrap">Letter No.</th>
-                          <th className="px-6 py-3 whitespace-nowrap">Complaint No.</th>
-                          <th className="px-6 py-3 whitespace-nowrap">Type</th>
-                          <th className="px-6 py-3 whitespace-nowrap">Subject</th>
-                       <th className="px-6 py-3 whitespace-nowrap">Medium</th>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4 md:mb-6">
+              Scan Letters / स्कैन किए गए पत्र
+            </h2>
 
-                          {/* <th className="px-6 py-3 whitespace-nowrap">Pages</th>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left text-gray-500 min-w-[800px]">
+                <thead className="text-xs text-gray-700 uppercase bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-6 py-3 whitespace-nowrap">Scan Date</th>
+                    <th className="px-6 py-3 whitespace-nowrap">Letter No.</th>
+                    <th className="px-6 py-3 whitespace-nowrap">
+                      Complaint No.
+                    </th>
+                    <th className="px-6 py-3 whitespace-nowrap">Type</th>
+                    <th className="px-6 py-3 whitespace-nowrap">Subject</th>
+                    <th className="px-6 py-3 whitespace-nowrap">Medium</th>
+                    <th className="px-6 py-3 whitespace-nowrap">View</th>
+
+                    {/* <th className="px-6 py-3 whitespace-nowrap">Pages</th>
                           <th className="px-6 py-3 whitespace-nowrap">Status</th> */}
-                          {/* <th className="px-6 py-3 text-right whitespace-nowrap">
+                    {/* <th className="px-6 py-3 text-right whitespace-nowrap">
                             Actions
                           </th> */}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {isLettersLoading ? (
-                          <tr>
-                            <td colSpan="8" className="px-6 py-4 text-center">
-                              Loading...
-                            </td>
-                          </tr>
-                        ) : lettersList.length > 0 ? (
-                          lettersList.map((row) => (
-                            <tr
-                              key={row.id}
-                              className="bg-white border-b hover:bg-gray-50"
-                            >
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                {formatDate(row.created_at)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
-                                {row.letter_no || "NA"}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-blue-600 hover:underline cursor-pointer">
-                                {getComplaintNo(row.complaint_id)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                {row.letter_type || "NA"}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">
-                                {row.subject || "NA"}
-                              </td>
-                               <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">
-                                {row.Medium|| "NA"}
-                              </td>
-                              {/* <td className="px-6 py-4 whitespace-nowrap">NA</td> */}
-                              {/* <td className="px-6 py-4 whitespace-nowrap">NA</td> */}
-                              {/* <td className="px-6 py-4 whitespace-nowrap text-right flex justify-end items-center gap-3">
+                  </tr>
+                </thead>
+                <tbody>
+                  {isLettersLoading ? (
+                    <tr>
+                      <td colSpan="8" className="px-6 py-4 text-center">
+                        Loading...
+                      </td>
+                    </tr>
+                  ) : lettersList.length > 0 ? (
+                    lettersList.map((row) => (
+                      <tr
+                        key={row.id}
+                        className="bg-white border-b hover:bg-gray-50"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {formatDate(row.created_at)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">
+                          {row.letter_no || "NA"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-blue-600 hover:underline cursor-pointer">
+                          {getComplaintNo(row.complaint_id)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {row.letter_type || "NA"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">
+                          {row.subject || "NA"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-800 max-w-xs truncate">
+                          {row.Medium || "NA"}
+                        </td>
+                        {/* <td className="px-6 py-4 whitespace-nowrap">NA</td> */}
+                        {/* <td className="px-6 py-4 whitespace-nowrap">NA</td> */}
+                        {/* <td className="px-6 py-4 whitespace-nowrap text-right flex justify-end items-center gap-3">
                                 <button className="text-gray-500 hover:text-gray-700 p-2">
                                   <FaFilePdf />
                                 </button>
                               </td> */}
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan="8" className="px-6 py-4 text-center">
-                              No records found
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                           <td>
+               <button
+  onClick={() => handleViewPdf(row.file, row.complaint_id)}
+  disabled={loadingDoc === row.file}
+  className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg"
+>
+  {loadingDoc === row.file ? (
+    <FaSpinner className="w-4 h-4 animate-spin" />
+  ) : (
+    <FaEye className="w-4 h-4" />
+  )}
+  View
+</button>
+
+
+                           </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="8" className="px-6 py-4 text-center">
+                        No records found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
+
+             {pdfViewUrl && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">
+      <div className="flex items-center justify-between p-4 border-b">
+        <h3 className="text-lg font-semibold">PDF Viewer</h3>
+        <button onClick={() => setPdfViewUrl(null)}>
+          <FaTimes />
+        </button>
+      </div>
+
+      <iframe
+        src={`${pdfViewUrl}#zoom=page-width`}
+        className="w-full h-full border-0"
+      />
+    </div>
+  </div>
+)}
+
+
+
+
 
         {activeTab === "overall" && (
           <div>
@@ -1129,10 +1247,7 @@ const Reporting = () => {
                         <td className="px-4 md:px-6 py-4">
                           <div className="flex items-center gap-3">
                             <span
-                              className={`w-2 h-2 rounded-full ${item.color.replace(
-                                "text",
-                                "bg",
-                              )}`}
+                              className={`${item.color.replace("text", "bg")}`}
                             ></span>
                             <span className="font-medium text-gray-700 whitespace-nowrap">
                               {item.status}

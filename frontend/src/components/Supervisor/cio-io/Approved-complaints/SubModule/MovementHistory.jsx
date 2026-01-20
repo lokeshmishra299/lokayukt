@@ -117,6 +117,11 @@ const getMovementTitle = (item) => {
       if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_ps) {
       return `RO/ARO → RC → PS`;
     }
+    if (item.forward_by_sec && item.sent_through_rk === 1 && item.forward_to_dispatch) {
+      return `Secratory → RC → Dispatch`;
+    }else if (item.forward_by_sec && item.forward_to_dispatch) {
+      return `Secratory  → Dispatch`;
+    }
     return `${record} → Record Section`;
   };
 
