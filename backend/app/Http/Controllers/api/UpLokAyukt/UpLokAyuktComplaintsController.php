@@ -1072,4 +1072,55 @@ $complainDetails->actions = DB::table('complaint_actions')
         }
 
     }
+
+     public function approvedFeeByUpLokayukt(Request $request, $complaint_id){
+
+        // dd($complaint_id);
+         $validation = Validator::make($request->all(), [
+            'fee_exempted' => 'required|string',
+            'remarks' => 'required|string',
+        
+        ], [
+            'fee_exempted.required' => 'Fees is required.',
+            'remarks.required' => 'Remarks is Required',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        
+
+        if(isset($complaint_id)){
+            
+             $cmp = Complaint::find($complaint_id);
+             if($cmp == null){
+                return response()->json([
+                'status' => false,
+                'errors' => 'Please Check Complaint Id'
+            ], 422);
+             }
+           $cmp->fee_exempted  = $request->fee_exempted;
+           $cmp->fee_approved_by_lokayukt  = 1;
+     
+            if($cmp->save()){
+            
+                    
+                $apcAction = new ComplaintAction();
+                                $apcAction->complaint_id = $complaint_id;
+                                $apcAction->status = 'Fees Approved';
+                                $apcAction->remarks = $request->remarks;
+                                $apcAction->save();
+            }
+            return response()->json([
+                    'status' => true,
+                    'message' => 'Fee Added successfully.'
+                ], 201);
+
+        }
+   
+    
+    }
 }
