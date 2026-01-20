@@ -11,6 +11,8 @@ import {
   FaCheckCircle,
   FaTrash,
   FaSearch,
+   FaEye,
+   FaSpinner, // ✅ Yahaan add karein
 } from "react-icons/fa";
 import { MdOutlineScanner } from "react-icons/md";
 
@@ -42,6 +44,8 @@ const ScanLetter = () => {
   const fileInputRef = useRef(null);
   const [searchCase, setSearchCase] = useState("");
   const [filteredComplainList, setFilteredComplainList] = useState([]);
+  const [pdfViewUrl, setPdfViewUrl] = useState(null);
+  const [loadingDoc, setLoadingDoc] = useState(null);
 
   // 1. Fetch Complaint IDs
   const getAllComplainsID = async () => {
@@ -183,6 +187,44 @@ const ScanLetter = () => {
     return found ? found.compNo : "NA";
   };
 
+  const normalizePath = (filePath) => {
+  if (!filePath) return "";
+  let fp = filePath.replace(/^\//, "");
+  fp = fp.replace("storage/", "storage/Document/");
+  return fp;
+};
+
+const makeFileUrl = (filePath) => {
+  const root = BASE_URL.replace("/api", "");
+  const fixedPath = normalizePath(filePath);
+  return `${root}/${fixedPath}`;
+};
+
+  const handleViewPdf = async (filename, complaintId) => {
+    try {
+      setLoadingDoc(filename);
+      setPdfViewUrl(null); // 🔴 RESET first
+  
+      const res = await api.get(
+        `/dispatch/get-file-preview/${complaintId}`
+      );
+  
+      if (res.data.status && res.data.data?.length > 0) {
+        // 🔴 filename unreliable hai → first file hi open karo
+        const filePath = res.data.data[0];
+        const url = makeFileUrl(filePath);
+        setPdfViewUrl(url); // ✅ POPUP OPEN
+      } else {
+        toast.error("File not found");
+      }
+    } catch (e) {
+      toast.error("PDF open nahi ho pa raha");
+    } finally {
+      setLoadingDoc(null);
+    }
+  };
+  
+
   return (
     <div className="min-h-screen bg-gray-50">
          <Toaster position="top-right"  />
@@ -220,6 +262,8 @@ const ScanLetter = () => {
                 <th className="px-6 py-3 whitespace-nowrap">Type</th>
                 <th className="px-6 py-3 whitespace-nowrap">Subject</th>
                 <th className="px-6 py-3 whitespace-nowrap">Medium</th>
+                    <th className="px-6 py-3 whitespace-nowrap">View</th>
+
 
 
                 {/* <th className="px-6 py-3 whitespace-nowrap">Pages</th> */}
@@ -264,6 +308,24 @@ const ScanLetter = () => {
                         <FaFilePdf />
                       </button>
                     </td> */}
+
+                      <td>
+                       <button
+                      onClick={() => handleViewPdf(row.file, row.complaint_id)}
+                      disabled={loadingDoc === row.file}
+                      className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg"
+                    >
+                      {loadingDoc === row.file ? (
+                        <FaSpinner className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <FaEye className="w-4 h-4" />
+                      )}
+                      View
+                    </button>
+                    
+                    
+                                               </td>
+
                   </tr>
                 ))
               ) : (
@@ -277,6 +339,24 @@ const ScanLetter = () => {
           </table>
         </div>
       </div>
+
+              {pdfViewUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">PDF Viewer</h3>
+              <button onClick={() => setPdfViewUrl(null)}>
+                <FaTimes />
+              </button>
+            </div>
+      
+            <iframe
+              src={`${pdfViewUrl}#zoom=page-width`}
+              className="w-full h-full border-0"
+            />
+          </div>
+        </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-black/50 backdrop-blur-sm p-0 md:p-4">
@@ -501,6 +581,9 @@ const ScanLetter = () => {
                   <p className="text-red-500 text-xs mt-1">{errors.file[0]}</p>
                 )}
               </div>
+
+               
+
             </div>
 
             <div className="p-4 md:p-5 bg-gray-50 border-t border-gray-100 flex flex-col-reverse md:flex-row justify-end gap-3 shrink-0">
