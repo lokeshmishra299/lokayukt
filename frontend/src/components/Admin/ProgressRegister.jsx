@@ -16,8 +16,9 @@ import { IoTimeOutline } from "react-icons/io5";
 import Pagination from "../Pagination";
 import * as XLSX from "xlsx-js-style";
 import { saveAs } from "file-saver";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { toast, ToastContainer } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster  } from "react-hot-toast";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
@@ -835,19 +836,8 @@ const ProgressRegister = () => {
   return (
     <div className="bg-gray-50 min-h-screen overflow-hidden">
       {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }}
-      />
+            <Toaster position="top-right"  />
+
 
       <div className=" max-w-full space-y-3">
         {/* Header */}

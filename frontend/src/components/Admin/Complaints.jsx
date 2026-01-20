@@ -13,8 +13,10 @@ import {
   FaCheck,
   FaTimes
 } from 'react-icons/fa';
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster  } from "react-hot-toast";
+
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 
@@ -489,19 +491,8 @@ const [isCompareClicked, setIsCompareClicked] = useState(false);
 
   return (
     <div className="p-3 sm:p-4 md:p-6 bg-gray-50 min-h-screen">
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        style={{ zIndex: 9999 }}
-      />
+            <Toaster position="top-right"  />
+      
 
       {/* Modal for duplicate check */}
       {showDuplicateModal && (
