@@ -80,7 +80,58 @@ class SupervisorDashboardController extends Controller
                     ->selectRaw('Round(AVG(DATEDIFF(NOW(), cmp.created_at)),1) as avg_days');          
 
     switch ($userSubrole) {
-       
+            case "sec":
+           $query->where('rep.status', 'Forwarded')
+                                ->whereNotNull('rep.forward_to_sec')
+                                ->distinct('cmp.id')
+                                 ->where('rep.forward_to_sec',$user);
+        //    ->where('cmp.form_status', 1)
+        //           ->where('cmp.approved_rejected_by_rk', 1)
+        //         //   ->where('cmp.approved_rejected_by_sec', 0)
+        //           ->distinct('cmp.id')
+        //           ->where('rep.forward_to_sec',$user);
+            
+            $queryDay = $queryDay->where('cmp.form_status', 1)
+              ->where('cmp.approved_rejected_by_rk', 1)
+              ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
+              ->groupBy(DB::raw('DATE(cmp.created_at)'))
+                // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
+                // ->where('cmp.status', 2)
+                // ->where('cmp.district_id', $user_district_code)
+                ->orderByDesc('cmp.id')
+                 ->distinct('cmp.id')
+                 ->where('rep.forward_to_sec',$user);
+            
+            $query1 = $query1->where('cmp.form_status', 1)
+            
+                ->where('cmp.approved_rejected_by_rk', 1)
+                ->where('cmp.approved_rejected_by_sec', 0)
+                ->whereYear('cmp.created_at', $date->year)
+                ->whereMonth('cmp.created_at', $date->month)
+                ->groupBy(groups: 'cmp.status')
+                 ->distinct('cmp.id')
+                ->where('rep.forward_to_sec',$user)
+                 ->orderByDesc('cmp.id');
+            
+            $query2=$query2->whereYear('cmp.created_at', $date->year)
+                ->whereMonth('cmp.created_at', $date->month)
+                ->where('cmp.approved_rejected_by_sec', 1)
+                ->where('rep.forward_to_sec',$user)
+                ->distinct('cmp.id')
+                ->orderByDesc('cmp.id');
+             $query4 = $query4->where('cmp.status','Rejected')
+                     ->where('cmp.form_status', 1)
+                      ->where('cmp.approved_rejected_by_rk', 1)
+                       ->whereYear('cmp.created_at', $date->year)
+                        ->whereMonth('cmp.created_at', $date->month)
+                        ->distinct('cmp.id')
+                        ->where('rep.forward_to_sec',$user)
+                    ->orderByDesc('cmp.id');
+               $avgPendingDays = $avgPendingDays
+             ->where('rep.forward_to_sec', $user)
+            ->value('avg_days');
+            break;
+   
           case "ro-aro":
           $query->where('form_status', 1)
                   ->where('approved_rejected_by_rk', 1)
