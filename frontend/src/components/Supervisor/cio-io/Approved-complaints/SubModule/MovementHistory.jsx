@@ -60,9 +60,8 @@ const MovementHistory = ({ complaint }) => {
   //   return `${recordSection} → Record Section`;
   // };
 
-
-  const getMovementTitle = (item) => {
-    const record = "Recived ";
+const getMovementTitle = (item) => {
+    const record = "Received";
     const recordSection = "Record Section";
     // forward_by_rk && forward_to_lokayukt is 0 or null
     if (item.forward_by_rk && (item.forward_to_lokayukt === 0 || item.forward_to_lokayukt === null)) {
@@ -113,6 +112,10 @@ const MovementHistory = ({ complaint }) => {
       return `PS → RC → RO/ARO`;
     }else if (item.forward_by_ps && item.forward_to_ro_aro) {
       return `PS  → RO/ARO`;
+    }
+
+      if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_ps) {
+      return `RO/ARO → RC → PS`;
     }
     return `${record} → Record Section`;
   };

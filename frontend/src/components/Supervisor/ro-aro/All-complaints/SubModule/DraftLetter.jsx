@@ -516,13 +516,19 @@ const DraftLetter = ({ complaint }) => {
                   )}
                   View
                 </button>
-                <button
+
+                {doc.approved_rejected_by_ro_aro !== 1 && (
+                      <button
                 onClick={() => handleEditDraft(doc.id, doc.complain_id)}
                 className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50"
                 >
                 <RiEditBoxLine className="w-4 h-4" />
                 Edit
                 </button>
+                )
+
+                }
+               
               </div>
             </div>
           ))
