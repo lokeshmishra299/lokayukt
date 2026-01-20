@@ -66,3 +66,22 @@
     .animate-float, .animate-cardIn, .animate-fadeIn, .animate-popIn { animation: none; }
   }
 }
+
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-overall,
+  .print-overall * {
+    visibility: visible;
+  }
+
+  .print-overall {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}

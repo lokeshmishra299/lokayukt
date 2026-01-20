@@ -613,7 +613,10 @@ const Dashboard = ({ userRole = "Administrator" }) => {
           )}
 
           {/* ✅ UPDATED: Refresh Button with Orange Icon */}
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
+          <Button  variant="outline" 
+  size="sm" 
+  onClick={() => window.location.reload()}>
+            
             <FaChartLine className="h-4 w-4 mr-2 text-orange-600" />
             Refresh
           </Button>

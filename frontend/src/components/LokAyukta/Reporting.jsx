@@ -18,6 +18,8 @@ import {
 import * as XLSX from "xlsx";
 import html2pdf from "html2pdf.js";
 import toast from "react-hot-toast";
+import { useRef } from "react";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
@@ -36,6 +38,7 @@ const Reporting = () => {
   const [exportingExcel, setExportingExcel] = useState(false);
 const [pdfViewUrl, setPdfViewUrl] = useState(null);
 const [loadingDoc, setLoadingDoc] = useState(null);
+const overallPrintRef = useRef(null);
 
 
   const [enrollmentFilters, setEnrollmentFilters] = useState({
@@ -1179,12 +1182,16 @@ const handleViewPdf = async (filename, complaintId) => {
               <h2 className="text-base md:text-lg font-semibold text-gray-800">
                 Overall Complaint Status / कुल शिकायत स्थिति
               </h2>
-              <button className="flex items-center gap-2 px-3 md:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                <FaPrint />{" "}
-                <span className="hidden sm:inline">Print Summary</span>
-              </button>
-            </div>
+              <button
+  onClick={() => window.print()}
+  className="flex items-center gap-2 px-3 md:px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+>
+  <FaPrint />
+  <span className="hidden sm:inline">Print Summary</span>
+</button>
 
+            </div>
+              <div ref={overallPrintRef} className="print-overall">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 flex flex-col items-center justify-center">
                 <h3 className="text-gray-600 text-sm font-medium mb-1">
@@ -1273,8 +1280,10 @@ const handleViewPdf = async (filename, complaintId) => {
                 </table>
               </div>
             </div>
+            </div>
           </div>
         )}
+        
       </div>
     </div>
   );
