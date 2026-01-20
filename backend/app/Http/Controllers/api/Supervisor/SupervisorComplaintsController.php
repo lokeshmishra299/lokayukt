@@ -1037,12 +1037,14 @@ class SupervisorComplaintsController extends Controller
                         $apcAction->forward_by_ro_aro = $userId;
                         // $apcAction->approved_rejected_by_ro_aro = $userId;
 
-                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt'])) {
+                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','ps'])) {
 
                             if ($roleFwd === 'lok-ayukt') {
                                 $apcAction->forward_to_lokayukt = $request->forward_to;
-                            } else {
+                            } else if($roleFwd === 'up-lok-ayukt') {
                                 $apcAction->forward_to_uplokayukt = $request->forward_to;
+                            }else{
+                                 $apcAction->forward_to_ps = $request->forward_to;
                             }
 
                         } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
@@ -1705,7 +1707,7 @@ class SupervisorComplaintsController extends Controller
     //         return response()->json(["message"=>"Data Not Found"]);
     //     }
 
-
+        
      $usersByRole = User::with('role')
             ->whereNotNull('role_id')
             ->get()
@@ -1714,7 +1716,8 @@ class SupervisorComplaintsController extends Controller
         // lok-ayukt + ps users merge
         $users = collect()
             ->merge($usersByRole['up-lok-ayukt'] ?? collect())
-            ->merge($usersByRole['dispatch'] ?? collect());
+            ->merge($usersByRole['dispatch'] ?? collect())
+            ->merge($usersByRole['ps'] ?? collect());
 
         if ($users->isNotEmpty()) {
             return response()->json($users->values());

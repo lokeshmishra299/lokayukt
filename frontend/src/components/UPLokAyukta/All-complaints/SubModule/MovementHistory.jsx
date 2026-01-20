@@ -120,6 +120,10 @@ const MovementHistory = ({ complaint }) => {
     }else if (item.forward_by_ps && item.forward_to_ro_aro) {
       return `PS  → RO/ARO`;
     }
+
+      if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_ps) {
+      return `RO/ARO → RC → PS`;
+    }
     return `${record} → Record Section`;
   };
 
