@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 // import { ToastContainer, toast } from "react-toastify";
 import { toast } from "react-hot-toast";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCheckCircle } from "react-icons/fa";
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -19,6 +19,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
   const { id } = useParams();
   const [erorrss, setErrorss] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // Added loading state
+    const queryClient = useQueryClient();
   const [fessSubmitForm, setFessSubmitForm] = useState({
     fee_exempted: "2",
     remarks: "",
@@ -48,6 +49,10 @@ const Fees = ({ complaint, onFeeApproved }) => {
       // Success Toast
       toast.success("Fee Verified Successfully!");
       // Clear Remarks Field
+        queryClient.invalidateQueries({
+        queryKey: ["complaint", id],
+      });
+       
 
       
     if (onFeeApproved) {
