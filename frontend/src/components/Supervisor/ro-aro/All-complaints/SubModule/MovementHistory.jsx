@@ -113,6 +113,8 @@ const getMovementTitle = (item) => {
     if (item.forward_by_cio && item.forward_to_ps) {
       return `CIO  → PS`;
     }
+
+
     if (item.forward_by_sec && item.forward_to_ro_aro) {
       return `Secratory  → RO/ARO`;
     }
@@ -129,6 +131,10 @@ const getMovementTitle = (item) => {
       return `PS → RC → RO/ARO`;
     }else if (item.forward_by_ps && item.forward_to_ro_aro) {
       return `PS  → RO/ARO`;
+    }
+
+     if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_ps) {
+      return `RO/ARO → RC → PS`;
     }
     return `${record} → Record Section`;
   };

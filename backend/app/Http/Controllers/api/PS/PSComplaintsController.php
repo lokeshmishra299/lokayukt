@@ -620,7 +620,10 @@ class PSComplaintsController extends Controller
                                     }elseif($subroleFwd === "ro-aro"){
 
                                             $apcAction->forward_to_ro_aro = $request->forward_to;
-                                            
+                                            // if($cmp->approved_rejected_by_ro_aro == 1){
+                                            //     $cmp->approved_rejected_by_ro_aro = 0;
+                                            //     $cmp->save();
+                                            // }
                                     }
                                 }
                                    
