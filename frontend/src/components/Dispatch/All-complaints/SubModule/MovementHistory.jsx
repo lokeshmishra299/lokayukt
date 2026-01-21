@@ -8,7 +8,66 @@ const MovementHistory = ({ complaint }) => {
   const finalItems = actions.length > 0 ? actions : [{ remarks: "NA" }];
 
 
-const getMovementTitle = (item) => {
+  // const getMovementTitle = (item) => {
+  //   const record = "Recived ";
+  //   const recordSection = "Record Section";
+
+  //   // forward_by_rk && forward_to_lokayukt is 0 or null
+  //   if (item.forward_by_rk && (item.forward_to_lokayukt === 0 || item.forward_to_lokayukt === null)) {
+  //     return `${record} → Record Section`;
+  //   }
+
+  //   // forward_by_rk && forward_by_lokayukt present value 
+  //   if (item.forward_by_rk && item.forward_to_lokayukt) {
+  //     return `${recordSection} → Lokayukta`;
+  //   }
+
+   
+  //   return `${recordSection} → Record Section`;
+  // };
+// const getMovementTitle = (item) => {
+//     const record = "Received ";
+//     const recordSection = "Record Section";
+
+//     // forward_by_rk && forward_to_lokayukt is 0 or null
+//     if (item.forward_by_rk && (item.forward_to_lokayukt === 0 || item.forward_to_lokayukt === null)) {
+//       return `${record} → Record Section`;
+//     }
+
+//     // forward_by_rk && forward_by_lokayukt present value 
+//     if (item.forward_by_rk && item.forward_to_lokayukt) {
+//       return `${recordSection} → Lokayukta`;
+//     }
+//     if (item.forward_by_ps && item.forward_to_lokayukt) {
+//       return `PS  → Lokayukta`;
+//     }
+//     if (item.forward_by_ps && item.forward_to_uplokayukt) {
+//       return `PS  → UpLokayukta`;
+//     }
+//     if (item.forward_by_ps && item.forward_to_sec) {
+//       return `PS  → Secratory`;
+//     }
+//     if (item.forward_by_ps && item.forward_to_cio_io) {
+//       return `PS  → CIO`;
+//     }
+//     if (item.forward_by_ps && item.forward_to_ro_aro) {
+//       return `PS  → RO/ARO`;
+//     }
+//     if (item.forward_by_ro_aro && item.forward_to_sec) {
+//       return `RO/ARO  → Secratory`;
+//     }
+//     if (item.forward_by_cio && item.forward_to_ps) {
+//       return `CIO  → PS`;
+//     }
+//     if (item.forward_by_sec && item.forward_to_ro_aro) {
+//       return `Secratory  → RO/ARO`;
+//     }
+
+   
+//     return `${recordSection} → Record Section`;
+//   };
+
+  const getMovementTitle = (item) => {
     const record = "Received";
     const recordSection = "Record Section";
     // forward_by_rk && forward_to_lokayukt is 0 or null
@@ -70,8 +129,15 @@ const getMovementTitle = (item) => {
     }else if (item.forward_by_sec && item.forward_to_dispatch) {
       return `Secratory  → Dispatch`;
     }
+
+       if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_sec) {
+      return `Lokayukt → RC → Secratory`;
+    }else if (item.forward_by_lokayukt && item.forward_to_sec) {
+      return `Lokayukt  → Secratory`;
+    }
     return `${record} → Record Section`;
   };
+
 
   return (
     <div className="p-6">
@@ -102,20 +168,20 @@ const getMovementTitle = (item) => {
 
                 
                 <p className="text-[12px] text-gray-500 mt-1">
-                  {item.created_at || "No time"}
+                  {item?.created_at || ""}
                 </p>
 
                 
                 <p className="text-[13px] text-gray-600 mt-1 leading-snug">
                   <span className="font-semibold text-gray-700 mr-1">Remark:</span>
-                  {item.remarks || "NA"}
+                  {item?.remarks || "NA"}
                 </p>
               </div>
 
               
               <div className="flex flex-col items-start sm:items-end gap-1.5 min-w-fit">
                 <span className="text-[11px] sm:text-[12px] bg-blue-100 text-blue-600 px-2 py-1 rounded-md whitespace-nowrap">
-                  {item.status || "Forwarded"}
+                  {item?.status || "Forwarded"}
                 </span>
               </div>
 

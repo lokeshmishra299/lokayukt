@@ -117,6 +117,7 @@ const EditModal = ({
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (isOpen && editingItem) {
@@ -129,6 +130,7 @@ const EditModal = ({
       setErrors({});
     }
   }, [isOpen, editingItem]);
+
 
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -264,6 +266,7 @@ const EditModal = ({
 
   if (!isOpen) return null;
 
+  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg">
@@ -662,6 +665,7 @@ const AddModal = ({
 
 const MasterData = () => {
   const [activeTab, setActiveTab] = useState('districts');
+  const [isLoading, setIsLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -690,6 +694,7 @@ const MasterData = () => {
   // Fetch all master data on component mount
   useEffect(() => {
     const fetchMasterData = async () => {
+      setIsLoading(true);
       try {
         // Fetch districts
         const districtsResponse = await api.get('/admin/all-district');
@@ -776,6 +781,9 @@ const MasterData = () => {
         // console.error('Error fetching master data:', error);
         // toast.error('Error fetching data');
       }
+      finally {
+      setIsLoading(false); 
+    }
     };
 
     fetchMasterData();
@@ -1027,13 +1035,24 @@ const MasterData = () => {
   const masterDataTabs = [
     { id: 'districts', label: 'Districts', labelHi: 'जिले', icon: FaMapMarkerAlt, data: districts, iconColor: 'text-red-600' },
     { id: 'departments', label: 'Departments', labelHi: 'विभाग', icon: FaBuilding, data: departments, iconColor: 'text-blue-600' },
-    { id: 'subjects', label: 'Subjects', labelHi: 'विषय', icon: FaFileAlt, data: subjects, iconColor: 'text-green-600' },
+    { id: 'subjects', label: 'Category', labelHi: 'विषय', icon: FaFileAlt, data: subjects, iconColor: 'text-green-600' },
     { id: 'designations', label: 'Designations', labelHi: 'पदनाम', icon: FaUsers, data: designations, iconColor: 'text-purple-600' },
-    { id: 'complaint-types', label: 'Complaint Types', labelHi: 'शिकायत प्रकार', icon: FaFileAlt, data: complaintTypes, iconColor: 'text-orange-600' },
-    { id: 'rejection-reasons', label: 'Rejection Reasons', labelHi: 'अस्वीकृति कारण', icon: FaFileAlt, data: rejectionReasons, iconColor: 'text-pink-600' },
+    // { id: 'complaint-types', label: 'Complaint Types', labelHi: 'शिकायत प्रकार', icon: FaFileAlt, data: complaintTypes, iconColor: 'text-orange-600' },
+    // { id: 'rejection-reasons', label: 'Rejection Reasons', labelHi: 'अस्वीकृति कारण', icon: FaFileAlt, data: rejectionReasons, iconColor: 'text-pink-600' },
   ];
 
-  const MasterDataTable = ({ data, title, tabId }) => {
+     if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          {/* <FaSpinner className="w-12 h-12 animate-spin text-[#13316C] mx-auto mb-4" /> */}
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const MasterDataTable = ({ data, title, tabId, isLoading  }) => {
     const { currentPage, onPageChange } = getCurrentPageAndHandler(tabId);
     const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
     const paginatedData = getPaginatedData(data, currentPage);
@@ -1073,7 +1092,17 @@ const MasterData = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedData.length > 0 ? (
+              {
+                isLoading ? 
+                <tr>
+                  <td colSpan="7" className="py-8 text-center text-gray-500">
+                    No data available for {title}
+                  </td>
+                </tr>
+
+                :
+                
+                paginatedData.length > 0 ? (
                 paginatedData.map((item) => (
                   <tr key={`${tabId}-${item.id}`} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-2 sm:py-3 px-2 sm:px-3 font-medium text-gray-900">{item.name}</td>
@@ -1125,6 +1154,7 @@ const MasterData = () => {
                     No data available for {title}
                   </td>
                 </tr>
+
               )}
             </tbody>
           </table>
@@ -1167,7 +1197,7 @@ const MasterData = () => {
         {/* Tabs Component */}
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
           <div className="space-y-6">
-            <div className="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+            <div className="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500 w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
               {masterDataTabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
@@ -1194,6 +1224,7 @@ const MasterData = () => {
                       data={tab.data} 
                       title={`${tab.label} / ${tab.labelHi}`}
                       tabId={tab.id}
+                        isLoading={isLoading}
                     />
                   </div>
                 ) : null
