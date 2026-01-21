@@ -83,7 +83,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           </Link>
 
           {/* Complaints */}
-          <Link
+          {/* <Link
             to="/admin/complaints"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
@@ -96,10 +96,10 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <FaFileAlt />
             {(!isCollapsed || isMobile) && "Complaints"}
-          </Link>
+          </Link> */}
 
           {/* Progress Register */}
-          <Link
+          {/* <Link
             to="/admin/progress-register"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
@@ -112,10 +112,10 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <FaChartBar />
             {(!isCollapsed || isMobile) && "Progress Register"}
-          </Link>
+          </Link> */}
 
           {/* Search & Reports */}
-          <Link
+          {/* <Link
             to="/admin/search-reports"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
@@ -128,7 +128,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <FaSearch />
             {(!isCollapsed || isMobile) && "Search & Reports"}
-          </Link>
+          </Link> */}
 
           {/* User Management */}
           <Link
