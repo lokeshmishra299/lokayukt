@@ -157,8 +157,8 @@ const ViewAllComplaint = () => {
   const [activeTab, setActiveTab] = useState("fee");
   const [showPreview, setShowPreview] = useState(false);
   const [relefPs, setRelefPs] = useState(false);
-  const [ps, setReleasePd] = useState("");
-const [roaro, setReleaseRoAro] = useState(false);
+  const [releaseType, setReleaseType] = useState("");
+const [releaseForwardTo, setReleaseForwardTo] = useState("");
 
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
@@ -276,6 +276,28 @@ const [releaseRemark, setReleaseRemark] = useState("");
     enabled: confirmConfig.open && confirmConfig.type === "forward",
     staleTime: 0,
   });
+
+const releaseComplaintMutation = useMutation({
+  mutationFn: async ({ forword_to }) => {
+    const res = await api.post(
+      `/lokayukt/released-by-lokayukt/${id}`,
+      {
+        forword_to, 
+      }
+    );
+    return res.data;
+  },
+  onSuccess: (data) => {
+    toast.success(data.message || "Released successfully");
+    queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+    setRelefPs(false);
+    setReleaseType("");
+  },
+  onError: (error) => {
+    toast.error(error?.response?.data?.message || "Failed to release");
+  },
+});
+
 
   const { mutate: rejectComplaint, isPending } = useMutation({
     mutationFn: async ({ complaintId }) => {
@@ -943,70 +965,75 @@ const [releaseRemark, setReleaseRemark] = useState("");
       </div>
 
 
-      {
-        relefPs && (
-        <div className="fixed inset-0 flex items-center justify-center pt-20 bg-black bg-opacity-50 z-50">
-  <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
-    
-    <h2 className="text-lg font-semibold mb-4">Release Details</h2>
+{relefPs && (
+  <div className="fixed inset-0 flex items-center justify-center pt-20 bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
+      <h2 className="text-lg font-semibold mb-4">Release Details</h2>
 
-       <div className="flex items-center mb-6">
-      <input
-        type="checkbox"
-        id="ps"
-      
-        checked={ps}
-        onChange={(e) => setReleasePd(e.target.checked)}
-        className="mr-2"
-      />
-      <label htmlFor="releaseRoAro" className="text-sm text-gray-700">
-        Release Ps
-      </label>
+      {/* Release PS */}
+      <div className="flex items-center mb-4">
+        <input
+          type="radio"
+          name="release"
+          id="ps"
+          checked={releaseType === "ps"}
+          onChange={() => setReleaseType("ps")}
+          className="mr-2 cursor-pointer"
+        />
+        <label htmlFor="ps" className="text-sm text-gray-700 cursor-pointer">
+          Release PS
+        </label>
+      </div>
+
+      {/* Release RO / ARO */}
+      <div className="flex items-center mb-6">
+        <input
+          type="radio"
+          name="release"
+          id="roaro"
+          checked={releaseType === "ro-aro"}
+          onChange={() => setReleaseType("ro-aro")}
+          className="mr-2 cursor-pointer"
+        />
+        <label htmlFor="roaro" className="text-sm text-gray-700 cursor-pointer">
+          Release RO / ARO
+        </label>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => {
+            setRelefPs(false);
+            setReleaseType("");
+          }}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          Back
+        </button>
+
+        <button
+          onClick={() => {
+            if (!releaseType) {
+              toast.error("Please select release type");
+              return;
+            }
+
+            releaseComplaintMutation.mutate({
+              forword_to: releaseType, // ✅ SAME KEY AS mutationFn
+            });
+          }}
+          disabled={releaseComplaintMutation.isPending}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          {releaseComplaintMutation.isPending ? "Processing..." : "Release"}
+        </button>
+      </div>
     </div>
-  
-
-    {/* Release RO/ARO Checkbox */}
-    <div className="flex items-center mb-6">
-      <input
-        type="checkbox"
-        id="roaro"
-        checked={roaro}
-        onChange={(e) => setReleaseRoAro(e.target.checked)}
-        className="mr-2"
-      />
-      <label htmlFor="releaseRoAro" className="text-sm text-gray-700">
-        Release RO / ARO
-      </label>
-    </div>
-
-    {/* Buttons */}
-    <div className="flex justify-end gap-2">
-      <button
-        onClick={() => setShowModal(false)}
-        className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-      >
-        Back
-      </button>
-
-      <button
-        onClick={() => {
-          console.log({
-            releasePd,
-            releaseRoAro,
-          });
-          // yahan API call kar sakti ho
-        }}
-        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-      >
-       Relese
-      </button>
-    </div>
-
   </div>
-</div>
+)}
 
-        )
-      }
+
 
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center  pt-20 bg-black bg-opacity-50 z-50">

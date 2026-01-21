@@ -12,7 +12,7 @@ import {
   FaFileExcel,
   FaPrint,
   FaSpinner,
-  FaEye, // ✅ Yahaan add karein
+  FaEye, 
   FaTimes,
 } from "react-icons/fa";
 import * as XLSX from "xlsx";
@@ -155,34 +155,32 @@ const overallPrintRef = useRef(null);
   const complainList = complainIdsData?.data || [];
 
   // `makeFileUrl` function se pehle yeh function add karein
-  const normalizePath = (filePath) => {
+ const normalizePath = (filePath) => {
   if (!filePath) return "";
-  let fp = filePath.replace(/^\//, "");
-  fp = fp.replace("storage/", "storage/Document/");
-  return fp;
+  return filePath.replace(/^\/+/, ""); 
 };
 
 const makeFileUrl = (filePath) => {
-  const root = BASE_URL.replace("/api", "");
+  const root = BASE_URL.replace("/api", ""); 
   const fixedPath = normalizePath(filePath);
   return `${root}/${fixedPath}`;
 };
 
 
+
 const handleViewPdf = async (filename, complaintId) => {
   try {
     setLoadingDoc(filename);
-    setPdfViewUrl(null); // 🔴 RESET first
+    setPdfViewUrl(null);
 
     const res = await api.get(
       `/lokayukt/get-file-preview/${complaintId}`
     );
 
     if (res.data.status && res.data.data?.length > 0) {
-      // 🔴 filename unreliable hai → first file hi open karo
-      const filePath = res.data.data[0];
-      const url = makeFileUrl(filePath);
-      setPdfViewUrl(url); // ✅ POPUP OPEN
+      const filePath = res.data.data[0]; // backend se jo mila
+      const url = makeFileUrl(filePath); // ✅ correct URL
+      setPdfViewUrl(url);
     } else {
       toast.error("File not found");
     }
@@ -192,6 +190,7 @@ const handleViewPdf = async (filename, complaintId) => {
     setLoadingDoc(null);
   }
 };
+
 
 
 
@@ -1005,7 +1004,7 @@ const handleViewPdf = async (filename, complaintId) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {departmentData.map((row, idx) => (
+                  {filteredDepartmentData.map((row, idx) => (
                     <tr
                       key={idx}
                       className="bg-white border-b hover:bg-gray-50"
