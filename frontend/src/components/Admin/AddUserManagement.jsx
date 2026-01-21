@@ -17,6 +17,7 @@ import { toast, Toaster } from "react-hot-toast";
 
 import axios from "axios";
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
 
@@ -30,6 +31,8 @@ const api = axios.create({
 });
 
 const AddUserManagement = () => {
+    const navigate =useNavigate()
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -337,7 +340,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
   
 
   return (
-    <div className="p-3 sm:p-4 md:p-6 bg-gray-50 min-h-screen">
+    <div className=" bg-gray-50 min-h-screen">
       <Toaster
         position="top-right"
      
@@ -347,8 +350,16 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Add New User</h1>
+            <h1 className="text-xl font-bold text-gray-900">Add New User</h1>
             <p className="text-xs sm:text-sm text-gray-600">Create a new user account</p>
+          </div>
+          <div>
+            <button onClick={()=>{
+              navigate(-1)
+            }} 
+             className="inline-flex items-center gap-2 px-4 py-2 bg-[#13316C] text-white rounded-md text-sm hover:bg-[#0f2451] transition"
+            
+            >Back</button>
           </div>
         </div>
       </div>
