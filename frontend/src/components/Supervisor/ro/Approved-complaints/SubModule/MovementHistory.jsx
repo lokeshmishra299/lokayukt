@@ -8,59 +8,7 @@ const MovementHistory = ({ complaint }) => {
   const finalItems = actions.length > 0 ? actions : [{ remarks: "NA" }];
 
 
-  // const getMovementTitle = (item) => {
-  //   const record = "Received";
-  //   const recordSection = "Record Section";
-
-  //   // forward_by_rk && forward_to_lokayukt is 0 or null
-  //   if (item.forward_by_rk && (item.forward_to_lokayukt === 0 || item.forward_to_lokayukt === null)) {
-  //     return `${record} → Record Section`;
-  //   }
-
-  //   // forward_by_rk && forward_by_lokayukt present value 
-  //   if (item.forward_by_rk && item.forward_to_lokayukt) {
-  //     return `${recordSection} → Lokayukta`;
-  //   }
-  //   if (item.forward_by_ps && item.forward_to_lokayukt) {
-  //     return `PS  → Lokayukta`;
-  //   }
-  //   if (item.forward_by_ps && item.forward_to_uplokayukt) {
-  //     return `PS  → UpLokayukta`;
-  //   }
-  //   if (item.forward_by_ps && item.forward_to_sec) {
-  //     return `PS  → Secratory`;
-  //   }
-  //   if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_cio_io) {
-  //     return `PS → RC → CIO`;
-  //   }else if (item.forward_by_ps && item.forward_to_cio_io) {
-  //     return `PS  → CIO`;
-  //   }
-  //   if (item.forward_by_ps && item.forward_to_ro_aro) {
-  //     return `PS  → RO/ARO`;
-  //   }
-  //   if (item.forward_by_ps && item.forward_to_ro_aro) {
-  //     return `PS  → RO/ARO`;
-  //   }
-  //   if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_sec) {
-  //     return `RO/ARO → RO → Secratory`;
-  //   }else if (item.forward_by_ro_aro && item.forward_to_sec) {
-  //     return `RO/ARO → Secratory`;
-  //   }
-  //   if (item.forward_by_cio && item.forward_to_ps) {
-  //     return `CIO  → PS`;
-  //   }
-  //   if (item.forward_by_sec && item.forward_to_ro_aro) {
-  //     return `Secratory  → RO/ARO`;
-  //   }
-  //   if (item.forward_by_sec && item.sent_through_rk === 1 && item.forward_to_ro_aro) {
-  //     return `Secratory → RO → RO/ARO`;
-  //   }
-
-   
-  //   return `${recordSection} → Record Section`;
-  // };
-
- const getMovementTitle = (item) => {
+const getMovementTitle = (item) => {
     const record = "Received";
     const recordSection = "Record Section";
     // forward_by_rk && forward_to_lokayukt is 0 or null
@@ -122,18 +70,9 @@ const MovementHistory = ({ complaint }) => {
     }else if (item.forward_by_sec && item.forward_to_dispatch) {
       return `Secratory  → Dispatch`;
     }
-
-
-    
-     if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_sec) {
-      return `Lokayukt → RC → Secratory`;
-    }else if (item.forward_by_lokayukt && item.forward_to_sec) {
-      return `Lokayukt  → Secratory`;
-    }
-    
     return `${record} → Record Section`;
   };
-  
+
 
   return (
     <div className="p-6">
