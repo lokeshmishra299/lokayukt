@@ -278,11 +278,11 @@ const [releaseRemark, setReleaseRemark] = useState("");
   });
 
 const releaseComplaintMutation = useMutation({
-  mutationFn: async ({ forword_to }) => {
+  mutationFn: async ({ forward_to }) => {
     const res = await api.post(
       `/lokayukt/released-by-lokayukt/${id}`,
       {
-        forword_to, 
+        forward_to, 
       }
     );
     return res.data;
@@ -912,7 +912,7 @@ const releaseComplaintMutation = useMutation({
                   onClick={opebnRelefPSPoup}
                     className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                   >
-                    Relese Ps
+                    Relese 
                   </button>
                 </div>
 
@@ -968,7 +968,7 @@ const releaseComplaintMutation = useMutation({
 {relefPs && (
   <div className="fixed inset-0 flex items-center justify-center pt-20 bg-black bg-opacity-50 z-50">
     <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
-      <h2 className="text-lg font-semibold mb-4">Release Details</h2>
+      <h2 className="text-lg font-semibold mb-4">Are You Sure you Want to Release?</h2>
 
       {/* Release PS */}
       <div className="flex items-center mb-4">
@@ -981,7 +981,7 @@ const releaseComplaintMutation = useMutation({
           className="mr-2 cursor-pointer"
         />
         <label htmlFor="ps" className="text-sm text-gray-700 cursor-pointer">
-          Release PS
+          PS
         </label>
       </div>
 
@@ -996,7 +996,7 @@ const releaseComplaintMutation = useMutation({
           className="mr-2 cursor-pointer"
         />
         <label htmlFor="roaro" className="text-sm text-gray-700 cursor-pointer">
-          Release RO / ARO
+         RO / ARO
         </label>
       </div>
 
@@ -1020,7 +1020,7 @@ const releaseComplaintMutation = useMutation({
             }
 
             releaseComplaintMutation.mutate({
-              forword_to: releaseType, // ✅ SAME KEY AS mutationFn
+              forward_to: releaseType, // ✅ SAME KEY AS mutationFn
             });
           }}
           disabled={releaseComplaintMutation.isPending}
