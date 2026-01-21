@@ -89,7 +89,7 @@ public function subrole() {
 
 public function userParentRole()
 {
-    return $this->belongsTo(User::class, '','');
+    return $this->belongsTo(User::class, 'parent_user_id');
 }
 
 

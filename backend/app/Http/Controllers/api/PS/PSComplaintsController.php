@@ -26,7 +26,7 @@ class PSComplaintsController extends Controller
         $userParentData = User::with('role')->where('id',$parentId)->get();
         $roleParent = $userParentData[0]->role->name;
         // dd($roleParent);
-
+           $userParentSubrole = Auth::user()->userParentRole;  
   
     $query = DB::table('complaints')
         ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
@@ -153,7 +153,7 @@ class PSComplaintsController extends Controller
                     ->where('fee_exempted', 0)
                      ->distinct('complaints.id')
                     ->count();
-     }elseif($roleParent === 'supervisor'){
+     }elseif($roleParent ==="supervisor" && $userParentSubrole->sub_role_id == 14){
          $todayCount = DB::table('complaints')
              ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
                     ->where('in_draft', 0)
