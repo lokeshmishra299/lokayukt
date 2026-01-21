@@ -102,6 +102,31 @@ import SupervisorAllComplaitsro from './components/Supervisor/ro-aro/All-complai
 import SupervisorViewAllComplaintro from './components/Supervisor/ro-aro/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintsro from './components/Supervisor/ro-aro/All-complaints/EditAllComplaints';
 
+
+
+// ARO
+//----------
+
+import SupervisorLayoutaro from './components/Supervisor/ro-aro/Layout';
+import SupervisorDashboardaro from './components/Supervisor/ro-aro/Dashboard';
+import SupervisorComplaintsaro from './components/Supervisor/ro-aro/Complaints';
+import SupervisorProgressRegisteraro from './components/Supervisor/ro-aro/ProgressRegister';
+import SupervisorSearchReportsaro from './components/Supervisor/ro-aro/SearchReports';
+import SupervisorViewComplaintsaro from './components/Supervisor/ro-aro/ViewComplaints';
+import SupervisorPendingComplaintsaro from './components/Supervisor/ro-aro/Pending-complaints/PendingComplaints';
+import SupervisorEditPendingComplaintsaro from './components/Supervisor/ro-aro/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintsaro from './components/Supervisor/ro-aro/Pending-complaints/ViewPendingComplaints';
+
+
+import SupervisorApprovedComplaintsaro from './components/Supervisor/ro-aro/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintaro from './components/Supervisor/ro-aro/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintaro from './components/Supervisor/ro-aro/Approved-complaints/EditApprovedComplaints';
+
+import SupervisorAllComplaitsaro from './components/Supervisor/ro-aro/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintaro from './components/Supervisor/ro-aro/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintsaro from './components/Supervisor/ro-aro/All-complaints/EditAllComplaints';
+
+
 // Supervisor 
 // SubRole -> sec
 import SupervisorLayoutsec from './components/Supervisor/sec/Layout';
@@ -390,6 +415,31 @@ function App() {
           <Route path="approved-complaints" element={<SupervisorApprovedComplaintsro />} />   
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintro/>} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintro />} /> 
+        </Route>
+      )}
+
+
+
+          {/** ARO */}
+         {role === 'supervisor' && subrole === 'ro-aro' && (
+        <Route path="/supervisor" element={<SupervisorLayoutaro />}>
+          <Route path="dashboard" element={<SupervisorDashboardaro />} />
+          <Route path="complaints" element={<SupervisorComplaintsaro />} />
+          <Route path="progress-register" element={<SupervisorProgressRegisteraro />} />
+          <Route path="search-reports" element={<SupervisorSearchReportsaro />} />
+          <Route path="search-reports/view/:id" element={<SupervisorViewComplaintsaro />} />
+
+          <Route path="all-complaints" element={<SupervisorAllComplaitsaro />} />
+          <Route path="all-complaints/view/:id" element={<SupervisorViewAllComplaintaro />} />
+          <Route path="all-complaints/edit/:id" element={<SupervisorEditComplaintsaro />} />
+
+          <Route path="pending-complaints" element={<SupervisorPendingComplaintsaro />} />
+          <Route path="pending-complaints/view/:id" element={<SupervisorViewPendingComplaintsaro />} />
+          <Route path="pending-complaints/edit/:id" element={<SupervisorEditPendingComplaintsaro />} />
+
+          <Route path="approved-complaints" element={<SupervisorApprovedComplaintsaro />} />   
+          <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintaro/>} />
+          <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintaro />} /> 
         </Route>
       )}
 

@@ -129,6 +129,12 @@ const MovementHistory = ({ complaint }) => {
     }else if (item.forward_by_sec && item.forward_to_dispatch) {
       return `Secratory  → Dispatch`;
     }
+
+       if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_sec) {
+      return `Lokayukt → RC → Secratory`;
+    }else if (item.forward_by_lokayukt && item.forward_to_sec) {
+      return `Lokayukt  → Secratory`;
+    }
     return `${record} → Record Section`;
   };
 
