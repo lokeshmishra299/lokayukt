@@ -1448,4 +1448,41 @@ class LokAyuktComplaintsController extends Controller
     ]);
 
     }
+
+      public function releasekByLokayukt(Request $request,$complainId){
+                                    
+          $request->validate([
+            'forward_to' => 'required',
+            
+        ]);
+
+       
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                if($request->forward_to == "ps"){
+                    $cmp->assign_to_ps = null;
+                }else if($request->forward_to == "ro-aro"){
+                    $cmp->assign_to_ro_aro = null;
+                }
+                    
+              $cmp->save(); 
+            }
+            
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Release Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
 }

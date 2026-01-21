@@ -482,6 +482,8 @@ class PSDashboardController extends Controller
                                 ->whereMonth('cmp.created_at', $date->month)
                                 ->orderByDesc('cmp.id');
     
+            }else if($roleParent ==="supervisor"){
+
             }
           
          

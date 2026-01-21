@@ -296,6 +296,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/all-complain-ids',[LokAyuktComplaintsController::class,'allComplainsId']);
         Route::get('/all-dispatch-letters',[LokAyuktComplaintsController::class,'allDispatchLetters']);
          Route::post('/upload-document',[LokAyuktComplaintsController::class,'uploadDocument']);
+         Route::post('/released-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'releasekByLokayukt']);
        
        
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);

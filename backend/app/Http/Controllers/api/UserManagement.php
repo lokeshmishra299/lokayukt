@@ -39,7 +39,7 @@ class UserManagement extends Controller
             // 'designation'  => 'required|exists:designations,id',
             // 'department'   => 'required|exists:departments,id',
             'district_id'  => 'required|exists:district_master,district_code',
-            'ps_parent'  => 'required',
+            // 'ps_parent'  => 'required',
         ], [
 
             'name.required'        => 'Name is required.',

@@ -25,6 +25,7 @@ class OperatorDashboardController extends Controller
             // ->where('cmp.district_id', $user_district_code)
             ->whereYear('created_at', $date->year)
             ->whereMonth('created_at', $date->month)
+             ->where('approved_rejected_by_rk','0')
             ->orderByDesc('cmp.id');
          $totalcomplains = $query->count();
 

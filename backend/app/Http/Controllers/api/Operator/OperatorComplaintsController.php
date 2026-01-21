@@ -1786,6 +1786,7 @@ class OperatorComplaintsController extends Controller
                     'cd.description',
                   
                 )
+                 ->where('approved_rejected_by_rk','0')
                  ->where('in_draft','0')
                  ->distinct('cm.id')
                 ->get();

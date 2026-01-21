@@ -38,6 +38,9 @@ class PSComplaintsController extends Controller
                         //  $q->where('rep.forward_to_lokayukt', $parentId);      
                     } elseif ($roleParent === 'up-lok-ayukt') {
                         // $q->where('rep.forward_to_uplokayukt', $parentId);
+                    
+                    } elseif ($roleParent === 'supervisor') {
+                        // $q->where('rep.forward_to_sec', $parentId);
                     } else {
                         // 🔥 fallback (safe)
                         $q->where('rep.forward_to_lokayukt', $parentId)
@@ -77,6 +80,11 @@ class PSComplaintsController extends Controller
             $query->where('complaints.approved_rejected_by_lokayukt', 0);
         }else if($roleParent === 'up-lok-ayukt'){
             $query->where('complaints.approved_rejected_by_lokayukt', 1);
+        }
+        else if($roleParent === 'supervisor'){
+            $query->where('rep.status', 'Forwarded')
+                                ->whereNotNull('rep.forward_to_sec')
+            ->where('rep.forward_to_sec', $parentId);
         }
 
     $records = $query->get();
@@ -141,6 +149,42 @@ class PSComplaintsController extends Controller
                 ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
                     ->where('approved_rejected_by_rk', 1)
                     ->where('rep.forward_to_uplokayukt', $parentId)
+                    ->where('in_draft', 0)
+                    ->where('fee_exempted', 0)
+                     ->distinct('complaints.id')
+                    ->count();
+     }elseif($roleParent === 'supervisor'){
+         $todayCount = DB::table('complaints')
+             ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
+                    ->where('in_draft', 0)
+                    ->whereDate('rep.created_at', today())
+                     ->distinct('complaints.id')
+                     ->where('rep.forward_to_sec', $parentId)
+                    ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('rep.created_at', '<', now()->subDays(7))
+                    ->where('rep.forward_to_sec', $parentId)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 0)
+                    ->where('rep.created_at', '<', now()->subDays(7))
+                    ->where('rep.forward_to_sec', $parentId)
+                     ->distinct('complaints.id')
+                    ->count();
+              
+                $feePending = DB::table('complaints')
+                ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('rep.forward_to_sec', $parentId)
                     ->where('in_draft', 0)
                     ->where('fee_exempted', 0)
                      ->distinct('complaints.id')
@@ -986,6 +1030,8 @@ class PSComplaintsController extends Controller
                     //  $q->where('rep.forward_to_lokayukt', $parentId);      
                  } elseif ($roleParent === 'up-lok-ayukt') {
                      $q->where('rep.forward_to_uplokayukt', $parentId);
+                 } elseif ($roleParent === 'supervisor') {
+                     $q->where('rep.forward_to_sec', $parentId);
                  } else {
                      // 🔥 fallback (safe)
                      $q->where('rep.forward_to_lokayukt', $parentId)
