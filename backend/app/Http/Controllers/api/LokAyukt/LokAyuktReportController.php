@@ -1083,14 +1083,55 @@ $complainDetails->details = DB::table('complaints_details as cd')
     public function complaintPercentages(Request $request)
 {
     $date = now();
-    $data = DB::table('complaints as cmp')
- ->join('respondents as respon', 'respon.complaint_id', '=', 'cmp.id')
-    ->join('departments as dep', 
-        DB::raw('dep.name COLLATE utf8mb4_unicode_ci'), 
-        '=', 
-        DB::raw('respon.department_name COLLATE utf8mb4_unicode_ci')
-    )
-      ->join('complaint_actions as ca', DB::raw("cmp.id"), '=', DB::raw("ca.complaint_id"))
+//     $data = DB::table('complaints as cmp')
+//  ->join('respondents as respon', 'respon.complaint_id', '=', 'cmp.id')
+//     ->join('departments as dep', 
+//         DB::raw('dep.name COLLATE utf8mb4_unicode_ci'), 
+//         '=', 
+//         DB::raw('respon.department_name COLLATE utf8mb4_unicode_ci')
+//     )
+//       ->join('complaint_actions as ca', DB::raw("cmp.id"), '=', DB::raw("ca.complaint_id"))
+//     ->selectRaw("
+//         COUNT(*) as total,
+
+//         SUM(CASE WHEN cmp.status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
+
+//         SUM(CASE WHEN cmp.status = 'Under Investigation' THEN 1 ELSE 0 END) as under_investigation,
+
+//         SUM(CASE WHEN cmp.status = 'Disposed - Accepted' THEN 1 ELSE 0 END) as disposed,
+        
+//         SUM(CASE WHEN ca.status = 'Final Decision' THEN 1 ELSE 0 END) as final_submit,
+
+//         SUM(CASE WHEN cmp.status = 'Rejected' THEN 1 ELSE 0 END) as rejected,
+
+//         SUM(CASE 
+//             WHEN cmp.status IN ('In Progress') 
+//             AND respon.department_name IS NOT NULL
+//             THEN 1 ELSE 0 
+//         END) as pending_with_department
+//     ")->where('cmp.approved_rejected_by_rk','1')
+//     ->first();
+
+
+//     $percentages = [
+//     // 'in_progress' => $data->total ? round(($data->in_progress / $data->total) * 100, 2) : 0,
+
+//         'pending_with_department' => $data->total 
+//         ? round(($data->pending_with_department / $data->total) * 100, 1) 
+//         : 0,
+
+//     'under_investigation' => $data->total ? round(($data->under_investigation / $data->total) * 100, 2) : 0,
+
+//     'disposed' => $data->total ? round(($data->disposed / $data->total) * 100, 2) : 0,
+
+//     'rejected' => $data->total ? round(($data->rejected / $data->total) * 100, 2) : 0,
+    
+//     'final_submit' => $data->total ? round(($data->final_submit / $data->total) * 100, 2) : 0,
+
+
+// ];
+
+$data = DB::table('complaints as cmp')
     ->selectRaw("
         COUNT(*) as total,
 
@@ -1099,37 +1140,40 @@ $complainDetails->details = DB::table('complaints_details as cd')
         SUM(CASE WHEN cmp.status = 'Under Investigation' THEN 1 ELSE 0 END) as under_investigation,
 
         SUM(CASE WHEN cmp.status = 'Disposed - Accepted' THEN 1 ELSE 0 END) as disposed,
-        
-        SUM(CASE WHEN ca.status = 'Final Decision' THEN 1 ELSE 0 END) as final_submit,
 
         SUM(CASE WHEN cmp.status = 'Rejected' THEN 1 ELSE 0 END) as rejected,
 
+        SUM(CASE WHEN cmp.status = 'Final Decision' THEN 1 ELSE 0 END) as final_submit,
+
         SUM(CASE 
-            WHEN cmp.status IN ('In Progress') 
-            AND respon.department_name IS NOT NULL
+            WHEN cmp.status = 'In Progress' 
             THEN 1 ELSE 0 
         END) as pending_with_department
-    ")->where('cmp.approved_rejected_by_rk','1')
+    ")
+    // ->where('cmp.approved_rejected_by_rk', 1)
     ->first();
-
-
-    $percentages = [
-    // 'in_progress' => $data->total ? round(($data->in_progress / $data->total) * 100, 2) : 0,
-
-        'pending_with_department' => $data->total 
+$percentages = [
+    'pending_with_department' => $data->total 
         ? round(($data->pending_with_department / $data->total) * 100, 1) 
         : 0,
 
-    'under_investigation' => $data->total ? round(($data->under_investigation / $data->total) * 100, 2) : 0,
+    'under_investigation' => $data->total 
+        ? round(($data->under_investigation / $data->total) * 100, 2) 
+        : 0,
 
-    'disposed' => $data->total ? round(($data->disposed / $data->total) * 100, 2) : 0,
+    'disposed' => $data->total 
+        ? round(($data->disposed / $data->total) * 100, 2) 
+        : 0,
 
-    'rejected' => $data->total ? round(($data->rejected / $data->total) * 100, 2) : 0,
-    
-    'final_submit' => $data->total ? round(($data->final_submit / $data->total) * 100, 2) : 0,
+    'rejected' => $data->total 
+        ? round(($data->rejected / $data->total) * 100, 2) 
+        : 0,
 
-
+    'final_submit' => $data->total 
+        ? round(($data->final_submit / $data->total) * 100, 2) 
+        : 0,
 ];
+
 
     return compact('data', 'percentages');
 }
