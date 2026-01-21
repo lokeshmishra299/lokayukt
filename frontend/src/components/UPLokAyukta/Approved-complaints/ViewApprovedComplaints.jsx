@@ -161,6 +161,9 @@ const ViewApprovedComplaints = () => {
   const [sent_through_rk, setThroughRC] = useState(false);
      const [showModal, setShowModal] = useState(false);
         const [Rejectedloading,setRejectedloading] = useState(false)
+
+        const [showReleaseModal, setShowReleaseModal] = useState(false);
+const [releaseType, setReleaseType] = useState("");
      
    
       const handleReject = () => {
@@ -262,6 +265,29 @@ const ViewApprovedComplaints = () => {
   });
 
    
+
+  const releaseComplaintMutation = useMutation({
+  mutationFn: async ({ forward_to }) => {
+    const res = await api.post(
+      `/uplokayukt/released-by-uplokayukt/${id}`,
+      {
+        forward_to, // PS | RO_ARO
+      }
+    );
+    return res.data;
+  },
+  onSuccess: (data) => {
+    toast.success(data?.message || "Released successfully");
+    queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+    setShowReleaseModal(false);
+    setReleaseType("");
+  },
+  onError: (error) => {
+    toast.error(error?.response?.data?.message || "Failed to release");
+  },
+});
+
+
    const {
         mutate: rejectComplaint,
         isPending,
@@ -836,6 +862,13 @@ const ViewApprovedComplaints = () => {
         Reject
       </button>
 
+      <button
+  onClick={() => setShowReleaseModal(true)}
+  className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+>
+  Release
+</button>
+
                 </div>
 
                 <div className="flex gap-2">
@@ -877,6 +910,71 @@ const ViewApprovedComplaints = () => {
           </div>
         )}
       </div>
+
+      {showReleaseModal && (
+  <div className="fixed inset-0 flex items-center justify-center pt-20 bg-black bg-opacity-50 z-50">
+    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
+      <h2 className="text-lg font-semibold mb-4">
+        Are you sure you want to Release?
+      </h2>
+
+      {/* PS */}
+      <div className="flex items-center mb-4">
+        <input
+          type="radio"
+          name="release"
+          checked={releaseType === "PS"}
+          onChange={() => setReleaseType("PS")}
+          className="mr-2"
+        />
+        <label className="text-sm text-gray-700">PS</label>
+      </div>
+
+      {/* RO / ARO */}
+      <div className="flex items-center mb-6">
+        <input
+          type="radio"
+          name="release"
+          checked={releaseType === "RO_ARO"}
+          onChange={() => setReleaseType("RO_ARO")}
+          className="mr-2"
+        />
+        <label className="text-sm text-gray-700">RO / ARO</label>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => {
+            setShowReleaseModal(false);
+            setReleaseType("");
+          }}
+          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+        >
+          Back
+        </button>
+
+        <button
+          onClick={() => {
+            if (!releaseType) {
+              toast.error("Please select release type");
+              return;
+            }
+
+            releaseComplaintMutation.mutate({
+              forward_to: releaseType,
+            });
+          }}
+          disabled={releaseComplaintMutation.isPending}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+        >
+          {releaseComplaintMutation.isPending ? "Processing..." : "Release"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
 
           {showModal && (
   <div className="fixed inset-0 flex items-center justify-center  pt-20 bg-black bg-opacity-50 z-50">
