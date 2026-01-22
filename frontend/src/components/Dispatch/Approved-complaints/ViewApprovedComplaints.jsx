@@ -223,17 +223,17 @@ const ViewAllComplaint = () => {
       isFetching: isFetchingOptions,
       error: forwardOptionsError,
     } = useQuery({
-      queryKey: ["lokayukt-options", forwardType], // 
+      queryKey: ["dispatch-options", forwardType], // 
       queryFn: async () => {
         try {
           //  Send To My Pool  API: /lokayukt/get-users
           if (forwardType === "self") {
-            const res = await api.get("/lokayukt/get-users");
+            const res = await api.get("/dispatch/get-users");
             return res.data?.data || res.data || [];
           }
   
           //  Send To Other Pool  API: /lokayukt/get-lokayukt-uplokayukt
-          const res = await api.get("/lokayukt/get-uplokayukt");
+          const res = await api.get("/dispatch/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
   
@@ -248,7 +248,7 @@ const ViewAllComplaint = () => {
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
-      const res = await api.post("/lokayukt/received-physical", {
+      const res = await api.post("/dispatch/received-physical", {
         complaint_id: complaintId,
         remark: remarkData,
       });
@@ -290,7 +290,7 @@ const ViewAllComplaint = () => {
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
+        const res = await api.post(`/dispatch/forward-by-lokayukt/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
         });
@@ -984,7 +984,7 @@ const ViewAllComplaint = () => {
 
             <h3 className="text-xl font-semibold mb-6 border-b pb-2 text-gray-800">
               {viewModalConfig.type === "correspondence"
-                ? "पत्राचार पता विवरण"
+                ? "शिकायतकर्ता का विवरण"
                 : viewModalConfig.type === "respondent"
                 ? "प्रतिवादी का विवरण"
                 : viewModalConfig.type === "support"
