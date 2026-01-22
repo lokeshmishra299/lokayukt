@@ -233,7 +233,7 @@ const ViewDraft = () => {
       // case 'support': return 'Supporting Persons Details';
       // case 'witness': return 'Witness Details';
       case "correspondence":
-        return "परिवादी का विवरण";
+        return "शिकायतकर्ता का विवरण";
       case "respondent":
         return "प्रतिवादी का विवरण";
       case "support":
