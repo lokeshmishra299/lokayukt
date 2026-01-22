@@ -199,10 +199,14 @@ const AllComplaints = () => {
     }
 
     if (selectedCaseType !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.complaint_type_id === parseInt(selectedCaseType);
-      });
-    }
+  filtered = filtered.filter((complaint) => {
+    return (
+      complaint.category &&
+      complaint.category.toLowerCase() === selectedCaseType.toLowerCase()
+    );
+  });
+}
+
 
     const sorted = sortComplaintsByDate(filtered, sortOrder);
     setFilteredComplaints(sorted);
@@ -369,12 +373,12 @@ const AllComplaints = () => {
                   <option value="">Status: All</option>
                   <option value="In Progress">In Progress</option>
                   <option value="Disposed Accepted">Disposed Accepted</option>
-                  <option value="Resolved">Resolved</option>
+                  {/* <option value="Resolved">Resolved</option> */}
                   <option value="Rejected">Rejected</option>
                   <option value="Under Investigation">
                     Under Investigation
                   </option>
-                  <option value="Pending">Pending</option>
+                  {/* <option value="Pending">Pending</option> */}
                 </select>
 
                 <select
@@ -402,18 +406,15 @@ const AllComplaints = () => {
                   <option value="3">Exempted</option>
                 </select>
                 <select
-                  className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
-                  disabled={typesLoading}
-                  value={selectedCaseType}
-                  onChange={(e) => setSelectedCaseType(e.target.value)}
-                >
-                  <option value="">Case Type: All</option>
-                  {complaintTypesData?.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
-                </select>
+  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+  value={selectedCaseType}
+  onChange={(e) => setSelectedCaseType(e.target.value)}
+>
+  <option value="">Case Type: All</option>
+  <option value="complaint">Complaint</option>
+  <option value="assertion">Assertion</option>
+</select>
+
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-gray-600 text-xs whitespace-nowrap">

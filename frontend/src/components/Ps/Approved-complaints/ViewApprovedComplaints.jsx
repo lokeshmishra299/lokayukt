@@ -1240,7 +1240,7 @@ const ViewApprovedComplaints = () => {
 
             <h3 className="text-xl font-semibold mb-6 border-b pb-2 text-gray-800">
               {viewModalConfig.type === "correspondence"
-                ? "पत्राचार पता विवरण"
+                ? "शिकायतकर्ता का विवरण"
                 : viewModalConfig.type === "respondent"
                 ? "प्रतिवादी विवरण"
                 : viewModalConfig.type === "support"
