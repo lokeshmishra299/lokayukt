@@ -1,7 +1,7 @@
 import React from "react";
 import { FaInfoCircle } from "react-icons/fa";
 
-const HideModule = () => {
+const HideModule = ({ complaint }) => {
   return (
     <div className="p-6 mx-6 mt-2 bg-gray-100 border border-gray-300 rounded-lg text-center shadow-sm">
       <div className="flex flex-col items-center gap-2">
