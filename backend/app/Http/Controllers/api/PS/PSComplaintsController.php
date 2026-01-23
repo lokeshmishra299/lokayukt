@@ -285,7 +285,7 @@ class PSComplaintsController extends Controller
          'ddn.district_name as correspondence_district',
               'rmc.district_name as main_complainant_district',
         'dmc.district_name as main_respondant_district',
-        'u.name us ps_assign_name',
+        'u.name as ps_assign_name',
         // 'r.*',
         // 'r.respondent_name as r_name',
         // 'r.designation as r_desig',
