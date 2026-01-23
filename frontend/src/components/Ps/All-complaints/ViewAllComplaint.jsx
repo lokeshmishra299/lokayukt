@@ -884,7 +884,7 @@ const ViewAllComplaint = () => {
               </div>
             ) : (
               <div>
-                <HideModule />
+                <HideModule complaint={complaintData}  />
               </div>
             )}
 
