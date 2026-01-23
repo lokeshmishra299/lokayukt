@@ -1762,7 +1762,9 @@ class OperatorComplaintsController extends Controller
        
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
+                ->leftJoin('complainants as cmlan', 'cm.id', '=', 'cmlan.complaint_id')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -1770,6 +1772,7 @@ class OperatorComplaintsController extends Controller
                 ->select(
                     'cm.*',
                     'dd.district_name',
+                    'dd1.district_name as dist_new',
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',

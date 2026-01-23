@@ -208,7 +208,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/categories',[CommonController::class,'fetch_Category']);
     });
 
-    Route::middleware('role:supervisor:so-us|ro-aro|sec|cio-io|dea-assis')->prefix('supervisor')->group(function () {
+    Route::middleware('role:supervisor:so-us|ro-aro|ro|sec|cio-io|dea-assis')->prefix('supervisor')->group(function () {
         
         Route::get('/all-district',[SupervisorCommonController::class,'fetch_district']);
         Route::get('/all-complaints',[SupervisorComplaintsController::class,'allComplains']);

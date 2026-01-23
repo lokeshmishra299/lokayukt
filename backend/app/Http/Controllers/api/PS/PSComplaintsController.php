@@ -251,7 +251,7 @@ class PSComplaintsController extends Controller
 //     ->where('cd.complain_id', $id)
 //     ->get();
              $complainDetails = DB::table('complaints as cm')
-    // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+    ->leftJoin('users as u', 'cm.assign_to_ps', '=', 'u.id')
     ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
     ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
     
@@ -285,6 +285,7 @@ class PSComplaintsController extends Controller
          'ddn.district_name as correspondence_district',
               'rmc.district_name as main_complainant_district',
         'dmc.district_name as main_respondant_district',
+        'u.name us ps_assign_name',
         // 'r.*',
         // 'r.respondent_name as r_name',
         // 'r.designation as r_desig',
@@ -1067,7 +1068,7 @@ class PSComplaintsController extends Controller
     $complainDetails = $complainDetails
                       
                         // ->toSql();
-                        ->where('approved_rejected_by_ps', 1 )
+                        // ->where('approved_rejected_by_ps', 1 )
                         ->distinct('cm.id')
                       ->get();
 
