@@ -554,7 +554,7 @@ $complainDetails->actions = DB::table('complaint_actions')
              $cmp =  Complaint::findOrFail($complainId);
              
             if($cmp){
-                $cmp->status = "Disposed - Accepted";
+                $cmp->status = "Final Disposal / Closed";
                
                 if($cmp->save()){
                     $apcAction = new ComplaintAction();
