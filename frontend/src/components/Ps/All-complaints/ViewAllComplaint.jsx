@@ -512,7 +512,7 @@ const ViewAllComplaint = () => {
 
                 {/* मोबाइल वर्जन */}
 {/* Mobile Header */}
-<div className="md:hidden mb-4">
+{/* <div className="md:hidden mb-4">
   <div className="flex justify-between items-center mb-3">
     <button
       onClick={() => navigate(-1)}
@@ -535,7 +535,7 @@ const ViewAllComplaint = () => {
         : "In Motion – With Lokayukta"}
     </span>
   </div>
-</div>
+</div> */}
 
 {/* Desktop Header */}
 <div className="hidden md:block">
