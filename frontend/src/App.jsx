@@ -36,6 +36,7 @@ import OperatorEditPendingComplaints from './components/Operator/Pending-complai
 import AllDraft from './components/Operator/Draft/AllDraft';
 import ViewDraft from './components/Operator/Draft/ViewDraft';
 import EditDraft from './components/Operator/Draft/EditDraft';
+import RcLog from './components/Operator/RcLog';
 
 
 
@@ -283,6 +284,7 @@ import DispatchScaneLetter from "./components/Dispatch/ScaneLetter"
 
 // import LokayuktUserManagement from './components/LokAyukta/UserManagement';
 import DispatchUserManagement from './components/Dispatch/UserManagement';
+
 // import DispatchAddUserManagement from './components/Dispatch/AddUserManagement';
 // import LokayuktEditUserManagement from './components/LokAyukta/EditUserManagment';
 // import LokayuktMasterData from './components/LokAyukta/MasterData';
@@ -340,6 +342,8 @@ function App() {
              <Route path="draft" element={<AllDraft />} />
              <Route path="draft/view/:id" element={<ViewDraft />} />
              <Route path="draft/edit/:id" element={<EditDraft />} />
+             <Route path="rc-log" element={<RcLog />} />
+
              {/* <Route path="/operator/complaints/Cheekdublicate" element={<Cheekdublicate />} /> */}
 
         </Route>

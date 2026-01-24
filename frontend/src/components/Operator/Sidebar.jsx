@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineHome } from "react-icons/ai";
 import {FiInbox,FiSend,FiFileText,FiBarChart2,FiSearch}  from "react-icons/fi";
+import { IoIosDocument } from "react-icons/io";
+import { TiDocumentText } from "react-icons/ti";
 import {
   
   FaHome,
@@ -280,6 +282,30 @@ const Sidebar = ({
                   {(isMobile || !isCollapsed) && <span>Drafts</span>}
                 </div>
                 {isActive("/draft") && (isMobile) && (
+                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                )}
+              </Link>
+            </li>
+
+
+             <li>
+              <Link
+                to="/operator/rc-log"
+                onClick={handleLinkClick}
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                  isActive("/rc-log")
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-200"
+                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                title={!isMobile && isCollapsed ? "rc-log" : ""}
+              >
+                <div className="flex items-center gap-3">
+                    <TiDocumentText size={18} className="w-[18px] h-[18px] flex-shrink-0" />
+                  {(isMobile || !isCollapsed) && <span>RCLog</span>}
+                </div>
+                {isActive("/rc-log") && (isMobile) && (
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
                     <div className="w-4 h-4 bg-white rounded-full"></div>
                   </div>
