@@ -511,13 +511,15 @@ const handleViewPdf = async (filename, complaintId) => {
     // },
     {
       status: "Rejected",
-      count: 150,
       count: overallStatusData?.data?.rejected || "N/A",
       percentage: overallStatusData?.percentages?.rejected ?? "N/A",
 
       color: "text-red-600",
       bg: "bg-red-100",
     },
+
+
+    
   ];
 
   const tabs = [
