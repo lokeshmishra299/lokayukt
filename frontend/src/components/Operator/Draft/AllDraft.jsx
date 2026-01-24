@@ -37,8 +37,6 @@ const AllDraft = () => {
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
 
-
-
   const sortComplaintsByDate = (complaints, order) => {
     return [...complaints].sort((a, b) => {
       const dateA = new Date(a.created_at);
@@ -52,27 +50,20 @@ const AllDraft = () => {
     });
   };
 
-
- const getAllComplaints = async () => {
-  const res = await api.get("/operator/all-draft");
-  return res.data;
-};
-
-
-
+  const getAllComplaints = async () => {
+    const res = await api.get("/operator/all-draft");
+    return res.data;
+  };
 
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["all-draft", location.pathname],
     queryFn: getAllComplaints,
   });
 
-
-const stats = {
-  overdue: data?.older7DaysCount ?? 0,
-  receivedToday: data?.todayCount ?? 0,
-};
-
-
+  const stats = {
+    overdue: data?.older7DaysCount ?? 0,
+    receivedToday: data?.todayCount ?? 0,
+  };
 
   const getDistrict = async () => {
     const res = await api.get("/operator/all-district");
@@ -82,7 +73,6 @@ const stats = {
   const { data: districtData, isLoading: districtLoading } = useQuery({
     queryKey: ["district-api"],
     queryFn: getDistrict,
-
   });
 
   const getComplaintTypes = async () => {
@@ -93,17 +83,15 @@ const stats = {
   const { data: complaintTypesData, isLoading: typesLoading } = useQuery({
     queryKey: ["complaint-types"],
     queryFn: getComplaintTypes,
-
   });
 
-useEffect(() => {
-  if (data?.data && Array.isArray(data.data)) {
-    setAllComplaints(data.data);
-    const sorted = sortComplaintsByDate(data.data, sortOrder);
-    setFilteredComplaints(sorted);
-  }
-}, [data, sortOrder]);
-
+  useEffect(() => {
+    if (data?.data && Array.isArray(data.data)) {
+      setAllComplaints(data.data);
+      const sorted = sortComplaintsByDate(data.data, sortOrder);
+      setFilteredComplaints(sorted);
+    }
+  }, [data, sortOrder]);
 
   useEffect(() => {
     if (allComplaints.length === 0) return;
@@ -127,7 +115,10 @@ useEffect(() => {
 
     if (selectedDistrict !== "") {
       filtered = filtered.filter((complaint) => {
-        return complaint.district_name?.toLowerCase() === selectedDistrict.toLowerCase();
+        return (
+          complaint.district_name?.toLowerCase() ===
+          selectedDistrict.toLowerCase()
+        );
       });
     }
 
@@ -139,7 +130,7 @@ useEffect(() => {
 
     if (selectedFeeStatus !== "") {
       filtered = filtered.filter((complaint) => {
-          return complaint.fee_exempted?.toString() === selectedFeeStatus;
+        return complaint.fee_exempted?.toString() === selectedFeeStatus;
       });
     }
 
@@ -183,7 +174,7 @@ useEffect(() => {
 
     try {
       const response = await api.post(
-        `/operator/approved-by-ro/${complaintToApprove.id}`
+        `/operator/approved-by-ro/${complaintToApprove.id}`,
       );
 
       if (response.data.success || response.status === 200) {
@@ -200,7 +191,7 @@ useEffect(() => {
           prevData.map((complaint) =>
             complaint.id === complaintToApprove.id
               ? { ...complaint, approved_rejected_by_lokayukt: 1 }
-              : complaint
+              : complaint,
           );
 
         setAllComplaints(updateData);
@@ -230,8 +221,9 @@ useEffect(() => {
   };
 
   const getStatistics = () => {
-    const overdueCount = allComplaints.filter((c) => c.status === "overdue")
-      .length;
+    const overdueCount = allComplaints.filter(
+      (c) => c.status === "overdue",
+    ).length;
     const receivedToday = allComplaints.filter((c) => {
       const today = new Date().toDateString();
       const complaintDate = new Date(c.created_at).toDateString();
@@ -245,39 +237,37 @@ useEffect(() => {
     };
   };
 
-
   const getDaysDifference = (date) => {
     const created = new Date(date);
     const today = new Date();
 
-    const diffTime = today - created; 
+    const diffTime = today - created;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays;
   };
 
-
   function limitTo50Words(text) {
-  const words = text.trim().split(/\s+/);
+    const words = text.trim().split(/\s+/);
 
-  if (words.length <= 30) {
-    return text;
+    if (words.length <= 30) {
+      return text;
+    }
+
+    return words.slice(0, 30).join(" ") + " ...";
   }
-
-  return words.slice(0, 30).join(" ") + " ...";
-}
 
   return (
     <>
-      <Toaster 
-        position="top-right"
-      />
+      <Toaster position="top-right" />
 
       <div className="w-full h-screen flex bg-gray-50 rounded-md overflow-hidden">
         <div className="w-full bg-white flex flex-col overflow-hidden">
           <div className="px-3 sm:px-4 py-3 border-b flex-shrink-0 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-              <h2 className="text-base sm:text-lg font-bold text-gray-900">Draft</h2>
+              <h2 className="text-base sm:text-lg font-bold text-gray-900">
+                Draft
+              </h2>
               <div className="flex flex-wrap gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                 <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium whitespace-nowrap">
                   Inbox: {filteredComplaints.length}
@@ -293,15 +283,14 @@ useEffect(() => {
 
             <div className="flex gap-2 mb-3">
               <div className="flex flex-col ">
-               <button className="flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
-  <IoMdTime className="text-rose-500 text-sm" />
-  Overdue &gt; 7 days ({data?.older7DaysDueCount ?? 0})
-</button>
-</div>
-             <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
-  ₹ Fee Pending {data?.feePending ?? 0}
-</button>
-
+                <button className="flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 rounded text-red-600 hover:bg-red-100 transition-colors text-xs font-medium">
+                  <IoMdTime className="text-rose-500 text-sm" />
+                  Overdue &gt; 7 days ({data?.older7DaysDueCount ?? 0})
+                </button>
+              </div>
+              <button className="px-2.5 py-1 bg-orange-50 border border-orange-200 rounded text-orange-600 hover:bg-orange-100 transition-colors text-xs font-medium">
+                ₹ Fee Pending {data?.feePending ?? 0}
+              </button>
             </div>
 
             <div className="relative mb-3">
@@ -320,13 +309,16 @@ useEffect(() => {
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}>
+                  onChange={(e) => setSelectedStatus(e.target.value)}
+                >
                   <option value="">Status: All</option>
                   <option value="In Progress">In Progress</option>
                   <option value="Disposed Accepted">Disposed Accepted</option>
                   <option value="Resolved">Resolved</option>
                   <option value="Rejected">Rejected</option>
-                  <option value="Under Investigation">Under Investigation</option>
+                  <option value="Under Investigation">
+                    Under Investigation
+                  </option>
                   <option value="Pending">Pending</option>
                 </select>
 
@@ -344,7 +336,7 @@ useEffect(() => {
                   ))}
                 </select>
 
-             <select 
+                <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedFeeStatus}
                   onChange={(e) => setSelectedFeeStatus(e.target.value)}
@@ -372,7 +364,9 @@ useEffect(() => {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-gray-600 text-xs whitespace-nowrap">Sort by:</span>
+                <span className="text-gray-600 text-xs whitespace-nowrap">
+                  Sort by:
+                </span>
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={sortOrder}
@@ -389,27 +383,15 @@ useEffect(() => {
           </div>
 
           <div className="flex-1 overflow-y-auto">
-             {
-              
-               isLoading ? (
-                 <div className="flex items-center justify-center h-full">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">Loading...</h1>
               </div>
-            )
-            :
-              filteredComplaints?.length == 0 ? (
+            ) : filteredComplaints?.length == 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
-            )  : 
-            
-            
-            
-            
-            
-            
-            
-            isError ? (
+            ) : isError ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-red-500 text-sm">Error: {error.message}</p>
               </div>
@@ -426,18 +408,17 @@ useEffect(() => {
                           File No. {complaint.complain_no}
                         </p>
                         <p className="text-xs text-gray-700 mb-1">
-                          Description: {limitTo50Words(complaint.complaint_description) ||
+                          Description:{" "}
+                          {limitTo50Words(complaint.complaint_description) ||
                             "No description available"}
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
-                          <span className="text-gray-500">
-                            Cause Date
-                            :</span>
-                          <span className="ml-1">{complaint.cause_date || "NA"}</span>
+                          <span className="text-gray-500">Cause Date :</span>
+                          <span className="ml-1">
+                            {complaint.cause_date || "NA"}
+                          </span>
                           <span className="mx-1 text-gray-400">•</span>
-                          <span className="text-gray-500">
-                            Category
-                            :</span>
+                          <span className="text-gray-500">Category :</span>
                           <span className="ml-1">
                             {complaint.category || "NA"}
                           </span>
@@ -450,7 +431,7 @@ useEffect(() => {
                               day: "numeric",
                               month: "short",
                               year: "numeric",
-                            }
+                            },
                           )}{" "}
                           • Last action:{" "}
                           {new Date(complaint.updated_at).toLocaleDateString(
@@ -459,7 +440,7 @@ useEffect(() => {
                               day: "numeric",
                               month: "short",
                               year: "numeric",
-                            }
+                            },
                           )}
                         </div>
                       </div>
@@ -470,38 +451,39 @@ useEffect(() => {
                             New Case
                           </span>
                           {/* {complaint.fee_exempted === 1 && ( */}
-                            <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
-                              {
-                                complaint.approved_rejected_by_rk === 0 && complaint.approved_rejected_by_lokayukt === 0? "Record Section"
-                                :  complaint.approved_rejected_by_rk === 1 && 
-                                complaint.approved_rejected_by_lokayukt != 1 
+                          <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
+                            {complaint.approved_rejected_by_rk === 0 &&
+                            complaint.approved_rejected_by_lokayukt === 0
+                              ? "Record Section"
+                              : complaint.approved_rejected_by_rk === 1 &&
+                                  complaint.approved_rejected_by_lokayukt != 1
                                 ? "With Lokayukta"
-                                : 
-                                complaint.approved_rejected_by_rk === 1 && complaint.
-                                approved_rejected_by_lokayukt === 1 ? "  With UpLokayukta"
-                                : "Record Section"
-                              } 
-                            
-                            </span>
+                                : complaint.approved_rejected_by_rk === 1 &&
+                                    complaint.approved_rejected_by_lokayukt ===
+                                      1
+                                  ? "  With UpLokayukta"
+                                  : "Record Section"}
+                          </span>
                           {/* )} */}
                         </div>
 
                         <div className="flex gap-1.5">
                           <span className="px-2 py-0.5 bg-red-50 text-red-600 rounded text-[11px] font-medium">
-                            {getDaysDifference(complaint.created_at)}d</span>
+                            {getDaysDifference(complaint.created_at)}d
+                          </span>
 
                           <span
                             className={`
     px-2 py-0.5 rounded text-[11px] font-medium
-    ${complaint.fee_exempted === 0
-                                ? "bg-green-50 text-blue-600"
-                                : complaint.fee_exempted === 1
-                                  ?
-                                  "bg-orange-50 text-orange-600"
-                                  : complaint.fee_exempted === 2
-                                    ? "bg-blue-50 text-orange-400"
-                                    : ""
-                              }
+    ${
+      complaint.fee_exempted === 0
+        ? "bg-green-50 text-blue-600"
+        : complaint.fee_exempted === 1
+          ? "bg-orange-50 text-orange-600"
+          : complaint.fee_exempted === 2
+            ? "bg-blue-50 text-orange-400"
+            : ""
+    }
   `}
                           >
                             {complaint.fee_exempted === 3
@@ -512,10 +494,7 @@ useEffect(() => {
                                   ? "Partial"
                                   : "Pending"}
                           </span>
-
-
                         </div>
-
 
                         <div className="flex gap-2 w-full sm:w-auto">
                           <button
@@ -542,12 +521,9 @@ useEffect(() => {
                             </span>
                           ) : (
                             <button
-                              onClick={(e) =>
-                                handleApproveClick(e, complaint)
-                              }
+                              onClick={(e) => handleApproveClick(e, complaint)}
                               className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
                             >
-
                               Send To Inbox
                             </button>
                           )}
@@ -560,7 +536,11 @@ useEffect(() => {
             ) : (
               <div className="flex items-center justify-center h-full">
                 <p className="text-gray-500 text-sm">
-                  {searchQuery || selectedDistrict || selectedStatus || selectedFeeStatus || selectedCaseType
+                  {searchQuery ||
+                  selectedDistrict ||
+                  selectedStatus ||
+                  selectedFeeStatus ||
+                  selectedCaseType
                     ? "No results found"
                     : ""}
                 </p>
@@ -594,7 +574,7 @@ useEffect(() => {
                 </div>
                 <div className="ml-4">
                   <h3 className="text-base sm:text-lg font-medium text-gray-900">
-                    Confirm 
+                    Confirm
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500">
                     Are you sure you want to the file in Inbox?
