@@ -2408,7 +2408,7 @@ class OperatorComplaintsController extends Controller
         $join->on('cm.id', '=', 'ca.complaint_id')
              ->where('ca.sent_through_rk', 1);
     })
-    ->select('cm.id')
+    ->select('cm.id' )
     ->groupBy('cm.id')   // duplicate complaints se bachne ke liye
     ->orderBy('cm.id', 'DESC')
     ->get();

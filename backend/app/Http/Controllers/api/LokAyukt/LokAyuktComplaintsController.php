@@ -184,10 +184,10 @@ class LokAyuktComplaintsController extends Controller
     ->get();
       $complainDetails->actions =  DB::table('complaint_actions')
     ->where('complaint_id', $id)
-     ->where(function($q){
-                            $q->where('status','Verified')
-                            ->Orwhere('status', 'Forwarded');               
-                         })
+    //  ->where(function($q){
+    //                         $q->where('status','Verified')
+    //                         ->Orwhere('status', 'Forwarded');               
+    //                      })
                          ->orderBy('id','desc')
     ->get();
 
@@ -1326,6 +1326,7 @@ class LokAyuktComplaintsController extends Controller
                     $apcAction->complaint_id = $id;
                     // $apcAction->status = 'Forwarded';
                     // $apcAction->remarks = "Sent complain to Uplokayukt";
+                    $apcAction->sent_through_rk = "1";
                     $apcAction->forward_by_lokayukt = $userId;
                     $apcAction->forward_to_uplokayukt = $request->forward_to;
                     $apcAction->save();
