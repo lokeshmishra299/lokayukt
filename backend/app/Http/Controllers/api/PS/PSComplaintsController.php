@@ -26,39 +26,26 @@ class PSComplaintsController extends Controller
         $userParentData = User::with('role')->where('id',$parentId)->get();
         $roleParent = $userParentData[0]->role->name;
         // dd($roleParent);
-<<<<<<< HEAD
-=======
            $userParentSubrole = Auth::user()->userParentRole ?? '';  
 
            
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
 
   
     $query = DB::table('complaints')
         ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
-<<<<<<< HEAD
-        ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
-            $join->on('complaints.id', '=', 'rep.complaint_id')
-                ->where(function ($q) use ($parentId, $roleParent) {
-=======
          ->leftJoin('complainants as cmlan', 'complaints.id', '=', 'cmlan.complaint_id')
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
         ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent,$userParentSubrole) {
             $join->on('complaints.id', '=', 'rep.complaint_id')
                 ->where(function ($q) use ($parentId, $roleParent,$userParentSubrole) {
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
 
                     if ($roleParent === 'lok-ayukt') {
                         //  $q->where('rep.forward_to_lokayukt', $parentId);      
                     } elseif ($roleParent === 'up-lok-ayukt') {
-<<<<<<< HEAD
-                        // $q->where('rep.forward_to_uplokayukt', $parentId);
-=======
                         $q->where('rep.forward_to_uplokayukt', $parentId);
                     
                     } elseif ($roleParent ==="supervisor" && $userParentSubrole->sub_role_id === 14) {
                         $q->where('rep.forward_to_sec', $parentId);
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
                     } else {
                         // 🔥 fallback (safe)
                         $q->where('rep.forward_to_lokayukt', $parentId)
@@ -80,38 +67,22 @@ class PSComplaintsController extends Controller
             'complaints.created_at',
             'complaints.updated_at',
             'dd.district_name',
-<<<<<<< HEAD
-            DB::raw('MIN(rep.id) as action_id') // 🔥 avoid duplicates
-        )
-        ->where('complaints.form_status', 1)
-        ->where('complaints.approved_rejected_by_rk', 1)      
-=======
               'dd1.district_name as dist_new',
             DB::raw('MIN(rep.id) as action_id') // 🔥 avoid duplicates
         )
         // ->where('complaints.form_status', 1)
         // ->where('complaints.approved_rejected_by_rk', 1)      
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
         ->groupBy('complaints.id','complaints.complaint_description','complaints.complain_no','complaints.cause_date','complaints.category','complaints.fee_exempted',
          'complaints.approved_rejected_by_rk',
             'complaints.approved_rejected_by_ps',
             'complaints.approved_rejected_by_lokayukt',
-<<<<<<< HEAD
-            'complaints.created_at','complaints.updated_at','dd.district_name');   // 🔥 distinct complaints
-=======
             'complaints.created_at','complaints.updated_at','dd.district_name','dist_new');   // 🔥 distinct complaints
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
 
         // if ($roleParent === 'up-lok-ayukt') {
         //                $query->where('complaints.approved_rejected_by_lokayukt', 1);
         //  }
 
         if($roleParent === 'lok-ayukt'){
-<<<<<<< HEAD
-            $query->where('complaints.approved_rejected_by_lokayukt', 0);
-        }else if($roleParent === 'up-lok-ayukt'){
-            $query->where('complaints.approved_rejected_by_lokayukt', 1);
-=======
             $query->where('complaints.approved_rejected_by_rk', 1)
             ->where('complaints.approved_rejected_by_lokayukt', 0);
         }else if($roleParent === 'up-lok-ayukt'){
@@ -136,7 +107,6 @@ class PSComplaintsController extends Controller
                                 ->whereNotNull('rep.forward_to_sec')
                                  ->where('rep.forward_to_sec',$parentId);
 
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
         }
 
     $records = $query->get();
@@ -205,8 +175,6 @@ class PSComplaintsController extends Controller
                     ->where('fee_exempted', 0)
                      ->distinct('complaints.id')
                     ->count();
-<<<<<<< HEAD
-=======
      }elseif($roleParent ==="supervisor" && $userParentSubrole->sub_role_id == 14){
          $todayCount = DB::table('complaints')
              ->join('complaint_actions as rep','complaints.id', '=', 'rep.complaint_id')
@@ -243,7 +211,6 @@ class PSComplaintsController extends Controller
                     ->where('fee_exempted', 0)
                      ->distinct('complaints.id')
                     ->count();
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
      }
        
      
@@ -306,11 +273,7 @@ class PSComplaintsController extends Controller
 //     ->where('cd.complain_id', $id)
 //     ->get();
              $complainDetails = DB::table('complaints as cm')
-<<<<<<< HEAD
-    // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
-=======
     ->leftJoin('users as u', 'cm.assign_to_ps', '=', 'u.id')
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
     ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
     ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
     
@@ -342,14 +305,9 @@ class PSComplaintsController extends Controller
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',
          'ddn.district_name as correspondence_district',
-<<<<<<< HEAD
-              'rmc.district_name as main_complainant_district',
-        'dmc.district_name as main_respondant_district',
-=======
             'dmc.district_name as main_complainant_district',
         'rmc.district_name as main_respondant_district',
         'u.name as ps_assign_name',
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
         // 'r.*',
         // 'r.respondent_name as r_name',
         // 'r.designation as r_desig',
@@ -1095,11 +1053,8 @@ class PSComplaintsController extends Controller
                     //  $q->where('rep.forward_to_lokayukt', $parentId);      
                  } elseif ($roleParent === 'up-lok-ayukt') {
                      $q->where('rep.forward_to_uplokayukt', $parentId);
-<<<<<<< HEAD
-=======
                  } elseif ($roleParent === 'supervisor') {
                      $q->where('rep.forward_to_sec', $parentId);
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
                  } else {
                      // 🔥 fallback (safe)
                      $q->where('rep.forward_to_lokayukt', $parentId)
@@ -1135,11 +1090,7 @@ class PSComplaintsController extends Controller
     $complainDetails = $complainDetails
                       
                         // ->toSql();
-<<<<<<< HEAD
-                        ->where('approved_rejected_by_ps', 1 )
-=======
                         // ->where('approved_rejected_by_ps', 1 )
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
                         ->distinct('cm.id')
                       ->get();
 

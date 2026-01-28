@@ -192,11 +192,19 @@ const handleSendToUPLokayukt = async () => {
       });
     }
 
-    if (selectedDistrict !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.district_name?.toLowerCase() === selectedDistrict.toLowerCase();
-      });
-    }
+   if (selectedDistrict !== "") {
+  filtered = filtered.filter((complaint) => {
+    const dataDistrict = complaint.dist_new;
+
+    if (!dataDistrict) return false;
+
+    return (
+      dataDistrict.toString().toLowerCase().trim() ===
+      selectedDistrict.toString().toLowerCase().trim()
+    );
+  });
+}
+
 
     if (selectedStatus !== "") {
       filtered = filtered.filter((complaint) => {

@@ -152,13 +152,8 @@ class LokAyuktComplaintsController extends Controller
         // 'cpt.is_public_servant as comp_public_servant',
          'cpt.complainant_name as main_complainant_name',
         'cpt.father_name as main_complainant_father',
-<<<<<<< HEAD
-             'rmc.district_name as main_complainant_district',
-        'dmc.district_name as main_respondant_district',
-=======
              'dmc.district_name as main_complainant_district',
         'rmc.district_name as main_respondant_district',
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
         // main respondent
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',
@@ -1456,8 +1451,6 @@ class LokAyuktComplaintsController extends Controller
     ]);
 
     }
-<<<<<<< HEAD
-=======
 
       public function releasekByLokayukt(Request $request,$complainId){
                                     
@@ -1495,5 +1488,4 @@ class LokAyuktComplaintsController extends Controller
         }
 
     }
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
 }
