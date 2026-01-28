@@ -357,6 +357,10 @@ class ComplaintsController extends Controller
          if(!empty($usersByRole['lok-ayukt'])){
             $data[] =  $usersByRole['lok-ayukt'];
             $data[] =  $usersByRole['up-lok-ayukt'];
+<<<<<<< HEAD
+=======
+            $data[] =  $usersByRole['supervisor'];
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
 
            return response()->json($data);
         }else{

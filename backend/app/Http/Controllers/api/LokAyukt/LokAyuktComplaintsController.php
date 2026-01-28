@@ -25,6 +25,8 @@ class LokAyuktComplaintsController extends Controller
     $query = DB::table('complaints')
         //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
         ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+         ->leftJoin('complainants as cmlan', 'complaints.id', '=', 'cmlan.complaint_id')
+                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
         // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
         // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
         // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -33,6 +35,7 @@ class LokAyuktComplaintsController extends Controller
         ->select(
             'complaints.*',
             'dd.district_name as district_name',
+              'dd1.district_name as dist_new',
 
         );
 
@@ -149,8 +152,13 @@ class LokAyuktComplaintsController extends Controller
         // 'cpt.is_public_servant as comp_public_servant',
          'cpt.complainant_name as main_complainant_name',
         'cpt.father_name as main_complainant_father',
+<<<<<<< HEAD
              'rmc.district_name as main_complainant_district',
         'dmc.district_name as main_respondant_district',
+=======
+             'dmc.district_name as main_complainant_district',
+        'rmc.district_name as main_respondant_district',
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
         // main respondent
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',
@@ -423,7 +431,7 @@ class LokAyuktComplaintsController extends Controller
              $cmp =  Complaint::findOrFail($complainId);
              
             if($cmp){
-                $cmp->status = "Disposed - Accepted";
+                $cmp->status = "Final Disposal / Closed";
                
                 if($cmp->save()){
                     $apcAction = new ComplaintAction();
@@ -1448,4 +1456,44 @@ class LokAyuktComplaintsController extends Controller
     ]);
 
     }
+<<<<<<< HEAD
+=======
+
+      public function releasekByLokayukt(Request $request,$complainId){
+                                    
+          $request->validate([
+            'forward_to' => 'required',
+            
+        ]);
+
+       
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                if($request->forward_to == "ps"){
+                    $cmp->assign_to_ps = null;
+                }else if($request->forward_to == "ro-aro"){
+                    $cmp->assign_to_ro_aro = null;
+                }
+                    
+              $cmp->save(); 
+            }
+            
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Release Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
 }

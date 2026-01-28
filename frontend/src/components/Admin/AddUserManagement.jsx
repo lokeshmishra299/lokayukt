@@ -541,7 +541,11 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
         
         {/* ये code अपडेट करें */}
         {fetchLokayuktData?.flat(2)?.map((item) => (
+<<<<<<< HEAD
           <option key={item.id} value={item.user_name}>
+=======
+          <option key={item.id} value={item.id}>
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
             {item.user_name} ({item.name})
           </option>
         ))}

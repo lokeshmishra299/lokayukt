@@ -81,7 +81,12 @@ class SupervisorDashboardController extends Controller
 
     switch ($userSubrole) {
             case "sec":
+<<<<<<< HEAD
            $query->where('rep.status', 'Forwarded')
+=======
+           $query->where('approved_rejected_by_sec', 0)
+           ->where('rep.status', 'Forwarded')
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
                                 ->whereNotNull('rep.forward_to_sec')
                                 ->distinct('cmp.id')
                                  ->where('rep.forward_to_sec',$user);

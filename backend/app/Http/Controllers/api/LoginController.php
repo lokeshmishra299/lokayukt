@@ -100,6 +100,18 @@ class LoginController extends Controller
         //         'role' => $user->role->name ?? 'N/A',
         //     ]
         // ]);
+        $deviceId = get_device_id();
+
+        audit_log([
+            'user_id'    => auth()->id(),
+            'action'     => 'LOGIN_SUCCESS',
+            'entity'     => null,
+            'entity_id'  => null,
+            'device_id'  => $deviceId,
+            'ip_addr'    => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+
          return ApiResponse::generateResponse('success', 'Login Successful.', [
             'access_token' => $token,
             'token_type'   => 'Bearer',
@@ -223,8 +235,17 @@ public function resetPassword(Request $request)
 
   public function logout(Request $request){
 
-        $request->user()->currentAccessToken()->delete();
-
+      $request->user()->currentAccessToken()->delete();
+            $deviceId = get_device_id();
+            audit_log([
+        'user_id'    => auth()->id(),
+        'action'     => 'LOGOUT',
+        'entity'     => 'users',
+        'entity_id'  => auth()->id(),
+        'device_id'  => $deviceId,
+        'ip_addr'    => request()->ip(),
+        'user_agent' => request()->userAgent(),
+        ]);
         return ApiResponse::generateResponse('success','Logout Successfully');
     }
 }

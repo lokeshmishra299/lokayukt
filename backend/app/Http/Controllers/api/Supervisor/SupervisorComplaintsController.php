@@ -90,13 +90,13 @@ class SupervisorComplaintsController extends Controller
         // ->where('approved_by_ro', 1);
 
     switch ($userSubrole) {
-        case "so-us":
-            $query->where('form_status', 1)
-                  ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_ds_js', 0);
-                //   ->where('approved_by_ro', 1);
-            // $query->where('complaints.added_by', $user);
-            break;
+        // case "so-us":
+        //     $query->where('form_status', 1)
+        //           ->where('approved_rejected_by_ro', 1)
+        //           ->where('approved_rejected_by_ds_js', 0);
+        //         //   ->where('approved_by_ro', 1);
+        //     // $query->where('complaints.added_by', $user);
+        //     break;
 
         // case "ds-js":
         //   $query->where('form_status', 1)
@@ -108,6 +108,10 @@ class SupervisorComplaintsController extends Controller
         case "ro-aro":
           $query->where('form_status', 1)
                   ->where('approved_rejected_by_rk', 1)
+<<<<<<< HEAD
+=======
+                  ->where('approved_rejected_by_ro_aro', 0)
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
                   ->where('rep.forward_to_ro_aro', $user)
                   ->whereOr('rep.forward_to_uplokayukt','<>',0);
                 //   ->where('forward_so', 1)
@@ -159,7 +163,12 @@ class SupervisorComplaintsController extends Controller
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
                 // $query->groupBy('rep.target_date');    
+<<<<<<< HEAD
                         $query->where('rep.status', 'Forwarded')
+=======
+                        $query->where('approved_rejected_by_sec', 0)
+                        ->where('rep.status', 'Forwarded')
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
                                 ->whereNotNull('rep.forward_to_sec')
                                  ->where('rep.forward_to_sec',$user);
                 //  $query->where('rep.type', 2)
@@ -258,15 +267,15 @@ class SupervisorComplaintsController extends Controller
 
             break;
 
-        case "dea-assis":
-          $query->where('form_status', 1)
-                  ->where('approved_rejected_by_ro', 1)
-                   ->where(function($q){
-                            $q->where('approved_rejected_by_so_us',1)
-                            ->Orwhere('approved_rejected_by_ds_js', 1);               
-                         });
-                    // ->whereNotNull('forward_to_d_a');
-            break;
+        // case "dea-assis":
+        //   $query->where('form_status', 1)
+        //           ->where('approved_rejected_by_ro', 1)
+        //            ->where(function($q){
+        //                     $q->where('approved_rejected_by_so_us',1)
+        //                     ->Orwhere('approved_rejected_by_ds_js', 1);               
+        //                  });
+        //             // ->whereNotNull('forward_to_d_a');
+        //     break;
 
         default:
             return response()->json([
@@ -381,8 +390,13 @@ class SupervisorComplaintsController extends Controller
         // 'cpt.is_public_servant as comp_public_servant',
          'cpt.complainant_name as main_complainant_name',
         'cpt.father_name as main_complainant_father',
+<<<<<<< HEAD
              'rmc.district_name as main_complainant_district',
         'dmc.district_name as main_respondant_district',
+=======
+             'dmc.district_name as main_complainant_district',
+        'rmc.district_name as main_respondant_district',
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
         // main respondent
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',
@@ -1559,13 +1573,23 @@ class SupervisorComplaintsController extends Controller
            $complainDetails->where('rep.status', 'Forwarded')
                                 // ->whereNotNull('rep.forward_to_sec')
                                 // ->where('approved_rejected_by_rk', 1)
+<<<<<<< HEAD
+=======
+                                 ->where('approved_rejected_by_sec', 1)
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
                                 ->where('cm.approved_rejected_by_sec', 1)
                                  ->where('rep.forward_by_sec',$user);
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
             break;
        case "ro-aro":
+<<<<<<< HEAD
           $complainDetails->where('rep.status','Forwarded')
+=======
+          $complainDetails
+          ->where('approved_rejected_by_ro_aro', 1)
+          ->where('rep.status','Forwarded')
+>>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
           ->where('rep.forward_by_ro_aro', $user);
                 //   ->where('approved_rejected_by_rk', 1)
                 //   ->where('cm.approved_rejected_by_ro_aro', 1)
