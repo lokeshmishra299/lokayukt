@@ -354,8 +354,8 @@ $complainDetails = DB::table('complaints as cm')
         // main complainant
         'cpt.complainant_name as main_complainant_name',
         'cpt.father_name as main_complainant_father',
-        'rmc.district_name as main_complainant_district',
-        'dmc.district_name as main_respondant_district',
+        'dmc.district_name as main_complainant_district',
+        'rmc.district_name as main_respondant_district',
         // main respondent
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',

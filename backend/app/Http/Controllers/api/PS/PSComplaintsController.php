@@ -26,21 +26,26 @@ class PSComplaintsController extends Controller
         $userParentData = User::with('role')->where('id',$parentId)->get();
         $roleParent = $userParentData[0]->role->name;
         // dd($roleParent);
-           $userParentSubrole = Auth::user()->userParentRole;  
+           $userParentSubrole = Auth::user()->userParentRole ?? '';  
+
+           
+
   
     $query = DB::table('complaints')
         ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
-        ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
+         ->leftJoin('complainants as cmlan', 'complaints.id', '=', 'cmlan.complaint_id')
+                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
+        ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent,$userParentSubrole) {
             $join->on('complaints.id', '=', 'rep.complaint_id')
-                ->where(function ($q) use ($parentId, $roleParent) {
+                ->where(function ($q) use ($parentId, $roleParent,$userParentSubrole) {
 
                     if ($roleParent === 'lok-ayukt') {
                         //  $q->where('rep.forward_to_lokayukt', $parentId);      
                     } elseif ($roleParent === 'up-lok-ayukt') {
-                        // $q->where('rep.forward_to_uplokayukt', $parentId);
+                        $q->where('rep.forward_to_uplokayukt', $parentId);
                     
-                    } elseif ($roleParent === 'supervisor') {
-                        // $q->where('rep.forward_to_sec', $parentId);
+                    } elseif ($roleParent ==="supervisor" && $userParentSubrole->sub_role_id === 14) {
+                        $q->where('rep.forward_to_sec', $parentId);
                     } else {
                         // 🔥 fallback (safe)
                         $q->where('rep.forward_to_lokayukt', $parentId)
@@ -62,29 +67,46 @@ class PSComplaintsController extends Controller
             'complaints.created_at',
             'complaints.updated_at',
             'dd.district_name',
+              'dd1.district_name as dist_new',
             DB::raw('MIN(rep.id) as action_id') // 🔥 avoid duplicates
         )
-        ->where('complaints.form_status', 1)
-        ->where('complaints.approved_rejected_by_rk', 1)      
+        // ->where('complaints.form_status', 1)
+        // ->where('complaints.approved_rejected_by_rk', 1)      
         ->groupBy('complaints.id','complaints.complaint_description','complaints.complain_no','complaints.cause_date','complaints.category','complaints.fee_exempted',
          'complaints.approved_rejected_by_rk',
             'complaints.approved_rejected_by_ps',
             'complaints.approved_rejected_by_lokayukt',
-            'complaints.created_at','complaints.updated_at','dd.district_name');   // 🔥 distinct complaints
+            'complaints.created_at','complaints.updated_at','dd.district_name','dist_new');   // 🔥 distinct complaints
 
         // if ($roleParent === 'up-lok-ayukt') {
         //                $query->where('complaints.approved_rejected_by_lokayukt', 1);
         //  }
 
         if($roleParent === 'lok-ayukt'){
-            $query->where('complaints.approved_rejected_by_lokayukt', 0);
+            $query->where('complaints.approved_rejected_by_rk', 1)
+            ->where('complaints.approved_rejected_by_lokayukt', 0);
         }else if($roleParent === 'up-lok-ayukt'){
-            $query->where('complaints.approved_rejected_by_lokayukt', 1);
+            $query->where('complaints.approved_rejected_by_rk', 1)
+            ->where('complaints.approved_rejected_by_lokayukt', 1);
         }
-        else if($roleParent === 'supervisor'){
-            $query->where('rep.status', 'Forwarded')
+        else if($roleParent ==="supervisor" && $userParentSubrole->sub_role_id == 14){
+            // $query
+            // ->where('complaints.approved_rejected_by_lokayukt', 0)
+            // ->Orwhere('complaints.approved_rejected_by_lokayukt', 1)
+            // ->where('rep.status', 'Forwarded')
+            //                     ->whereNotNull('rep.forward_to_sec')
+            // ->where('rep.forward_to_sec', $parentId);
+            // ->where(function ($query) {
+            //     $query->where('complaints.approved_rejected_by_lokayukt', 0)
+            //         ->orWhere('complaints.approved_rejected_by_lokayukt', 1);
+            // })
+            // ->where('rep.status', 'Forwarded')
+            // ->whereNotNull('rep.forward_to_sec')
+            // ->where('rep.forward_to_sec', $parentId);
+             $query->where('rep.status', 'Forwarded')
                                 ->whereNotNull('rep.forward_to_sec')
-            ->where('rep.forward_to_sec', $parentId);
+                                 ->where('rep.forward_to_sec',$parentId);
+
         }
 
     $records = $query->get();
@@ -283,8 +305,8 @@ class PSComplaintsController extends Controller
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',
          'ddn.district_name as correspondence_district',
-              'rmc.district_name as main_complainant_district',
-        'dmc.district_name as main_respondant_district',
+            'dmc.district_name as main_complainant_district',
+        'rmc.district_name as main_respondant_district',
         'u.name as ps_assign_name',
         // 'r.*',
         // 'r.respondent_name as r_name',

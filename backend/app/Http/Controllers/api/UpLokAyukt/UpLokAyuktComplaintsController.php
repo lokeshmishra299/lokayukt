@@ -24,6 +24,8 @@ class UpLokAyuktComplaintsController extends Controller
     $query = DB::table('complaints')
         //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
         ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+         ->leftJoin('complainants as cmlan', 'complaints.id', '=', 'cmlan.complaint_id')
+                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
         // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
         // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
         // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -32,15 +34,15 @@ class UpLokAyuktComplaintsController extends Controller
         ->select(
             'complaints.*',
             'dd.district_name as district_name',
+              'dd1.district_name as dist_new',
 
         );
 
 
-     $query->where('form_status', 1)
-                    ->distinct('complaints.id')
-                    ->where('complaints.approved_rejected_by_lokayukt' ,'<>', 0)
-                    ->where('rep.forward_to_uplokayukt', $user)
-                    ->where('approved_rejected_by_rk', 1);
+     $query->distinct('complaints.id')
+                    ->where('approved_rejected_by_rk', 1)
+                     ->where('complaints.approved_rejected_by_lokayukt' , 1)
+                    ->where('rep.forward_to_uplokayukt', $user);
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)
                     //         ->Orwhere('approved_rejected_by_ds_js', 1);               
@@ -263,8 +265,8 @@ $complainDetails = DB::table('complaints as cm')
         // main complainant
         'cpt.complainant_name as main_complainant_name',
         'cpt.father_name as main_complainant_father',
-        'rmc.district_name as main_complainant_district',
-        'dmc.district_name as main_respondant_district',
+         'dmc.district_name as main_complainant_district',
+        'rmc.district_name as main_respondant_district',
         // main respondent
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',
