@@ -998,8 +998,6 @@ class OperatorComplaintsController extends Controller
         }
 
     }
-<<<<<<< HEAD
-=======
 
 //  Multiple file upload
 // ----------------------
@@ -1073,7 +1071,6 @@ class OperatorComplaintsController extends Controller
 //     ], 400);
 // }
 
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
     public function checkduplicateStoreComplain(Request $request)
     {
         // DB::beginTransaction();
@@ -1838,10 +1835,7 @@ class OperatorComplaintsController extends Controller
        
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-<<<<<<< HEAD
-=======
-                ->leftJoin('complainants as cmlan', 'cm.id', '=', 'cmlan.complaint_id')
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
+    ->leftJoin('complainants as cmlan', 'cm.id', '=', 'cmlan.complaint_id')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
@@ -2392,9 +2386,6 @@ class OperatorComplaintsController extends Controller
         }
 
     }
-<<<<<<< HEAD
-
-=======
     
     public function allRCmovement(){
         // $ca = DB::table('complaints as cm')
@@ -2447,5 +2438,4 @@ class OperatorComplaintsController extends Controller
                     ], 200);
 
         }
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
 }
