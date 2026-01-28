@@ -186,10 +186,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/approved-by-ro/{complainId}',[OperatorComplaintsController::class,'approvedByRo']);
         Route::get('get-section-officers',[OperatorComplaintsController::class,'getSectionOfficers']);
         Route::get('/get-users',[OperatorComplaintsController::class,'getSubROleUsers']);
-<<<<<<< HEAD
-=======
         Route::get('/get-movement-history',[OperatorComplaintsController::class,'allRCmovement']);
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
 
         Route::get('/progress-register',[OperatorReportController::class,'progress_report']);
         Route::get('/current-report',[OperatorReportController::class,'current_report']);
@@ -212,11 +209,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/categories',[CommonController::class,'fetch_Category']);
     });
 
-<<<<<<< HEAD
-    Route::middleware('role:supervisor:so-us|ro-aro|sec|cio-io|dea-assis')->prefix('supervisor')->group(function () {
-=======
     Route::middleware('role:supervisor:so-us|ro-aro|ro|sec|cio-io|dea-assis')->prefix('supervisor')->group(function () {
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
         
         Route::get('/all-district',[SupervisorCommonController::class,'fetch_district']);
         Route::get('/all-complaints',[SupervisorComplaintsController::class,'allComplains']);
@@ -304,10 +297,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/all-complain-ids',[LokAyuktComplaintsController::class,'allComplainsId']);
         Route::get('/all-dispatch-letters',[LokAyuktComplaintsController::class,'allDispatchLetters']);
          Route::post('/upload-document',[LokAyuktComplaintsController::class,'uploadDocument']);
-<<<<<<< HEAD
-=======
          Route::post('/released-by-lokayukt/{id}',[LokAyuktComplaintsController::class,'releasekByLokayukt']);
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
        
        
         // Route::post('/forward-by-ds-js/{complainId}',[LokAyuktComplaintsController::class,'forwardComplaintbyds']);
@@ -549,11 +539,9 @@ Route::middleware('auth:sanctum')->group(function(){
           Route::post('/pull-back-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'pullBackByupLokayukt']);
           Route::post('/reject-complaint-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'rejectComplaintByUpLokayukt']);
           Route::post('/fee-exempted/{complaint_id}',[UpLokAyuktComplaintsController::class,'approvedFeeByUpLokayukt']);
-<<<<<<< HEAD
-=======
+
           Route::post('/released-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'releasekByUpLokayukt']);
          
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
           // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
         // Route::post('/forward-by-da/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/request-report/{complainId}',[UpLokAyuktReportController::class,'requestReport']);
