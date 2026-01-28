@@ -39,18 +39,10 @@ class UpLokAyuktComplaintsController extends Controller
         );
 
 
-<<<<<<< HEAD
-     $query->where('form_status', 1)
-                    ->distinct('complaints.id')
-                    ->where('complaints.approved_rejected_by_lokayukt' ,'<>', 0)
-                    ->where('rep.forward_to_uplokayukt', $user)
-                    ->where('approved_rejected_by_rk', 1);
-=======
      $query->distinct('complaints.id')
                     ->where('approved_rejected_by_rk', 1)
                      ->where('complaints.approved_rejected_by_lokayukt' , 1)
                     ->where('rep.forward_to_uplokayukt', $user);
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)
                     //         ->Orwhere('approved_rejected_by_ds_js', 1);               
@@ -273,13 +265,8 @@ $complainDetails = DB::table('complaints as cm')
         // main complainant
         'cpt.complainant_name as main_complainant_name',
         'cpt.father_name as main_complainant_father',
-<<<<<<< HEAD
-        'rmc.district_name as main_complainant_district',
-        'dmc.district_name as main_respondant_district',
-=======
          'dmc.district_name as main_complainant_district',
         'rmc.district_name as main_respondant_district',
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
         // main respondent
         'r.respondent_name as main_respondent_name',
         'r.designation as main_respondent_designation',
@@ -1138,8 +1125,6 @@ $complainDetails->actions = DB::table('complaint_actions')
    
     
     }
-<<<<<<< HEAD
-=======
 
          public function releasekByUpLokayukt(Request $request,$complainId){
                                     
@@ -1177,5 +1162,4 @@ $complainDetails->actions = DB::table('complaint_actions')
         }
 
     }
->>>>>>> 4b942a91dcc497015cd3ee7ad99087e83fa42308
 }
