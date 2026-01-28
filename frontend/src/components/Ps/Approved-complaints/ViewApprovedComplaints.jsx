@@ -485,17 +485,17 @@ const ViewApprovedComplaints = () => {
             <div className="p-4 md:p-6 border-b">
               {/* Mobile Header */}
               <div className="md:hidden mb-4">
-                <div className="flex justify-between items-center mb-3">
+                {/* <div className="flex justify-between items-center mb-3">
                   <button
                     onClick={() => navigate(-1)}
                     className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
                   >
                     <IoMdArrowBack className="w-4 h-4" /> Back
                   </button>
-                </div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                </div> */}
+                {/* <h2 className="text-lg font-semibold text-gray-800 mb-2">
                   File No. {complaintData.complain_no}
-                </h2>
+                </h2> */}
                 {/* <div className="mb-3">
                   <span
   className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
