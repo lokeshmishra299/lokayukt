@@ -58,17 +58,27 @@ const SearchableDropdown = ({
     };
   }, [wrapperRef]);
 
-  const selectedOption = options.find((opt) => opt.id == value);
+  // const selectedOption = options.find((opt) => opt.id == value);
+const selectedOption = (options || []).find(
+  (opt) => opt && typeof opt === "object" && opt.id == value
+);
 
-  const filteredOptions = options.filter((option) => {
-    const label = option.name || option.user_name || `User ${option.id}`;
-    const district = option.district_name || "";
-    const search = searchTerm.toLowerCase();
-    return (
-      label.toLowerCase().includes(search) ||
-      district.toLowerCase().includes(search)
-    );
-  });
+
+const filteredOptions = (options || []).filter((option) => {
+  if (!option || typeof option !== "object") return false; // 🛡 protection
+
+  const label = option.name || option.user_name;
+  if (!label) return false; // remove nameless entries
+
+  const district = option.district_name || "";
+  const search = searchTerm.toLowerCase();
+
+  return (
+    label.toLowerCase().includes(search) ||
+    district.toLowerCase().includes(search)
+  );
+});
+
 
   const handleSelect = (option) => {
     onChange(option.id);
@@ -220,7 +230,9 @@ const ViewAllComplaint = () => {
         const raw = res.data?.data || res.data || [];
         const flatList = Array.isArray(raw) ? raw.flat() : [];
 
-        return flatList;
+return flatList.filter(
+  (item) => item && typeof item === "object" && (item.name || item.user_name)
+);
       } catch (error) {
         throw error;
       }

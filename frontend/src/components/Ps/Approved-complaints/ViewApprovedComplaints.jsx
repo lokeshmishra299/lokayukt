@@ -58,17 +58,27 @@ const SearchableDropdown = ({
     };
   }, [wrapperRef]);
 
-  const selectedOption = options.find((opt) => opt.id == value);
+  // const selectedOption = options.find((opt) => opt.id == value);
+const selectedOption = (options || []).find(
+  (opt) => opt && typeof opt === "object" && opt.id == value
+);
 
-  const filteredOptions = options.filter((option) => {
-    const label = option.name || option.user_name || `User ${option.id}`;
-    const district = option.district_name || "";
-    const search = searchTerm.toLowerCase();
-    return (
-      label.toLowerCase().includes(search) ||
-      district.toLowerCase().includes(search)
-    );
-  });
+
+const filteredOptions = (options || []).filter((option) => {
+  if (!option || typeof option !== "object") return false; // 🛡 protection
+
+  const label = option.name || option.user_name;
+  if (!label) return false; // remove nameless entries
+
+  const district = option.district_name || "";
+  const search = searchTerm.toLowerCase();
+
+  return (
+    label.toLowerCase().includes(search) ||
+    district.toLowerCase().includes(search)
+  );
+});
+
 
   const handleSelect = (option) => {
     onChange(option.id);
@@ -220,7 +230,9 @@ const ViewApprovedComplaints = () => {
         const raw = res.data?.data || res.data || [];
         const flatList = Array.isArray(raw) ? raw.flat() : [];
 
-        return flatList;
+return flatList.filter(
+  (item) => item && typeof item === "object" && (item.name || item.user_name)
+);
       } catch (error) {
         throw error;
       }
@@ -254,6 +266,7 @@ const ViewApprovedComplaints = () => {
     );
   },
 });
+
 
   const pullBackMutation = useMutation({
     mutationFn: async ({ complaintId }) => {
@@ -485,17 +498,17 @@ const ViewApprovedComplaints = () => {
             <div className="p-4 md:p-6 border-b">
               {/* Mobile Header */}
               <div className="md:hidden mb-4">
-                {/* <div className="flex justify-between items-center mb-3">
+                <div className="flex justify-between items-center mb-3">
                   <button
                     onClick={() => navigate(-1)}
                     className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
                   >
                     <IoMdArrowBack className="w-4 h-4" /> Back
                   </button>
-                </div> */}
-                {/* <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                </div>
+                <h2 className="text-lg font-semibold text-gray-800 mb-2">
                   File No. {complaintData.complain_no}
-                </h2> */}
+                </h2>
                 {/* <div className="mb-3">
                   <span
   className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
@@ -511,7 +524,7 @@ const ViewApprovedComplaints = () => {
 
                 {/* मोबाइल वर्जन */}
 {/* Mobile Header */}
-<div className="md:hidden mb-4">
+{/* <div className="md:hidden mb-4">
   <div className="flex justify-between items-center mb-3">
     <button
       onClick={() => navigate(-1)}
@@ -534,7 +547,7 @@ const ViewApprovedComplaints = () => {
         : "In Motion – With Lokayukta"}
     </span>
   </div>
-</div>
+</div> */}
 
 {/* Desktop Header */}
 <div className="hidden md:block">
@@ -883,7 +896,7 @@ const ViewApprovedComplaints = () => {
               </div>
             ) : (
               <div>
-                <HideModule />
+                <HideModule complaint={complaintData}  />
               </div>
             )}
 
@@ -984,11 +997,11 @@ const ViewApprovedComplaints = () => {
 
 
 
-                    {complaintData.approved_rejected_by_ps == "1" ? (
-                      <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                    {/* {complaintData.approved_rejected_by_ps == "1" ? ( */}
+                      {/* <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
                         Forwarded
-                      </span>
-                    ) : (
+                      </span> */}
+                    {/* ) : ( */}
                       <button
                         onClick={handleforwardphysical}
                         disabled={forwardComplaintMutation.isPending}
@@ -998,7 +1011,7 @@ const ViewApprovedComplaints = () => {
                           ? "Processing..."
                           : "Send / Mark"}
                       </button>
-                    )}
+                    {/* )} */}
                   </div>
                 </div>
               </div>
