@@ -1090,7 +1090,14 @@ $complainDetails->actions = $actions;
         $roleParent = $userParentData[0]->role->name;
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
-                  ->leftJoin('complainants as cmlan', 'cm.id', '=', 'cmlan.complaint_id')
+                 ->leftJoin('complainants as cmlan', function ($join) {
+                    $join->on('cm.id', '=', 'cmlan.complaint_id')
+                        ->where('cmlan.is_main', 1);
+                })
+                    ->leftJoin('respondents as resp', function ($join) {
+                    $join->on('cm.id', '=', 'resp.complaint_id')
+                        ->where('resp.is_main', 1);
+                })
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
         $join->on('cm.id', '=', 'rep.complaint_id')
@@ -1120,6 +1127,8 @@ $complainDetails->actions = $actions;
                     'dd.district_name',
                      'dd.district_name as district_name',
                        'dd1.district_name as dist_new',
+                         'cmlan.complainant_name as complainantName',
+                      'resp.respondent_name as respondentName',
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',

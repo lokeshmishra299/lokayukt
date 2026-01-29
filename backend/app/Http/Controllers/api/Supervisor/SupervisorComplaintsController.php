@@ -27,6 +27,15 @@ class SupervisorComplaintsController extends Controller
     $query = DB::table('complaints')
         //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
         ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+        ->leftJoin('complainants as cmlan', function ($join) {
+                    $join->on('cm.id', '=', 'cmlan.complaint_id')
+                        ->where('cmlan.is_main', 1);
+                })
+                    ->leftJoin('respondents as resp', function ($join) {
+                    $join->on('cm.id', '=', 'resp.complaint_id')
+                        ->where('resp.is_main', 1);
+                })
+                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
         // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
         // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
         // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -35,6 +44,9 @@ class SupervisorComplaintsController extends Controller
         ->select(
             'complaints.*',
             'dd.district_name as district_name',
+             'dd1.district_name as dist_new',
+              'cmlan.complainant_name as complainantName',
+                      'resp.respondent_name as respondentName',
             // 'dp.name as department_name',
             // 'ds.name as designation_name',
             // 'ct.name as complaintype_name',
@@ -1568,7 +1580,14 @@ $complainDetails->actions = $actions;
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 ->leftJoin('complaint_actions as rep', 'cm.id', '=', 'rep.complaint_id')
-                  ->leftJoin('complainants as cmlan', 'cm.id', '=', 'cmlan.complaint_id')
+                 ->leftJoin('complainants as cmlan', function ($join) {
+                    $join->on('cm.id', '=', 'cmlan.complaint_id')
+                        ->where('cmlan.is_main', 1);
+                })
+                    ->leftJoin('respondents as resp', function ($join) {
+                    $join->on('cm.id', '=', 'resp.complaint_id')
+                        ->where('resp.is_main', 1);
+                })
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
@@ -1579,6 +1598,8 @@ $complainDetails->actions = $actions;
                     'dd.district_name',
                      'dd.district_name as district_name',
                        'dd1.district_name as dist_new',
+                         'cmlan.complainant_name as complainantName',
+                      'resp.respondent_name as respondentName',
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',
