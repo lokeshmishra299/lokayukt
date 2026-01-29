@@ -952,124 +952,124 @@ class OperatorComplaintsController extends Controller
     //     }   
     // }
 
-    public function uploadDocument(Request $request)
-    {
-        // dd($request->complain_id);
-        // $user = $request->user()->id;
-        $added_by = Auth::user()->id;
+    // public function uploadDocument(Request $request)
+    // {
+    //     // dd($request->complain_id);
+    //     // $user = $request->user()->id;
+    //     $added_by = Auth::user()->id;
     
-        $validation = Validator::make($request->all(), [
+    //     $validation = Validator::make($request->all(), [
             
-            'complain_id' => 'required|numeric',
-            'type' => 'required|string',
-            'title' => 'required|string',
-            'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
-        ], [
-            'complain_id.required' => 'Complaint Id is required.',
-            'type.required' => 'Complaint description is required.',
-            'title.required' => 'Letter Subject is Required',
-            'file.required' => 'File is Required',
-        ]);
+    //         'complain_id' => 'required|numeric',
+    //         'type' => 'required|string',
+    //         'title' => 'required|string',
+    //         'file' =>  'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+    //     ], [
+    //         'complain_id.required' => 'Complaint Id is required.',
+    //         'type.required' => 'Complaint description is required.',
+    //         'title.required' => 'Letter Subject is Required',
+    //         'file.required' => 'File is Required',
+    //     ]);
 
-        if ($validation->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validation->errors()
-            ], 422);
-        }
+    //     if ($validation->fails()) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'errors' => $validation->errors()
+    //         ], 422);
+    //     }
 
-        if(isset($request->complain_id)){    
-                $compDoc = new ComplainDocuments();
-                $compDoc->complain_id = $request->complain_id;
-                $compDoc->added_by = $added_by;
-                $compDoc->type = $request->type;
-                $compDoc->title = $request->title;     
-                $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
-                $filePath = $request->file('file')->storeAs('Document', $file, 'public');
-                $compDoc->file = $file;
+    //     if(isset($request->complain_id)){    
+    //             $compDoc = new ComplainDocuments();
+    //             $compDoc->complain_id = $request->complain_id;
+    //             $compDoc->added_by = $added_by;
+    //             $compDoc->type = $request->type;
+    //             $compDoc->title = $request->title;     
+    //             $file = 'doc_' . uniqid() . '.' . $request->file('file')->getClientOriginalExtension();
+    //             $filePath = $request->file('file')->storeAs('Document', $file, 'public');
+    //             $compDoc->file = $file;
                 
-                $compDoc->save();
+    //             $compDoc->save();
               
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Document Added successfully.',
-                    'data' => $compDoc
-                ], 201);
-        }
+    //             return response()->json([
+    //                 'status' => true,
+    //                 'message' => 'Document Added successfully.',
+    //                 'data' => $compDoc
+    //             ], 201);
+    //     }
 
-    }
+    // }
 
 //  Multiple file upload
 // ----------------------
 
-//     public function uploadDocument(Request $request)
-// {
-//     $added_by = Auth::user()->id;
+    public function uploadDocument(Request $request)
+{
+    $added_by = Auth::user()->id;
 
-//     // Validation for multiple files
-//     $validation = Validator::make($request->all(), [
+    // Validation for multiple files
+    $validation = Validator::make($request->all(), [
 
-//         'complain_id' => 'required|numeric',
-//         'type'        => 'required|string',
-//         'title'       => 'required|string',
+        'complain_id' => 'required|numeric',
+        'type'        => 'required|string',
+        'title'       => 'required|string',
 
-//         // Multiple file validation
-//         'file'        => 'required|array',
-//         'file.*'      => 'file|mimes:jpg,jpeg,png,pdf|max:2048',
+        // Multiple file validation
+        'file'        => 'required|array',
+        'file.*'      => 'file|mimes:jpg,jpeg,png,pdf|max:2048',
 
-//     ], [
+    ], [
 
-//         'complain_id.required' => 'Complaint Id is required.',
-//         'type.required'        => 'Complaint description is required.',
-//         'title.required'       => 'Letter Subject is Required.',
-//         'file.required'        => 'At least one file is required.',
-//         'file.array'           => 'Invalid file format.',
-//         'file.*.mimes'         => 'Only JPG, PNG and PDF files are allowed.',
-//         'file.*.max'           => 'Each file must be less than 2MB.',
+        'complain_id.required' => 'Complaint Id is required.',
+        'type.required'        => 'Complaint description is required.',
+        'title.required'       => 'Letter Subject is Required.',
+        'file.required'        => 'At least one file is required.',
+        'file.array'           => 'Invalid file format.',
+        'file.*.mimes'         => 'Only JPG, PNG and PDF files are allowed.',
+        'file.*.max'           => 'Each file must be less than 2MB.',
 
-//     ]);
+    ]);
 
-//     if ($validation->fails()) {
-//         return response()->json([
-//             'status' => false,
-//             'errors' => $validation->errors()
-//         ], 422);
-//     }
+    if ($validation->fails()) {
+        return response()->json([
+            'status' => false,
+            'errors' => $validation->errors()
+        ], 422);
+    }
 
-//     if ($request->hasFile('file')) {
+    if ($request->hasFile('file')) {
 
-//         $uploadedFiles = [];
+        $uploadedFiles = [];
 
-//         foreach ($request->file('file') as $uploadedFile) {
+        foreach ($request->file('file') as $uploadedFile) {
 
-//             $fileName = 'doc_' . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
+            $fileName = 'doc_' . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
 
-//             $filePath = $uploadedFile->storeAs('Document', $fileName, 'public');
+            $filePath = $uploadedFile->storeAs('Document', $fileName, 'public');
 
-//             $compDoc = new ComplainDocuments();
-//             $compDoc->complain_id = $request->complain_id;
-//             $compDoc->added_by   = $added_by;
-//             $compDoc->type       = $request->type;
-//             $compDoc->title      = $request->title;
-//             $compDoc->file       = $fileName;
+            $compDoc = new ComplainDocuments();
+            $compDoc->complain_id = $request->complain_id;
+            $compDoc->added_by   = $added_by;
+            $compDoc->type       = $request->type;
+            $compDoc->title      = $request->title;
+            $compDoc->file       = $fileName;
 
-//             $compDoc->save();
+            $compDoc->save();
 
-//             $uploadedFiles[] = $compDoc;
-//         }
+            $uploadedFiles[] = $compDoc;
+        }
 
-//         return response()->json([
-//             'status'  => true,
-//             'message' => 'Documents uploaded successfully.',
-//             'data'    => $uploadedFiles
-//         ], 201);
-//     }
+        return response()->json([
+            'status'  => true,
+            'message' => 'Documents uploaded successfully.',
+            'data'    => $uploadedFiles
+        ], 201);
+    }
 
-//     return response()->json([
-//         'status' => false,
-//         'message' => 'No files found.'
-//     ], 400);
-// }
+    return response()->json([
+        'status' => false,
+        'message' => 'No files found.'
+    ], 400);
+}
 
     public function checkduplicateStoreComplain(Request $request)
     {
@@ -1835,7 +1835,10 @@ class OperatorComplaintsController extends Controller
        
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-    ->leftJoin('complainants as cmlan', 'cm.id', '=', 'cmlan.complaint_id')
+                ->leftJoin('complainants as cmlan', function ($join) {
+                    $join->on('cm.id', '=', 'cmlan.complaint_id')
+                        ->where('cmlan.is_main', 1);
+                })
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
@@ -1846,6 +1849,7 @@ class OperatorComplaintsController extends Controller
                     'cm.*',
                     'dd.district_name',
                     'dd1.district_name as dist_new',
+                    'cmlan.complainant_name as complainantName',
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',
@@ -1980,7 +1984,10 @@ class OperatorComplaintsController extends Controller
            $complainDetails = DB::table('complaints as cm')
             ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
-                  ->leftJoin('complainants as cmlan', 'cm.id', '=', 'cmlan.complaint_id')
+                    ->leftJoin('complainants as cmlan', function ($join) {
+                    $join->on('cm.id', '=', 'cmlan.complaint_id')
+                        ->where('cmlan.is_main', 1);
+                })
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
@@ -1991,6 +1998,7 @@ class OperatorComplaintsController extends Controller
                     'dd.district_name',
                     'cd.description',
                       'dd1.district_name as dist_new',
+                      'cmlan.complainant_name as complainantName',
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',
@@ -2390,21 +2398,7 @@ class OperatorComplaintsController extends Controller
     }
     
     public function allRCmovement(){
-        // $ca = DB::table('complaints as cm')
-        // ->leftJoin('complaint_actions as ca','cm.id','=','ca.complaint_id')
-        // // ->select('ca.*')
-        // // ->groupBy('ca.id')
-        // ->get();
-        // $ca = DB::table('complaints as cm')
-        //     ->join('complaint_actions as ca', function ($join) {
-        //         $join->on('cm.id', '=', 'ca.complaint_id')
-        //             ->where('ca.sent_through_rk', 1);
-        //     })
-        //     ->select('ca.*')
-        //     ->groubBy('cm.id')
-        //     ->orderBy('id','DESC')
-        //     ->get();
-
+       
        $complaints = DB::table('complaints as cm')
     ->leftJoin('complaint_actions as ca', function ($join) {
         $join->on('cm.id', '=', 'ca.complaint_id')

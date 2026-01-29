@@ -419,46 +419,46 @@ $complainDetails->witness = DB::table('complaint_witness')
     ->orderBy('id', 'desc')
     ->get();
 
-$userIds = [];
+        $userIds = [];
 
-/* Sab forward_* fields se IDs collect karo */
-foreach ($actions as $row) {
+        /* Sab forward_* fields se IDs collect karo */
+        foreach ($actions as $row) {
 
-    foreach ($row as $key => $value) {
+            foreach ($row as $key => $value) {
 
-        if (
-            str_starts_with($key, 'forward_') &&
-            is_numeric($value)
-        ) {
-            $userIds[] = $value;
+                if (
+                    str_starts_with($key, 'forward_') &&
+                    is_numeric($value)
+                ) {
+                    $userIds[] = $value;
+                }
+            }
         }
-    }
-}
 
-$userIds = array_unique($userIds);
+        $userIds = array_unique($userIds);
 
-/* Users ka data lao */
-$users = DB::table('users')
-    ->whereIn('id', $userIds)
-    ->pluck('name', 'id'); // id => name
+        /* Users ka data lao */
+        $users = DB::table('users')
+            ->whereIn('id', $userIds)
+            ->pluck('name', 'id'); // id => name
 
 
-/* IDs ko name me convert karo */
-foreach ($actions as $row) {
+        /* IDs ko name me convert karo */
+        foreach ($actions as $row) {
 
-    foreach ($row as $key => $value) {
+            foreach ($row as $key => $value) {
 
-        if (
-            str_starts_with($key, 'forward_') &&
-            is_numeric($value)
-        ) {
-            $row->{$key . '_name'} = $users[$value] ?? null;
+                if (
+                    str_starts_with($key, 'forward_') &&
+                    is_numeric($value)
+                ) {
+                    $row->{$key . '_name'} = $users[$value] ?? null;
+                }
+            }
         }
-    }
-}
 
-/* Final assign */
-$complainDetails->actions = $actions;
+        /* Final assign */
+        $complainDetails->actions = $actions;
 
     // dd($complainDetails);
 
