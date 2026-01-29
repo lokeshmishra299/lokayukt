@@ -1839,6 +1839,10 @@ class OperatorComplaintsController extends Controller
                     $join->on('cm.id', '=', 'cmlan.complaint_id')
                         ->where('cmlan.is_main', 1);
                 })
+                       ->leftJoin('respondents as resp', function ($join) {
+                    $join->on('cm.id', '=', 'resp.complaint_id')
+                        ->where('resp.is_main', 1);
+                })
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
@@ -1850,6 +1854,7 @@ class OperatorComplaintsController extends Controller
                     'dd.district_name',
                     'dd1.district_name as dist_new',
                     'cmlan.complainant_name as complainantName',
+                     'resp.respondent_name as respondentName',
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',
@@ -1988,6 +1993,10 @@ class OperatorComplaintsController extends Controller
                     $join->on('cm.id', '=', 'cmlan.complaint_id')
                         ->where('cmlan.is_main', 1);
                 })
+                    ->leftJoin('respondents as resp', function ($join) {
+                    $join->on('cm.id', '=', 'resp.complaint_id')
+                        ->where('resp.is_main', 1);
+                })
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
@@ -1999,6 +2008,7 @@ class OperatorComplaintsController extends Controller
                     'cd.description',
                       'dd1.district_name as dist_new',
                       'cmlan.complainant_name as complainantName',
+                      'resp.respondent_name as respondentName',
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',
