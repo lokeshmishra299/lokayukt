@@ -425,7 +425,7 @@ function App() {
 
 
           {/** ARO */}
-         {role === 'supervisor' && subrole === 'ro-aro' && (
+         {role === 'supervisor' && subrole === 'ro' && (
         <Route path="/supervisor" element={<SupervisorLayoutaro />}>
           <Route path="dashboard" element={<SupervisorDashboardaro />} />
           <Route path="complaints" element={<SupervisorComplaintsaro />} />
