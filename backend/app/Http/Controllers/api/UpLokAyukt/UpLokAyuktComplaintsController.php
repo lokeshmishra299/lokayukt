@@ -1164,6 +1164,7 @@ $complainDetails->actions = $actions;
              }
            $cmp->fee_exempted  = $request->fee_exempted;
            $cmp->fee_approved_by_lokayukt  = 1;
+           $cmp->remark  = $request->remarks;
             $cmp->save();
             // if($cmp->save()){
             
