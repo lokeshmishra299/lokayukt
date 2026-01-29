@@ -162,6 +162,8 @@ const ApprovedComplaints = () => {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter((complaint) => {
         return (
+                      complaint.complainantName?.toLowerCase().includes(query) ||
+      complaint.respondentName?.toLowerCase().includes(query) ||
           complaint.complain_no?.toLowerCase().includes(query) ||
           complaint.name?.toLowerCase().includes(query) ||
           complaint.district_name?.toLowerCase().includes(query) ||
