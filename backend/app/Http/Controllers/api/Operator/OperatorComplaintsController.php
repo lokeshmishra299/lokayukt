@@ -2439,31 +2439,68 @@ class OperatorComplaintsController extends Controller
     
     public function allRCmovement(){
        
-       $complaints = DB::table('complaints as cm')
+    //    $complaints = DB::table('complaints as cm')
+    // ->leftJoin('complaint_actions as ca', function ($join) {
+    //     $join->on('cm.id', '=', 'ca.complaint_id')
+    //          ->where('ca.sent_through_rk', 1);
+    // })
+    // ->select('cm.id')
+    // ->groupBy('cm.id')   // duplicate complaints se bachne ke liye
+    // ->orderBy('cm.id', 'DESC')
+    // ->get();
+
+    //  $actions = DB::table('complaint_actions as ca')
+    // ->where('ca.sent_through_rk', 1)
+    // ->whereIn('ca.complaint_id', $complaints->pluck('id'))
+    // ->orderBy('ca.id', 'DESC')
+    // ->get()
+    // ->groupBy('complaint_id');
+
+    // foreach ($complaints as $complaint) {
+    //     $complaint->actions = $actions[$complaint->id] ?? collect();
+    // }
+
+    // $complaints = $complaints->filter(function ($complaint) {
+    //     return $complaint->actions->isNotEmpty();
+    // })->values();
+    //   dd($complaints);
+
+    $complaints = DB::table('complaints as cm')
     ->leftJoin('complaint_actions as ca', function ($join) {
         $join->on('cm.id', '=', 'ca.complaint_id')
              ->where('ca.sent_through_rk', 1);
     })
-    ->select('cm.id' )
-    ->groupBy('cm.id')   // duplicate complaints se bachne ke liye
+    ->select('cm.id')
+    ->groupBy('cm.id')
     ->orderBy('cm.id', 'DESC')
     ->get();
 
-     $actions = DB::table('complaint_actions as ca')
+
+$actions = DB::table('complaint_actions as ca')
     ->where('ca.sent_through_rk', 1)
     ->whereIn('ca.complaint_id', $complaints->pluck('id'))
-    ->orderBy('ca.id', 'DESC')
+    ->orderBy('ca.id', 'DESC') // latest first
     ->get()
     ->groupBy('complaint_id');
 
-    foreach ($complaints as $complaint) {
-        $complaint->actions = $actions[$complaint->id] ?? collect();
-    }
 
-    $complaints = $complaints->filter(function ($complaint) {
-        return $complaint->actions->isNotEmpty();
-    })->values();
-    //   dd($complaints);
+foreach ($complaints as $complaint) {
+
+    $allActions = $actions[$complaint->id] ?? collect();
+
+    // All actions
+    $complaint->actions = $allActions;
+
+    // Last (latest) action
+    $complaint->last_action = $allActions->first();
+}
+
+
+// Remove empty
+$complaints = $complaints->filter(function ($complaint) {
+    return $complaint->actions->isNotEmpty();
+})->values();
+
 
 
 
