@@ -37,28 +37,47 @@ const Documents = ({ complaint }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
-  const handleFileUpload = (e) => {
-    setFieldErrors((prev) => ({ ...prev, file: undefined })); // clear file error
+ const handleFileUpload = (e) => {
+  setFieldErrors((prev) => ({ ...prev, file: undefined }));
 
-    const files = Array.from(e.target.files);
-    const pdfFiles = files.filter((file) => file.type === "application/pdf");
+  const files = Array.from(e.target.files);
+  const pdfFiles = files.filter((file) => file.type === "application/pdf");
 
-    if (pdfFiles.length !== files.length) {
-      toast.error("Only PDF files are allowed!");
-      return;
-    }
+  if (pdfFiles.length !== files.length) {
+    toast.error("Only PDF files are allowed!");
+    return;
+  }
 
-    const newFiles = pdfFiles.map((file, index) => ({
-      id: Date.now() + index,
-      file,
-      name: file.name,
-      size: (file.size / 1024).toFixed(2),
-      uploadDate: new Date().toLocaleDateString(),
-    }));
+  setUploadedFiles((prevFiles) => {
+    let updatedFiles = [...prevFiles];
 
-    setUploadedFiles((prev) => [...prev, ...newFiles]);
-    e.target.value = null;
-  };
+    pdfFiles.forEach((file) => {
+      const existingIndex = updatedFiles.findIndex(
+        (f) => f.name === file.name // same name = same file
+      );
+
+      const newFileObj = {
+        id: Date.now() + Math.random(),
+        file,
+        name: file.name,
+        size: (file.size / 1024).toFixed(2),
+        uploadDate: new Date().toLocaleDateString(),
+      };
+
+      if (existingIndex !== -1) {
+        // 🔁 Replace at same index
+        updatedFiles[existingIndex] = newFileObj;
+      } else {
+        // ➕ Add new file
+        updatedFiles.push(newFileObj);
+      }
+    });
+
+    return updatedFiles;
+  });
+
+  e.target.value = null;
+};
 
   const handleRemoveFile = (fileId) => {
     setUploadedFiles((prev) => prev.filter((file) => file.id !== fileId));
@@ -85,10 +104,14 @@ const Documents = ({ complaint }) => {
     try {
       const formData = new FormData();
 
-      uploadedFiles.forEach((fileData) => {
-        formData.append("file", fileData.file);
-      });
+      // uploadedFiles.forEach((fileData) => {
+      //   formData.append("file", fileData.file);
+      // });
 
+      // File Uplode Array
+      uploadedFiles.forEach((fileData, index) => {
+  formData.append(`file[${index}]`, fileData.file);
+});
       formData.append("type", correspondenceType);
       
       // 2. Append Title to Form Data

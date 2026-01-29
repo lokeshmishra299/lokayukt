@@ -539,10 +539,6 @@ Route::middleware('auth:sanctum')->group(function(){
           Route::post('/pull-back-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'pullBackByupLokayukt']);
           Route::post('/reject-complaint-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'rejectComplaintByUpLokayukt']);
           Route::post('/fee-exempted/{complaint_id}',[UpLokAyuktComplaintsController::class,'approvedFeeByUpLokayukt']);
-<<<<<<< HEAD
-=======
-
->>>>>>> 55e03f96aa6790d0b073afe4722abb808d4f8447
           Route::post('/released-by-uplokayukt/{id}',[UpLokAyuktComplaintsController::class,'releasekByUpLokayukt']);
          
           // Route::post('/forward-by-ds-js/{complainId}',[UpLokAyuktComplaintsController::class,'forwardComplaintbyds']);
