@@ -10,6 +10,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { IoMdTime } from "react-icons/io";
 import { Toaster } from "react-hot-toast";
 
+import Pagination from "../../Pagination";
+
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const token = localStorage.getItem("access_token");
@@ -39,6 +42,20 @@ const AllComplaints = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 10;
+
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+const currentComplaints = filteredComplaints.slice(
+  indexOfFirstItem,
+  indexOfLastItem
+);
+
+const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
+
+
 
 
 
@@ -104,6 +121,7 @@ useEffect(() => {
     setAllComplaints(data.data);
     const sorted = sortComplaintsByDate(data.data, sortOrder);
     setFilteredComplaints(sorted);
+    setCurrentPage(1);
   }
 }, [data, sortOrder]);
 
@@ -120,7 +138,7 @@ useEffect(() => {
 
                 complaint.complainantName?.toLowerCase().includes(query) ||
       complaint.respondentName?.toLowerCase().includes(query) ||
-      
+
           complaint.complain_no?.toLowerCase().includes(query) ||
           complaint.name?.toLowerCase().includes(query) ||
           complaint.district_name?.toLowerCase().includes(query) ||
@@ -170,6 +188,7 @@ if (selectedCaseType !== "") {
 
     const sorted = sortComplaintsByDate(filtered, sortOrder);
     setFilteredComplaints(sorted);
+    setCurrentPage(1);
   }, [
     searchQuery,
     allComplaints,
@@ -425,7 +444,7 @@ if (selectedCaseType !== "") {
               </div>
             ) : filteredComplaints.length > 0 ? (
               <div className="divide-y divide-gray-200">
-                {filteredComplaints.map((complaint) => (
+                {currentComplaints.map((complaint) => (
                   <div
                     key={complaint.id}
                     className="px-3 sm:px-4 py-3 hover:bg-gray-50 transition-colors"
@@ -578,6 +597,14 @@ if (selectedCaseType !== "") {
           </div>
         </div>
       </div>
+
+      <Pagination
+  currentPage={currentPage}
+  totalPages={totalPages}
+  onPageChange={setCurrentPage}
+  totalItems={filteredComplaints.length}
+  itemsPerPage={itemsPerPage}
+/>
 
       {isConfirmModalOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-center p-4">

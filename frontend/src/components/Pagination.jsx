@@ -57,7 +57,7 @@ const Pagination = ({
       {/* Info Section */}
       {showInfo && (
         <div className="text-xs sm:text-sm text-gray-700 order-2 sm:order-1">
-          Showing {startItem}-{endItem} of {totalItems} results
+          {/* Showing {startItem}-{endItem} of {totalItems} results */}
         </div>
       )}
 

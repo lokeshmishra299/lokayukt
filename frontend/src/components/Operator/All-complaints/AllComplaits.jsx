@@ -7,6 +7,8 @@ import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdTime } from "react-icons/io";
 import { useMemo } from "react";
+import Pagination from "../../Pagination";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -26,6 +28,7 @@ const getCleanValue = (val) => {
 };
 
 const normalizeText = (text) => {
+  
   if (!text) return "";
   // 1. String me convert karein
   // 2. Lowercase karein
@@ -50,6 +53,19 @@ const AllComplaints = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 10;
+
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+const currentComplaints = filteredComplaints.slice(
+  indexOfFirstItem,
+  indexOfLastItem
+);
+
+const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
+
 
   const sortComplaintsByDate = (complaints, order) => {
     return [...complaints].sort((a, b) => {
@@ -117,6 +133,7 @@ const AllComplaints = () => {
       setAllComplaints(data.data);
       const sorted = sortComplaintsByDate(data.data, sortOrder);
       setFilteredComplaints(sorted);
+      setCurrentPage(1);
     }
   }, [data, sortOrder]);
 
@@ -132,7 +149,7 @@ const AllComplaints = () => {
 
             complaint.complainantName?.toLowerCase().includes(query) ||
       complaint.respondentName?.toLowerCase().includes(query) ||
-      
+
           complaint.complain_no?.toLowerCase().includes(query) ||
           complaint.name?.toLowerCase().includes(query) ||
           complaint.district_name?.toLowerCase().includes(query) ||
@@ -197,6 +214,7 @@ const AllComplaints = () => {
 
     const sorted = sortComplaintsByDate(filtered, sortOrder);
     setFilteredComplaints(sorted);
+    setCurrentPage(1);
   }, [
     searchQuery,
     allComplaints,
@@ -458,7 +476,7 @@ const AllComplaints = () => {
               </div>
             ) : filteredComplaints.length > 0 ? (
               <div className="divide-y divide-gray-200">
-                {filteredComplaints.map((complaint) => (
+                {currentComplaints.map((complaint) => (
                   <div
                     key={complaint.id}
                     className="px-3 sm:px-4 py-3 hover:bg-gray-50 transition-colors"
@@ -612,6 +630,14 @@ const AllComplaints = () => {
           </div>
         </div>
       </div>
+      <Pagination
+  currentPage={currentPage}
+  totalPages={totalPages}
+  onPageChange={setCurrentPage}
+  totalItems={filteredComplaints.length}
+  itemsPerPage={itemsPerPage}
+/>
+
 
       {isConfirmModalOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-center p-4">
