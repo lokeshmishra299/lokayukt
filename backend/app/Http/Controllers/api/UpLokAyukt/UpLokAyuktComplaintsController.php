@@ -1164,16 +1164,16 @@ $complainDetails->actions = $actions;
              }
            $cmp->fee_exempted  = $request->fee_exempted;
            $cmp->fee_approved_by_lokayukt  = 1;
-     
-            if($cmp->save()){
+            $cmp->save();
+            // if($cmp->save()){
             
                     
-                $apcAction = new ComplaintAction();
-                                $apcAction->complaint_id = $complaint_id;
-                                $apcAction->status = 'Fees Approved';
-                                $apcAction->remarks = $request->remarks;
-                                $apcAction->save();
-            }
+            //     $apcAction = new ComplaintAction();
+            //                     $apcAction->complaint_id = $complaint_id;
+            //                     $apcAction->status = 'Fees Approved';
+            //                     $apcAction->remarks = $request->remarks;
+            //                     $apcAction->save();
+            // }
             return response()->json([
                     'status' => true,
                     'message' => 'Fee Added successfully.'
