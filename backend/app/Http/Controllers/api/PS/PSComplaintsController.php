@@ -331,15 +331,60 @@ class PSComplaintsController extends Controller
      $complainDetails->witness =  DB::table('complaint_witness')
     ->where('complaint_id', $id)
     ->get();
-      $complainDetails->actions =  DB::table('complaint_actions')
-    ->where('complaint_id', $id)
-    ->where('status','Forwarded')
-     ->orderBy('id','desc')
-    //  ->where(function($q){
-    //                         $q->where('status','Forwarded');
+    //   $complainDetails->actions =  DB::table('complaint_actions')
+    // ->where('complaint_id', $id)
+    // ->where('status','Forwarded')
+    //  ->orderBy('id','desc')
+    // //  ->where(function($q){
+    // //                         $q->where('status','Forwarded');
                                      
-    //                      })
+    // //                      })
+    // ->get();
+        $actions = DB::table('complaint_actions')
+    ->where('complaint_id', $id)
+    ->orderBy('id', 'desc')
     ->get();
+
+$userIds = [];
+
+/* Sab forward_* fields se IDs collect karo */
+foreach ($actions as $row) {
+
+    foreach ($row as $key => $value) {
+
+        if (
+            str_starts_with($key, 'forward_') &&
+            is_numeric($value)
+        ) {
+            $userIds[] = $value;
+        }
+    }
+}
+
+$userIds = array_unique($userIds);
+
+/* Users ka data lao */
+$users = DB::table('users')
+    ->whereIn('id', $userIds)
+    ->pluck('name', 'id'); // id => name
+
+
+/* IDs ko name me convert karo */
+foreach ($actions as $row) {
+
+    foreach ($row as $key => $value) {
+
+        if (
+            str_starts_with($key, 'forward_') &&
+            is_numeric($value)
+        ) {
+            $row->{$key . '_name'} = $users[$value] ?? null;
+        }
+    }
+}
+
+/* Final assign */
+$complainDetails->actions = $actions;
 
            
 
@@ -1045,6 +1090,8 @@ class PSComplaintsController extends Controller
         $roleParent = $userParentData[0]->role->name;
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                  ->leftJoin('complainants as cmlan', 'cm.id', '=', 'cmlan.complaint_id')
+                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
         $join->on('cm.id', '=', 'rep.complaint_id')
              ->where(function ($q) use ($parentId, $roleParent) {
@@ -1072,6 +1119,7 @@ class PSComplaintsController extends Controller
                     'cm.*',
                     'dd.district_name',
                      'dd.district_name as district_name',
+                       'dd1.district_name as dist_new',
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',

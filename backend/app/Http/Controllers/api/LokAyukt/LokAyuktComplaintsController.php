@@ -182,14 +182,60 @@ class LokAyuktComplaintsController extends Controller
      $complainDetails->witness =  DB::table('complaint_witness')
     ->where('complaint_id', $id)
     ->get();
-      $complainDetails->actions =  DB::table('complaint_actions')
+    //   $complainDetails->actions =  DB::table('complaint_actions')
+    // ->where('complaint_id', $id)
+    // //  ->where(function($q){
+    // //                         $q->where('status','Verified')
+    // //                         ->Orwhere('status', 'Forwarded');               
+    // //                      })
+    //                      ->orderBy('id','desc')
+    // ->get();
+    $actions = DB::table('complaint_actions')
     ->where('complaint_id', $id)
-    //  ->where(function($q){
-    //                         $q->where('status','Verified')
-    //                         ->Orwhere('status', 'Forwarded');               
-    //                      })
-                         ->orderBy('id','desc')
+    ->orderBy('id', 'desc')
     ->get();
+
+$userIds = [];
+
+/* Sab forward_* fields se IDs collect karo */
+foreach ($actions as $row) {
+
+    foreach ($row as $key => $value) {
+
+        if (
+            str_starts_with($key, 'forward_') &&
+            is_numeric($value)
+        ) {
+            $userIds[] = $value;
+        }
+    }
+}
+
+$userIds = array_unique($userIds);
+
+/* Users ka data lao */
+$users = DB::table('users')
+    ->whereIn('id', $userIds)
+    ->pluck('name', 'id'); // id => name
+
+
+/* IDs ko name me convert karo */
+foreach ($actions as $row) {
+
+    foreach ($row as $key => $value) {
+
+        if (
+            str_starts_with($key, 'forward_') &&
+            is_numeric($value)
+        ) {
+            $row->{$key . '_name'} = $users[$value] ?? null;
+        }
+    }
+}
+
+/* Final assign */
+$complainDetails->actions = $actions;
+
 
            
 
@@ -916,6 +962,8 @@ class LokAyuktComplaintsController extends Controller
     //    $userSubrole = Auth::user()->subrole->name; 
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                  ->leftJoin('complainants as cmlan', 'cm.id', '=', 'cmlan.complaint_id')
+                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')
@@ -924,6 +972,7 @@ class LokAyuktComplaintsController extends Controller
                     'cm.*',
                     'dd.district_name',
                      'dd.district_name as district_name',
+                       'dd1.district_name as dist_new',
                     // 'dp.name as department_name',
                     // 'ds.name as designation_name',
                     // 'ct.name as complaintype_name',

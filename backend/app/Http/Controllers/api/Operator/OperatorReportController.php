@@ -407,14 +407,58 @@ $complainDetails->witness = DB::table('complaint_witness')
 /*--------------------------------------------------
 | ACTIONS (Verified / Forwarded only)
 |--------------------------------------------------*/
-$complainDetails->actions = DB::table('complaint_actions')
+// $complainDetails->actions = DB::table('complaint_actions')
+//     ->where('complaint_id', $id)
+//     ->where(function ($q) {
+//         $q->where('status', 'Verified')
+//           ->orWhere('status', 'Forwarded');
+//     })
+//     ->get();
+    $actions = DB::table('complaint_actions')
     ->where('complaint_id', $id)
-    ->where(function ($q) {
-        $q->where('status', 'Verified')
-          ->orWhere('status', 'Forwarded');
-    })
+    ->orderBy('id', 'desc')
     ->get();
 
+$userIds = [];
+
+/* Sab forward_* fields se IDs collect karo */
+foreach ($actions as $row) {
+
+    foreach ($row as $key => $value) {
+
+        if (
+            str_starts_with($key, 'forward_') &&
+            is_numeric($value)
+        ) {
+            $userIds[] = $value;
+        }
+    }
+}
+
+$userIds = array_unique($userIds);
+
+/* Users ka data lao */
+$users = DB::table('users')
+    ->whereIn('id', $userIds)
+    ->pluck('name', 'id'); // id => name
+
+
+/* IDs ko name me convert karo */
+foreach ($actions as $row) {
+
+    foreach ($row as $key => $value) {
+
+        if (
+            str_starts_with($key, 'forward_') &&
+            is_numeric($value)
+        ) {
+            $row->{$key . '_name'} = $users[$value] ?? null;
+        }
+    }
+}
+
+/* Final assign */
+$complainDetails->actions = $actions;
 
     // dd($complainDetails);
 
