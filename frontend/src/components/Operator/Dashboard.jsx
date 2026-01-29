@@ -278,7 +278,7 @@ const Dashboard = ({ userRole = "operator" }) => {
   const fetchWeeklyData = async () => {
     try {
       console.log('Fetching weekly graph data...');
-      const response = await api.get('/admin/getWeeklyGraph');
+      const response = await api.get('/operator/getWeeklyGraph');
       console.log('Weekly API Response:', response.data);
       
       if (response.data && response.data.labels) {
