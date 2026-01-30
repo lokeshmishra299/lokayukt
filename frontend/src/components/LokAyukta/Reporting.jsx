@@ -19,7 +19,9 @@ import * as XLSX from "xlsx";
 import html2pdf from "html2pdf.js";
 import toast from "react-hot-toast";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Pagination from "../Pagination";
+
 
 
 
@@ -34,6 +36,7 @@ const api = axios.create({
 });
 
 const Reporting = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("enrollment");
   const [isExporting, setIsExporting] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
@@ -61,6 +64,11 @@ const itemsPerPage = 10;
     fromDate: "",
     toDate: "",
   });
+
+  const handleViewComplaint = (complaintId) => {
+  if (!complaintId) return;
+   navigate(`/lokayukt/all-complaints/view/${complaintId}`);
+};
 
   const getDistirct = async () => {
     const res = await api.get("/lokayukt/all-district");
@@ -781,9 +789,12 @@ useEffect(() => {
                           className="bg-white border-b hover:bg-gray-50"
                         >
                           <td className="px-6 py-4">{index + 1}</td>
-                          <td className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap hover:underline cursor-pointer">
-                            {row?.complain_no}
-                          </td>
+                         <td
+  onClick={() => handleViewComplaint(row.id)}
+  className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap hover:underline cursor-pointer"
+>
+  {row?.complain_no}
+</td>
                           {/* <td className="px-6 py-4 text-blue-600 whitespace-nowrap hover:underline cursor-pointer">
                             {row.caseNo || "N/A"}
                           </td> */}

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt } from "react-icons/fa";
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 // import { toast } from "react-toastify";
 import { toast } from "react-hot-toast";
+import Pagination from "../../../Pagination"
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
@@ -22,6 +23,8 @@ const Documents = ({ complaint }) => {
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
+  const [docPage, setDocPage] = useState(1);
+const itemsPerPage = 5;
 
   // -- Add Document State --
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -65,6 +68,17 @@ const Documents = ({ complaint }) => {
     },
     enabled: !!complaint?.id,
   });
+
+  
+  useEffect(() => {
+  setDocPage(1);
+}, [documents]);
+
+  const lastIndex = docPage * itemsPerPage;
+const firstIndex = lastIndex - itemsPerPage;
+const currentDocs = documents.slice(firstIndex, lastIndex);
+const totalPages = Math.ceil(documents.length / itemsPerPage);
+
 
   const handleViewPdf = async (filename) => {
     try {
@@ -181,7 +195,7 @@ const Documents = ({ complaint }) => {
             No documents available
           </div>
         ) : (
-          documents.map((doc) => (
+          currentDocs.map((doc) => (
             <div
               key={doc.id}
               className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
@@ -215,9 +229,22 @@ const Documents = ({ complaint }) => {
                 </button>
               </div>
             </div>
+
+            
           ))
         )}
       </div>
+
+      {documents.length > itemsPerPage && (
+  <Pagination
+    currentPage={docPage}
+    totalPages={totalPages}
+    onPageChange={setDocPage}
+    totalItems={documents.length}
+    itemsPerPage={itemsPerPage}
+  />
+)}
+
 
       {/* Add Document Modal */}
       {openAddDocuments && (
