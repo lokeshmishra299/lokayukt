@@ -52,9 +52,12 @@ const SearchableDropdown = ({
     };
   }, [wrapperRef]);
 
-  const selectedOption = options.find((opt) => opt.id == value);
+  // const selectedOption = options.find((opt) => opt.id == value);
+  const selectedOption = options?.find((opt) => opt && opt.id == value);
+
 
   const filteredOptions = options.filter((option) => {
+    if (!option) return false;
     const label = option.name || option.user_name || `User ${option.id}`;
     const district = option.district_name || "";
     const search = searchTerm.toLowerCase();
@@ -517,7 +520,7 @@ function takefile(){
                       complaintData.status
                     )}`}
                   >
-                      {complaintData.approved_rejected_by_lokayukt == 0
+                    {complaintData.approved_rejected_by_lokayukt == 0
                       ? "In Motion – With Lokayukt"
                       : "In Motion - With upLokayukta" 
                       }
@@ -539,9 +542,10 @@ function takefile(){
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_lokayukt == 1
-                      ? "In Motion – With Lokayukta"
-                      : "Received - Record Section" }
+                         {complaintData.approved_rejected_by_lokayukt == 0
+                      ? "In Motion – With Lokayukt"
+                      : "In Motion - With upLokayukta" 
+                      }
                     </span>
 
                     <button
@@ -700,7 +704,7 @@ function takefile(){
                   }`}
                 >
                   शुल्क का प्रकार:{" "}
-                   {complaintData.fee_exempted == 3 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "Pending"}
+                  {complaintData.fee_exempted == 3 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "Pending"}
                 </span>
 
                 <span
@@ -711,7 +715,7 @@ function takefile(){
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                  स्थिति:  {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
+                  स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -854,12 +858,18 @@ function takefile(){
                   </button> */}
                   
                  
-                    <button
-                      onClick={takefile}
-                      className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
-                    >
-                       Take File In Hand
-                    </button>
+                   {complaintData.assign_to_ro_aro ? (
+                      <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                        Assigned
+                      </span>
+                    ) : (
+                      <button
+                        onClick={takefile}
+                        className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
+                      >
+                        Take File in Hand
+                      </button>
+                    )}
               
 
                 </div>

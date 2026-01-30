@@ -49,9 +49,12 @@ const SearchableDropdown = ({
     };
   }, [wrapperRef]);
 
-  const selectedOption = options.find((opt) => opt.id == value);
+  // const selectedOption = options.find((opt) => opt.id == value);
+
+  const selectedOption = options?.find((opt) => opt && opt.id == value);
 
   const filteredOptions = options.filter((option) => {
+     if (!option) return false;
     const label = option.name || option.user_name || `User ${option.id}`;
     const district = option.district_name || "";
     const search = searchTerm.toLowerCase();
