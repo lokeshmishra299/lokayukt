@@ -745,7 +745,7 @@ const ViewApprovedComplaints = () => {
                     <option value="">Select User...</option>
                     {Array.isArray(forwardOptionsData) &&
                     forwardOptionsData.length > 0 ? (
-                      forwardOptionsData.map((option) => (
+                      forwardOptionsData.filter(Boolean).map((option) => (
                         <option key={option.id} value={option.id}>
                           {option.name ||
                             option.user_name ||
