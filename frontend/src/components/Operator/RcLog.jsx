@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEye } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
+import Pagination from "../../components/Pagination";
+
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
@@ -26,16 +29,29 @@ const RcLog = () => {
     queryFn: getRcLogData,
   });
 
-  // 2. State for Popup and Selected Item
+
+
   const [openViewPopup, setOpenViewPopup] = useState(false);
   const [selectedLog, setSelectedLog] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 10;
 
-  // 3. Helper Functions for Logic
+useEffect(() => {
+  setCurrentPage(1);
+}, [rclogValue]);
+
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+const currentLogs = rclogValue?.slice(indexOfFirstItem, indexOfLastItem) || [];
+
+const totalPages = Math.ceil((rclogValue?.length || 0) / itemsPerPage);
+
+
   const label = (role, name) => {
     return name ? `${role} (${name})` : role;
   };
 
-  // Aapka Logic Function
   const getMovementTitle = (item) => {
     if (!item) return "N/A";
 
@@ -108,9 +124,8 @@ const RcLog = () => {
     return `${record} → Record Section (RC)`;
   };
 
-  // 4. Handlers
   const handleViewOpenPopup = (logItem) => {
-    setSelectedLog(logItem); // Poora object (id, last_action, actions) save karein
+    setSelectedLog(logItem); 
     setOpenViewPopup(true);
   };
 
@@ -119,7 +134,6 @@ const RcLog = () => {
     setSelectedLog(null);
   };
 
-  // Date formatter helper
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -156,14 +170,15 @@ const RcLog = () => {
               </thead>
 
               <tbody className="divide-y divide-gray-200">
-                {rclogValue?.map((item, index) => (
+                {currentLogs?.map((item, index) => (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-2">{index + 1}</td>
+                    <td className="px-4 py-2">
+  {indexOfFirstItem + index + 1}
+</td>
                     <td className="px-4 py-2 font-medium text-gray-800">
                       {item.last_action?.complaint_id || "-"}
                     </td>
                     <td className="px-4 py-2 text-blue-600 font-medium">
-                      {/* MAIN TABLE: Showing Last Action Title */}
                       {getMovementTitle(item.last_action)}
                     </td>
                     <td className="px-4 py-2 text-gray-600">
@@ -183,9 +198,17 @@ const RcLog = () => {
               </tbody>
             </table>
           </div>
+          
         )}
+        <Pagination
+  currentPage={currentPage}
+  totalPages={totalPages}
+  onPageChange={setCurrentPage}
+  totalItems={rclogValue?.length || 0}
+  itemsPerPage={itemsPerPage}
+/>
 
-        {/* --- POPUP MODAL --- */}
+
         {openViewPopup && selectedLog && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
             <div className="bg-white w-full max-w-4xl rounded-lg shadow-xl max-h-[90vh] flex flex-col">
@@ -214,7 +237,6 @@ const RcLog = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {/* POPUP TABLE: Showing All Actions History */}
                     {selectedLog.actions?.map((action, idx) => (
                       <tr key={action.id} className="hover:bg-gray-50">
                         <td className="border px-4 py-2">{idx + 1}</td>

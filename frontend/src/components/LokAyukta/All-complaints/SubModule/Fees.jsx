@@ -80,16 +80,27 @@ const Fees = ({ complaint, onFeeApproved }) => {
     <>
       {complaint.fee_approved_by_lokayukt == 1 ? (
         <div className="w-full flex items-center gap-4 p-6 bg-green-50 border border-green-300 rounded-xl shadow-sm">
-          <FaCheckCircle className="text-green-600" size={28} />
-          <div>
-            <p className="text-green-800 text-base font-semibold">
-              Fee Approved
-            </p>
-            <p className="text-green-700 text-sm mt-1">
-              The fee has already been approved .
-            </p>
-          </div>
-        </div>
+  <FaCheckCircle className="text-green-600" size={28} />
+
+  <div className="w-full">
+    <div className="flex justify-between items-start">
+      <p className="text-green-800 text-base font-semibold">
+        Fee Approved
+      </p>
+
+      <p className="text-green-700 text-sm">
+       <span className="text-black font-semibold">Remark:</span> <span className="">{complaint?.remark || "N/A"}</span> 
+      </p>
+    </div>
+
+    {/* Description below */}
+    <p className="text-green-700 text-sm mt-1">
+      The fee has already been approved.
+    </p>
+  </div>
+</div>
+
+
       ) : (
         <div className="w-full space-y-6">
           <div className="border rounded-xl bg-white shadow-sm overflow-hidden">

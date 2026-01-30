@@ -19,6 +19,8 @@ import * as XLSX from "xlsx";
 import html2pdf from "html2pdf.js";
 import toast from "react-hot-toast";
 import { useRef } from "react";
+import Pagination from "../Pagination";
+
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -39,6 +41,14 @@ const Reporting = () => {
 const [pdfViewUrl, setPdfViewUrl] = useState(null);
 const [loadingDoc, setLoadingDoc] = useState(null);
 const overallPrintRef = useRef(null);
+
+const [enrollmentPage, setEnrollmentPage] = useState(1);
+const [districtPage, setDistrictPage] = useState(1);
+const [departmentPage, setDepartmentPage] = useState(1);
+const [dispatchPage, setDispatchPage] = useState(1);
+
+const itemsPerPage = 10;
+
 
 
   const [enrollmentFilters, setEnrollmentFilters] = useState({
@@ -126,6 +136,11 @@ const overallPrintRef = useRef(null);
   });
 
   const lettersList = dispatchLettersData?.data || [];
+const dispatchLast = dispatchPage * itemsPerPage;
+const dispatchFirst = dispatchLast - itemsPerPage;
+const dispatchCurrent = lettersList.slice(dispatchFirst, dispatchLast);
+const dispatchTotalPages = Math.ceil(lettersList.length / itemsPerPage);
+
 
   const formatDate = (dateString) => {
     if (!dateString) return "NA";
@@ -244,6 +259,12 @@ const handleViewPdf = async (filename, complaintId) => {
     });
   }, [enrolmentDate, enrollmentFilters]);
 
+const enrollmentLast = enrollmentPage * itemsPerPage;
+const enrollmentFirst = enrollmentLast - itemsPerPage;
+const enrollmentCurrent = filteredEnrollmentData.slice(enrollmentFirst, enrollmentLast);
+const enrollmentTotalPages = Math.ceil(filteredEnrollmentData.length / itemsPerPage);
+
+
   const filteredDistrictData = useMemo(() => {
     if (!districtViseData) return [];
     if (districtFilter === "All Districts") return districtViseData;
@@ -253,6 +274,11 @@ const handleViewPdf = async (filename, complaintId) => {
         item.district === districtFilter,
     );
   }, [districtViseData, districtFilter]);
+const districtLast = districtPage * itemsPerPage;
+const districtFirst = districtLast - itemsPerPage;
+const districtCurrent = filteredDistrictData.slice(districtFirst, districtLast);
+const districtTotalPages = Math.ceil(filteredDistrictData.length / itemsPerPage);
+
 
   const filteredDepartmentData = useMemo(() => {
     if (!departmentData) return [];
@@ -261,6 +287,12 @@ const handleViewPdf = async (filename, complaintId) => {
       (item) => item.department === departmentFilter,
     );
   }, [departmentData, departmentFilter]);
+
+const departmentLast = departmentPage * itemsPerPage;
+const departmentFirst = departmentLast - itemsPerPage;
+const departmentCurrent = filteredDepartmentData.slice(departmentFirst, departmentLast);
+const departmentTotalPages = Math.ceil(filteredDepartmentData.length / itemsPerPage);
+
 
   const filteredDispatchData = useMemo(() => {
     if (!dispatcheData) return [];
@@ -279,6 +311,20 @@ const handleViewPdf = async (filename, complaintId) => {
       return true;
     });
   }, [dispatcheData, dispatchFilters]);
+
+
+  useEffect(() => { 
+    setEnrollmentPage(1);
+   }, [filteredEnrollmentData]);
+useEffect(() => { 
+  setDistrictPage(1); 
+}, [filteredDistrictData]);
+useEffect(() => {
+   setDepartmentPage(1); 
+  }, [filteredDepartmentData]);
+useEffect(() => {
+   setDispatchPage(1);
+   }, [lettersList]);
 
   // const prepareEnrollmentDataForExport = (data) => {
   //   return data.map((item, index) => ({
@@ -729,7 +775,7 @@ const handleViewPdf = async (filename, complaintId) => {
                         </td>
                       </tr>
                     ) : (
-                      filteredEnrollmentData?.map((row, index) => (
+                      enrollmentCurrent?.map((row, index) => (
                         <tr
                           key={row.id || index}
                           className="bg-white border-b hover:bg-gray-50"
@@ -768,6 +814,13 @@ const handleViewPdf = async (filename, complaintId) => {
                     )}
                   </tbody>
                 </table>
+                <Pagination
+  currentPage={enrollmentPage}
+  totalPages={enrollmentTotalPages}
+  onPageChange={setEnrollmentPage}
+  totalItems={filteredEnrollmentData.length}
+  itemsPerPage={itemsPerPage}
+/>
               </div>
             </div>
           </div>
@@ -887,7 +940,7 @@ const handleViewPdf = async (filename, complaintId) => {
                       </td>
                     </tr>
                   ) : (
-                    filteredDistrictData?.map((row, idx) => (
+                    districtCurrent?.map((row, idx) => (
                       <tr
                         key={idx}
                         className="bg-white border-b hover:bg-gray-50"
@@ -912,6 +965,14 @@ const handleViewPdf = async (filename, complaintId) => {
                   )}
                 </tbody>
               </table>
+              <Pagination
+  currentPage={districtPage}
+  totalPages={districtTotalPages}
+  onPageChange={setDistrictPage}
+  totalItems={filteredDistrictData.length}
+  itemsPerPage={itemsPerPage}
+/>
+
             </div>
           </div>
         )}
@@ -1006,7 +1067,7 @@ const handleViewPdf = async (filename, complaintId) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredDepartmentData.map((row, idx) => (
+                  {departmentCurrent.map((row, idx) => (
                     <tr
                       key={idx}
                       className="bg-white border-b hover:bg-gray-50"
@@ -1028,6 +1089,14 @@ const handleViewPdf = async (filename, complaintId) => {
                   ))}
                 </tbody>
               </table>
+              <Pagination
+  currentPage={departmentPage}
+  totalPages={departmentTotalPages}
+  onPageChange={setDepartmentPage}
+  totalItems={filteredDepartmentData.length}
+  itemsPerPage={itemsPerPage}
+/>
+
             </div>
           </div>
         )}
@@ -1094,7 +1163,7 @@ const handleViewPdf = async (filename, complaintId) => {
                       </td>
                     </tr>
                   ) : lettersList.length > 0 ? (
-                    lettersList.map((row) => (
+                    dispatchCurrent.map((row) => (
                       <tr
                         key={row.id}
                         className="bg-white border-b hover:bg-gray-50"
@@ -1151,6 +1220,15 @@ const handleViewPdf = async (filename, complaintId) => {
                   )}
                 </tbody>
               </table>
+
+              <Pagination
+  currentPage={dispatchPage}
+  totalPages={dispatchTotalPages}
+  onPageChange={setDispatchPage}
+  totalItems={lettersList.length}
+  itemsPerPage={itemsPerPage}
+/>
+
             </div>
           </div>
         )}

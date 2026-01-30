@@ -15,6 +15,8 @@ import AdminAddUserManagement from './components/Admin/AddUserManagement';
 import AdminEditUserManagment from './components/Admin/EditUserManagment';
 import AdminViewComplaints from './components/Admin/ViewComplaints';
 import AdminEditComplaint from './components/Admin/EditComplaint';
+import AdminFileAdministrator from './components/Admin/FileAdministrator';
+
 
 // Operator
 import OperatorLayout from './components/Operator/Layout';
@@ -318,6 +320,7 @@ function App() {
           <Route path="user-management/add" element={<AdminAddUserManagement />} />
           <Route path="user-management/edit/:id" element={<AdminEditUserManagment />} />
           <Route path="master-data" element={<AdminMasterData />} />
+          <Route path="file-administrator" element={<AdminFileAdministrator />} />
         </Route>
       )}
 

@@ -10,6 +10,7 @@ import {
   FaDatabase,
   FaTimes
 } from "react-icons/fa";
+import { IoFileTray } from "react-icons/io5";
 
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
   const location = useLocation();
@@ -160,6 +161,23 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <FaDatabase />
             {(!isCollapsed || isMobile) && "Master Data"}
+          </Link>
+
+
+           {/* File Administrator */}
+          <Link
+            to="/admin/file-administrator"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+              ${isActive("/file-administrator")
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-700 hover:bg-gray-200"
+              }
+              ${isCollapsed && !isMobile ? "justify-center" : ""}
+            `}
+          >
+            <IoFileTray />
+            {(!isCollapsed || isMobile) && "File Administrator"}
           </Link>
 
         </nav>

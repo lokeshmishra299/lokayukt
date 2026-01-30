@@ -631,6 +631,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
         </div>
       </div>
       <Pagination
+      
   currentPage={currentPage}
   totalPages={totalPages}
   onPageChange={setCurrentPage}
