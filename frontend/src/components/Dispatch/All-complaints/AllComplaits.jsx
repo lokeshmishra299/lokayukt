@@ -540,7 +540,7 @@ const handleSend = async () => {
                             className="flex-1 sm:flex-none px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors duration-200 font-medium whitespace-nowrap">
                             View Details
                           </button>
-                        {isApprovedByRO(complaint) ? (
+                        {/* {isApprovedByRO(complaint) ? (
                             <span className="flex-1 sm:flex-none px-2 py-1.5 bg-green-100 text-green-700 rounded-md text-[11px] font-medium whitespace-nowrap flex items-center justify-center gap-1">
                             <svg
                               className="w-3 h-3"
@@ -565,7 +565,7 @@ const handleSend = async () => {
                               
                               Send To UPLokayukt
                             </button>
-                          )} 
+                          )}  */}
                         </div>
                       </div>
                     </div>

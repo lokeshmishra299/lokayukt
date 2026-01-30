@@ -552,7 +552,7 @@ const AddModal = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg">
         <div className="px-4 py-3 border-b text-lg font-semibold">
-          Add New {activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
+          Add New Category
         </div>
         <form onSubmit={handleSubmit}>
           <div className="p-4 space-y-3">
