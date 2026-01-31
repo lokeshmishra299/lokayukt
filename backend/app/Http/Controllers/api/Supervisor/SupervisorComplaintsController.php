@@ -28,11 +28,11 @@ class SupervisorComplaintsController extends Controller
         //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
         ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
         ->leftJoin('complainants as cmlan', function ($join) {
-                    $join->on('cm.id', '=', 'cmlan.complaint_id')
+                    $join->on('complaints.id', '=', 'cmlan.complaint_id')
                         ->where('cmlan.is_main', 1);
                 })
                     ->leftJoin('respondents as resp', function ($join) {
-                    $join->on('cm.id', '=', 'resp.complaint_id')
+                    $join->on('complaints.id', '=', 'resp.complaint_id')
                         ->where('resp.is_main', 1);
                 })
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
@@ -1407,7 +1407,7 @@ $complainDetails->actions = $actions;
 
                if($cmp){
                 $cmp->approved_rejected_by_cio_io= 1;
-                // $cmp->forward_to_d_a = $request->forward_to_d_a;
+                $cmp->status = "Final Report";
                 // $remark ='Remark By Deputy Secretary / Joint Secretary';
                 // $remark.='\n';
                 // $remark.= $request->remarks;

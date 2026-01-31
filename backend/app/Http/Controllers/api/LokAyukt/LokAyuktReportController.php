@@ -1139,11 +1139,11 @@ $data = DB::table('complaints as cmp')
 
         SUM(CASE WHEN cmp.status = 'Under Investigation' THEN 1 ELSE 0 END) as under_investigation,
 
-        SUM(CASE WHEN cmp.status = 'Disposed - Accepted' THEN 1 ELSE 0 END) as disposed,
+        SUM(CASE WHEN cmp.status = 'Final Disposal/Closed' THEN 1 ELSE 0 END) as disposed,
 
         SUM(CASE WHEN cmp.status = 'Rejected' THEN 1 ELSE 0 END) as rejected,
 
-        SUM(CASE WHEN cmp.status = 'Final Decision' THEN 1 ELSE 0 END) as final_submit,
+        SUM(CASE WHEN cmp.status = 'Final Report' THEN 1 ELSE 0 END) as final_submit,
 
         SUM(CASE 
             WHEN cmp.status = 'In Progress' 
@@ -1154,26 +1154,27 @@ $data = DB::table('complaints as cmp')
     ->first();
 $percentages = [
     'pending_with_department' => $data->total 
-        ? round(($data->pending_with_department / $data->total) * 100, 1) 
+        ? round(($data->pending_with_department / $data->total) * 100) 
         : 0,
 
     'under_investigation' => $data->total 
-        ? round(($data->under_investigation / $data->total) * 100, 2) 
+        ? round(($data->under_investigation / $data->total) * 100) 
         : 0,
 
     'disposed' => $data->total 
-        ? round(($data->disposed / $data->total) * 100, 2) 
+        ? round(($data->disposed / $data->total) * 100) 
         : 0,
 
     'rejected' => $data->total 
-        ? round(($data->rejected / $data->total) * 100, 2) 
+        ? round(($data->rejected / $data->total) * 100) 
         : 0,
 
     'final_submit' => $data->total 
-        ? round(($data->final_submit / $data->total) * 100, 2) 
+        ? round(($data->final_submit / $data->total) * 100) 
         : 0,
 ];
 
+$percentages['total_percentage'] = array_sum($percentages);
 
     return compact('data', 'percentages');
 }

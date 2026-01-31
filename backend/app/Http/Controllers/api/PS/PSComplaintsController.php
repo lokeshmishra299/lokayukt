@@ -66,7 +66,7 @@ class PSComplaintsController extends Controller
             'complaints.approved_rejected_by_lokayukt',
             'complaints.created_at',
             'complaints.updated_at',
-            'dd.district_name',
+            'dd.district_name','complaints.status',
               'dd1.district_name as dist_new',
             DB::raw('MIN(rep.id) as action_id') // 🔥 avoid duplicates
         )
@@ -76,7 +76,7 @@ class PSComplaintsController extends Controller
          'complaints.approved_rejected_by_rk',
             'complaints.approved_rejected_by_ps',
             'complaints.approved_rejected_by_lokayukt',
-            'complaints.created_at','complaints.updated_at','dd.district_name','dist_new');   // 🔥 distinct complaints
+            'complaints.created_at','complaints.updated_at','dd.district_name','dist_new','complaints.status');   // 🔥 distinct complaints
 
         // if ($roleParent === 'up-lok-ayukt') {
         //                $query->where('complaints.approved_rejected_by_lokayukt', 1);

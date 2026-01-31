@@ -480,7 +480,7 @@ $complainDetails->actions = $actions;
              $cmp =  Complaint::findOrFail($complainId);
              
             if($cmp){
-                $cmp->status = "Final Disposal / Closed";
+                $cmp->status = "Final Disposal/Closed";
                
                 if($cmp->save()){
                     $apcAction = new ComplaintAction();
