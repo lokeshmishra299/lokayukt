@@ -6,6 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdTime } from "react-icons/io";
+import Pagination from "../../Pagination";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -36,6 +38,10 @@ const ApprovedComplaints = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
+  // ✅ PAGINATION STATE
+const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 10;
+
 
   const [uploadList, setUploadList] = useState([]);
 const [selectedUpload, setSelectedUpload] = useState("");
@@ -160,6 +166,7 @@ const handleSendToUPLokayukt = async () => {
 
   const sorted = sortComplaintsByDate(complaints, sortOrder);
   setFilteredComplaints(sorted);
+  setCurrentPage(1);
 
   // 👇 top stats (badges)
   setApiStats({
@@ -232,6 +239,7 @@ const handleSendToUPLokayukt = async () => {
 
     const sorted = sortComplaintsByDate(filtered, sortOrder);
     setFilteredComplaints(sorted);
+    setCurrentPage(1);
   }, [
     searchQuery,
     allComplaints,
@@ -255,6 +263,17 @@ const handleSendToUPLokayukt = async () => {
   }
 }, [isConfirmModalOpen]);
 
+
+// ✅ PAGINATION LOGIC
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+const currentComplaints = filteredComplaints.slice(
+  indexOfFirstItem,
+  indexOfLastItem
+);
+
+const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
@@ -502,7 +521,7 @@ const handleSendToUPLokayukt = async () => {
               </div>
             ) : filteredComplaints.length > 0 ? (
               <div className="divide-y divide-gray-200">
-                {filteredComplaints.map((complaint) => (
+                {currentComplaints.map((complaint) => (
                   <div
                     key={complaint.id}
                     className="px-3 sm:px-4 py-3 hover:bg-gray-50 transition-colors"
@@ -687,6 +706,13 @@ const handleSendToUPLokayukt = async () => {
           </div>
         </div>
       </div>
+            <Pagination
+  currentPage={currentPage}
+  totalPages={totalPages}
+  onPageChange={setCurrentPage}
+  totalItems={filteredComplaints.length}
+  itemsPerPage={itemsPerPage}
+/>
 
       {/* {isConfirmModalOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-center p-4">

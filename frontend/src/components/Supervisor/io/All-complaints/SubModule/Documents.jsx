@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt } from "react-icons/fa";
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 // import { toast } from "react-toastify";
-import { toast, Toaster } from "react-hot-toast";
-import Pagination from "../../../Pagination";
 
+import { toast, Toaster } from "react-hot-toast";
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
@@ -20,7 +19,7 @@ const api = axios.create({
   },
 });
 
- const Documents = ({ complaint }) => {
+const Documents = ({ complaint }) => {
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
@@ -35,9 +34,6 @@ const api = axios.create({
 
   // Backend Errors State
   const [errors, setErrors] = useState({});
-
-  const [currentPage, setCurrentPage] = useState(1);
-const docsPerPage = 5;
 
   const handleAddDocuments = () => {
     setErrors({});
@@ -65,30 +61,16 @@ const docsPerPage = 5;
   } = useQuery({
     queryKey: ["documents", complaint?.id],
     queryFn: async () => {
-      const res = await api.get(`/ps/get-document/${complaint.id}`);
+      const res = await api.get(`/supervisor/get-document/${complaint.id}`);
       return res.data.status ? res.data.data : [];
     },
     enabled: !!complaint?.id,
   });
 
-
-  useEffect(() => {
-  setCurrentPage(1);
-}, [complaint?.id]);
-
-
-  // ✅ PAGINATION LOGIC
-const indexOfLastDoc = currentPage * docsPerPage;
-const indexOfFirstDoc = indexOfLastDoc - docsPerPage;
-
-const currentDocuments = documents.slice(indexOfFirstDoc, indexOfLastDoc);
-const totalPages = Math.ceil(documents.length / docsPerPage);
-
-
   const handleViewPdf = async (filename) => {
     try {
       setLoadingDoc(filename);
-      const res = await api.get(`/ps/get-file-preview/${complaint.id}`);
+      const res = await api.get(`/supervisor/get-file-preview/${complaint.id}`);
       if (res.data.status && res.data.data.length > 0) {
         const match = res.data.data.find((p) => p.includes(filename));
         if (match) {
@@ -102,13 +84,6 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
       setLoadingDoc(null);
     }
   };
-
-
-  useEffect(() => {
-  if (currentPage > totalPages) {
-    setCurrentPage(totalPages || 1);
-  }
-}, [totalPages]);
 
   // -- Handle File Selection --
   const handleFileChange = (e) => {
@@ -144,7 +119,7 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
       formData.append("title", newDoc.title || ""); 
       formData.append("complain_id", complaint.id);
 
-      await api.post("/ps/upload-document", formData, {
+      await api.post("/supervisor/upload-document", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -207,7 +182,7 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
             No documents available
           </div>
         ) : (
-          currentDocuments.map((doc) => (
+          documents.map((doc) => (
             <div
               key={doc.id}
               className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
@@ -244,15 +219,6 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
           ))
         )}
       </div>
-
-
-              <Pagination
-  currentPage={currentPage}
-  totalPages={totalPages}
-  onPageChange={setCurrentPage}
-  totalItems={documents.length}
-  itemsPerPage={docsPerPage}
-/>
 
       {/* Add Document Modal */}
       {openAddDocuments && (

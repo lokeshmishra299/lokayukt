@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt } from "react-icons/fa";
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 // import { toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
+import Pagination from "../../../Pagination";
+
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
@@ -18,7 +20,7 @@ const api = axios.create({
   },
 });
 
-const Documents = ({ complaint }) => {
+ const Documents = ({ complaint }) => {
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
@@ -33,6 +35,9 @@ const Documents = ({ complaint }) => {
 
   // Backend Errors State
   const [errors, setErrors] = useState({});
+
+  const [currentPage, setCurrentPage] = useState(1);
+const docsPerPage = 5;
 
   const handleAddDocuments = () => {
     setErrors({});
@@ -66,6 +71,20 @@ const Documents = ({ complaint }) => {
     enabled: !!complaint?.id,
   });
 
+
+  useEffect(() => {
+  setCurrentPage(1);
+}, [complaint?.id]);
+
+
+  // ✅ PAGINATION LOGIC
+const indexOfLastDoc = currentPage * docsPerPage;
+const indexOfFirstDoc = indexOfLastDoc - docsPerPage;
+
+const currentDocuments = documents.slice(indexOfFirstDoc, indexOfLastDoc);
+const totalPages = Math.ceil(documents.length / docsPerPage);
+
+
   const handleViewPdf = async (filename) => {
     try {
       setLoadingDoc(filename);
@@ -83,6 +102,13 @@ const Documents = ({ complaint }) => {
       setLoadingDoc(null);
     }
   };
+
+
+  useEffect(() => {
+  if (currentPage > totalPages) {
+    setCurrentPage(totalPages || 1);
+  }
+}, [totalPages]);
 
   // -- Handle File Selection --
   const handleFileChange = (e) => {
@@ -181,7 +207,7 @@ const Documents = ({ complaint }) => {
             No documents available
           </div>
         ) : (
-          documents.map((doc) => (
+          currentDocuments.map((doc) => (
             <div
               key={doc.id}
               className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
@@ -218,6 +244,15 @@ const Documents = ({ complaint }) => {
           ))
         )}
       </div>
+
+
+              <Pagination
+  currentPage={currentPage}
+  totalPages={totalPages}
+  onPageChange={setCurrentPage}
+  totalItems={documents.length}
+  itemsPerPage={docsPerPage}
+/>
 
       {/* Add Document Modal */}
       {openAddDocuments && (
