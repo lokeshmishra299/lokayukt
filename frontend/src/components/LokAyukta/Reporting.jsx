@@ -524,6 +524,9 @@ useEffect(() => {
     rejection: 15,
   };
 
+
+  const grandTotalPercentage = overallStatusData?.percentages?.total_percentage ?? 0;
+
   const statusBreakdown = [
     {
       status: "Pending with Dept",
@@ -1364,7 +1367,7 @@ useEffect(() => {
                       <td className="px-4 md:px-6 py-4 text-right text-blue-700">
                         {overallStats.total}
                       </td>
-                      <td className="px-4 md:px-6 py-4 text-right">100%</td>
+                      <td className="px-4 md:px-6 py-4 text-right">{grandTotalPercentage}%</td>
                     </tr>
                   </tbody>
                 </table>
