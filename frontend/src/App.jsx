@@ -171,6 +171,29 @@ import SupervisorAllComplaitscio from './components/Supervisor/cio-io/All-compla
 import SupervisorViewAllComplaintcio from './components/Supervisor/cio-io/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintscio from './components/Supervisor/cio-io/All-complaints/EditAllComplaints';
 
+
+// Supervisor 
+// SubRole -> cio - io
+import SupervisorLayoutio from './components/Supervisor/io/Layout';
+import SupervisorDashboardio from './components/Supervisor/io/Dashboard';
+import SupervisorComplaintsio from './components/Supervisor/io/Complaints';
+import SupervisorProgressRegisterio from './components/Supervisor/io/ProgressRegister';
+import SupervisorSearchReportsio from './components/Supervisor/io/SearchReports';
+import SupervisorViewComplaintsio from './components/Supervisor/io/ViewComplaints';
+// import SupervisorPendingComplaintsio from './components/Supervisors/io-io/Pending-complaints/PendingComplaints';
+import SupervisorEditPendingComplaintsio from './components/Supervisor/io/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintsio from './components/Supervisor/io/Pending-complaints/ViewPendingComplaints';
+// import SupervisorViewPendingComplaintsio from './components/Supervisor/io-io/Pending-complaints/ViewPendingComplaints';
+
+import SupervisorApprovedComplaintsio from './components/Supervisor/io/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintsio from './components/Supervisor/io/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintsio from './components/Supervisor/io/Approved-complaints/EditApprovedComplaints';
+
+import SupervisorAllComplaitsio from './components/Supervisor/io/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintio from './components/Supervisor/io/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintsio from './components/Supervisor/io/All-complaints/EditAllComplaints';
+
+
 // Supervisor 
 // SubRole -> dea-assis
 import SupervisorLayoutdea from './components/Supervisor/dea-assis/Layout';
@@ -500,6 +523,31 @@ function App() {
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintscio/>} /> 
         </Route>
       )} 
+
+
+          {/*io*/}
+      
+     {role === 'supervisor' && subrole === 'io' && (
+        <Route path="/supervisor" element={<SupervisorLayoutio />}>
+          <Route path="dashboard" element={<SupervisorDashboardio />} />
+          <Route path="complaints" element={<SupervisorComplaintsio />} />
+          <Route path="progress-register" element={<SupervisorProgressRegisterio />} />
+          <Route path="search-reports" element={<SupervisorSearchReportsio />} />
+          <Route path="search-reports/view/:id" element={<SupervisorViewComplaintsio />} />
+
+          <Route path="all-complaints" element={<SupervisorAllComplaitsio />} />
+          <Route path="all-complaints/view/:id" element={<SupervisorViewAllComplaintio />} />
+          <Route path="all-complaints/edit/:id" element={<SupervisorEditComplaintsio />} />
+
+          {/* <Route path="pending-complaints" element={<SupervisorPendingComplaintsio />} /> */}
+          <Route path="pending-complaints/view/:id" element={<SupervisorViewPendingComplaintsio />} />
+          <Route path="pending-complaints/edit/:id" element={<SupervisorEditPendingComplaintsio />} />
+
+          <Route path="approved-complaints" element={<SupervisorApprovedComplaintsio />} />   
+          <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintsio />} />
+          <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintsio/>} /> 
+        </Route>
+      )}
 
 
    {/* Supervisor  Routes */}

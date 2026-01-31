@@ -793,31 +793,31 @@ useEffect(() => {
   onClick={() => handleViewComplaint(row.id)}
   className="px-6 py-4 font-medium text-blue-600 whitespace-nowrap hover:underline cursor-pointer"
 >
-  {row?.complain_no}
+  {row?.complain_no || "N/A"}
 </td>
                           {/* <td className="px-6 py-4 text-blue-600 whitespace-nowrap hover:underline cursor-pointer">
                             {row.caseNo || "N/A"}
                           </td> */}
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {row?.created_at}
+                            {row?.created_at || "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {row?.district_name}
+                            {row?.district_name || "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {row?.department_name}
+                            {row?.department_name || "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {row?.complainant_name}
+                            {row?.complainant_name || "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className="px-2 py-1 rounded-full bg-gray-100 text-xs border border-gray-200">
-                              {row?.category}
+                              {row?.category || "N/A"}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
-                              {row?.status}
+                              {row?.status || "N/A"}
                             </span>
                           </td>
                         </tr>
@@ -826,12 +826,12 @@ useEffect(() => {
                   </tbody>
                 </table>
                 <Pagination
-  currentPage={enrollmentPage}
-  totalPages={enrollmentTotalPages}
-  onPageChange={setEnrollmentPage}
-  totalItems={filteredEnrollmentData.length}
-  itemsPerPage={itemsPerPage}
-/>
+                  currentPage={enrollmentPage}
+                  totalPages={enrollmentTotalPages}
+                  onPageChange={setEnrollmentPage}
+                  totalItems={filteredEnrollmentData.length}
+                  itemsPerPage={itemsPerPage}
+                />
               </div>
             </div>
           </div>
