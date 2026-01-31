@@ -16,6 +16,7 @@ import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 import PreView from "./PreView";
+import { krutiToUnicode } from "../../utils/krutiToUnicode";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -55,11 +56,75 @@ const ViewApprovedComplaints = () => {
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
   const [priviewPopup, setPriviewPopup] = useState(false);
 
+
+  const transformComplaintData = (data) => {
+    if (!data) return null;
+
+    // शॉर्टकट फंक्शन
+    const decode = (text) => krutiToUnicode(text || "");
+
+    return {
+      ...data,
+      // Main Fields
+      complain_no: decode(data.complain_no), 
+      complaint_description: decode(data.complaint_description),
+      delay_reason: decode(data.delay_reason),
+      
+      main_complainant_name: decode(data.main_complainant_name),
+      main_complainant_father: decode(data.main_complainant_father),
+      main_complainant_district: data.main_complainant_district,
+      
+      main_respondent_name: decode(data.main_respondent_name),
+      main_respondent_designation: decode(data.main_respondent_designation),
+      main_respondant_district: data.main_respondant_district,
+      
+      relation_with_person: decode(data.relation_with_person),
+      category: data.category,
+      
+      // Arrays (Complainants List)
+      complainants: data.complainants?.map((comp) => ({
+        ...comp,
+        complainant_name: decode(comp.complainant_name),
+        father_name: decode(comp.father_name),
+        district_name: comp.district_name,
+        occupation: decode(comp.occupation),
+        is_public_servant: decode(comp.is_public_servant),
+        permanent_place: decode(comp.permanent_place),
+      })) || [],
+
+      // Arrays (Respondents List)
+      respondant: data.respondant?.map((resp) => ({
+        ...resp,
+        respondent_name: decode(resp.respondent_name),
+        designation: resp.designation,
+        department_name: resp.department_name,
+        district_name: resp.district_name,
+        officer_category: resp.officer_category,
+        current_address: decode(resp.current_address),
+      })) || [],
+
+      // Arrays (Support List)
+      support: data.support?.map((item) => ({
+        ...item,
+        support_name: decode(item.support_name),
+        support_address: decode(item.support_address),
+      })) || [],
+
+      // Arrays (Witness List)
+      witness: data.witness?.map((item) => ({
+        ...item,
+        witness_name: decode(item.witness_name),
+        witness_address: decode(item.witness_address),
+      })) || [],
+    };
+  };
+
   const {data: complaintData,isLoading,isError,error,} = useQuery({
     queryKey: ["complaint-details", id],
     queryFn: async () => {
       const res = await api.get(`/operator/view-complaint/${id}`);
-      return res.data.data;
+      // return res.data.data;
+      return transformComplaintData(res.data.data);
     },
     enabled: !!id,
     staleTime: 1000 * 60 * 5,
@@ -272,7 +337,7 @@ const ViewApprovedComplaints = () => {
                       complaintData.status
                     )}`}
                   >
-                  { complaintData.approved_rejected_by_rk === 0 && complaintData.approved_rejected_by_lokayukt === 0 ? "Received - Record Section"
+                    { complaintData.approved_rejected_by_rk === 0 && complaintData.approved_rejected_by_lokayukt === 0 ? "Received - Record Section"
                    :
                    complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt != 1 ?  "In Motion - With Lokayukt"
                    :
@@ -307,7 +372,11 @@ const ViewApprovedComplaints = () => {
                         complaintData.status
                       )}`}
                     >
-                  { complaintData.approved_rejected_by_rk === 0 && complaintData.approved_rejected_by_lokayukt === 0 ? "Received - Record Section"
+                      {/* {complaintData.approved_rejected_by_operator == 0
+                        ? "Received - Record Section"
+                        : "In Motion - With Lokayukt"} */}
+
+                   { complaintData.approved_rejected_by_rk === 0 && complaintData.approved_rejected_by_lokayukt === 0 ? "Received - Record Section"
                    :
                    complaintData.approved_rejected_by_rk === 1 && complaintData.approved_rejected_by_lokayukt != 1 ?  "In Motion - With Lokayukt"
                    :
@@ -316,6 +385,7 @@ const ViewApprovedComplaints = () => {
 
 
                    }
+
                     </span>
 
                     <button
@@ -492,6 +562,7 @@ const ViewApprovedComplaints = () => {
                   }`}
                 >
                        स्थिति:  {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
+
                 </span>
 
                 {complaintData.challan_no && (

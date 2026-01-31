@@ -8,6 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { IoMdTime } from "react-icons/io";
 import { useMemo } from "react";
 import Pagination from "../../Pagination";
+import { krutiToUnicode } from "../../../components/utils/krutiToUnicode";
+import { unicodeToKrutiDev } from "../../../components/utils/unicodeToKruti";
 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -128,93 +130,205 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
     // "Allegation", "Grievance"
   }, [complaintTypesData]);
 
+  // useEffect(() => {
+  //   if (data?.data && Array.isArray(data.data)) {
+  //     setAllComplaints(data.data);
+  //     const sorted = sortComplaintsByDate(data.data, sortOrder);
+  //     setFilteredComplaints(sorted);
+  //     setCurrentPage(1);
+  //   }
+  // }, [data, sortOrder]);
+
+
   useEffect(() => {
     if (data?.data && Array.isArray(data.data)) {
-      setAllComplaints(data.data);
-      const sorted = sortComplaintsByDate(data.data, sortOrder);
+      
+      const decodedData = data.data.map((item) => ({
+        ...item, 
+        
+        complainantName: krutiToUnicode(item.complainantName || ""),
+        respondentName: krutiToUnicode(item.respondentName || ""),
+        name: krutiToUnicode(item.name || ""), 
+        district_name: krutiToUnicode(item.district_name || ""), 
+        remark: krutiToUnicode(item.remark || ""),
+        description: krutiToUnicode(item.description || ""),
+        complaint_description: krutiToUnicode(item.complaint_description || ""),
+        
+        fatherName: krutiToUnicode(item.fatherName || ""),
+        currentAddress: krutiToUnicode(item.currentAddress || ""),
+      }));
+
+      setAllComplaints(decodedData);
+      
+      const sorted = sortComplaintsByDate(decodedData, sortOrder);
       setFilteredComplaints(sorted);
       setCurrentPage(1);
     }
   }, [data, sortOrder]);
 
+  // useEffect(() => {
+  //   if (allComplaints.length === 0) return;
+
+  //   let filtered = [...allComplaints];
+
+  //   if (searchQuery.trim() !== "") {
+  //     const query = searchQuery.toLowerCase();
+  //     filtered = filtered.filter((complaint) => {
+  //       return (
+
+  //           complaint.complainantName?.toLowerCase().includes(query) ||
+  //     complaint.respondentName?.toLowerCase().includes(query) ||
+
+  //         complaint.complain_no?.toLowerCase().includes(query) ||
+  //         complaint.name?.toLowerCase().includes(query) ||
+  //         complaint.district_name?.toLowerCase().includes(query) ||
+  //         complaint.remark?.toLowerCase().includes(query) ||
+  //         complaint.description?.toLowerCase().includes(query) ||
+  //         complaint.email?.toLowerCase().includes(query) ||
+  //         complaint.mobile?.includes(query)
+  //       );
+  //     });
+  //   }
+
+  //   // ... search query logic ke baad ...
+
+  //   if (selectedDistrict !== "") {
+  //     filtered = filtered.filter((complaint) => {
+  //       // 1. Complaint data se 'dist_new' nikalein
+  //       const dataDistrict = complaint.dist_new;
+
+  //       // 2. Agar dataDistrict null ya undefined hai to false return karein (match nahi hua)
+  //       if (!dataDistrict) return false;
+
+  //       // 3. String match karein (case-insensitive aur space trim karke)
+  //       return (
+  //         dataDistrict.toString().toLowerCase().trim() ===
+  //         selectedDistrict.toString().toLowerCase().trim()
+  //       );
+  //     });
+  //   }
+
+  //   // ... status logic ...
+
+  //   if (selectedStatus !== "") {
+  //     filtered = filtered.filter((complaint) => {
+  //       return complaint.status === selectedStatus;
+  //     });
+  //   }
+
+  //   if (selectedFeeStatus !== "") {
+  //     filtered = filtered.filter((complaint) => {
+  //       return complaint.fee_exempted?.toString() === selectedFeeStatus;
+  //     });
+  //   }
+
+  //   // ... (District filter ke baad) ...
+  //   // ... District Filter ke baad ...
+  //   // 5. Case Type Filter (Is code ko update karein)
+  //   // 5. Case Type Filter (Is code ko update karein)
+  //   if (selectedCaseType !== "") {
+  //     filtered = filtered.filter((complaint) => {
+  //       const dataCategory = String(complaint.category || "")
+  //         .toLowerCase()
+  //         .trim();
+  //       const selectedValue = String(selectedCaseType).toLowerCase().trim();
+
+  //       return dataCategory === selectedValue;
+  //     });
+  //   }
+
+  //   // ... Baki filters ...
+
+  //   // ... (baki filters waise hi rahenge) ...
+
+  //   const sorted = sortComplaintsByDate(filtered, sortOrder);
+  //   setFilteredComplaints(sorted);
+  //   setCurrentPage(1);
+  // }, [
+  //   searchQuery,
+  //   allComplaints,
+  //   selectedDistrict,
+  //   selectedStatus,
+  //   selectedFeeStatus,
+  //   selectedCaseType,
+  // ]);
+
+
+
+  // ✅ Search Logic Updated (Hindi + Kruti Dev Input Support)
   useEffect(() => {
     if (allComplaints.length === 0) return;
 
     let filtered = [...allComplaints];
 
     if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
+      const query = searchQuery.toLowerCase().trim(); // 1. जो आपने टाइप किया (Direct Search)
+      
+      // 2. अगर आपने "Kruti Code" (जैसे dqN gks) टाइप किया है, तो उसे हिंदी बनाओ
+      const queryFromKruti = krutiToUnicode(searchQuery).toLowerCase().trim();
+
+      // 3. अगर आपने "Hindi" टाइप किया है, तो उसका Kruti Code बनाओ (Backup)
+      const queryToKruti = unicodeToKrutiDev(searchQuery).trim(); 
+
       filtered = filtered.filter((complaint) => {
+        
+        const match = (val) => {
+            if (!val) return false;
+            const strVal = String(val).toLowerCase(); // डेटा (जो अब हिंदी में है)
+            
+            return (
+              strVal.includes(query) ||          // Direct Match
+              strVal.includes(queryFromKruti) || // Kruti Input -> Matches Hindi Data
+              strVal.includes(queryToKruti)      // Hindi Input -> Matches Old Kruti Data
+            );
+        };
+
         return (
-
-            complaint.complainantName?.toLowerCase().includes(query) ||
-      complaint.respondentName?.toLowerCase().includes(query) ||
-
-          complaint.complain_no?.toLowerCase().includes(query) ||
-          complaint.name?.toLowerCase().includes(query) ||
-          complaint.district_name?.toLowerCase().includes(query) ||
-          complaint.remark?.toLowerCase().includes(query) ||
-          complaint.description?.toLowerCase().includes(query) ||
-          complaint.email?.toLowerCase().includes(query) ||
-          complaint.mobile?.includes(query)
+          match(complaint.complainantName) ||      
+          match(complaint.respondentName) ||       
+          match(complaint.complain_no) ||          
+          match(complaint.name) ||                 
+          match(complaint.district_name) ||        
+          match(complaint.remark) ||               
+          match(complaint.description) ||
+          match(complaint.complaint_description) ||
+          match(complaint.email) ||
+          match(complaint.mobile)
         );
       });
     }
 
-    // ... search query logic ke baad ...
+    // --- बाकी फिल्टर्स (District, Status आदि) को छेड़ें नहीं ---
 
     if (selectedDistrict !== "") {
       filtered = filtered.filter((complaint) => {
-        // 1. Complaint data se 'dist_new' nikalein
-        const dataDistrict = complaint.dist_new;
-
-        // 2. Agar dataDistrict null ya undefined hai to false return karein (match nahi hua)
+        const dataDistrict = complaint.dist_new || complaint.district_name;
         if (!dataDistrict) return false;
-
-        // 3. String match karein (case-insensitive aur space trim karke)
-        return (
-          dataDistrict.toString().toLowerCase().trim() ===
-          selectedDistrict.toString().toLowerCase().trim()
-        );
+        return String(dataDistrict).toLowerCase().trim() === selectedDistrict.toLowerCase().trim();
       });
     }
 
-    // ... status logic ...
-
     if (selectedStatus !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.status === selectedStatus;
-      });
+      filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
     }
 
     if (selectedFeeStatus !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.fee_exempted?.toString() === selectedFeeStatus;
-      });
+      filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
     }
 
-    // ... (District filter ke baad) ...
-    // ... District Filter ke baad ...
-    // 5. Case Type Filter (Is code ko update karein)
-    // 5. Case Type Filter (Is code ko update karein)
     if (selectedCaseType !== "") {
       filtered = filtered.filter((complaint) => {
-        const dataCategory = String(complaint.category || "")
-          .toLowerCase()
-          .trim();
+        const dataCategory = String(complaint.category || "").toLowerCase().trim();
         const selectedValue = String(selectedCaseType).toLowerCase().trim();
-
         return dataCategory === selectedValue;
       });
     }
 
-    // ... Baki filters ...
-
-    // ... (baki filters waise hi rahenge) ...
-
+    // सॉर्टिंग
     const sorted = sortComplaintsByDate(filtered, sortOrder);
     setFilteredComplaints(sorted);
     setCurrentPage(1);
+
   }, [
     searchQuery,
     allComplaints,
@@ -222,8 +336,8 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
     selectedStatus,
     selectedFeeStatus,
     selectedCaseType,
+    sortOrder
   ]);
-
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
     navigate(`view/${complaintId}`);

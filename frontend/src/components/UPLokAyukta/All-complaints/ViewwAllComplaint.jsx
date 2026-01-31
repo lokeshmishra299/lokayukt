@@ -12,12 +12,15 @@ import { IoMdArrowBack } from "react-icons/io";
 // import { toast, ToastContainer } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 import { toast, Toaster } from "react-hot-toast";
+import { krutiToUnicode } from "../../../components/utils/krutiToUnicode";
+
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -189,6 +192,69 @@ const [releaseType, setReleaseType] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
   const [forwardType, setForwardType] = useState("self");
 
+
+
+   const transformComplaintData = (data) => {
+      if (!data) return null;
+  
+      const decode = (text) => krutiToUnicode(text || "");
+  
+      return {
+        ...data,
+        // Main Fields
+        complain_no: decode(data.complain_no),
+        complaint_description: decode(data.complaint_description),
+        delay_reason: decode(data.delay_reason),
+        
+        main_complainant_name: decode(data.main_complainant_name),
+        main_complainant_father: decode(data.main_complainant_father),
+        main_complainant_district: data.main_complainant_district,
+        
+        main_respondent_name: decode(data.main_respondent_name),
+        main_respondent_designation: data.main_respondent_designation,
+        main_respondant_district: data.main_respondant_district,
+        
+        relation_with_person: decode(data.relation_with_person),
+        category: data.category, 
+  
+        // Complainants Array
+        complainants: data.complainants?.map((comp) => ({
+          ...comp,
+          complainant_name: decode(comp.complainant_name),
+          father_name: decode(comp.father_name),
+          district_name: comp.district_name,
+          occupation: decode(comp.occupation),
+          is_public_servant: decode(comp.is_public_servant),
+          permanent_place: decode(comp.permanent_place),
+        })) || [],
+  
+        // Respondents Array
+        respondant: data.respondant?.map((resp) => ({
+          ...resp,
+          respondent_name: decode(resp.respondent_name),
+          designation: resp.designation,
+          department_name: resp.department_name,
+          district_name: resp.district_name,
+          officer_category: resp.officer_category,
+          current_address: decode(resp.current_address),
+        })) || [],
+  
+        // Support Array
+        support: data.support?.map((item) => ({
+          ...item,
+          support_name: decode(item.support_name),
+          support_address: decode(item.support_address),
+        })) || [],
+  
+        // Witness Array
+        witness: data.witness?.map((item) => ({
+          ...item,
+          witness_name: decode(item.witness_name),
+          witness_address: decode(item.witness_address),
+        })) || [],
+      };
+    };
+
   const {
     data: complaintData,
     isLoading,
@@ -198,7 +264,9 @@ const [releaseType, setReleaseType] = useState("");
     queryKey: ["complaint-details", id],
     queryFn: async () => {
       const res = await api.get(`/uplokayukt/view-complaint/${id}`);
-      return res.data.data;
+      // return res.data.data;
+      return transformComplaintData(res.data.data);
+
     },
     enabled: !!id,
     staleTime: 1000 * 60 * 5,

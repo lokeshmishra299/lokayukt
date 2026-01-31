@@ -9,6 +9,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdTime } from "react-icons/io";
 import { Toaster } from "react-hot-toast";
+import { krutiToUnicode } from "../../../components/utils/krutiToUnicode";
+import { unicodeToKrutiDev } from "../../../components/utils/unicodeToKruti";
 
 import Pagination from "../../Pagination";
 
@@ -116,14 +118,115 @@ const stats = {
 
   });
 
+// useEffect(() => {
+//   if (data?.data && Array.isArray(data.data)) {
+//     setAllComplaints(data.data);
+//     const sorted = sortComplaintsByDate(data.data, sortOrder);
+//     setFilteredComplaints(sorted);
+//     setCurrentPage(1);
+//   }
+// }, [data, sortOrder]);
+
+
+
 useEffect(() => {
-  if (data?.data && Array.isArray(data.data)) {
-    setAllComplaints(data.data);
-    const sorted = sortComplaintsByDate(data.data, sortOrder);
-    setFilteredComplaints(sorted);
-    setCurrentPage(1);
-  }
-}, [data, sortOrder]);
+    if (data?.data && Array.isArray(data.data)) {
+      
+      const decodedData = data.data.map((item) => ({
+        ...item, 
+        
+        complain_no: item.complain_no || "",
+
+        complainantName: krutiToUnicode(item.complainantName || ""),
+        respondentName: krutiToUnicode(item.respondentName || ""),
+        name: krutiToUnicode(item.name || ""), 
+        district_name: krutiToUnicode(item.district_name || ""), 
+        remark: krutiToUnicode(item.remark || ""),
+        description: krutiToUnicode(item.description || ""),
+        complaint_description: krutiToUnicode(item.complaint_description || ""),
+        fatherName: krutiToUnicode(item.fatherName || ""),
+        currentAddress: krutiToUnicode(item.currentAddress || ""),
+      }));
+
+      setAllComplaints(decodedData);
+      
+      const sorted = sortComplaintsByDate(decodedData, sortOrder);
+      setFilteredComplaints(sorted);
+      setCurrentPage(1);
+    }
+  }, [data, sortOrder]);
+//   useEffect(() => {
+//     if (allComplaints.length === 0) return;
+
+//     let filtered = [...allComplaints];
+
+//     if (searchQuery.trim() !== "") {
+//       const query = searchQuery.toLowerCase();
+//       filtered = filtered.filter((complaint) => {
+//         return (
+
+//                 complaint.complainantName?.toLowerCase().includes(query) ||
+//       complaint.respondentName?.toLowerCase().includes(query) ||
+
+//           complaint.complain_no?.toLowerCase().includes(query) ||
+//           complaint.name?.toLowerCase().includes(query) ||
+//           complaint.district_name?.toLowerCase().includes(query) ||
+//           complaint.remark?.toLowerCase().includes(query) ||
+//           complaint.description?.toLowerCase().includes(query) ||
+//           complaint.email?.toLowerCase().includes(query) ||
+//           complaint.mobile?.includes(query)
+//         );
+//       });
+//     }
+
+//    if (selectedDistrict !== "") {
+//   filtered = filtered.filter((complaint) => {
+//     const dataDistrict = complaint.dist_new;
+
+//     if (!dataDistrict) return false;
+
+//     return (
+//       dataDistrict.toString().toLowerCase().trim() === 
+//       selectedDistrict.toString().toLowerCase().trim()
+//     );
+//   });
+// }
+
+
+//     if (selectedStatus !== "") {
+//       filtered = filtered.filter((complaint) => {
+//         return complaint.status === selectedStatus;
+//       });
+//     }
+
+//     if (selectedFeeStatus !== "") {
+//       filtered = filtered.filter((complaint) => {
+//           return complaint.fee_exempted?.toString() === selectedFeeStatus;
+//       });
+//     }
+
+// if (selectedCaseType !== "") {
+//   filtered = filtered.filter((complaint) => {
+//     return (
+//       complaint.category &&
+//       complaint.category.toLowerCase() === selectedCaseType.toLowerCase()
+//     );
+//   });
+// }
+
+
+//     const sorted = sortComplaintsByDate(filtered, sortOrder);
+//     setFilteredComplaints(sorted);
+//     setCurrentPage(1);
+//   }, [
+//     searchQuery,
+//     allComplaints,
+//     selectedDistrict,
+//     selectedStatus,
+//     selectedFeeStatus,
+//     selectedCaseType,
+//   ]);
+
 
 
   useEffect(() => {
@@ -132,63 +235,76 @@ useEffect(() => {
     let filtered = [...allComplaints];
 
     if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
+      // 1. जो आपने टाइप किया (Direct Hindi Search)
+      const query = searchQuery.toLowerCase().trim();
+      
+      // 2. अगर आपने Kruti कोड (जैसे 'dqN') टाइप किया, तो उसे हिंदी ('कुछ') बनाओ
+      const queryFromKruti = krutiToUnicode(searchQuery).toLowerCase().trim();
+
+      // 3. अगर आपने Hindi ('कुछ') टाइप किया, तो उसका Kruti कोड ('dqN') बनाओ (Backup के लिए)
+      const queryToKruti = unicodeToKrutiDev(searchQuery).trim(); 
+
       filtered = filtered.filter((complaint) => {
+        
+        // यह फंक्शन चेक करेगा कि डेटा मैच हो रहा है या नहीं
+        const match = (val) => {
+            if (!val) return false;
+            const strVal = String(val).toLowerCase(); // डेटाबेस की वैल्यू (Hindi)
+            const strValOriginal = String(val); // ओरिजिनल केस
+
+            return (
+              strVal.includes(query) ||           // सीधा हिंदी मैच
+              strVal.includes(queryFromKruti) ||  // Kruti इनपुट -> Hindi मैच
+              strValOriginal.includes(queryToKruti) // Hindi इनपुट -> Old Kruti Data मैच
+            );
+        };
+
         return (
-
-                complaint.complainantName?.toLowerCase().includes(query) ||
-      complaint.respondentName?.toLowerCase().includes(query) ||
-
-          complaint.complain_no?.toLowerCase().includes(query) ||
-          complaint.name?.toLowerCase().includes(query) ||
-          complaint.district_name?.toLowerCase().includes(query) ||
-          complaint.remark?.toLowerCase().includes(query) ||
-          complaint.description?.toLowerCase().includes(query) ||
-          complaint.email?.toLowerCase().includes(query) ||
-          complaint.mobile?.includes(query)
+          match(complaint.complainantName) ||      
+          match(complaint.respondentName) ||       
+          match(complaint.complain_no) ||          
+          match(complaint.name) ||                 
+          match(complaint.district_name) ||        
+          match(complaint.remark) ||               
+          match(complaint.description) ||
+          match(complaint.complaint_description) ||
+          match(complaint.email) ||
+          match(complaint.mobile)
         );
       });
     }
 
-   if (selectedDistrict !== "") {
-  filtered = filtered.filter((complaint) => {
-    const dataDistrict = complaint.dist_new;
+    // --- बाकी फिल्टर्स (District, Status आदि) को वैसे ही रहने दें ---
 
-    if (!dataDistrict) return false;
-
-    return (
-      dataDistrict.toString().toLowerCase().trim() === 
-      selectedDistrict.toString().toLowerCase().trim()
-    );
-  });
-}
-
+    if (selectedDistrict !== "") {
+      filtered = filtered.filter((complaint) => {
+        const dataDistrict = complaint.dist_new || complaint.district_name;
+        if (!dataDistrict) return false;
+        return String(dataDistrict).toLowerCase().trim() === selectedDistrict.toLowerCase().trim();
+      });
+    }
 
     if (selectedStatus !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.status === selectedStatus;
-      });
+      filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
     }
 
     if (selectedFeeStatus !== "") {
+      filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
+    }
+
+    if (selectedCaseType !== "") {
       filtered = filtered.filter((complaint) => {
-          return complaint.fee_exempted?.toString() === selectedFeeStatus;
+        const dataCategory = String(complaint.category || "").toLowerCase().trim();
+        const selectedValue = String(selectedCaseType).toLowerCase().trim();
+        return dataCategory === selectedValue;
       });
     }
 
-if (selectedCaseType !== "") {
-  filtered = filtered.filter((complaint) => {
-    return (
-      complaint.category &&
-      complaint.category.toLowerCase() === selectedCaseType.toLowerCase()
-    );
-  });
-}
-
-
+    // सॉर्टिंग (Sorting)
     const sorted = sortComplaintsByDate(filtered, sortOrder);
     setFilteredComplaints(sorted);
     setCurrentPage(1);
+
   }, [
     searchQuery,
     allComplaints,
@@ -196,8 +312,10 @@ if (selectedCaseType !== "") {
     selectedStatus,
     selectedFeeStatus,
     selectedCaseType,
+    sortOrder
   ]);
 
+  
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
     navigate(`view/${complaintId}`);
