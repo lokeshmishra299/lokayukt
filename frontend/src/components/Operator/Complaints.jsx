@@ -3,14 +3,13 @@ import axios from 'axios';
 // import { ToastContainer, toast } from 'react-toastify';
 // import 'react-toastify/dist/ReactToastify.css';
 import { toast, Toaster } from "react-hot-toast";
-import { unicodeToKrutiDev } from '../../components/utils/unicodeToKruti';
 
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
- 
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -841,230 +840,114 @@ const handleMainRespondent = (id) => {
 };
 
 
-//   const handleSaveDraft = async () => {
-//   try {
-//     setDrfatLoader(true);
-//     setErrors({});
+  const handleSaveDraft = async () => {
+  try {
+    setDrfatLoader(true);
+    setErrors({});
 
-//     const draftData = new FormData();
+    const draftData = new FormData();
 
-//     // 1️⃣ Complainants
-//     complainants.forEach((c, index) => {
-//       draftData.append(`complainant_name[${index}]`, c.name || '');
-//       draftData.append(`father_name[${index}]`, c.fatherName || '');
-//       draftData.append(`occupation[${index}]`, c.occupation || '');
-//       draftData.append(`is_public_servant[${index}]`,
-//         c.isPublicServant === 'हाँ' ? 'yes' :
-//         c.isPublicServant === 'नहीं' ? 'no' : ''
-//       );
-
-//       draftData.append(`permanent_place[${index}]`, c.place || '');
-//       draftData.append(`permanent_post_office[${index}]`, c.postOffice || '');
-//       draftData.append(`permanent_district[${index}]`, c.district || '');
-//       draftData.append(`is_main_c[${index}]`, c.isMain ? 1 : 0);
-//     });
-
-//     // 2️⃣ Respondents
-//     persons.forEach((p, index) => {
-//       draftData.append(`respondent_name[${index}]`, p.name || '');
-//       draftData.append(`designation[${index}]`, p.designation || '');
-//       draftData.append(`current_address[${index}]`, p.currentAddress || '');
-//       draftData.append(`respondent_district[${index}]`, p.district || '');
-//       draftData.append(`department_name[${index}]`, p.departmentNature || '');
-//       draftData.append(`officer_category[${index}]`, p.officerCategory || '');
-//       draftData.append(`is_main_r[${index}]`, p.isMain ? 1 : 0);
-//     });
-
-//     // 3️⃣ Relation + Auth
-//     draftData.append('relation_with_person', formData.relation || '');
-//     if (formData.authorizationFile) {
-//       draftData.append('authorization_document', formData.authorizationFile);
-//     }
-
-//     // 4️⃣ Correspondence Address
-//     draftData.append('correspondence_name', formData.correspondenceAddress.name || '');
-//     draftData.append('correspondence_place', formData.correspondenceAddress.place || '');
-//     draftData.append('correspondence_post_office', formData.correspondenceAddress.postOffice || '');
-//     draftData.append('correspondence_district', formData.correspondenceAddress.district || '');
-
-//     // 5️⃣ Complaint Info
-//     draftData.append('cause_date', formData.complaintDate || '');
-//     draftData.append('delay_reason', formData.delayReason || '');
-
-//     const prev =
-//       formData.previousComplaint === 'हाँ' ? 'yes' :
-//       formData.previousComplaint === 'नहीं' ? 'no' : '';
-//     draftData.append('previously_submitted', prev);
-//     draftData.append('previously_submitted_details', formData.previousComplaintDetails || '');
-
-//     // 6️⃣ Category
-//     draftData.append(
-//       'category',
-//       formData.complaintType === 'अभिकथन'
-//         ? 'assertion'
-//         : formData.complaintType === 'शिकायत'
-//         ? 'complaint'
-//         : ''
-//     );
-
-//     // 7️⃣ Support Persons
-//     formData.supportingPersons?.forEach((p, i) => {
-//       draftData.append(`support_name[${i}]`, p.name || '');
-//       draftData.append(`support_address[${i}]`, p.address || '');
-//     });
-
-//     // 8️⃣ Witness
-//     formData.otherPersons?.forEach((p, i) => {
-//       draftData.append(`witness_name[${i}]`, p.name || '');
-//       draftData.append(`witness_address[${i}]`, p.address || '');
-//     });
-
-//     // 9️⃣ Documents
-//     draftData.append('attached_documents_description', formData.attachedDocuments || '');
-//     if (formData.attachedDocumentsFile) {
-//       draftData.append('attached_documents', formData.attachedDocumentsFile);
-//     }
-
-//     draftData.append('complaint_description', formData.complaintDescription || '');
-
-//     // 🔥 DRAFT API CALL
-//     await api.post('/operator/save-draft-complaint', draftData, {
-//       headers: { 'Content-Type': 'multipart/form-data' }
-//     });
-
-//     toast.success('ड्राफ्ट सफलतापूर्वक सेव हो गया ✅');
-//     setShowPreview(false);
-//     resetAll()
-
-//   } catch (error) {
-//     console.error("Draft Error:", error);
-
-//     if (error.response?.data?.errors) {
-//       setErrors(error.response.data.errors);
-//       toast.error(error.response.data.message || 'ड्राफ्ट सेव नहीं हुआ');
-//     } else {
-//       toast.error('कुछ गलत हो गया');
-//     }
-//   } finally {
-//     setDrfatLoader(false);
-//   }
-// };
-
-
-const handleSaveDraft = async () => {
-    try {
-      setDrfatLoader(true);
-      setErrors({});
-
-      const draftData = new FormData();
-
-      // 1️⃣ Complainants (यहाँ conversion जोड़ें)
-      complainants.forEach((c, index) => {
-        draftData.append(`complainant_name[${index}]`, unicodeToKrutiDev(c.name || ''));
-        draftData.append(`father_name[${index}]`, unicodeToKrutiDev(c.fatherName || ''));
-        draftData.append(`occupation[${index}]`, unicodeToKrutiDev(c.occupation || ''));
-        draftData.append(`is_public_servant[${index}]`,
-          c.isPublicServant === 'हाँ' ? 'yes' :
-          c.isPublicServant === 'नहीं' ? 'no' : ''
-        );
-
-        draftData.append(`permanent_place[${index}]`, unicodeToKrutiDev(c.place || ''));
-        draftData.append(`permanent_post_office[${index}]`, unicodeToKrutiDev(c.postOffice || ''));
-        draftData.append(`permanent_district[${index}]`, c.district || ''); // District Code है तो convert न करें
-        draftData.append(`is_main_c[${index}]`, c.isMain ? 1 : 0);
-      });
-
-      // 2️⃣ Respondents (यहाँ conversion जोड़ें)
-      persons.forEach((p, index) => {
-        draftData.append(`respondent_name[${index}]`, unicodeToKrutiDev(p.name || ''));
-        draftData.append(`designation[${index}]`, unicodeToKrutiDev(p.designation || ''));
-        draftData.append(`current_address[${index}]`, unicodeToKrutiDev(p.currentAddress || ''));
-        draftData.append(`respondent_district[${index}]`, p.district || '');
-        draftData.append(`department_name[${index}]`, p.departmentNature || '');
-        draftData.append(`officer_category[${index}]`, p.officerCategory || '');
-        draftData.append(`is_main_r[${index}]`, p.isMain ? 1 : 0);
-      });
-
-      // 3️⃣ Relation + Auth
-      draftData.append('relation_with_person', unicodeToKrutiDev(formData.relation || ''));
-      if (formData.authorizationFile) {
-        draftData.append('authorization_document', formData.authorizationFile);
-      }
-
-      // 4️⃣ Correspondence Address
-      draftData.append('correspondence_name', unicodeToKrutiDev(formData.correspondenceAddress.name || ''));
-      draftData.append('correspondence_place', unicodeToKrutiDev(formData.correspondenceAddress.place || ''));
-      draftData.append('correspondence_post_office', unicodeToKrutiDev(formData.correspondenceAddress.postOffice || ''));
-      draftData.append('correspondence_district', formData.correspondenceAddress.district || '');
-
-      // 5️⃣ Complaint Info
-      draftData.append('cause_date', formData.complaintDate || '');
-      draftData.append('delay_reason', unicodeToKrutiDev(formData.delayReason || ''));
-
-      const prev =
-        formData.previousComplaint === 'हाँ' ? 'yes' :
-        formData.previousComplaint === 'नहीं' ? 'no' : '';
-      draftData.append('previously_submitted', prev);
-      
-      if(prev === 'yes'){
-          draftData.append('previously_submitted_details', unicodeToKrutiDev(formData.previousComplaintDetails || ''));
-      } else {
-          draftData.append('previously_submitted_details', '');
-      }
-
-      // 6️⃣ Category
-      draftData.append(
-        'category',
-        formData.complaintType === 'अभिकथन'
-          ? 'assertion'
-          : formData.complaintType === 'शिकायत'
-          ? 'complaint'
-          : ''
+    // 1️⃣ Complainants
+    complainants.forEach((c, index) => {
+      draftData.append(`complainant_name[${index}]`, c.name || '');
+      draftData.append(`father_name[${index}]`, c.fatherName || '');
+      draftData.append(`occupation[${index}]`, c.occupation || '');
+      draftData.append(`is_public_servant[${index}]`,
+        c.isPublicServant === 'हाँ' ? 'yes' :
+        c.isPublicServant === 'नहीं' ? 'no' : ''
       );
 
-      // 7️⃣ Support Persons
-      formData.supportingPersons?.forEach((p, i) => {
-        draftData.append(`support_name[${i}]`, unicodeToKrutiDev(p.name || ''));
-        draftData.append(`support_address[${i}]`, unicodeToKrutiDev(p.address || ''));
-      });
+      draftData.append(`permanent_place[${index}]`, c.place || '');
+      draftData.append(`permanent_post_office[${index}]`, c.postOffice || '');
+      draftData.append(`permanent_district[${index}]`, c.district || '');
+      draftData.append(`is_main_c[${index}]`, c.isMain ? 1 : 0);
+    });
 
-      // 8️⃣ Witness
-      formData.otherPersons?.forEach((p, i) => {
-        draftData.append(`witness_name[${i}]`, unicodeToKrutiDev(p.name || ''));
-        draftData.append(`witness_address[${i}]`, unicodeToKrutiDev(p.address || ''));
-      });
+    // 2️⃣ Respondents
+    persons.forEach((p, index) => {
+      draftData.append(`respondent_name[${index}]`, p.name || '');
+      draftData.append(`designation[${index}]`, p.designation || '');
+      draftData.append(`current_address[${index}]`, p.currentAddress || '');
+      draftData.append(`respondent_district[${index}]`, p.district || '');
+      draftData.append(`department_name[${index}]`, p.departmentNature || '');
+      draftData.append(`officer_category[${index}]`, p.officerCategory || '');
+      draftData.append(`is_main_r[${index}]`, p.isMain ? 1 : 0);
+    });
 
-      // 9️⃣ Documents
-      draftData.append('attached_documents_description', unicodeToKrutiDev(formData.attachedDocuments || ''));
-      if (formData.attachedDocumentsFile) {
-        draftData.append('attached_documents', formData.attachedDocumentsFile);
-      }
-
-      draftData.append('complaint_description', unicodeToKrutiDev(formData.complaintDescription || ''));
-
-      // 🔥 DRAFT API CALL
-      await api.post('/operator/save-draft-complaint', draftData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
-      toast.success('ड्राफ्ट सफलतापूर्वक सेव हो गया ✅');
-      setShowPreview(false);
-      resetAll()
-
-    } catch (error) {
-      console.error("Draft Error:", error);
-
-      if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors);
-        toast.error(error.response.data.message || 'ड्राफ्ट सेव नहीं हुआ');
-      } else {
-        toast.error('कुछ गलत हो गया');
-      }
-    } finally {
-      setDrfatLoader(false);
+    // 3️⃣ Relation + Auth
+    draftData.append('relation_with_person', formData.relation || '');
+    if (formData.authorizationFile) {
+      draftData.append('authorization_document', formData.authorizationFile);
     }
-  };
 
+    // 4️⃣ Correspondence Address
+    draftData.append('correspondence_name', formData.correspondenceAddress.name || '');
+    draftData.append('correspondence_place', formData.correspondenceAddress.place || '');
+    draftData.append('correspondence_post_office', formData.correspondenceAddress.postOffice || '');
+    draftData.append('correspondence_district', formData.correspondenceAddress.district || '');
+
+    // 5️⃣ Complaint Info
+    draftData.append('cause_date', formData.complaintDate || '');
+    draftData.append('delay_reason', formData.delayReason || '');
+
+    const prev =
+      formData.previousComplaint === 'हाँ' ? 'yes' :
+      formData.previousComplaint === 'नहीं' ? 'no' : '';
+    draftData.append('previously_submitted', prev);
+    draftData.append('previously_submitted_details', formData.previousComplaintDetails || '');
+
+    // 6️⃣ Category
+    draftData.append(
+      'category',
+      formData.complaintType === 'अभिकथन'
+        ? 'assertion'
+        : formData.complaintType === 'शिकायत'
+        ? 'complaint'
+        : ''
+    );
+
+    // 7️⃣ Support Persons
+    formData.supportingPersons?.forEach((p, i) => {
+      draftData.append(`support_name[${i}]`, p.name || '');
+      draftData.append(`support_address[${i}]`, p.address || '');
+    });
+
+    // 8️⃣ Witness
+    formData.otherPersons?.forEach((p, i) => {
+      draftData.append(`witness_name[${i}]`, p.name || '');
+      draftData.append(`witness_address[${i}]`, p.address || '');
+    });
+
+    // 9️⃣ Documents
+    draftData.append('attached_documents_description', formData.attachedDocuments || '');
+    if (formData.attachedDocumentsFile) {
+      draftData.append('attached_documents', formData.attachedDocumentsFile);
+    }
+
+    draftData.append('complaint_description', formData.complaintDescription || '');
+
+    // 🔥 DRAFT API CALL
+    await api.post('/operator/save-draft-complaint', draftData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+
+    toast.success('ड्राफ्ट सफलतापूर्वक सेव हो गया ✅');
+    setShowPreview(false);
+    resetAll()
+
+  } catch (error) {
+    console.error("Draft Error:", error);
+
+    if (error.response?.data?.errors) {
+      setErrors(error.response.data.errors);
+      toast.error(error.response.data.message || 'ड्राफ्ट सेव नहीं हुआ');
+    } else {
+      toast.error('कुछ गलत हो गया');
+    }
+  } finally {
+    setDrfatLoader(false);
+  }
+};
 
 
   const handleSubmit = async (e) => {
@@ -1104,25 +987,25 @@ const handleSaveDraft = async () => {
       // 1. Complainants & Their Addresses (MERGED LOOP)
       complainants.forEach((complainant, index) => {
         // Personal Details
-        submitData.append(`complainant_name[${index}]`, unicodeToKrutiDev(complainant.name || ''));
-        submitData.append(`father_name[${index}]`, unicodeToKrutiDev(complainant.fatherName || ''));
-        submitData.append(`occupation[${index}]`, unicodeToKrutiDev(complainant.occupation || ''));
+        submitData.append(`complainant_name[${index}]`, complainant.name || '');
+        submitData.append(`father_name[${index}]`, complainant.fatherName || '');
+        submitData.append(`occupation[${index}]`, complainant.occupation || '');
         submitData.append(`is_public_servant[${index}]`, complainant.isPublicServant === 'हाँ' ? 'yes' : 'no');
         submitData.append(`is_main_c[${index}]`, complainant.isMain ? 1 : 0);
 
         // ✅ FIXED: Address Fields ab Loop ke andar hain (Dynamic Index ke sath)
         // Note: permanent_name usually same as complainant name in this context
-        submitData.append(`permanent_name[${index}]`, unicodeToKrutiDev(complainant.name || '')); 
-        submitData.append(`permanent_place[${index}]`, unicodeToKrutiDev(complainant.place || ''));
-        submitData.append(`permanent_post_office[${index}]`, unicodeToKrutiDev(complainant.postOffice || ''));
+        submitData.append(`permanent_name[${index}]`, complainant.name || ''); 
+        submitData.append(`permanent_place[${index}]`, complainant.place || '');
+        submitData.append(`permanent_post_office[${index}]`, complainant.postOffice || '');
         submitData.append(`permanent_district[${index}]`, complainant.district || '');
       });
 
       // 2. Respondents (Persons)
       persons.forEach((person, index) => {
-        submitData.append(`respondent_name[${index}]`, unicodeToKrutiDev(person.name || ''));
-        submitData.append(`designation[${index}]`, unicodeToKrutiDev(person.designation || ''));
-        submitData.append(`current_address[${index}]`, unicodeToKrutiDev(person.currentAddress || ''));
+        submitData.append(`respondent_name[${index}]`, person.name || '');
+        submitData.append(`designation[${index}]`, person.designation || '');
+        submitData.append(`current_address[${index}]`, person.currentAddress || '');
         submitData.append(`respondent_district[${index}]`, person.district || '');
         submitData.append(`department_name[${index}]`, person.departmentNature || '');
         submitData.append(`officer_category[${index}]`, person.officerCategory || '');
@@ -1130,25 +1013,25 @@ const handleSaveDraft = async () => {
       });
 
       // 3. Relation & Auth
-      submitData.append('relation_with_person', unicodeToKrutiDev(formData.relation || ''));
+      submitData.append('relation_with_person', formData.relation || '');
       if (formData.authorizationFile) {
         submitData.append('authorization_document', formData.authorizationFile);
       }
 
       // 4. Correspondence Address (Ye abhi bhi global formData se aa raha hai - agar UI me alag hai)
-      submitData.append('correspondence_name', unicodeToKrutiDev(formData.correspondenceAddress.name || ''));
-      submitData.append('correspondence_place', unicodeToKrutiDev(formData.correspondenceAddress.place || ''));
-      submitData.append('correspondence_post_office', unicodeToKrutiDev(formData.correspondenceAddress.postOffice || ''));
+      submitData.append('correspondence_name', formData.correspondenceAddress.name || '');
+      submitData.append('correspondence_place', formData.correspondenceAddress.place || '');
+      submitData.append('correspondence_post_office', formData.correspondenceAddress.postOffice || '');
       submitData.append('correspondence_district', formData.correspondenceAddress.district || '');
 
       // 5. Complaint Details
       submitData.append('cause_date', formData.complaintDate || '');
-      submitData.append('delay_reason', unicodeToKrutiDev(formData.delayReason || ''));
+      submitData.append('delay_reason', formData.delayReason || '');
       
       const prevVal = formData.previousComplaint === 'हाँ' ? 'yes' : formData.previousComplaint === 'नहीं' ? 'no' : '';
       submitData.append('previously_submitted', prevVal);
       if (prevVal === 'yes') {
-        submitData.append('previously_submitted_details', unicodeToKrutiDev(formData.previousComplaintDetails || ''));
+        submitData.append('previously_submitted_details', formData.previousComplaintDetails || '');
       }
 
       // 6. Category
@@ -1167,16 +1050,16 @@ const handleSaveDraft = async () => {
       // 8. Support Persons (Loop Fixed)
       if (Array.isArray(formData.supportingPersons)) {
         formData.supportingPersons.forEach((p, i) => {
-            submitData.append(`support_name[${i}]`, unicodeToKrutiDev(p.name || ''));
-            submitData.append(`support_address[${i}]`, unicodeToKrutiDev(p.address || ''));
+            submitData.append(`support_name[${i}]`, p.name || '');
+            submitData.append(`support_address[${i}]`, p.address || '');
         });
       }
 
       // 9. Other Witnesses (Loop Fixed)
       if (Array.isArray(formData.otherPersons)) {
          formData.otherPersons.forEach((p, i) => {
-            submitData.append(`witness_name[${i}]`, unicodeToKrutiDev(p.name || ''));
-            submitData.append(`witness_address[${i}]`, unicodeToKrutiDev(p.address || ''));
+            submitData.append(`witness_name[${i}]`, p.name || '');
+            submitData.append(`witness_address[${i}]`, p.address || '');
          });
       }
 
@@ -1184,8 +1067,8 @@ const handleSaveDraft = async () => {
       if (formData.attachedDocumentsFile) {
         submitData.append('attached_documents', formData.attachedDocumentsFile);
       }
-      submitData.append('attached_documents_description', unicodeToKrutiDev(formData.attachedDocuments || ''));
-      submitData.append('complaint_description', unicodeToKrutiDev(formData.complaintDescription || ''));
+      submitData.append('attached_documents_description', formData.attachedDocuments || '');
+      submitData.append('complaint_description', formData.complaintDescription || '');
 
 
       // API Call
@@ -1546,7 +1429,7 @@ const handleSaveDraft = async () => {
               </label>
               <input
                 type="text" placeholder='परिवादी का नाम दर्ज करें' 
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
+                className={`w-full px-4 py-3 border  rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                   errors.complainant_name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={complainant.name || ''}

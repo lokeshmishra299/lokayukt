@@ -527,12 +527,12 @@ const Dashboard = ({ userRole = "Administrator" }) => {
 
   // ✅ Handle Date Picker Change
   const handleDateChange = (date) => {
-    setSelectedDate(date);
-    setShowDatePicker(false);
-    const newMonth = date.toISOString().slice(0, 7); // YYYY-MM format
-    setCurrentMonth(newMonth);
-    fetchDashboardData(newMonth);
-  };
+  setSelectedDate(date);
+  setShowDatePicker(false);
+  const newMonth = date.toISOString().slice(0, 7);
+  setCurrentMonth(newMonth);   // bas ye
+};
+
 
   // ✅ Refresh to Current Month
   const handleRefresh = () => {
@@ -604,8 +604,8 @@ const Dashboard = ({ userRole = "Administrator" }) => {
                 dateFormat="MM/yyyy"
                 showMonthYearPicker
                 showFullMonthYearPicker
-                minDate={new Date('2022-01-01')}
-                maxDate={new Date('2025-12-31')}
+                  minDate={new Date('2022-01-01')}
+  maxDate={new Date()} 
                 inline
                 className="border-0"
               />

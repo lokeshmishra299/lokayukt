@@ -391,14 +391,12 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
   }, [currentMonth]);
 
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    setShowDatePicker(false);
-    const newMonth = date.toISOString().slice(0, 7); 
-    setCurrentMonth(newMonth);
-    fetchDashboardData(newMonth);
-  };
-
+const handleDateChange = (date) => {
+  setSelectedDate(date);
+  setShowDatePicker(false);
+  const newMonth = date.toISOString().slice(0, 7);
+  setCurrentMonth(newMonth);   // bas ye
+}
 
   const handleRefresh = () => {
     const now = new Date();
@@ -543,8 +541,8 @@ const Dashboard = ({ userRole = "lokayukt" }) => {
                     dateFormat="MM/yyyy"
                     showMonthYearPicker
                     showFullMonthYearPicker
-                    minDate={new Date('2022-01-01')}
-                    maxDate={new Date('2025-12-31')}
+                   minDate={new Date('2022-01-01')}
+  maxDate={new Date()}
                     inline
                 />
               </div>
