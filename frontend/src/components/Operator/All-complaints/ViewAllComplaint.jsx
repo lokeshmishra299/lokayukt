@@ -75,7 +75,7 @@ const ViewAllComplaint = () => {
       main_complainant_district: data.main_complainant_district,
       
       main_respondent_name: decode(data.main_respondent_name),
-      main_respondent_designation: decode(data.main_respondent_designation),
+      main_respondent_designation: data.main_respondent_designation,
       main_respondant_district: data.main_respondant_district,
       
       relation_with_person: decode(data.relation_with_person),
