@@ -194,66 +194,66 @@ const [releaseType, setReleaseType] = useState("");
 
 
 
-   const transformComplaintData = (data) => {
-      if (!data) return null;
+  //  const transformComplaintData = (data) => {
+  //     if (!data) return null;
   
-      const decode = (text) => krutiToUnicode(text || "");
+  //     const decode = (text) => krutiToUnicode(text || "");
   
-      return {
-        ...data,
-        // Main Fields
-        complain_no: decode(data.complain_no),
-        complaint_description: decode(data.complaint_description),
-        delay_reason: decode(data.delay_reason),
+  //     return {
+  //       ...data,
+  //       // Main Fields
+  //       complain_no: decode(data.complain_no),
+  //       complaint_description: decode(data.complaint_description),
+  //       delay_reason: decode(data.delay_reason),
         
-        main_complainant_name: decode(data.main_complainant_name),
-        main_complainant_father: decode(data.main_complainant_father),
-        main_complainant_district: data.main_complainant_district,
+  //       main_complainant_name: decode(data.main_complainant_name),
+  //       main_complainant_father: decode(data.main_complainant_father),
+  //       main_complainant_district: data.main_complainant_district,
         
-        main_respondent_name: decode(data.main_respondent_name),
-        main_respondent_designation: data.main_respondent_designation,
-        main_respondant_district: data.main_respondant_district,
+  //       main_respondent_name: decode(data.main_respondent_name),
+  //       main_respondent_designation: data.main_respondent_designation,
+  //       main_respondant_district: data.main_respondant_district,
         
-        relation_with_person: decode(data.relation_with_person),
-        category: data.category, 
+  //       relation_with_person: decode(data.relation_with_person),
+  //       category: data.category, 
   
-        // Complainants Array
-        complainants: data.complainants?.map((comp) => ({
-          ...comp,
-          complainant_name: decode(comp.complainant_name),
-          father_name: decode(comp.father_name),
-          district_name: comp.district_name,
-          occupation: decode(comp.occupation),
-          is_public_servant: decode(comp.is_public_servant),
-          permanent_place: decode(comp.permanent_place),
-        })) || [],
+  //       // Complainants Array
+  //       complainants: data.complainants?.map((comp) => ({
+  //         ...comp,
+  //         complainant_name: decode(comp.complainant_name),
+  //         father_name: decode(comp.father_name),
+  //         district_name: comp.district_name,
+  //         occupation: decode(comp.occupation),
+  //         is_public_servant: decode(comp.is_public_servant),
+  //         permanent_place: decode(comp.permanent_place),
+  //       })) || [],
   
-        // Respondents Array
-        respondant: data.respondant?.map((resp) => ({
-          ...resp,
-          respondent_name: decode(resp.respondent_name),
-          designation: resp.designation,
-          department_name: resp.department_name,
-          district_name: resp.district_name,
-          officer_category: resp.officer_category,
-          current_address: decode(resp.current_address),
-        })) || [],
+  //       // Respondents Array
+  //       respondant: data.respondant?.map((resp) => ({
+  //         ...resp,
+  //         respondent_name: decode(resp.respondent_name),
+  //         designation: resp.designation,
+  //         department_name: resp.department_name,
+  //         district_name: resp.district_name,
+  //         officer_category: resp.officer_category,
+  //         current_address: decode(resp.current_address),
+  //       })) || [],
   
-        // Support Array
-        support: data.support?.map((item) => ({
-          ...item,
-          support_name: decode(item.support_name),
-          support_address: decode(item.support_address),
-        })) || [],
+  //       // Support Array
+  //       support: data.support?.map((item) => ({
+  //         ...item,
+  //         support_name: decode(item.support_name),
+  //         support_address: decode(item.support_address),
+  //       })) || [],
   
-        // Witness Array
-        witness: data.witness?.map((item) => ({
-          ...item,
-          witness_name: decode(item.witness_name),
-          witness_address: decode(item.witness_address),
-        })) || [],
-      };
-    };
+  //       // Witness Array
+  //       witness: data.witness?.map((item) => ({
+  //         ...item,
+  //         witness_name: decode(item.witness_name),
+  //         witness_address: decode(item.witness_address),
+  //       })) || [],
+  //     };
+  //   };
 
   const {
     data: complaintData,
@@ -264,8 +264,8 @@ const [releaseType, setReleaseType] = useState("");
     queryKey: ["complaint-details", id],
     queryFn: async () => {
       const res = await api.get(`/uplokayukt/view-complaint/${id}`);
-      // return res.data.data;
-      return transformComplaintData(res.data.data);
+      return res.data.data;
+      // return transformComplaintData(res.data.data);
 
     },
     enabled: !!id,
@@ -628,12 +628,13 @@ const [releaseType, setReleaseType] = useState("");
 
               {/* ===== DESCRIPTION (Hindi) ===== */}
 
-              <p className="text-[14px] text-black font-semibold uppercase my-2">
+              <p className="text-[14px] text-black font-semibold my-2">
                 {/* Description:{" "} */}
                 विवरण:{" "}
-                <span className="text-gray-500">
-                  {complaintData.complaint_description ||
-                    "No detailed description available for this complaint."}
+                <span className=" text-gray-500">
+                <span className="kruti-input">  {complaintData.complaint_description ||
+                    "No detailed description available for this complaint."}</span>
+                
                 </span>
               </p>
 
@@ -661,10 +662,10 @@ const [releaseType, setReleaseType] = useState("");
                       <p className="text-[14px] text-black font-semibold uppercase mb-1">
                         नाम
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.main_complainant_name
-                        ) || "N/A"}
+                         || "N/A"}
                       </p>
                     </div>
 
@@ -673,10 +674,10 @@ const [releaseType, setReleaseType] = useState("");
                       <p className="text-[14px] text-black font-semibold uppercase mb-1">
                         पिता का नाम
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.main_complainant_father
-                        ) || "N/A"}
+                         || "N/A"}
                       </p>
                     </div>
 
@@ -705,10 +706,10 @@ const [releaseType, setReleaseType] = useState("");
                       <p className="text-[14px] text-black font-semibold uppercase mb-1">
                         नाम
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.main_respondent_name
-                        ) || "N/A"}
+                         || "N/A"}
                       </p>
                     </div>
 
@@ -746,10 +747,10 @@ const [releaseType, setReleaseType] = useState("");
                       <p className="text-[14px] text-black font-semibold uppercase mb-1">
                         व्यक्ति से संबंध
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.relation_with_person
-                        ) || "NA"}
+                         || "NA"}
                       </p>
                     </div>
 
@@ -1390,16 +1391,16 @@ const [releaseType, setReleaseType] = useState("");
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700 border-r border-gray-200 bg-gray-50">
                               {idx + 1}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
+                            <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
                               {comp.complainant_name || "-"}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.father_name || "-"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.district_name || "-"}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.occupation || "-"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -1414,7 +1415,7 @@ const [releaseType, setReleaseType] = useState("");
                                 {comp.is_public_servant || "-"}
                               </span>
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-700 break-words">
+                            <td className="px-6 py-4 kruti-input text-sm text-gray-700 break-words">
                               {comp.permanent_place || "-"}
                             </td>
                           </tr>
@@ -1539,7 +1540,7 @@ const [releaseType, setReleaseType] = useState("");
                             <td className="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-100">
                               {idx + 1}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 py-3 kruti-input text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
                               {resp.respondent_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
@@ -1555,7 +1556,7 @@ const [releaseType, setReleaseType] = useState("");
                               {resp.officer_category || "-"}
                             </td>
                             {/* Address Column: whitespace-normal ensures text wrapping */}
-                            <td className="px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                            <td className="px-4 py-3 kruti-input text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {resp.current_address || "-"}
                             </td>
                           </tr>
@@ -1598,13 +1599,13 @@ const [releaseType, setReleaseType] = useState("");
                             key={idx}
                             className="hover:bg-blue-50 transition-colors"
                           >
-                            <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
+                            <td className="px-6 py-4  text-sm font-medium text-gray-900 border-r border-gray-100">
                               {idx + 1}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-6 py-4 text-sm kruti-input text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
                               {item.support_name || "-"}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                            <td className="px-6 py-4 kruti-input text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {item.support_address || "-"}
                             </td>
                           </tr>
@@ -1650,10 +1651,10 @@ const [releaseType, setReleaseType] = useState("");
                             <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
                               {idx + 1}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-6 py-4 kruti-input text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
                               {item.witness_name || "-"}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                            <td className="px-6 py-4 kruti-input text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {item.witness_address || "-"}
                             </td>
                           </tr>

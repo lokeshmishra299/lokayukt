@@ -153,6 +153,18 @@ const itemsPerPage = 10;
     queryFn: getComplaintTypes,
   });
 
+  
+      function limitTo50Words(text) {
+      const words = text.trim().split(/\s+/);
+
+      if (words.length <= 30) {
+        return text;
+      }
+
+      return words.slice(0, 30).join(" ") + " ...";
+    }
+
+  
   const indexOfLastItem = currentPage * itemsPerPage;
 const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
@@ -163,64 +175,64 @@ const currentComplaints = filteredComplaints.slice(
 
 const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
-  // useEffect(() => {
-  //   if (data) {
-  //     setAllComplaints(data);
-  //     const sorted = sortComplaintsByDate(data, sortOrder);
-  //     setFilteredComplaints(sorted);
-  //     setCurrentPage(1); 
-  //   }
-  // }, [data, sortOrder]);
+  useEffect(() => {
+    if (data) {
+      setAllComplaints(data);
+      const sorted = sortComplaintsByDate(data, sortOrder);
+      setFilteredComplaints(sorted);
+      setCurrentPage(1); 
+    }
+  }, [data, sortOrder]);
 
   // Change ye hoga 
-  useEffect(() => {
-    if (data?.data && Array.isArray(data.data)) { // Note: 'data' variable structure might vary based on getAllComplaints return
+  // useEffect(() => {
+  //   if (data?.data && Array.isArray(data.data)) { // Note: 'data' variable structure might vary based on getAllComplaints return
       
      
-      const rawData = Array.isArray(data) ? data : (data?.data || []);
+  //     const rawData = Array.isArray(data) ? data : (data?.data || []);
 
-      const decodedData = rawData.map((item) => ({
-        ...item,
-        complain_no: krutiToUnicode(item.complain_no || ""),
-        complainantName: krutiToUnicode(item.complainantName || ""),
-        respondentName: krutiToUnicode(item.respondentName || ""),
-        name: krutiToUnicode(item.name || ""),
-        district_name: krutiToUnicode(item.district_name || ""),
-        remark: krutiToUnicode(item.remark || ""),
-        description: krutiToUnicode(item.description || ""),
-        complaint_description: krutiToUnicode(item.complaint_description || ""),
-        // अन्य फील्ड्स
-        fatherName: krutiToUnicode(item.fatherName || ""),
-        currentAddress: krutiToUnicode(item.currentAddress || ""),
-      }));
+  //     const decodedData = rawData.map((item) => ({
+  //       ...item,
+  //       complain_no: krutiToUnicode(item.complain_no || ""),
+  //       complainantName: krutiToUnicode(item.complainantName || ""),
+  //       respondentName: krutiToUnicode(item.respondentName || ""),
+  //       name: krutiToUnicode(item.name || ""),
+  //       district_name: krutiToUnicode(item.district_name || ""),
+  //       remark: krutiToUnicode(item.remark || ""),
+  //       description: krutiToUnicode(item.description || ""),
+  //       complaint_description: krutiToUnicode(item.complaint_description || ""),
+  //       // अन्य फील्ड्स
+  //       fatherName: krutiToUnicode(item.fatherName || ""),
+  //       currentAddress: krutiToUnicode(item.currentAddress || ""),
+  //     }));
 
-      setAllComplaints(decodedData);
+  //     setAllComplaints(decodedData);
       
-      const sorted = sortComplaintsByDate(decodedData, sortOrder);
-      setFilteredComplaints(sorted);
-      setCurrentPage(1);
-    }
-    else if (Array.isArray(data)) {
-         const decodedData = data.map((item) => ({
-            ...item,
-            complain_no: item.complain_no || "",
-            complainantName: krutiToUnicode(item.complainantName || ""),
-            respondentName: krutiToUnicode(item.respondentName || ""),
-            name: krutiToUnicode(item.name || ""),
-            district_name: krutiToUnicode(item.district_name || ""),
-            remark: krutiToUnicode(item.remark || ""),
-            description: krutiToUnicode(item.description || ""),
-            complaint_description: krutiToUnicode(item.complaint_description || ""),
-            fatherName: krutiToUnicode(item.fatherName || ""),
-            currentAddress: krutiToUnicode(item.currentAddress || ""),
-          }));
-          setAllComplaints(decodedData);
-          const sorted = sortComplaintsByDate(decodedData, sortOrder);
-          setFilteredComplaints(sorted);
-          setCurrentPage(1);
-    }
+  //     const sorted = sortComplaintsByDate(decodedData, sortOrder);
+  //     setFilteredComplaints(sorted);
+  //     setCurrentPage(1);
+  //   }
+  //   else if (Array.isArray(data)) {
+  //        const decodedData = data.map((item) => ({
+  //           ...item,
+  //           complain_no: item.complain_no || "",
+  //           complainantName: krutiToUnicode(item.complainantName || ""),
+  //           respondentName: krutiToUnicode(item.respondentName || ""),
+  //           name: krutiToUnicode(item.name || ""),
+  //           district_name: krutiToUnicode(item.district_name || ""),
+  //           remark: krutiToUnicode(item.remark || ""),
+  //           description: krutiToUnicode(item.description || ""),
+  //           complaint_description: krutiToUnicode(item.complaint_description || ""),
+  //           fatherName: krutiToUnicode(item.fatherName || ""),
+  //           currentAddress: krutiToUnicode(item.currentAddress || ""),
+  //         }));
+  //         setAllComplaints(decodedData);
+  //         const sorted = sortComplaintsByDate(decodedData, sortOrder);
+  //         setFilteredComplaints(sorted);
+  //         setCurrentPage(1);
+  //   }
 
-  }, [data, sortOrder]);
+  // }, [data, sortOrder]);
 
 //   useEffect(() => {
 
@@ -486,13 +498,21 @@ useEffect(() => {
 
             <div className="relative mb-3">
               <IoSearchOutline className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
+              {/* <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Search by file no., complainant, subject..."
-              />
+              /> */}
+
+                      <input
+  type="text"
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  className="kruti-input w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:!font-sans placeholder:!text-gray-500 placeholder:!text-sm placeholder:!tracking-normal"
+  placeholder="Search by file no., complainant, subject..."
+/>
             </div>
 
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 text-xs">
@@ -589,11 +609,14 @@ useEffect(() => {
                         <p className="text-sm font-semibold text-gray-900 mb-1">
                           File No. {complaint.complain_no}
                         </p>
-                        <p className="text-xs text-gray-700 mb-1">
-                          Description:{" "}
-                          {complaint.complaint_description ||
-                            "No description available"}
-                        </p>
+                          <p className="text-xs text-gray-700 mb-1">
+                          <span className="text-[15px]">Description: </span>
+                            <span className="kruti-input">
+                                {limitTo50Words(complaint.complaint_description) ||
+                              "No description available"}
+                            </span>
+                          
+                          </p>
                         <div className="text-[11px] text-gray-600 mb-1">
                           <span className="text-gray-500">Cause Date:</span>
                           <span className="ml-1">

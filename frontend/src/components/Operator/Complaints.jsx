@@ -29,7 +29,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
       : '';
 
   return (
-    <div ref={ref} className="rounded-md text-[12px] leading-relaxed text-gray-900">
+    <div ref={ref} className=" kruti-input rounded-md text-[12px] leading-relaxed text-gray-900">
       <div className="w-full h-full px-8 pt-8 pb-10">
         <div className="text-center mb-2">
           <p className="font-semibold text-[13px]">
@@ -1429,7 +1429,8 @@ const handleMainRespondent = (id) => {
               </label>
               <input
                 type="text" placeholder='परिवादी का नाम दर्ज करें' 
-                className={`w-full px-4 py-3 border  rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
+                  style={{ height: "48px" }} 
+                className={` kruti-input w-full px-4 py-3 border  rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                   errors.complainant_name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={complainant.name || ''}
@@ -1442,7 +1443,9 @@ const handleMainRespondent = (id) => {
               </label>
               <input
                 type="text" placeholder=' पिता का नाम दर्ज करें' 
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
+                  style={{ height: "48px" }} 
+
+                className={` kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                   errors.father_name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={complainant.fatherName || ''}
@@ -1459,7 +1462,9 @@ const handleMainRespondent = (id) => {
               </label>
               <input
                 type="text" placeholder='व्यवसाय का प्रकार दर्ज करें'
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
+                  style={{ height: "48px" }} 
+
+                className={` kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                   errors.occupation ? 'border-red-500' : 'border-gray-300'
                 }`}
                 value={complainant.occupation || ''}
@@ -1496,7 +1501,9 @@ const handleMainRespondent = (id) => {
               </label>
               <input
                 type="text" placeholder='संबंधित डाकघर / पुलिस थाना का नाम'
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
+                  style={{ height: "48px" }} 
+
+                className={`kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                   errors.permanent_post_office ? 'border-red-500' : 'border-gray-300'
                 }`}
                 // ✅ Fixed: Using complainant.postOffice
@@ -1535,7 +1542,9 @@ const handleMainRespondent = (id) => {
             </label>
             <input
               type="text" placeholder='स्थान का नाम'
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all placeholder:text-xs duration-200  ${
+                  style={{ height: "48px" }} 
+
+              className={` kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all placeholder:text-xs duration-200  ${
                 errors.permanent_place ? 'border-red-500' : 'border-gray-300'
               }`}
               // ✅ Fixed: Using complainant.place
@@ -1623,18 +1632,29 @@ const handleMainRespondent = (id) => {
 
           {/* 2. Relation */}
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            <h3 className="  text-lg font-semibold text-gray-800 mb-4">
               2. यदि परिवाद किसी दूसरे व्यक्ति की ओर से है तो उस व्यक्ति के साथ अपना संबंध बतायें। <span className="text-red-500">*</span>
             </h3>
-            <textarea
+            {/* <textarea
               placeholder="संबंध का विवरण लिखें"
               rows="4"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y ${
+              className={` kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y ${
                 errors.relation_with_person ? 'border-red-500' : 'border-gray-300'
               }`}
               value={formData.relation}
               onChange={(e) => handleFormDataChange('relation', e.target.value)}
-            />
+            /> */}
+
+            <textarea
+    placeholder="संबंध का विवरण लिखें"
+    rows="4"
+    // 👇 यहाँ 'placeholder:text-base' या 'placeholder:text-sm' जोड़ें
+    className={`kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-base ${
+      errors.relation_with_person ? 'border-red-500' : 'border-gray-300'
+    }`}
+    value={formData.relation}
+    onChange={(e) => handleFormDataChange('relation', e.target.value)}
+  />
             {errors.relation_with_person && (
               <p className="text-red-500 text-sm mt-1">{errors.relation_with_person[0]}</p>
             )}
@@ -1676,7 +1696,9 @@ const handleMainRespondent = (id) => {
                 </label>
                 <input
                   type="text" placeholder='नाम दर्ज करें'
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
+                                    style={{ height: "48px" }} 
+
+                  className={` kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                     errors.correspondence_name ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={formData.correspondenceAddress.name}
@@ -1694,7 +1716,9 @@ const handleMainRespondent = (id) => {
                 </label>
                 <input
                   type="text" placeholder='स्थान दर्ज करें'
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
+                                    style={{ height: "48px" }} 
+
+                  className={` kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                     errors.correspondence_place ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={formData.correspondenceAddress.place}
@@ -1714,7 +1738,9 @@ const handleMainRespondent = (id) => {
                 </label>
                 <input
                   type="text" placeholder='संबंधित डाकघर / पुलिस थाना का नाम'
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
+                                    style={{ height: "48px" }} 
+
+                  className={  `kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
                     errors.correspondence_post_office ? 'border-red-500' : 'border-gray-300'
                   }`}
                   value={formData.correspondenceAddress.postOffice}
@@ -1885,7 +1911,9 @@ const handleMainRespondent = (id) => {
             </label>
             <input
               type="text" placeholder='अधिकारी का नाम दर्ज करें'
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all placeholder:text-xs duration-200"
+                                style={{ height: "48px" }} 
+
+              className=" kruti-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all placeholder:text-xs duration-200"
               value={person.name || ''}
               onChange={(e) => updatePerson(person.id, 'name', e.target.value)}
             />
@@ -1897,7 +1925,7 @@ const handleMainRespondent = (id) => {
             </label>
             <textarea placeholder='वर्तमान पता दर्ज करें'
               rows="3"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-xs "
+              className=" kruti-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-xs "
               value={person.currentAddress || ''}
               onChange={(e) => updatePerson(person.id, 'currentAddress', e.target.value)}
             />
@@ -2015,7 +2043,7 @@ const handleMainRespondent = (id) => {
     </label>
     <textarea placeholder='विलम्ब का कारण दर्ज करें'
       rows="4"
-      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-xs ${
+      className={` kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-xs ${
         errors.delay_reason ? 'border-red-500' : 'border-gray-300'
       }`}
       value={formData.delayReason}
@@ -2062,12 +2090,14 @@ const handleMainRespondent = (id) => {
     )}
     {formData.previousComplaint === 'हाँ' && (
       <textarea
-        placeholder="यदि हाँ, तो परिणाम / स्थिति तथा यदि नहीं, तो संक्षेप में कारण लिखें।"
+        placeholder="यदि हाँ तो परिणाम  स्थिति तथा यदि नहीं तो संक्षेप में कारण लिखें।"
         rows="4"
-        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
+        // className=" kruti-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y"
+        className="kruti-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-sm"
         value={formData.previousComplaintDetails}
         onChange={(e) => handleFormDataChange('previousComplaintDetails', e.target.value)}
       />
+      
     )}
   </div>
 </div>
@@ -2248,7 +2278,9 @@ const handleMainRespondent = (id) => {
                             <input
                             type="text"
                             placeholder="नाम दर्ज करें"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs"
+                                              style={{ height: "48px" }} 
+
+                            className=" kruti-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs"
                             value={item.name}
                             onChange={(e) => {
                                 const updated = [...formData.supportingPersons];
@@ -2266,7 +2298,9 @@ const handleMainRespondent = (id) => {
                             <textarea
                             rows="1"
                             placeholder="पूरा पता लिखें"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none placeholder:text-xs "
+                                              style={{ height: "48px" }} 
+
+                            className=" kruti-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none placeholder:text-xs "
                             value={item.address}
                             onChange={(e) => {
                                 const updated = [...formData.supportingPersons];
@@ -2334,7 +2368,9 @@ const handleMainRespondent = (id) => {
                         <input
                         type="text"
                         placeholder="नाम दर्ज करें"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs"
+                                          style={{ height: "48px" }} 
+
+                        className=" kruti-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs"
                         value={item.name}
                         onChange={(e) => {
                             const updated = [...formData.otherPersons];
@@ -2352,7 +2388,9 @@ const handleMainRespondent = (id) => {
                         <textarea
                         rows="1"
                         placeholder="पूरा पता लिखें"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none placeholder:text-xs"
+                                          style={{ height: "48px" }} 
+
+                        className=" kruti-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-none placeholder:text-xs"
                         value={item.address}
                         onChange={(e) => {
                             const updated = [...formData.otherPersons];
@@ -2380,9 +2418,9 @@ const handleMainRespondent = (id) => {
             </h3>
 
             <textarea
-              placeholder="दस्तावेज क्रमवार लिखें (वैकल्पिक). वास्तविक फाइल नीचे अपलोड करें।"
+              placeholder="दस्तावेज क्रमवार लिखें वैकल्पिक वास्तविक फाइल नीचे अपलोड करें।"
               rows="3"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y mb-3 placeholder:text-xs"
+              className=" kruti-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y mb-3 placeholder:text-xs"
               value={formData.attachedDocuments}
               onChange={(e) => handleFormDataChange('attachedDocuments', e.target.value)}
             />
@@ -2422,7 +2460,7 @@ const handleMainRespondent = (id) => {
             <textarea
               placeholder="सम्पूर्ण विवरण स्पष्ट एवं संक्षेप में लिखें"
               rows="8"
-              className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-xs ${
+              className={` kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 resize-y placeholder:text-xs ${
                 errors.complaint_description ? 'border-red-500' : 'border-gray-300'
               }`}
               value={formData.complaintDescription}
