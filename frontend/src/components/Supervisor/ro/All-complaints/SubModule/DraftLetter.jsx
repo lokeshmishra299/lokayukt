@@ -5,6 +5,7 @@ import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 import { toast, Toaster } from "react-hot-toast";
 import { RiEditBoxLine } from "react-icons/ri";
+import { Modifier } from "draft-js";
 
 // Import Editor components
 import { EditorState, convertToRaw } from "draft-js";
@@ -60,6 +61,24 @@ const DraftLetter = ({ complaint }) => {
   const [draftTitle, setDraftTitle] = useState(""); 
 
   const [editDraftPopup, setEditDraftPopup] = useState(false);
+
+  const handlePastedText = (text, html, editorState) => {
+  const contentState = editorState.getCurrentContent();
+  const selection = editorState.getSelection();
+
+  const newContent = Modifier.replaceText(
+    contentState,
+    selection,
+    text,
+    editorState.getCurrentInlineStyle()
+  );
+
+  const newState = EditorState.push(editorState, newContent, "insert-characters");
+  setEditorState(newState);
+
+  return true; // ❌ stop HTML paste
+};
+
 
   // Refs for Print/Preview
   const popupRef = useRef(null);
@@ -734,7 +753,7 @@ const DraftLetter = ({ complaint }) => {
                   }
                 `}</style>
                 
-                <Editor
+                {/* <Editor
                   editorState={editorState}
                   onEditorStateChange={onEditorStateChange}
                   toolbarClassName="toolbarClassName"
@@ -757,7 +776,56 @@ const DraftLetter = ({ complaint }) => {
                     ],
                     inline: { options: ["bold", "italic", "underline"] },
                   }}
-                />
+                /> */}
+
+
+<style>{`
+.public-DraftStyleDefault-block {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.kruti-input .public-DraftEditor-content {
+  font-family: 'KrutiDev' !important;
+  font-size: 20px !important;
+  line-height: 1.5 !important;
+}
+
+.kruti-input .public-DraftEditorPlaceholder-root {
+  font-family: sans-serif !important;
+  font-size: 14px !important;
+  color: #9ca3af !important;
+}
+
+.kruti-input ol, 
+.kruti-input ul, 
+.kruti-input li {
+  font-family: sans-serif !important;
+}
+
+.kruti-input li span,
+.kruti-input li div {
+  font-family: 'KrutiDev' !important;
+}
+`}</style>
+
+                <Editor
+
+                
+  editorState={editorState}
+  onEditorStateChange={onEditorStateChange}
+  handlePastedText={handlePastedText}   
+  stripPastedStyles={true}              
+  toolbarClassName="toolbarClassName"
+  wrapperClassName="wrapperClassName"
+  editorClassName="editorClassName kruti-input px-3 min-h-[120px] md:min-h-[150px]"
+  editorStyle={{ lineHeight: '1.2', minHeight: '150px' }}
+  placeholder="Draft yahan likhen..."
+  toolbar={{
+    options: ["inline","blockType","fontSize","list","textAlign","colorPicker","link","emoji","remove","history"],
+    inline: { options: ["bold","italic","underline"] },
+  }}
+/>
               </div>
               {errors.draft_note && (
                 <p className="text-red-500 text-xs mt-1">
@@ -871,7 +939,11 @@ const DraftLetter = ({ complaint }) => {
                 </p>
                 <div
   className="rounded-md bg-white   min-h-[200px] md:min-h-[260px] draft-preview-content"
-  dangerouslySetInnerHTML={{ __html: note }}
+  // dangerouslySetInnerHTML={{ __html: note }}
+  dangerouslySetInnerHTML={{ __html: note
+    .replace(/<li>/g, '<li style="font-family: Arial, sans-serif;"><span style="font-family: KrutiDev; font-size:22px;">')
+    .replace(/<\/li>/g, '</span></li>')
+    .replace(/<p>/g, '<p style="font-family: KrutiDev; font-size:22px;">') }}
 />
                 <div className="flex justify-between pt-4">
                   <div />
