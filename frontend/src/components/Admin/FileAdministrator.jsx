@@ -240,7 +240,6 @@ const FileAdministrator = () => {
               <table className="w-full text-left border-collapse">
                 <thead className="bg-gray-50">
                   <tr className="text-gray-600 text-xs uppercase font-semibold">
-                    <th className="p-4 border-b">Project ID</th>
                     <th className="p-4 border-b"> Topics </th>
                     <th className="p-4 border-b">Department</th>
                     {/* <th className="p-4 border-b">Budget</th> */}
@@ -251,7 +250,6 @@ const FileAdministrator = () => {
                 <tbody className="text-sm text-gray-700 divide-y divide-gray-100">
                   {projects.map((item) => (
                     <tr key={item.id} className="hover:bg-blue-50/50 transition-colors">
-                      <td className="p-4 font-medium text-gray-900">{item.id}</td>
                       <td className="p-4 font-medium">{item.name}</td>
                       <td className="p-4">
                         <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">{item.department}</span>
@@ -283,12 +281,7 @@ const FileAdministrator = () => {
         {/* 2. Files Tab Content */}
         {activeTab === 'files' && (
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="flex justify-between items-center mb-4">
-               <h2 className="text-lg font-semibold text-gray-800">File Directory</h2>
-               <button className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                 <FaDownload size={12}/> Export Log
-               </button>
-            </div>
+           
 
             <div className="overflow-x-auto border border-gray-200 rounded-lg">
               <table className="w-full text-left border-collapse">
