@@ -19,6 +19,21 @@ import AdminEditComplaint from './components/Admin/EditComplaint';
 import AdminFileAdministrator from './components/Admin/FileAdministrator';
 
 
+
+// Admin
+import EmployLayout from './components/Employ/Layout';
+import EmployDashboard from './components/Employ/Dashboard';
+import EmployComplaints from './components/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import EmployUserManagement from './components/Employ/UserManagement';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
 // Operator
 import OperatorLayout from './components/Operator/Layout';
 import OperatorDashboard from './components/Operator/Dashboard';
@@ -348,6 +363,22 @@ function App() {
         </Route>
       )}
 
+
+ {role === 'employ' && (
+        <Route path="/employ" element={<EmployLayout />}>
+          <Route path="dashboard" element={<EmployDashboard />} />
+          <Route path="complaints" element={<EmployComplaints />} />
+          {/* <Route path="search-reports/view/:id" element={<AdminViewComplaints />} />
+          <Route path="search-reports/edit/:id" element={<AdminEditComplaint />} />
+          <Route path="progress-register" element={<AdminProgressRegister />} />
+          <Route path="search-reports" element={<AdminSearchReports />} /> */}
+          <Route path="user-management" element={<EmployUserManagement />} />
+          {/* <Route path="user-management/add" element={<AdminAddUserManagement />} /> */}
+          {/* <Route path="user-management/edit/:id" element={<AdminEditUserManagment />} /> */}
+          {/* <Route path="master-data" element={<AdminMasterData />} /> */}
+          {/* <Route path="file-administrator" element={<AdminFileAdministrator />} /> */}
+        </Route>
+      )}
       {/*  Operator Routes */}
       {role === 'operator' && (
         <Route path="/operator" element={<OperatorLayout />}>

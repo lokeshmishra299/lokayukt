@@ -34,10 +34,7 @@ const ViewDraft = () => {
   const { id } = useParams();
   const queryClient = useQueryClient();
 
-  const capitalizeFirstLetter = (text = "") => {
-  if (!text) return "N/A";
-  return text.charAt(0).toUpperCase() + text.slice(1);
-};
+ 
 
 
   const [activeTab, setActiveTab] = useState("documents");
@@ -55,11 +52,13 @@ const ViewDraft = () => {
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
   const [priviewPopup, setPriviewPopup] = useState(false);
 
+
   const {data: complaintData,isLoading,isError,error,} = useQuery({
     queryKey: ["complaint-details", id],
     queryFn: async () => {
       const res = await api.get(`/operator/view-complaint/${id}`);
       return res.data.data;
+      // return transformComplaintData(res.data.data);
     },
     enabled: !!id,
     staleTime: 1000 * 60 * 5,
@@ -335,12 +334,13 @@ const ViewDraft = () => {
 
               {/* Discription */}
 
-              <p className="text-[14px] text-black font-semibold uppercase my-2">
+              <p className="text-[14px] text-black font-semibold my-2">
                 {/* Description:{" "} */}
                 विवरण:{" "}
-                <span className="text-gray-500">
-                  {complaintData.complaint_description ||
-                    "No detailed description available for this complaint."}
+                <span className=" text-gray-500">
+                <span className="kruti-input">  {complaintData.complaint_description ||
+                    "No detailed description available for this complaint."}</span>
+                
                 </span>
               </p>
               {/* <p className="text-[14px] text-black font-semibold uppercase mb-1">
@@ -364,8 +364,8 @@ const ViewDraft = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
            नाम
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_name) || "N/A"}
+        <p className=" kruti-input text-gray-800 text-sm">
+          {complaintData.main_complainant_name || "N/A"}
         </p>
       </div>
 
@@ -374,8 +374,8 @@ const ViewDraft = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
           पिता का नाम
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_father) || "N/A"}
+        <p className=" kruti-input text-gray-800 text-sm">
+          {complaintData.main_complainant_father || "N/A"}
         </p>
       </div>
 
@@ -385,7 +385,7 @@ const ViewDraft = () => {
         जिला
         </p>
         <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_district) || "N/A"}
+          {complaintData.main_complainant_district || "N/A"}
         </p>
       </div>
     </div>
@@ -402,8 +402,8 @@ const ViewDraft = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
           नाम
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondent_name) || "N/A"}
+        <p className=" kruti-input text-gray-800 text-sm">
+          {complaintData.main_respondent_name || "N/A"}
         </p>
       </div>
 
@@ -413,7 +413,7 @@ const ViewDraft = () => {
          पद
         </p>
         <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondent_designation) || "N/A"}
+          {complaintData.main_respondent_designation || "N/A"}
         </p>
       </div>
 
@@ -423,7 +423,7 @@ const ViewDraft = () => {
          जिला
         </p>
         <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondant_district) || "N/A"}
+          {complaintData.main_respondant_district || "N/A"}
         </p>
       </div>
     </div>
@@ -437,8 +437,8 @@ const ViewDraft = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
           व्यक्ति से संबंध
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.relation_with_person) || "NA"}
+        <p className=" kruti-input text-gray-800 text-sm">
+          {complaintData.relation_with_person || "NA"}
         </p>
       </div>
 
@@ -448,8 +448,8 @@ const ViewDraft = () => {
           <p className="text-[14px] text-black font-semibold uppercase mb-1">
             कार्यवाही तिथि
           </p>
-          <p className="text-gray-800 text-sm">
-            {capitalizeFirstLetter(complaintData.cause_date) || "NA"}
+          <p className=" text-gray-800 text-sm">
+            {complaintData.cause_date || "NA"}
           </p>
         </div>
       )}
@@ -460,7 +460,7 @@ const ViewDraft = () => {
           श्रेणी
         </p>
         <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.category) || "N/A"}
+          {complaintData.category || "N/A"}
         </p>
       </div>
     </div>
@@ -485,7 +485,7 @@ const ViewDraft = () => {
                     ? "Paid"
                     : "Partial"} */}
                        शुल्क का प्रकार:{" "}
-                  {complaintData.fee_exempted == 0 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "NA"}
+                  {complaintData.fee_exempted == 3 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "Pending"}
                 </span>
 
                 <span
@@ -496,7 +496,7 @@ const ViewDraft = () => {
                       : "bg-yellow-50 text-yellow-700 border-yellow-200"
                   }`}
                 >
-                       स्थिति: {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
+                       स्थिति:  {complaintData.fee_approved_by_lokayukt == 1 ? "Approved" : "Awaiting approval"}
 
                 </span>
 
@@ -751,7 +751,7 @@ const ViewDraft = () => {
                     <option value="">Select User...</option>
                     {Array.isArray(forwardOptionsData) &&
                     forwardOptionsData.length > 0 ? (
-                      forwardOptionsData.map((option) => (
+                      forwardOptionsData.filter(Boolean).map((option) => (
                         <option key={option.id} value={option.id}>
                           {option.name ||
                             option.user_name ||
@@ -939,19 +939,19 @@ district_name || 'N/A'}</p>
                             key={idx}
                             className="hover:bg-blue-50 transition-colors duration-150"
                           >
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700 border-r border-gray-200 bg-gray-50">
+                            <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm font-semibold text-gray-700 border-r border-gray-200 bg-gray-50">
                               {idx + 1}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
+                            <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
                               {comp.complainant_name || "-"}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.father_name || "-"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.district_name || "-"}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.occupation || "-"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -966,7 +966,7 @@ district_name || 'N/A'}</p>
                                 {comp.is_public_servant || "-"}
                               </span>
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-700 break-words">
+                            <td className="px-6 kruti-input py-4 text-sm text-gray-700 break-words">
                               {comp.permanent_place || "-"}
                             </td>
                           </tr>
@@ -1078,7 +1078,7 @@ district_name || 'N/A'}</p>
                             <td className="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-100">
                               {idx + 1}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
                               {resp.respondent_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
@@ -1094,7 +1094,7 @@ district_name || 'N/A'}</p>
                               {resp.officer_category || "-"}
                             </td>
                             {/* Address Column: whitespace-normal ensures text wrapping */}
-                            <td className="px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {resp.current_address || "-"}
                             </td>
                           </tr>
@@ -1164,10 +1164,10 @@ district_name || 'N/A'}</p>
                             <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
                               {idx + 1}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-6 kruti-input py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
                               {item.support_name || "-"}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                            <td className="px-6 kruti-input py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {item.support_address || "-"}
                             </td>
                           </tr>
@@ -1237,10 +1237,10 @@ district_name || 'N/A'}</p>
                             <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
                               {idx + 1}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-6 kruti-input py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
                               {item.witness_name || "-"}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                            <td className="px-6 kruti-input py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {item.witness_address || "-"}
                             </td>
                           </tr>

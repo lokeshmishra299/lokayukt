@@ -12,6 +12,9 @@ const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const token = localStorage.getItem("access_token");
 
+import { krutiToUnicode } from "../../../components/utils/krutiToUnicode";
+import { unicodeToKrutiDev } from "../../../components/utils/unicodeToKruti";
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -108,64 +111,148 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
     }
   }, [data, sortOrder]);
 
-  useEffect(() => {
-    if (allComplaints.length === 0) return;
+  // useEffect(() => {
+  //   if (allComplaints.length === 0) return;
 
-    let filtered = [...allComplaints];
+  //   let filtered = [...allComplaints];
 
-    if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((complaint) => {
-        return (
-          complaint.complain_no?.toLowerCase().includes(query) ||
-          complaint.name?.toLowerCase().includes(query) ||
-          complaint.district_name?.toLowerCase().includes(query) ||
-          complaint.remark?.toLowerCase().includes(query) ||
-          complaint.description?.toLowerCase().includes(query) ||
-          complaint.email?.toLowerCase().includes(query) ||
-          complaint.mobile?.includes(query)
-        );
-      });
-    }
+  //   if (searchQuery.trim() !== "") {
+  //     const query = searchQuery.toLowerCase();
+  //     filtered = filtered.filter((complaint) => {
+  //       return (
+  //         complaint.complain_no?.toLowerCase().includes(query) ||
+  //         complaint.name?.toLowerCase().includes(query) ||
+  //         complaint.district_name?.toLowerCase().includes(query) ||
+  //         complaint.remark?.toLowerCase().includes(query) ||
+  //         complaint.description?.toLowerCase().includes(query) ||
+  //         complaint.email?.toLowerCase().includes(query) ||
+  //         complaint.mobile?.includes(query)
+  //       );
+  //     });
+  //   }
 
-    if (selectedDistrict !== "") {
-      filtered = filtered.filter((complaint) => {
-        return (
-          complaint.district_name?.toLowerCase() ===
-          selectedDistrict.toLowerCase()
-        );
-      });
-    }
+  //   if (selectedDistrict !== "") {
+  //     filtered = filtered.filter((complaint) => {
+  //       return (
+  //         complaint.district_name?.toLowerCase() ===
+  //         selectedDistrict.toLowerCase()
+  //       );
+  //     });
+  //   }
 
-    if (selectedStatus !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.status === selectedStatus;
-      });
-    }
+  //   if (selectedStatus !== "") {
+  //     filtered = filtered.filter((complaint) => {
+  //       return complaint.status === selectedStatus;
+  //     });
+  //   }
 
-    if (selectedFeeStatus !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.fee_exempted?.toString() === selectedFeeStatus;
-      });
-    }
+  //   if (selectedFeeStatus !== "") {
+  //     filtered = filtered.filter((complaint) => {
+  //       return complaint.fee_exempted?.toString() === selectedFeeStatus;
+  //     });
+  //   }
 
-    if (selectedCaseType !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.complaint_type_id === parseInt(selectedCaseType);
-      });
-    }
+  //   if (selectedCaseType !== "") {
+  //     filtered = filtered.filter((complaint) => {
+  //       return complaint.complaint_type_id === parseInt(selectedCaseType);
+  //     });
+  //   }
 
-    const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(sorted);
-    setCurrentPage(1);
-  }, [
-    searchQuery,
-    allComplaints,
-    selectedDistrict,
-    selectedStatus,
-    selectedFeeStatus,
-    selectedCaseType,
-  ]);
+  //   const sorted = sortComplaintsByDate(filtered, sortOrder);
+  //   setFilteredComplaints(sorted);
+  //   setCurrentPage(1);
+  // }, [
+  //   searchQuery,
+  //   allComplaints,
+  //   selectedDistrict,
+  //   selectedStatus,
+  //   selectedFeeStatus,
+  //   selectedCaseType,
+  // ]);
+
+
+    useEffect(() => {
+      if (allComplaints.length === 0) return;
+  
+      let filtered = [...allComplaints];
+  
+      if (searchQuery.trim() !== "") {
+        const query = searchQuery.toLowerCase().trim(); // 1. जो आपने टाइप किया (Direct Search)
+        
+        // 2. अगर आपने "Kruti Code" (जैसे dqN gks) टाइप किया है, तो उसे हिंदी बनाओ
+        const queryFromKruti = krutiToUnicode(searchQuery).toLowerCase().trim();
+  
+        // 3. अगर आपने "Hindi" टाइप किया है, तो उसका Kruti Code बनाओ (Backup)
+        const queryToKruti = unicodeToKrutiDev(searchQuery).trim(); 
+  
+        filtered = filtered.filter((complaint) => {
+          
+          const match = (val) => {
+              if (!val) return false;
+              const strVal = String(val).toLowerCase(); // डेटा (जो अब हिंदी में है)
+              
+              return (
+                strVal.includes(query) ||          // Direct Match
+                strVal.includes(queryFromKruti) || // Kruti Input -> Matches Hindi Data
+                strVal.includes(queryToKruti)      // Hindi Input -> Matches Old Kruti Data
+              );
+          };
+  
+          return (
+            match(complaint.complainantName) ||      
+            match(complaint.respondentName) ||       
+            match(complaint.complain_no) ||          
+            match(complaint.name) ||                 
+            match(complaint.district_name) ||        
+            match(complaint.remark) ||               
+            match(complaint.description) ||
+            match(complaint.complaint_description) ||
+            match(complaint.email) ||
+            match(complaint.mobile)
+          );
+        });
+      }
+  
+      // --- बाकी फिल्टर्स (District, Status आदि) को छेड़ें नहीं ---
+  
+      if (selectedDistrict !== "") {
+        filtered = filtered.filter((complaint) => {
+          const dataDistrict = complaint.dist_new || complaint.district_name;
+          if (!dataDistrict) return false;
+          return String(dataDistrict).toLowerCase().trim() === selectedDistrict.toLowerCase().trim();
+        });
+      }
+  
+      if (selectedStatus !== "") {
+        filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
+      }
+  
+      if (selectedFeeStatus !== "") {
+        filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
+      }
+  
+      if (selectedCaseType !== "") {
+        filtered = filtered.filter((complaint) => {
+          const dataCategory = String(complaint.category || "").toLowerCase().trim();
+          const selectedValue = String(selectedCaseType).toLowerCase().trim();
+          return dataCategory === selectedValue;
+        });
+      }
+  
+      // सॉर्टिंग
+      const sorted = sortComplaintsByDate(filtered, sortOrder);
+      setFilteredComplaints(sorted);
+      setCurrentPage(1);
+  
+    }, [
+      searchQuery,
+      allComplaints,
+      selectedDistrict,
+      selectedStatus,
+      selectedFeeStatus,
+      selectedCaseType,
+      sortOrder
+    ]);
 
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
@@ -311,13 +398,21 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
             <div className="relative mb-3">
               <IoSearchOutline className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
+              {/* <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Search by file no., complainant, subject..."
-              />
+              /> */}
+
+                         <input
+  type="text"
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  className="kruti-input w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:!font-sans placeholder:!text-gray-500 placeholder:!text-sm placeholder:!tracking-normal"
+  placeholder="Search by file no., complainant, subject..."
+/>
             </div>
 
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 text-xs">
@@ -423,10 +518,19 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                         <p className="text-sm font-semibold text-gray-900 mb-1">
                           File No. {complaint.complain_no}
                         </p>
-                        <p className="text-xs text-gray-700 mb-1">
+                        {/* <p className="text-xs text-gray-700 mb-1">
                           Description:{" "}
                           {limitTo50Words(complaint.complaint_description) ||
                             "No description available"}
+                        </p> */}
+
+                        <p className="text-xs text-gray-700 mb-1">
+                         <span className="text-[15px]">Description: </span>
+                          <span className="kruti-input">
+                               {limitTo50Words(complaint.complaint_description) ||
+                            "No description available"}
+                          </span>
+                         
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
                           <span className="text-gray-500">Cause Date :</span>

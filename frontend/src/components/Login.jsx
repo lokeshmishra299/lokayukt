@@ -60,12 +60,22 @@ const Login = () => {
           if (userRole === "admin") {
             window.open("/admin/dashboard", "_self");
             
-          } else if (userRole === "operator") {
+          }
+
+          else if (userRole === "operator") {
             localStorage.setItem('subrole', response.data.data.user.subrole.name);
             // localStorage.setItem('UserN', response.data.data.user.name);
 
             window.open("/operator/dashboard", "_self");
           }
+
+          else if (userRole === "employ"){
+            window.open("/employ/dashboard", "_self");
+            localStorage.setItem('subrole', response.data.data.user.subrole.name);
+
+
+          }
+
           else if (userRole === "supervisor") {
             localStorage.setItem('subrole', response.data.data.user.subrole.name);
             localStorage.setItem('name', response?.data?.data?.user?.name);
