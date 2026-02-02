@@ -6,6 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdTime } from "react-icons/io";
+import { krutiToUnicode } from "../../../utils/krutiToUnicode";
+import { unicodeToKrutiDev } from "../../../utils/unicodeToKruti";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -157,65 +159,149 @@ const AllComplaints = () => {
     }
   }, [complaintsData, sortOrder]);
 
-  useEffect(() => {
+//   useEffect(() => {
+//     if (allComplaints.length === 0) return;
+
+//     let filtered = [...allComplaints];
+
+//     if (searchQuery.trim() !== "") {
+//       const query = searchQuery.toLowerCase();
+//       filtered = filtered.filter((complaint) => {
+//         return (
+//                       complaint.complainantName?.toLowerCase().includes(query) ||
+//       complaint.respondentName?.toLowerCase().includes(query) ||
+//           complaint.complain_no?.toLowerCase().includes(query) ||
+//           complaint.name?.toLowerCase().includes(query) ||
+//           complaint.district_name?.toLowerCase().includes(query) ||
+//           complaint.remark?.toLowerCase().includes(query) ||
+//           complaint.description?.toLowerCase().includes(query) ||
+//           complaint.email?.toLowerCase().includes(query) ||
+//           complaint.mobile?.includes(query)
+//         );
+//       });
+//     }
+
+//        if (selectedDistrict !== "") {
+//   filtered = filtered.filter((complaint) => {
+//     const dataDistrict = complaint.dist_new;
+
+//     if (!dataDistrict) return false;
+
+//     return (
+//       dataDistrict.toString().toLowerCase().trim() ===
+//       selectedDistrict.toString().toLowerCase().trim()
+//     );
+//   });
+// }
+
+//     if (selectedStatus !== "") {
+//       filtered = filtered.filter((complaint) => {
+//         return complaint.status === selectedStatus;
+//       });
+//     }
+
+//     if (selectedFeeStatus !== "") {
+//       filtered = filtered.filter((complaint) => {
+//         return complaint.fee_exempted?.toString() === selectedFeeStatus;
+//       });
+//     }
+
+//     if (selectedCaseType !== "") {
+//   filtered = filtered.filter((complaint) => {
+//     return (
+//       complaint.category &&
+//       complaint.category.toLowerCase() === selectedCaseType.toLowerCase()
+//     );
+//   });
+// }
+
+
+//     const sorted = sortComplaintsByDate(filtered, sortOrder);
+//     setFilteredComplaints(sorted);
+//   }, [
+//     searchQuery,
+//     allComplaints,
+//     selectedDistrict,
+//     selectedStatus,
+//     selectedFeeStatus,
+//     selectedCaseType,
+//   ]);
+
+
+
+useEffect(() => {
     if (allComplaints.length === 0) return;
 
     let filtered = [...allComplaints];
 
     if (searchQuery.trim() !== "") {
-      const query = searchQuery.toLowerCase();
+      const query = searchQuery.toLowerCase().trim(); // 1. जो आपने टाइप किया (Direct Search)
+      
+      // 2. अगर आपने "Kruti Code" (जैसे dqN gks) टाइप किया है, तो उसे हिंदी बनाओ
+      const queryFromKruti = krutiToUnicode(searchQuery).toLowerCase().trim();
+
+      // 3. अगर आपने "Hindi" टाइप किया है, तो उसका Kruti Code बनाओ (Backup)
+      const queryToKruti = unicodeToKrutiDev(searchQuery).trim(); 
+
       filtered = filtered.filter((complaint) => {
+        
+        const match = (val) => {
+            if (!val) return false;
+            const strVal = String(val).toLowerCase(); // डेटा (जो अब हिंदी में है)
+            
+            return (
+              strVal.includes(query) ||          // Direct Match
+              strVal.includes(queryFromKruti) || // Kruti Input -> Matches Hindi Data
+              strVal.includes(queryToKruti)      // Hindi Input -> Matches Old Kruti Data
+            );
+        };
+
         return (
-                      complaint.complainantName?.toLowerCase().includes(query) ||
-      complaint.respondentName?.toLowerCase().includes(query) ||
-          complaint.complain_no?.toLowerCase().includes(query) ||
-          complaint.name?.toLowerCase().includes(query) ||
-          complaint.district_name?.toLowerCase().includes(query) ||
-          complaint.remark?.toLowerCase().includes(query) ||
-          complaint.description?.toLowerCase().includes(query) ||
-          complaint.email?.toLowerCase().includes(query) ||
-          complaint.mobile?.includes(query)
+          match(complaint.complainantName) ||      
+          match(complaint.respondentName) ||       
+          match(complaint.complain_no) ||          
+          match(complaint.name) ||                 
+          match(complaint.district_name) ||        
+          match(complaint.remark) ||               
+          match(complaint.description) ||
+          match(complaint.complaint_description) ||
+          match(complaint.email) ||
+          match(complaint.mobile)
         );
       });
     }
 
-       if (selectedDistrict !== "") {
-  filtered = filtered.filter((complaint) => {
-    const dataDistrict = complaint.dist_new;
+    // --- बाकी फिल्टर्स (District, Status आदि) को छेड़ें नहीं ---
 
-    if (!dataDistrict) return false;
-
-    return (
-      dataDistrict.toString().toLowerCase().trim() ===
-      selectedDistrict.toString().toLowerCase().trim()
-    );
-  });
-}
+    if (selectedDistrict !== "") {
+      filtered = filtered.filter((complaint) => {
+        const dataDistrict = complaint.dist_new || complaint.district_name;
+        if (!dataDistrict) return false;
+        return String(dataDistrict).toLowerCase().trim() === selectedDistrict.toLowerCase().trim();
+      });
+    }
 
     if (selectedStatus !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.status === selectedStatus;
-      });
+      filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
     }
 
     if (selectedFeeStatus !== "") {
-      filtered = filtered.filter((complaint) => {
-        return complaint.fee_exempted?.toString() === selectedFeeStatus;
-      });
+      filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
     }
 
     if (selectedCaseType !== "") {
-  filtered = filtered.filter((complaint) => {
-    return (
-      complaint.category &&
-      complaint.category.toLowerCase() === selectedCaseType.toLowerCase()
-    );
-  });
-}
+      filtered = filtered.filter((complaint) => {
+        const dataCategory = String(complaint.category || "").toLowerCase().trim();
+        const selectedValue = String(selectedCaseType).toLowerCase().trim();
+        return dataCategory === selectedValue;
+      });
+    }
 
-
+    // सॉर्टिंग
     const sorted = sortComplaintsByDate(filtered, sortOrder);
     setFilteredComplaints(sorted);
+    // setCurrentPage(1);
+
   }, [
     searchQuery,
     allComplaints,
@@ -223,8 +309,8 @@ const AllComplaints = () => {
     selectedStatus,
     selectedFeeStatus,
     selectedCaseType,
+    sortOrder
   ]);
-
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
     navigate(`view/${complaintId}`);
@@ -304,6 +390,17 @@ const AllComplaints = () => {
     return diffDays;
   };
 
+
+   function limitTo50Words(text) {
+    const words = text.trim().split(/\s+/);
+
+    if (words.length <= 30) {
+      return text;
+    }
+
+    return words.slice(0, 30).join(" ") + " ...";
+  }
+
   return (
     <>
       <ToastContainer
@@ -360,13 +457,21 @@ const AllComplaints = () => {
 
             <div className="relative mb-3">
               <IoSearchOutline className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
+              {/* <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Search by file no., complainant, subject..."
-              />
+              /> */}
+
+                       <input
+  type="text"
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  className="kruti-input w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:!font-sans placeholder:!text-gray-500 placeholder:!text-sm placeholder:!tracking-normal"
+  placeholder="Search by file no., complainant, subject..."
+/>
             </div>
 
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 text-xs">
@@ -463,10 +568,19 @@ const AllComplaints = () => {
                         <p className="text-sm font-semibold text-gray-900 mb-1">
                           File No. {complaint.complain_no}
                         </p>
-                        <p className="text-xs text-gray-700 mb-1">
+                        {/* <p className="text-xs text-gray-700 mb-1">
                           Description:{" "}
                           {complaint.complaint_description ||
                             "No description available"}
+                        </p> */}
+
+                          <p className="text-xs text-gray-700 mb-1">
+                         <span className="text-[15px]">Description: </span>
+                          <span className="kruti-input">
+                               {limitTo50Words(complaint.complaint_description) ||
+                            "No description available"}
+                          </span>
+                         
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
                           <span className="text-gray-500">Cause Date:</span>

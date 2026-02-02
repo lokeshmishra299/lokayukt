@@ -349,6 +349,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
     selectedCaseType,
     sortOrder
   ]);
+  
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
     navigate(`view/${complaintId}`);

@@ -19,10 +19,10 @@ const FileAdministrator = () => {
 
   // --- 1. Projects State ---
   const [projects, setProjects] = useState([
-    { id: 101, name: "Smart City Road Development", department: "PWD", status: "Ongoing", budget: "₹50 Cr" },
-    { id: 102, name: "City Park Renovation", department: "Horticulture", status: "Pending", budget: "₹2 Cr" },
-    { id: 103, name: "Street Light Installation Phase-2", department: "Electricity", status: "Completed", budget: "₹5 Cr" },
-    { id: 104, name: "Drainage Cleaning Project", department: "Sanitation", status: "Ongoing", budget: "₹15 Cr" },
+    { id: 1, name: "Smart City Road Development", department: "PWD", status: "Ongoing", budget: "₹50 Cr" },
+    { id: 2, name: "City Park Renovation", department: "Horticulture", status: "Pending", budget: "₹2 Cr" },
+    { id: 3, name: "Street Light Installation Phase-2", department: "Electricity", status: "Completed", budget: "₹5 Cr" },
+    { id: 4, name: "Drainage Cleaning Project", department: "Sanitation", status: "Ongoing", budget: "₹15 Cr" },
   ]);
 
   // --- 2. Files State ---
@@ -195,7 +195,7 @@ const FileAdministrator = () => {
           className="flex items-center gap-2 bg-[#123463] text-white px-4 py-2 rounded-lg hover:bg-[#0e2a4e] transition-colors text-sm font-medium shadow-sm w-full md:w-auto justify-center"
         >
           <FaPlus size={12} />
-          {activeTab === 'projects' ? 'Add Project' : activeTab === 'files' ? 'Upload File' : 'Add Allocation'}
+          {activeTab === 'projects' ? 'Add Topics' : activeTab === 'files' ? 'Upload File' : 'Add Allocation'}
         </button>
       </div>
 
@@ -227,7 +227,7 @@ const FileAdministrator = () => {
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {/* Filter Bar */}
             <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-              <h2 className="text-lg font-semibold text-gray-800">Active Projects List</h2>
+              <h2 className="text-lg font-semibold text-gray-800">Active Topics</h2>
               <div className="flex gap-2 w-full md:w-auto">
                  <div className="relative w-full md:w-64">
                    <FaSearch className="absolute left-3 top-3 text-gray-400 text-xs" />
@@ -241,9 +241,9 @@ const FileAdministrator = () => {
                 <thead className="bg-gray-50">
                   <tr className="text-gray-600 text-xs uppercase font-semibold">
                     <th className="p-4 border-b">Project ID</th>
-                    <th className="p-4 border-b">Project Name</th>
+                    <th className="p-4 border-b"> Topics </th>
                     <th className="p-4 border-b">Department</th>
-                    <th className="p-4 border-b">Budget</th>
+                    {/* <th className="p-4 border-b">Budget</th> */}
                     <th className="p-4 border-b">Status</th>
                     <th className="p-4 border-b text-right">Actions</th>
                   </tr>
@@ -251,12 +251,12 @@ const FileAdministrator = () => {
                 <tbody className="text-sm text-gray-700 divide-y divide-gray-100">
                   {projects.map((item) => (
                     <tr key={item.id} className="hover:bg-blue-50/50 transition-colors">
-                      <td className="p-4 font-medium text-gray-900">#{item.id}</td>
+                      <td className="p-4 font-medium text-gray-900">{item.id}</td>
                       <td className="p-4 font-medium">{item.name}</td>
                       <td className="p-4">
                         <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">{item.department}</span>
                       </td>
-                      <td className="p-4 font-semibold text-gray-700">{item.budget}</td>
+                      {/* <td className="p-4 font-semibold text-gray-700">{item.budget}</td> */}
                       <td className="p-4">
                         <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
                           item.status === 'Completed' ? 'bg-green-50 text-green-700 border-green-200' :
@@ -297,7 +297,7 @@ const FileAdministrator = () => {
                     <th className="p-4 border-b">File No.</th>
                     <th className="p-4 border-b">Subject / Name</th>
                     <th className="p-4 border-b">Type</th>
-                    <th className="p-4 border-b">Size</th>
+                    {/* <th className="p-4 border-b">Size</th> */}
                     <th className="p-4 border-b">Upload Date</th>
                     <th className="p-4 border-b text-right">Actions</th>
                   </tr>
@@ -310,7 +310,7 @@ const FileAdministrator = () => {
                       <td className="p-4">
                           <span className="px-2 py-0.5 rounded border border-gray-200 bg-gray-50 text-xs uppercase font-bold text-gray-600">{file.type}</span>
                       </td>
-                      <td className="p-4 text-gray-500">{file.size}</td>
+                      {/* <td className="p-4 text-gray-500">{file.size}</td> */}
                       <td className="p-4 text-gray-500">{file.date}</td>
                       <td className="p-4 text-right">
                         <div className="flex justify-end gap-3">
@@ -358,8 +358,8 @@ const FileAdministrator = () => {
                     <th className="p-4 border-b">Budget ID</th>
                     <th className="p-4 border-b">Head / Category</th>
                     <th className="p-4 border-b text-right">Allocated</th>
-                    <th className="p-4 border-b text-right">Spent</th>
-                    <th className="p-4 border-b text-right">Remaining</th>
+                    {/* <th className="p-4 border-b text-right">Spent</th>
+                    <th className="p-4 border-b text-right">Remaining</th> */}
                     <th className="p-4 border-b text-right">Utilization</th>
                   </tr>
                 </thead>
@@ -369,8 +369,8 @@ const FileAdministrator = () => {
                       <td className="p-4 font-medium text-gray-500">{b.id}</td>
                       <td className="p-4 font-medium text-gray-900">{b.head}</td>
                       <td className="p-4 text-right font-semibold text-blue-700">{b.allocated}</td>
-                      <td className="p-4 text-right text-red-600">{b.spent}</td>
-                      <td className="p-4 text-right text-green-600 font-bold">{b.remaining}</td>
+                      {/* <td className="p-4 text-right text-red-600">{b.spent}</td>
+                      <td className="p-4 text-right text-green-600 font-bold">{b.remaining}</td> */}
                       <td className="p-4 text-right">
                         <div className="w-24 ml-auto h-2 bg-gray-200 rounded-full overflow-hidden">
                            <div className="h-full bg-blue-600" style={{ width: '45%' }}></div>

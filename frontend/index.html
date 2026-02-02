@@ -10,11 +10,25 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
+
+    
   <style>
       @font-face {
         font-family: 'KrutiDev';
         src: url('/fonts/KrutiDev.ttf') format('truetype');
       }
+
+      .public-DraftStyleDefault-block {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 2. जो टेक्स्ट यूजर टाइप करेगा (Content) - उस पर Kruti Dev लगाएं */
+  .kruti-input .public-DraftEditor-content {
+    font-family: 'KrutiDev' !important; /* यहाँ अपना सही Font Family नाम लिखें */
+    font-size: 22px !important; /* Kruti Dev थोड़ा छोटा दिखता है, इसलिए साइज बढ़ाएं */
+    line-height: 1.5 !important;
+  }
 
       .kruti-input {
   font-family: 'KrutiDev', sans-serif !important;
@@ -23,6 +37,8 @@
   /* input ki height fix */
   
   font-weight: 400;
+
+
 
   
 }

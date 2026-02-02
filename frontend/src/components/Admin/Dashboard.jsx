@@ -744,425 +744,435 @@ const Dashboard = ({ userRole = "Administrator" }) => {
 
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="trends">Trends</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="workload">Workload</TabsTrigger>
-          <TabsTrigger value="compliance">Compliance</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Monthly Trends Chart */}
-            <Card className="cursor-pointer">
-              <CardHeader>
-                <CardTitle>Monthly Complaint Trends</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                  <LineChart data={monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="month" stroke="#6b7280" />
-                    <YAxis stroke="#6b7280" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="received" 
-                      stroke="#3b82f6" 
-                      strokeWidth={3}
-                      dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                      name="Received"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="disposed" 
-                      stroke="#10b981" 
-                      strokeWidth={3}
-                      dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
-                      name="Approved"
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="rejected" 
-                      stroke="#ef4444" 
-                      strokeWidth={3}
-                      dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
-                      name="Rejected"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* Status Distribution Pie Chart */}
-            <Card className="cursor-pointer">
-              <CardHeader>
-                <CardTitle>Current Status Distribution</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                  <PieChart>
-                    <Pie
-                      data={statusData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {statusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip />} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Department-wise Bar Chart */}
-            <Card className="cursor-pointer">
-              <CardHeader>
-                <CardTitle>Department-wise Complaints</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart data={departmentData} layout="vertical" margin={{ left: 100 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis type="number" stroke="#6b7280" />
-                    <YAxis dataKey="department" type="category" width={100} stroke="#6b7280" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="complaints" fill="#3b82f6" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* District-wise Stacked Bar Chart */}
-            <Card className="cursor-pointer">
-              <CardHeader>
-                <CardTitle>District-wise Allegations vs Grievances</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart data={districtData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="district" stroke="#6b7280" />
-                    <YAxis stroke="#6b7280" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Bar dataKey="allegation" stackId="a" fill="#ef4444" name="Allegations" radius={[0, 0, 0, 0]} />
-                    <Bar dataKey="grievance" stackId="a" fill="#f59e0b" name="Grievances" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="trends" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* ✅ Weekly Activity Area Chart with API Data (WITHOUT Total) */}
-            <Card className="cursor-pointer">
-              <CardHeader>
-                <CardTitle>Weekly Activity Trends</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                  <AreaChart 
-                    data={weeklyData} 
-                    key={JSON.stringify(weeklyData)} // ✅ Force re-render when data changes
-                  >
-                    <defs>
-                      <linearGradient id="colorProgress" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorDisposed" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                      </linearGradient>
-                      <linearGradient id="colorUI" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="day" stroke="#6b7280" />
-                    <YAxis stroke="#6b7280" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Area 
-                      type="monotone" 
-                      dataKey="progress" 
-                      stackId="1" 
-                      stroke="#f59e0b" 
-                      strokeWidth={2}
-                      fillOpacity={1} 
-                      fill="url(#colorProgress)"
-                      name="In Progress"
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="disposed" 
-                      stackId="1" 
-                      stroke="#10b981" 
-                      strokeWidth={2}
-                      fillOpacity={1} 
-                      fill="url(#colorDisposed)"
-                      name="Disposed"
-                    />
-                    <Area 
-                      type="monotone" 
-                      dataKey="underInvestigation" 
-                      stackId="1" 
-                      stroke="#8b5cf6" 
-                      strokeWidth={2}
-                      fillOpacity={1} 
-                      fill="url(#colorUI)"
-                      name="Under Investigation"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* Processing Time vs Target */}
-            <Card className="cursor-pointer">
-              <CardHeader>
-                <CardTitle>Processing Time vs Target (Days)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart data={processingTimeData} layout="vertical" margin={{ left: 150 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis type="number" stroke="#6b7280" />
-                    <YAxis dataKey="stage" type="category" width={150} stroke="#6b7280" fontSize={12} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Bar dataKey="avg" fill="#3b82f6" name="Actual Time" radius={[0, 4, 4, 0]} />
-                    <Bar dataKey="target" fill="#e5e7eb" name="Target Time" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="performance" className="space-y-6">
       
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Total Complaints</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {performanceData?.total_complaints || 0}
-                </div>
-                <div className="text-sm text-gray-500">All complaints</div>
-              </CardContent>
-            </Card> */}
-
-            <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Pending SLA</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">
-                    {performanceData?.pending_percentage || 0}%
-                  </div>
-                  <Badge 
-                    variant="secondary"
-                    className="bg-yellow-100 text-yellow-600"
-                  >
-                    In Progress
-                  </Badge>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
-                  <div 
-                    className="h-2 rounded-full transition-all duration-300 bg-yellow-600"
-                    style={{ width: `${Math.min(parseFloat(performanceData?.pending_percentage || 0), 100)}%` }}
-                  ></div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Investigation SLA</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">
-                    {performanceData?.investigation_percentage || 0}%
-                  </div>
-                  <Badge 
-                    variant="default"
-                    className="bg-blue-100 text-blue-600"
-                  >
-                    Active
-                  </Badge>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
-                  <div 
-                    className="h-2 rounded-full transition-all duration-300 bg-blue-600"
-                    style={{ width: `${Math.min(parseFloat(performanceData?.investigation_percentage || 0), 100)}%` }}
-                  ></div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Approved SLA</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">
-                    {performanceData?.approved_percentage || 0}%
-                  </div>
-                  <Badge 
-                    variant="default"
-                    className="bg-green-100 text-green-600"
-                  >
-                    Completed
-                  </Badge>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
-                  <div 
-                    className="h-2 rounded-full transition-all duration-300 bg-green-600"
-                    style={{ width: `${Math.min(parseFloat(performanceData?.approved_percentage || 0), 100)}%` }}
-                  ></div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Rejected SLA</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">
-                    {performanceData?.rejected_percentage || 0}%
-                  </div>
-                  <Badge 
-                    variant="destructive"
-                    className="bg-red-100 text-red-600"
-                  >
-                    Closed
-                  </Badge>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
-                  <div 
-                    className="h-2 rounded-full transition-all duration-300 bg-red-600"
-                    style={{ width: `${Math.min(parseFloat(performanceData?.rejected_percentage || 0), 100)}%` }}
-                  ></div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="workload" className="space-y-6">
-          {/* ✅ UPDATED: Role-wise Workload with API Data and Role Mapping */}
-          <Card className="cursor-pointer">
-            <CardHeader>
-              <CardTitle>SubRole-wise Workload Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <BarChart 
-                  data={workloadData} 
-                  layout="vertical" 
-                  margin={{ left: 130 }} // ✅ Increased left margin for longer role names
-                  key={JSON.stringify(workloadData)} // ✅ Force re-render when data changes
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis type="number" stroke="#6b7280" />
-                  <YAxis 
-                    dataKey="role" 
-                    type="category" 
-                    width={130} // ✅ Increased width for longer role names
-                    stroke="#6b7280" 
-                    fontSize={12}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend />
-                  <Bar dataKey="pending" fill="#f59e0b" name="Pending" radius={[0, 4, 4, 0]} />
-                  <Bar dataKey="completed" fill="#10b981" name="Completed" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="compliance" className="space-y-6">
-          {/* ✅ UPDATED: Compliance Section with API Data */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FaBullseye className="h-5 w-5" />
-                  Overall Compliance
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-green-600">
-                    {complianceData.approvedPercentage.toFixed(1)}%
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    {/* {complianceData.totalComplaints} total complaints */}
-                    Meeting SLA targets
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FaUsers className="h-5 w-5" />
-                  Active Users
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-4xl font-bold">{activeUsersCount}</div>
-                  <p className="text-sm text-gray-500">Currently active</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FaBuilding className="h-5 w-5" />
-                  Departments
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-4xl font-bold">{departmentCount}</div>
-                  <p className="text-sm text-gray-500">Total departments</p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+    
     </div>
   );
 };
 
 export default Dashboard;
+
+
+
+
+
+
+
+// Chart he pura isme 
+  // <Tabs defaultValue="overview" className="space-y-6">
+  //       <TabsList className="grid w-full grid-cols-5">
+  //         <TabsTrigger value="overview">Overview</TabsTrigger>
+  //         <TabsTrigger value="trends">Trends</TabsTrigger>
+  //         <TabsTrigger value="performance">Performance</TabsTrigger>
+  //         <TabsTrigger value="workload">Workload</TabsTrigger>
+  //         <TabsTrigger value="compliance">Compliance</TabsTrigger>
+  //       </TabsList>
+
+  //       <TabsContent value="overview" className="space-y-6">
+  //         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  //           {/* Monthly Trends Chart */}
+  //           <Card className="cursor-pointer">
+  //             <CardHeader>
+  //               <CardTitle>Monthly Complaint Trends</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <ResponsiveContainer width="100%" height={350}>
+  //                 <LineChart data={monthlyData}>
+  //                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+  //                   <XAxis dataKey="month" stroke="#6b7280" />
+  //                   <YAxis stroke="#6b7280" />
+  //                   <Tooltip content={<CustomTooltip />} />
+  //                   <Legend />
+  //                   <Line 
+  //                     type="monotone" 
+  //                     dataKey="received" 
+  //                     stroke="#3b82f6" 
+  //                     strokeWidth={3}
+  //                     dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+  //                     name="Received"
+  //                   />
+  //                   <Line 
+  //                     type="monotone" 
+  //                     dataKey="disposed" 
+  //                     stroke="#10b981" 
+  //                     strokeWidth={3}
+  //                     dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+  //                     name="Approved"
+  //                   />
+  //                   <Line 
+  //                     type="monotone" 
+  //                     dataKey="rejected" 
+  //                     stroke="#ef4444" 
+  //                     strokeWidth={3}
+  //                     dot={{ fill: '#ef4444', strokeWidth: 2, r: 4 }}
+  //                     name="Rejected"
+  //                   />
+  //                 </LineChart>
+  //               </ResponsiveContainer>
+  //             </CardContent>
+  //           </Card>
+
+  //           {/* Status Distribution Pie Chart */}
+  //           <Card className="cursor-pointer">
+  //             <CardHeader>
+  //               <CardTitle>Current Status Distribution</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <ResponsiveContainer width="100%" height={350}>
+  //                 <PieChart>
+  //                   <Pie
+  //                     data={statusData}
+  //                     cx="50%"
+  //                     cy="50%"
+  //                     labelLine={false}
+  //                     label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+  //                     outerRadius={100}
+  //                     fill="#8884d8"
+  //                     dataKey="value"
+  //                   >
+  //                     {statusData.map((entry, index) => (
+  //                       <Cell key={`cell-${index}`} fill={entry.color} />
+  //                     ))}
+  //                   </Pie>
+  //                   <Tooltip content={<CustomTooltip />} />
+  //                 </PieChart>
+  //               </ResponsiveContainer>
+  //             </CardContent>
+  //           </Card>
+  //         </div>
+
+  //         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  //           {/* Department-wise Bar Chart */}
+  //           <Card className="cursor-pointer">
+  //             <CardHeader>
+  //               <CardTitle>Department-wise Complaints</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <ResponsiveContainer width="100%" height={350}>
+  //                 <BarChart data={departmentData} layout="vertical" margin={{ left: 100 }}>
+  //                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+  //                   <XAxis type="number" stroke="#6b7280" />
+  //                   <YAxis dataKey="department" type="category" width={100} stroke="#6b7280" />
+  //                   <Tooltip content={<CustomTooltip />} />
+  //                   <Bar dataKey="complaints" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+  //                 </BarChart>
+  //               </ResponsiveContainer>
+  //             </CardContent>
+  //           </Card>
+
+  //           {/* District-wise Stacked Bar Chart */}
+  //           <Card className="cursor-pointer">
+  //             <CardHeader>
+  //               <CardTitle>District-wise Allegations vs Grievances</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <ResponsiveContainer width="100%" height={350}>
+  //                 <BarChart data={districtData}>
+  //                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+  //                   <XAxis dataKey="district" stroke="#6b7280" />
+  //                   <YAxis stroke="#6b7280" />
+  //                   <Tooltip content={<CustomTooltip />} />
+  //                   <Legend />
+  //                   <Bar dataKey="allegation" stackId="a" fill="#ef4444" name="Allegations" radius={[0, 0, 0, 0]} />
+  //                   <Bar dataKey="grievance" stackId="a" fill="#f59e0b" name="Grievances" radius={[4, 4, 0, 0]} />
+  //                 </BarChart>
+  //               </ResponsiveContainer>
+  //             </CardContent>
+  //           </Card>
+  //         </div>
+  //       </TabsContent>
+
+  //       <TabsContent value="trends" className="space-y-6">
+  //         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  //           {/* ✅ Weekly Activity Area Chart with API Data (WITHOUT Total) */}
+  //           <Card className="cursor-pointer">
+  //             <CardHeader>
+  //               <CardTitle>Weekly Activity Trends</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <ResponsiveContainer width="100%" height={350}>
+  //                 <AreaChart 
+  //                   data={weeklyData} 
+  //                   key={JSON.stringify(weeklyData)} // ✅ Force re-render when data changes
+  //                 >
+  //                   <defs>
+  //                     <linearGradient id="colorProgress" x1="0" y1="0" x2="0" y2="1">
+  //                       <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8}/>
+  //                       <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+  //                     </linearGradient>
+  //                     <linearGradient id="colorDisposed" x1="0" y1="0" x2="0" y2="1">
+  //                       <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+  //                       <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+  //                     </linearGradient>
+  //                     <linearGradient id="colorUI" x1="0" y1="0" x2="0" y2="1">
+  //                       <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+  //                       <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+  //                     </linearGradient>
+  //                   </defs>
+  //                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+  //                   <XAxis dataKey="day" stroke="#6b7280" />
+  //                   <YAxis stroke="#6b7280" />
+  //                   <Tooltip content={<CustomTooltip />} />
+  //                   <Legend />
+  //                   <Area 
+  //                     type="monotone" 
+  //                     dataKey="progress" 
+  //                     stackId="1" 
+  //                     stroke="#f59e0b" 
+  //                     strokeWidth={2}
+  //                     fillOpacity={1} 
+  //                     fill="url(#colorProgress)"
+  //                     name="In Progress"
+  //                   />
+  //                   <Area 
+  //                     type="monotone" 
+  //                     dataKey="disposed" 
+  //                     stackId="1" 
+  //                     stroke="#10b981" 
+  //                     strokeWidth={2}
+  //                     fillOpacity={1} 
+  //                     fill="url(#colorDisposed)"
+  //                     name="Disposed"
+  //                   />
+  //                   <Area 
+  //                     type="monotone" 
+  //                     dataKey="underInvestigation" 
+  //                     stackId="1" 
+  //                     stroke="#8b5cf6" 
+  //                     strokeWidth={2}
+  //                     fillOpacity={1} 
+  //                     fill="url(#colorUI)"
+  //                     name="Under Investigation"
+  //                   />
+  //                 </AreaChart>
+  //               </ResponsiveContainer>
+  //             </CardContent>
+  //           </Card>
+
+  //           {/* Processing Time vs Target */}
+  //           <Card className="cursor-pointer">
+  //             <CardHeader>
+  //               <CardTitle>Processing Time vs Target (Days)</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <ResponsiveContainer width="100%" height={350}>
+  //                 <BarChart data={processingTimeData} layout="vertical" margin={{ left: 150 }}>
+  //                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+  //                   <XAxis type="number" stroke="#6b7280" />
+  //                   <YAxis dataKey="stage" type="category" width={150} stroke="#6b7280" fontSize={12} />
+  //                   <Tooltip content={<CustomTooltip />} />
+  //                   <Legend />
+  //                   <Bar dataKey="avg" fill="#3b82f6" name="Actual Time" radius={[0, 4, 4, 0]} />
+  //                   <Bar dataKey="target" fill="#e5e7eb" name="Target Time" radius={[0, 4, 4, 0]} />
+  //                 </BarChart>
+  //               </ResponsiveContainer>
+  //             </CardContent>
+  //           </Card>
+  //         </div>
+  //       </TabsContent>
+
+  //       <TabsContent value="performance" className="space-y-6">
+      
+  //         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+  //           {/* <Card className="cursor-pointer">
+  //             <CardHeader className="pb-2">
+  //               <CardTitle className="text-sm">Total Complaints</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <div className="text-2xl font-bold">
+  //                 {performanceData?.total_complaints || 0}
+  //               </div>
+  //               <div className="text-sm text-gray-500">All complaints</div>
+  //             </CardContent>
+  //           </Card> */}
+
+  //           <Card className="cursor-pointer">
+  //             <CardHeader className="pb-2">
+  //               <CardTitle className="text-sm">Pending SLA</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <div className="flex items-center justify-between">
+  //                 <div className="text-2xl font-bold">
+  //                   {performanceData?.pending_percentage || 0}%
+  //                 </div>
+  //                 <Badge 
+  //                   variant="secondary"
+  //                   className="bg-yellow-100 text-yellow-600"
+  //                 >
+  //                   In Progress
+  //                 </Badge>
+  //               </div>
+  //               <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
+  //                 <div 
+  //                   className="h-2 rounded-full transition-all duration-300 bg-yellow-600"
+  //                   style={{ width: `${Math.min(parseFloat(performanceData?.pending_percentage || 0), 100)}%` }}
+  //                 ></div>
+  //               </div>
+  //             </CardContent>
+  //           </Card>
+
+  //           <Card className="cursor-pointer">
+  //             <CardHeader className="pb-2">
+  //               <CardTitle className="text-sm">Investigation SLA</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <div className="flex items-center justify-between">
+  //                 <div className="text-2xl font-bold">
+  //                   {performanceData?.investigation_percentage || 0}%
+  //                 </div>
+  //                 <Badge 
+  //                   variant="default"
+  //                   className="bg-blue-100 text-blue-600"
+  //                 >
+  //                   Active
+  //                 </Badge>
+  //               </div>
+  //               <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
+  //                 <div 
+  //                   className="h-2 rounded-full transition-all duration-300 bg-blue-600"
+  //                   style={{ width: `${Math.min(parseFloat(performanceData?.investigation_percentage || 0), 100)}%` }}
+  //                 ></div>
+  //               </div>
+  //             </CardContent>
+  //           </Card>
+
+  //           <Card className="cursor-pointer">
+  //             <CardHeader className="pb-2">
+  //               <CardTitle className="text-sm">Approved SLA</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <div className="flex items-center justify-between">
+  //                 <div className="text-2xl font-bold">
+  //                   {performanceData?.approved_percentage || 0}%
+  //                 </div>
+  //                 <Badge 
+  //                   variant="default"
+  //                   className="bg-green-100 text-green-600"
+  //                 >
+  //                   Completed
+  //                 </Badge>
+  //               </div>
+  //               <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
+  //                 <div 
+  //                   className="h-2 rounded-full transition-all duration-300 bg-green-600"
+  //                   style={{ width: `${Math.min(parseFloat(performanceData?.approved_percentage || 0), 100)}%` }}
+  //                 ></div>
+  //               </div>
+  //             </CardContent>
+  //           </Card>
+
+  //           <Card className="cursor-pointer">
+  //             <CardHeader className="pb-2">
+  //               <CardTitle className="text-sm">Rejected SLA</CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <div className="flex items-center justify-between">
+  //                 <div className="text-2xl font-bold">
+  //                   {performanceData?.rejected_percentage || 0}%
+  //                 </div>
+  //                 <Badge 
+  //                   variant="destructive"
+  //                   className="bg-red-100 text-red-600"
+  //                 >
+  //                   Closed
+  //                 </Badge>
+  //               </div>
+  //               <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
+  //                 <div 
+  //                   className="h-2 rounded-full transition-all duration-300 bg-red-600"
+  //                   style={{ width: `${Math.min(parseFloat(performanceData?.rejected_percentage || 0), 100)}%` }}
+  //                 ></div>
+  //               </div>
+  //             </CardContent>
+  //           </Card>
+  //         </div>
+  //       </TabsContent>
+
+  //       <TabsContent value="workload" className="space-y-6">
+  //         {/* ✅ UPDATED: Role-wise Workload with API Data and Role Mapping */}
+  //         <Card className="cursor-pointer">
+  //           <CardHeader>
+  //             <CardTitle>SubRole-wise Workload Distribution</CardTitle>
+  //           </CardHeader>
+  //           <CardContent>
+  //             <ResponsiveContainer width="100%" height={400}>
+  //               <BarChart 
+  //                 data={workloadData} 
+  //                 layout="vertical" 
+  //                 margin={{ left: 130 }} // ✅ Increased left margin for longer role names
+  //                 key={JSON.stringify(workloadData)} // ✅ Force re-render when data changes
+  //               >
+  //                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+  //                 <XAxis type="number" stroke="#6b7280" />
+  //                 <YAxis 
+  //                   dataKey="role" 
+  //                   type="category" 
+  //                   width={130} // ✅ Increased width for longer role names
+  //                   stroke="#6b7280" 
+  //                   fontSize={12}
+  //                 />
+  //                 <Tooltip content={<CustomTooltip />} />
+  //                 <Legend />
+  //                 <Bar dataKey="pending" fill="#f59e0b" name="Pending" radius={[0, 4, 4, 0]} />
+  //                 <Bar dataKey="completed" fill="#10b981" name="Completed" radius={[0, 4, 4, 0]} />
+  //               </BarChart>
+  //             </ResponsiveContainer>
+  //           </CardContent>
+  //         </Card>
+  //       </TabsContent>
+
+  //       <TabsContent value="compliance" className="space-y-6">
+  //         {/* ✅ UPDATED: Compliance Section with API Data */}
+  //         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+  //           <Card className="cursor-pointer">
+  //             <CardHeader>
+  //               <CardTitle className="flex items-center gap-2">
+  //                 <FaBullseye className="h-5 w-5" />
+  //                 Overall Compliance
+  //               </CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <div className="text-center">
+  //                 <div className="text-4xl font-bold text-green-600">
+  //                   {complianceData.approvedPercentage.toFixed(1)}%
+  //                 </div>
+  //                 <p className="text-sm text-gray-500">
+  //                   {/* {complianceData.totalComplaints} total complaints */}
+  //                   Meeting SLA targets
+  //                 </p>
+  //               </div>
+  //             </CardContent>
+  //           </Card>
+
+  //           <Card className="cursor-pointer">
+  //             <CardHeader>
+  //               <CardTitle className="flex items-center gap-2">
+  //                 <FaUsers className="h-5 w-5" />
+  //                 Active Users
+  //               </CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <div className="text-center">
+  //                 <div className="text-4xl font-bold">{activeUsersCount}</div>
+  //                 <p className="text-sm text-gray-500">Currently active</p>
+  //               </div>
+  //             </CardContent>
+  //           </Card>
+
+  //           <Card className="cursor-pointer">
+  //             <CardHeader>
+  //               <CardTitle className="flex items-center gap-2">
+  //                 <FaBuilding className="h-5 w-5" />
+  //                 Departments
+  //               </CardTitle>
+  //             </CardHeader>
+  //             <CardContent>
+  //               <div className="text-center">
+  //                 <div className="text-4xl font-bold">{departmentCount}</div>
+  //                 <p className="text-sm text-gray-500">Total departments</p>
+  //               </div>
+  //             </CardContent>
+  //           </Card>
+  //         </div>
+  //       </TabsContent>
+  //     </Tabs>
