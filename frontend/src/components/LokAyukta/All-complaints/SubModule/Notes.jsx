@@ -8,6 +8,7 @@ import { EditorState, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
+import { Modifier } from "draft-js";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -39,6 +40,23 @@ const Notes = ({ complaint }) => {
   const [errors, setErrors] = useState({});
 
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
+
+  const handlePastedText = (text, html, editorState) => {
+  const contentState = editorState.getCurrentContent();
+  const selection = editorState.getSelection();
+
+  const newContent = Modifier.replaceText(
+    contentState,
+    selection,
+    text,      // plain text only
+    editorState.getCurrentInlineStyle()
+  );
+
+  const newState = EditorState.push(editorState, newContent, "insert-characters");
+  setEditorState(newState);
+
+  return true; // ⛔ stop default HTML paste
+};
 
   // --- 1. SMART SPLIT HELPER (IMPROVED) ---
   const getSafeSplitY = (ctx, width, startY, pageHeightPx, totalHeight) => {
@@ -561,7 +579,8 @@ const Notes = ({ complaint }) => {
   onEditorStateChange={onEditorStateChange}
   toolbarClassName="toolbarClassName"
   wrapperClassName="wrapperClassName"
-  // 👇 यहाँ 'kruti-input' क्लास बहुत जरूरी है ताकि ऊपर वाला CSS इसे पहचान सकेx
+   handlePastedText={handlePastedText} 
+   stripPastedStyles={true}
   editorClassName="editorClassName kruti-input px-3 min-h-[120px] md:min-h-[150px]"
   editorStyle={{ lineHeight: '1.2', minHeight: '150px' }}
   placeholder="Enter your note here..."
