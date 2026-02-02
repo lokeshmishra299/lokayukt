@@ -17,6 +17,10 @@ import AdminEditUserManagment from './components/Admin/EditUserManagment';
 import AdminViewComplaints from './components/Admin/ViewComplaints';
 import AdminEditComplaint from './components/Admin/EditComplaint';
 import AdminFileAdministrator from './components/Admin/FileAdministrator';
+import AdminEmploymentManagement from './components/Admin/EmploymentManagement';
+import AdminAddEmploymentManagement from './components/Admin/AddEmploymentManagement';
+
+
 
 
 
@@ -360,14 +364,18 @@ function App() {
           <Route path="user-management/edit/:id" element={<AdminEditUserManagment />} />
           <Route path="master-data" element={<AdminMasterData />} />
           <Route path="file-administrator" element={<AdminFileAdministrator />} />
+          <Route path="employment-management" element={<AdminEmploymentManagement />} />
+          <Route path="employment-management/add" element={<AdminAddEmploymentManagement />} />
+
         </Route>
       )}
 
 
- {role === 'employ' && (
+ {role === 'emp' && (
         <Route path="/employ" element={<EmployLayout />}>
           <Route path="dashboard" element={<EmployDashboard />} />
           <Route path="complaints" element={<EmployComplaints />} />
+          {/* <Route path="employment-management" element={<AdminEmploymentManagement />} /> */}
           {/* <Route path="search-reports/view/:id" element={<AdminViewComplaints />} />
           <Route path="search-reports/edit/:id" element={<AdminEditComplaint />} />
           <Route path="progress-register" element={<AdminProgressRegister />} />

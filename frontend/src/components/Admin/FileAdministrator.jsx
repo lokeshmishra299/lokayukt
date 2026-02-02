@@ -215,7 +215,7 @@ const FileAdministrator = () => {
                 }
               `}
             >
-              {tab === 'projects' && 'Projects / Topics'}
+              {tab === 'projects' && 'Topics'}
               {tab === 'files' && 'Files Registry'}
               {tab === 'budget' && 'Budget Overview'}
             </button>

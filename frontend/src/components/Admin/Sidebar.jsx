@@ -11,6 +11,7 @@ import {
   FaTimes
 } from "react-icons/fa";
 import { IoFileTray } from "react-icons/io5";
+import { FaUserGroup } from "react-icons/fa6";
 
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
   const location = useLocation();
@@ -145,6 +146,21 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <FaUsers />
             {(!isCollapsed || isMobile) && "User Management"}
+          </Link>
+          
+          <Link
+            to="/admin/employment-management"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+              ${isActive("/employment-management")
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-700 hover:bg-gray-200"
+              }
+              ${isCollapsed && !isMobile ? "justify-center" : ""}
+            `}
+          >
+            <FaUserGroup  />
+            {(!isCollapsed || isMobile) && "Employment Management"}
           </Link>
 
           {/* Master Data */}

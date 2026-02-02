@@ -69,7 +69,7 @@ const Login = () => {
             window.open("/operator/dashboard", "_self");
           }
 
-          else if (userRole === "employ"){
+          else if (userRole === "emp"){
             window.open("/employ/dashboard", "_self");
             localStorage.setItem('subrole', response.data.data.user.subrole.name);
 

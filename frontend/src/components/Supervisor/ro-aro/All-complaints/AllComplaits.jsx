@@ -311,6 +311,7 @@ useEffect(() => {
     selectedCaseType,
     sortOrder
   ]);
+  
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
     navigate(`view/${complaintId}`);
