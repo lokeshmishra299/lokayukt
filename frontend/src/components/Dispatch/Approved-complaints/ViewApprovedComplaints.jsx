@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { FaFileAlt, FaExclamationTriangle, FaTimes, FaEye,FaChevronDown } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { toast, ToastContainer } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+import { toast, Toaster  } from "react-hot-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
@@ -136,7 +137,7 @@ const SearchableDropdown = ({
   );
 };
 
-const ViewAllComplaint = () => {
+const ViewApprovedComplaints = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -176,7 +177,7 @@ const ViewAllComplaint = () => {
   } = useQuery({
     queryKey: ["complaint-details", id],
     queryFn: async () => {
-      const res = await api.get(`/lokayukt/view-complaint/${id}`);
+      const res = await api.get(`/dispatch/view-complaint/${id}`);
       return res.data.data;
     },
     enabled: !!id,
@@ -190,10 +191,10 @@ const ViewAllComplaint = () => {
   //   isFetching: isFetchingOptions,
   //   error: forwardOptionsError,
   // } = useQuery({
-  //   queryKey: ["lokayukt-options"],
+  //   queryKey: ["dispatch-options"],
   //   queryFn: async () => {
   //     try {
-  //       const res = await api.get("/lokayukt/get-lokayukt");
+  //       const res = await api.get("/dispatch/get-dispatch");
   //       if (Array.isArray(res.data)) {
   //         return res.data;
   //       } else if (res.data && Array.isArray(res.data.data)) {
@@ -226,13 +227,13 @@ const ViewAllComplaint = () => {
       queryKey: ["dispatch-options", forwardType], // 
       queryFn: async () => {
         try {
-          //  Send To My Pool  API: /lokayukt/get-users
+          //  Send To My Pool  API: /dispatch/get-users
           if (forwardType === "self") {
             const res = await api.get("/dispatch/get-users");
             return res.data?.data || res.data || [];
           }
   
-          //  Send To Other Pool  API: /lokayukt/get-lokayukt-uplokayukt
+          //  Send To Other Pool  API: /dispatch/get-dispatch-updispatch
           const res = await api.get("/dispatch/get-uplokayukt");
           const raw = res.data?.data || res.data || [];
           const flatList = Array.isArray(raw) ? raw.flat() : [];
@@ -269,7 +270,7 @@ const ViewAllComplaint = () => {
 
   // const forwardComplaintMutation = useMutation({
   //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-  //     const res = await api.post(`/lokayukt/forward-by-lokayukt/${complaintId}`, {
+  //     const res = await api.post(`/dispatch/forward-by-dispatch/${complaintId}`, {
   //       forward_to: forwardTo,
   //       remark: remarkData,
   //     });
@@ -405,7 +406,7 @@ const ViewAllComplaint = () => {
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <ToastContainer position="top-right" autoClose={3000} />
+       <Toaster position="top-right"  />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
@@ -429,7 +430,7 @@ const ViewAllComplaint = () => {
                       complaintData.status
                     )}`}
                   >
-                    {complaintData.approved_rejected_by_lokayukt == 1
+                    {complaintData.approved_rejected_by_dispatch == 1
                       ? "In Motion – With Lokayukta"
                       : "Received - Record Section" }
                   </span>
@@ -450,7 +451,7 @@ const ViewAllComplaint = () => {
                         complaintData.status
                       )}`}
                     >
-                       {complaintData.approved_rejected_by_lokayukt == 1
+                       {complaintData.approved_rejected_by_dispatch == 1
                       ? "In Motion – With Lokayukta"
                       : "Received - Record Section" }
                     </span>
@@ -467,14 +468,14 @@ const ViewAllComplaint = () => {
 
               {/* ===== DESCRIPTION (Hindi) ===== */}
             
-              <p className="text-[14px] text-black font-semibold uppercase my-2">
+             <p className="text-[14px] text-black font-semibold my-2">
                 {/* Description:{" "} */}
                 विवरण:{" "}
-                <span className="text-gray-500">
-                  {complaintData.complaint_description ||
-                    "No detailed description available for this complaint."}
+                <span className=" text-gray-500">
+                <span className="kruti-input">  {complaintData.complaint_description ||
+                    "No detailed description available for this complaint."}</span>
+                
                 </span>
-
               </p>
 
                  {/* <p className="text-[14px] text-black font-semibold uppercase mb-1">
@@ -499,11 +500,11 @@ const ViewAllComplaint = () => {
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Name */}
       <div>
-        <p className="text-[14px] text-black font-semibold uppercase mb-1">
+        <p className="  text-[14px] text-black font-semibold uppercase mb-1">
            नाम
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_name) || "N/A"}
+        <p className=" kruti-input text-gray-800 text-sm">
+          {complaintData.main_complainant_name || "N/A"}
         </p>
       </div>
 
@@ -512,8 +513,8 @@ const ViewAllComplaint = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
           पिता का नाम
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_father) || "N/A"}
+        <p className=" kruti-input text-gray-800 text-sm">
+          {complaintData.main_complainant_father || "N/A"}
         </p>
       </div>
 
@@ -540,8 +541,8 @@ const ViewAllComplaint = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
           नाम
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondent_name) || "N/A"}
+        <p className=" kruti-input text-gray-800 text-sm">
+          {complaintData.main_respondent_name || "N/A"}
         </p>
       </div>
 
@@ -575,8 +576,8 @@ const ViewAllComplaint = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
           व्यक्ति से संबंध
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.relation_with_person) || "NA"}
+        <p className=" kruti-input text-gray-800 text-sm">
+          {complaintData.relation_with_person || "NA"}
         </p>
       </div>
 
@@ -1102,16 +1103,16 @@ const ViewAllComplaint = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700 border-r border-gray-200 bg-gray-50">
                               {idx + 1}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
+                            <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
                               {comp.complainant_name || "-"}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.father_name || "-"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.district_name || "-"}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.occupation || "-"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -1126,7 +1127,7 @@ const ViewAllComplaint = () => {
                                 {comp.is_public_servant || "-"}
                               </span>
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-700 break-words">
+                            <td className=" kruti-input px-6 py-4 text-sm text-gray-700 break-words">
                               {comp.permanent_place || "-"}
                             </td>
                           </tr>
@@ -1253,13 +1254,13 @@ const ViewAllComplaint = () => {
                             <td className="px-4 py-3 text-sm font-medium text-gray-900 border-r border-gray-100">
                               {idx + 1}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                            <td className=" kruti-input px-4 py-3 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
                               {resp.respondent_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.designation || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className=" kruti-input px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.department_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
@@ -1269,7 +1270,7 @@ const ViewAllComplaint = () => {
                               {resp.officer_category || "-"}
                             </td>
                             {/* Address Column: whitespace-normal ensures text wrapping */}
-                            <td className="px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                            <td className=" kruti-input px-4 py-3 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {resp.current_address || "-"}
                             </td>
                           </tr>
@@ -1315,10 +1316,10 @@ const ViewAllComplaint = () => {
                             <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
                               {idx + 1}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                            <td className=" kruti-input px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
                               {item.support_name || "-"}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                            <td className=" kruti-input px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {item.support_address || "-"}
                             </td>
                           </tr>
@@ -1364,10 +1365,10 @@ const ViewAllComplaint = () => {
                             <td className="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100">
                               {idx + 1}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
+                            <td className=" kruti-input px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100 whitespace-nowrap">
                               {item.witness_name || "-"}
                             </td>
-                            <td className="px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
+                            <td className=" kruti-input px-6 py-4 text-sm text-gray-600 whitespace-normal break-words leading-relaxed">
                               {item.witness_address || "-"}
                             </td>
                           </tr>
@@ -1401,4 +1402,4 @@ const ViewAllComplaint = () => {
   );
 };
 
-export default ViewAllComplaint;
+export default ViewApprovedComplaints;

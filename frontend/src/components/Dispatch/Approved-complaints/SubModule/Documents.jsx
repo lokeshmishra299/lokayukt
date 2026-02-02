@@ -4,6 +4,7 @@ import { BsFileEarmarkPdf, BsDownload } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
 
@@ -41,7 +42,7 @@ const Documents = ({ complaint }) => {
   } = useQuery({
     queryKey: ["documents", complaint?.id],
     queryFn: async () => {
-      const res = await api.get(`/lokayukt/get-document/${complaint.id}`);
+      const res = await api.get(`/dispatch/get-document/${complaint.id}`);
       return res.data.status ? res.data.data : [];
     },
     enabled: !!complaint?.id,
@@ -51,7 +52,7 @@ const Documents = ({ complaint }) => {
     try {
       setLoadingDoc(filename);
 
-      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+      const res = await api.get(`/dispatch/get-file-preview/${complaint.id}`);
 
       if (res.data.status && res.data.data.length > 0) {
         const match = res.data.data.find((p) => p.includes(filename));
@@ -70,7 +71,7 @@ const Documents = ({ complaint }) => {
 
   const handleDownloadPdf = async () => {
     try {
-      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+      const res = await api.get(`/dispatch/get-file-preview/${complaint.id}`);
       if (res.data.status && res.data.data.length > 0) {
         const url = makeFileUrl(res.data.data[0]);
         const a = document.createElement("a");
