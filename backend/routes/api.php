@@ -545,6 +545,13 @@ Route::middleware('auth:sanctum')->group(function(){
        
     });
 
+    Route::middleware('role:emp')->prefix('employee')->group(function () {
+       
+        // Route::get('/dashboard',[EmployeesController::class,'index']);
+       
+       
+    });
+
        Route::middleware('role:up-lok-ayukt')->prefix('uplokayukt')->group(function () {
         
         Route::get('/all-district',[UpLokAyuktCommonController::class,'fetch_district']);
