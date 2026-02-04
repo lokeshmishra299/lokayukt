@@ -1026,7 +1026,9 @@ class CommonController extends Controller
         }
 
         $Category = new Budget();
-        $Category->name = $request->name;
+        $Category->expense_type = $request->expense_type;
+        $Category->expense_money = $request->expense_money;
+        $Category->remark = $request->remark;
         $Category->status = 1;
     
         $Category->save(); // ✅ Insert into DB
@@ -1076,8 +1078,9 @@ class CommonController extends Controller
 
         }
 
-        $Category->name = $request->name;
-        $Category->name_h = $request->name_h;
+       $Category->expense_type = $request->expense_type;
+        $Category->expense_money = $request->expense_money;
+        $Category->remark = $request->remark;
         $Category->status = 1;
     
         $Category->save(); // ✅ Insert into DB
