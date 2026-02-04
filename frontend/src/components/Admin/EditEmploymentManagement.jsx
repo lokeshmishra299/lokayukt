@@ -409,48 +409,41 @@ const EditEmploymentManagement = () => {
               </div>
 
               {/* Role */}
-              <div>
-                <label htmlFor="role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  Role *
-                </label>
-                {/* <select
-                  id="role_id"
-                  name="role_id"
-                  value={formData.role_id}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
-                    errors.role_id ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select Role</option>
-                  {roles.map(role => (
-                    <option key={role.id} value={role.id}>{role.label}</option>
-                  ))}
-                </select> */}
+             
 
-                <select
-  id="role_id"
-  name="role_id"
-  value="8"
-  disabled
-  className="w-full px-3 py-2 text-sm border rounded-md bg-gray-100 border-gray-300 cursor-not-allowed"
->
-  {roles
+              <div>
+    <label htmlFor="role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+      Role *
+    </label>
+    <select
+      id="role_id"
+      name="role_id"
+      // value="8"
+      value={formData.role_id}
+      // disabled
+      onChange={handleInputChange}
+      className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+        errors.role_id ? 'border-red-500' : 'border-gray-300'
+      }`}
+    >
+      <option value="">Select Role</option>
+       {roles
     .filter(role => role.id === 8)
     .map(role => (
       <option key={role.id} value={role.id}>
         {role.label}
       </option>
   ))}
-</select>
-
-                {errors.role_id && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.role_id}</p>
-                )}
-              </div>
+    </select>
+    {errors.role_id && (
+      <p className="mt-1 text-sm text-red-600 flex items-center">
+        {errors.role_id}
+      </p>
+    )}
+  </div>
 
               {/* SUB ROLE - Only visible if NOT PS */}
-              {!isPersonalSecretary && (
+              {/* {!isPersonalSecretary && (
                 <div>
                   <label htmlFor="sub_role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                     Sub Role *
@@ -485,7 +478,7 @@ const EditEmploymentManagement = () => {
                     <p className="mt-1 text-sm text-red-600 flex items-center">{errors.sub_role_id}</p>
                   )}
                 </div>
-              )}
+              )} */}
 
               {/* LOKAYUKT-UPLOKAYUKT - Only visible if Role is PS (ID 6) */}
               {isPersonalSecretary && (
@@ -660,7 +653,7 @@ const EditEmploymentManagement = () => {
             <div className="flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => navigate("/admin/user-management")}
+                onClick={() => navigate("/admin/employment-management")}
                 className="px-6 py-3 rounded-lg font-medium bg-gray-300 hover:bg-gray-400 text-gray-700 transition-all"
               >
                 Cancel

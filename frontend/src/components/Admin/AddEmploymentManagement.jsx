@@ -282,6 +282,11 @@ const handleSubmit = async (e) => {
     
     if (response.data.status === true) {
       toast.success(response.data.message || 'User created successfully!');
+
+      setTimeout(()=>{
+        navigate("/admin/employment-management")
+
+      }, 2000)
       
       // Reset form
       setFormData({

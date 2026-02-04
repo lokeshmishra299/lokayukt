@@ -166,13 +166,13 @@ const EmploymentManagement = () => {
     mutationFn: toggleUserStatus,
     onMutate: async (userId) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['users'] });
+      await queryClient.cancelQueries({ queryKey: ['employees'] });
       
       // Snapshot previous value
-      const previousUsers = queryClient.getQueryData(['users']);
+      const previousUsers = queryClient.getQueryData(['employees']);
       
       // Optimistically update
-      queryClient.setQueryData(['users'], (old) =>
+      queryClient.setQueryData(['employees'], (old) =>
         old?.map(user =>
           user.id === userId
             ? { ...user, status: user.status === '1' || user.status === 1 ? '0' : '1' }
@@ -184,14 +184,14 @@ const EmploymentManagement = () => {
     },
     onError: (error, userId, context) => {
       // Rollback on error
-      queryClient.setQueryData(['users'], context.previousUsers);
+      queryClient.setQueryData(['employees'], context.previousUsers);
       toast.error(error.message || 'Failed to update status');
     },
     onSuccess: (data) => {
       toast.success(data.message || 'Status updated successfully');
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
     }
   });
 
@@ -202,7 +202,7 @@ const EmploymentManagement = () => {
       toast.success(data.message || 'User deleted successfully');
       
       // Update cache by removing deleted user
-      queryClient.setQueryData(['users'], (old) =>
+      queryClient.setQueryData(['employees'], (old) =>
         old?.filter(user => user.id !== userId)
       );
       
