@@ -532,10 +532,12 @@ const handleDateChange = (date) => {
       
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-                <h1 className="text-2xl sm:text-2xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
-                <p className="text-sm sm:text-base text-gray-600 break-words">
+                 <div>
+                <h1 className="text-xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
+                <p className="text-xs sm:text-sm text-gray-600">
                   Welcome Back, {userRole} • Last Updated: {new Date().toLocaleString()}
                 </p>
+              </div>
               </div>
               <div className="flex gap-2 relative justify-start sm:justify-end">
                 {/*  Month-Year Picker Button */}
@@ -614,13 +616,13 @@ const handleDateChange = (date) => {
 
 
       {/* Key Performance Indicators */}
- <div className="grid grid-cols-1 sm:grid-cols-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+ <div className="grid grid-cols-1 relative top-2 sm:grid-cols-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
 
 
         {/* Total Complaints */}
         <div
         onClick={()=>{
-          navigate("/emp/all-complaints ")
+          // navigate("/emp/all-complaints ")
         }}
          className="p-5 rounded-2xl shadow-md border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -639,9 +641,7 @@ const handleDateChange = (date) => {
 
         {/* Today's Entry */}
         <div
-        //  onClick={()=>{
-        //   navigate("/emp/pending-complaints")
-        // }}
+      
          className="p-5 rounded-2xl shadow-md border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
@@ -660,7 +660,7 @@ const handleDateChange = (date) => {
         {/* Approved */}
         <div 
           onClick={()=>{
-          navigate("/emp/approved-complaints")
+          // navigate("/emp/approved-complaints")
         }}
         className="p-5 rounded-2xl shadow-md border border-green-200 bg-green-50 hover:bg-green-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
