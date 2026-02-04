@@ -71,7 +71,7 @@ const FileAdministrator = () => {
   const { data: budgets = [], isLoading: loadingBudgets } = useQuery({
     queryKey: ['budgets'],
     queryFn: async () => {
-      const res = await api.get('/admin/budgets');
+      const res = await api.get('/admin/budget');
       return res.data.data || res.data;
     }
   });
@@ -230,15 +230,33 @@ const FileAdministrator = () => {
     );
   };
 
+  const getPlaceholder = () => {
+  if (activeTab === 'topics') return "Enter Topic Name";
+  if (activeTab === 'filetypes') return "Enter File Type Name";
+  return "";
+};
+
+
+       if (loadingTopics) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center">
+          {/* <FaSpinner className="w-12 h-12 animate-spin text-[#13316C] mx-auto mb-4" /> */}
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <Toaster position="top-right" />
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4  pb-0">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">File Administrator</h1>
-          <p className="text-sm text-gray-500">Manage Topics, File Types & Budget</p>
+          <p className="text-sm text-gray-600">Manage Topics, File Types & Budget</p>
         </div>
         
         <button 
@@ -250,7 +268,7 @@ const FileAdministrator = () => {
         </button>
       </div>
 
-      <div className="">
+      <div className="mt-4">
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
           
           {/* Tabs */}
@@ -333,7 +351,7 @@ const FileAdministrator = () => {
                   </thead>
                   <tbody className="text-sm text-gray-700 divide-y divide-gray-100">
                     {loadingFileTypes ? (
-                      <tr><td colSpan="5" className="p-8 text-center"><FaSpinner className="animate-spin inline mr-2"/> Loading...</td></tr>
+                      <tr><td colSpan="5" className="p-8 text-center">Loading...</td></tr>
                     ) : fileTypes.length === 0 ? (
                                                                  <tr><td colSpan="5" className="p-8 text-center">No Data Found.</td></tr>
 
@@ -368,7 +386,7 @@ const FileAdministrator = () => {
                     <tr>
                       <th className="p-4 border-b w-16">ID</th>
                       <th className="p-4 border-b">Expense Type</th>
-                      <th className="p-4 border-b">Amount</th>
+                      <th className="p-4 border-b">Expense Amount</th>
                       <th className="p-4 border-b">Remark</th>
                       <th className="p-4 border-b">Status</th>
                       <th className="p-4 border-b text-right">Actions</th>
@@ -376,7 +394,7 @@ const FileAdministrator = () => {
                   </thead>
                   <tbody className="text-sm text-gray-700 divide-y divide-gray-100">
                     {loadingBudgets ? (
-                      <tr><td colSpan="6" className="p-8 text-center"><FaSpinner className="animate-spin inline mr-2"/> Loading...</td></tr>
+                      <tr><td colSpan="6" className="p-8 text-center"> Loading...</td></tr>
                     ) : budgets.length === 0 ? (
                                                                  <tr><td colSpan="5" className="p-8 text-center">No Data Found.</td></tr>
 
@@ -412,7 +430,9 @@ const FileAdministrator = () => {
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
             
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50">
+            {/* <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50"> */}
+            <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50 rounded-t-xl">
+
               <h3 className="font-bold text-gray-800">
                 {modalMode === 'add' ? 'Add' : 'Edit'} {activeTab === 'topics' ? 'Topic' : activeTab === 'filetypes' ? 'File Type' : 'Budget'}
               </h3>
@@ -432,7 +452,7 @@ const FileAdministrator = () => {
                       value={budgetForm.expense_type} 
                       onChange={(e) => setBudgetForm({...budgetForm, expense_type: e.target.value})} 
                       required 
-                      placeholder="e.g. Office Supplies"
+                      placeholder="Enter Expense Type"
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123463] outline-none" 
                     />
                   </div>
@@ -443,7 +463,7 @@ const FileAdministrator = () => {
                       value={budgetForm.expense_money} 
                       onChange={(e) => setBudgetForm({...budgetForm, expense_money: e.target.value})} 
                       required 
-                      placeholder="e.g. 5000"
+                      placeholder="Expense Amount"
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123463] outline-none" 
                     />
                   </div>
@@ -452,7 +472,7 @@ const FileAdministrator = () => {
                     <textarea 
                       value={budgetForm.remark} 
                       onChange={(e) => setBudgetForm({...budgetForm, remark: e.target.value})} 
-                      placeholder="Optional details..."
+                      placeholder="Enter Remark"
                       rows={3}
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123463] outline-none" 
                     />
@@ -464,6 +484,8 @@ const FileAdministrator = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
                   <input 
                     value={nameInput} 
+                    // placeholder='Enter Topic Name.'
+                    placeholder={getPlaceholder()}
                     onChange={(e) => setNameInput(e.target.value)} 
                     required 
                     className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123463] outline-none" 
