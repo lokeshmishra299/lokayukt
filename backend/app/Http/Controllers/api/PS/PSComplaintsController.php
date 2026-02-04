@@ -31,85 +31,141 @@ class PSComplaintsController extends Controller
            
 
   
-    $query = DB::table('complaints')
-        ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
-         ->leftJoin('complainants as cmlan', 'complaints.id', '=', 'cmlan.complaint_id')
-                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
-        ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent,$userParentSubrole) {
-            $join->on('complaints.id', '=', 'rep.complaint_id')
-                ->where(function ($q) use ($parentId, $roleParent,$userParentSubrole) {
+    // $query = DB::table('complaints')
+    //     ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+    //      ->leftJoin('complainants as cmlan', 'complaints.id', '=', 'cmlan.complaint_id')
+    //             ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
+    //     ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent,$userParentSubrole) {
+    //         $join->on('complaints.id', '=', 'rep.complaint_id')
+    //             ->where(function ($q) use ($parentId, $roleParent,$userParentSubrole) {
 
-                    if ($roleParent === 'lok-ayukt') {
-                        //  $q->where('rep.forward_to_lokayukt', $parentId);      
-                    } elseif ($roleParent === 'up-lok-ayukt') {
-                        $q->where('rep.forward_to_uplokayukt', $parentId);
+    //                 if ($roleParent === 'lok-ayukt') {
+    //                     //  $q->where('rep.forward_to_lokayukt', $parentId);      
+    //                 } elseif ($roleParent === 'up-lok-ayukt') {
+    //                     $q->where('rep.forward_to_uplokayukt', $parentId);
                     
-                    } elseif ($roleParent ==="supervisor" && $userParentSubrole->sub_role_id === 14) {
-                        $q->where('rep.forward_to_sec', $parentId);
-                    } else {
-                        // 🔥 fallback (safe)
-                        $q->where('rep.forward_to_lokayukt', $parentId)
-                        ->orWhere('rep.forward_to_uplokayukt', $parentId);
-                    }
+    //                 } elseif ($roleParent ==="supervisor" && $userParentSubrole->sub_role_id === 14) {
+    //                     $q->where('rep.forward_to_sec', $parentId);
+    //                 } else {
+    //                     // 🔥 fallback (safe)
+    //                     $q->where('rep.forward_to_lokayukt', $parentId)
+    //                     ->orWhere('rep.forward_to_uplokayukt', $parentId);
+    //                 }
 
-                });
-        })
-        ->select(
-            'complaints.id',
-            'complaints.complain_no',
-            'complaints.complaint_description',
-            'complaints.cause_date',
-            'complaints.category',
-            'complaints.fee_exempted',
-            'complaints.approved_rejected_by_rk',
-            'complaints.approved_rejected_by_ps',
-            'complaints.approved_rejected_by_lokayukt',
-            'complaints.created_at',
-            'complaints.updated_at',
-            'dd.district_name','complaints.status',
-              'dd1.district_name as dist_new',
-            DB::raw('MIN(rep.id) as action_id') // 🔥 avoid duplicates
-        )
-        // ->where('complaints.form_status', 1)
-        // ->where('complaints.approved_rejected_by_rk', 1)      
-        ->groupBy('complaints.id','complaints.complaint_description','complaints.complain_no','complaints.cause_date','complaints.category','complaints.fee_exempted',
-         'complaints.approved_rejected_by_rk',
-            'complaints.approved_rejected_by_ps',
-            'complaints.approved_rejected_by_lokayukt',
-            'complaints.created_at','complaints.updated_at','dd.district_name','dist_new','complaints.status');   // 🔥 distinct complaints
+    //             });
+    //     })
+    //     ->select(
+    //         'complaints.id',
+    //         'complaints.complain_no',
+    //         'complaints.complaint_description',
+    //         'complaints.cause_date',
+    //         'complaints.category',
+    //         'complaints.fee_exempted',
+    //         'complaints.approved_rejected_by_rk',
+    //         'complaints.approved_rejected_by_ps',
+    //         'complaints.approved_rejected_by_lokayukt',
+    //         'complaints.created_at',
+    //         'complaints.updated_at',
+    //         'dd.district_name','complaints.status',
+    //           'dd1.district_name as dist_new',
+    //         // DB::raw('MIN(rep.id) as action_id') // 🔥 avoid duplicates
+    //     );
+    //     // ->where('complaints.form_status', 1)
+    //     // ->where('complaints.approved_rejected_by_rk', 1)      
+    //     // ->groupBy('complaints.id','complaints.complaint_description','complaints.complain_no','complaints.cause_date','complaints.category','complaints.fee_exempted',
+    //     //  'complaints.approved_rejected_by_rk',
+    //     //     'complaints.approved_rejected_by_ps',
+    //     //     'complaints.approved_rejected_by_lokayukt',
+    //     //     'complaints.created_at','complaints.updated_at','dd.district_name','dist_new','complaints.status');  
+    //          // 🔥 distinct complaints
 
-        // if ($roleParent === 'up-lok-ayukt') {
-        //                $query->where('complaints.approved_rejected_by_lokayukt', 1);
-        //  }
+    //     // if ($roleParent === 'up-lok-ayukt') {
+    //     //                $query->where('complaints.approved_rejected_by_lokayukt', 1);
+    //     //  }
 
-        if($roleParent === 'lok-ayukt'){
-            $query->where('complaints.approved_rejected_by_rk', 1)
-            ->where('complaints.approved_rejected_by_lokayukt', 0);
-        }else if($roleParent === 'up-lok-ayukt'){
-            $query->where('complaints.approved_rejected_by_rk', 1)
-            ->where('complaints.approved_rejected_by_lokayukt', 1);
-        }
-        else if($roleParent ==="supervisor" && $userParentSubrole->sub_role_id == 14){
-            // $query
-            // ->where('complaints.approved_rejected_by_lokayukt', 0)
-            // ->Orwhere('complaints.approved_rejected_by_lokayukt', 1)
-            // ->where('rep.status', 'Forwarded')
-            //                     ->whereNotNull('rep.forward_to_sec')
-            // ->where('rep.forward_to_sec', $parentId);
-            // ->where(function ($query) {
-            //     $query->where('complaints.approved_rejected_by_lokayukt', 0)
-            //         ->orWhere('complaints.approved_rejected_by_lokayukt', 1);
-            // })
-            // ->where('rep.status', 'Forwarded')
-            // ->whereNotNull('rep.forward_to_sec')
-            // ->where('rep.forward_to_sec', $parentId);
-             $query->where('rep.status', 'Forwarded')
-                                ->whereNotNull('rep.forward_to_sec')
-                                 ->where('rep.forward_to_sec',$parentId);
+    //     if($roleParent === 'lok-ayukt'){
+    //         $query->where('complaints.approved_rejected_by_rk', 1)
+    //         ->where('complaints.approved_rejected_by_lokayukt', 0);
+    //     }else if($roleParent === 'up-lok-ayukt'){
+    //         $query->where('complaints.approved_rejected_by_rk', 1)
+    //         ->where('complaints.approved_rejected_by_lokayukt', 1);
+    //     }
+    //     else if($roleParent ==="supervisor" && $userParentSubrole->sub_role_id == 14){
+    //         // $query
+    //         // ->where('complaints.approved_rejected_by_lokayukt', 0)
+    //         // ->Orwhere('complaints.approved_rejected_by_lokayukt', 1)
+    //         // ->where('rep.status', 'Forwarded')
+    //         //                     ->whereNotNull('rep.forward_to_sec')
+    //         // ->where('rep.forward_to_sec', $parentId);
+    //         // ->where(function ($query) {
+    //         //     $query->where('complaints.approved_rejected_by_lokayukt', 0)
+    //         //         ->orWhere('complaints.approved_rejected_by_lokayukt', 1);
+    //         // })
+    //         // ->where('rep.status', 'Forwarded')
+    //         // ->whereNotNull('rep.forward_to_sec')
+    //         // ->where('rep.forward_to_sec', $parentId);
+    //          $query->where('rep.status', 'Forwarded')
+    //                             ->whereNotNull('rep.forward_to_sec')
+    //                              ->where('rep.forward_to_sec',$parentId);
 
-        }
+    //     }
 
-    $records = $query->get();
+    // $records = $query->distinct('complaints.id')->get();
+
+    $query = DB::table('complaints')
+    ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+    ->leftJoin('complainants as cmlan', function ($join) {
+                    $join->on('complaints.id', '=', 'cmlan.complaint_id')
+                        ->where('cmlan.is_main', 1);
+                })
+                    ->leftJoin('respondents as resp', function ($join) {
+                    $join->on('complaints.id', '=', 'resp.complaint_id')
+                        ->where('resp.is_main', 1);
+                })
+    ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
+
+    // 🔥 Join only latest action
+    ->join(DB::raw('
+        (SELECT complaint_id, MAX(id) as max_id 
+         FROM complaint_actions 
+         GROUP BY complaint_id) as latest_rep
+    '), 'complaints.id', '=', 'latest_rep.complaint_id')
+
+    ->join('complaint_actions as rep', 'rep.id', '=', 'latest_rep.max_id')
+
+    ->select(
+        'complaints.id',
+        'complaints.complain_no',
+        'complaints.complaint_description',
+        'complaints.cause_date',
+        'complaints.category',
+        'complaints.fee_exempted',
+        'complaints.approved_rejected_by_rk',
+        'complaints.approved_rejected_by_ps',
+        'complaints.approved_rejected_by_lokayukt',
+        'complaints.created_at',
+        'complaints.updated_at',
+        'complaints.status',
+
+        'dd.district_name',
+        'dd1.district_name as dist_new'
+    );
+if($roleParent === 'lok-ayukt'){
+    $query->where('complaints.approved_rejected_by_rk', 1)
+          ->where('complaints.approved_rejected_by_lokayukt', 0);
+
+}elseif($roleParent === 'up-lok-ayukt'){
+    $query->where('complaints.approved_rejected_by_rk', 1)
+          ->where('complaints.approved_rejected_by_lokayukt', 1);
+
+}elseif($roleParent === "supervisor" && $userParentSubrole->sub_role_id == 14){
+
+    $query->where('rep.status', 'Forwarded')
+          ->whereNotNull('rep.forward_to_sec')
+          ->where('rep.forward_to_sec', $parentId);
+}
+$records = $query->get();
+
 
      if ($roleParent === 'lok-ayukt') {
              $todayCount = DB::table('complaints')
@@ -1082,7 +1138,7 @@ $complainDetails->actions = $actions;
     }
 
          public function allComplainsapproved(){
-    //    $userSubrole = Auth::user()->subrole->name; 
+       $userId = Auth::user()->id; 
        $parentId = null;
         $parentId = Auth::user()->parent_user_id;
         // dd($parentId);
@@ -1099,14 +1155,16 @@ $complainDetails->actions = $actions;
                         ->where('resp.is_main', 1);
                 })
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
-                ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
+                ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent,$userId) {
         $join->on('cm.id', '=', 'rep.complaint_id')
-             ->where(function ($q) use ($parentId, $roleParent) {
+             ->where(function ($q) use ($parentId, $roleParent,$userId) {
 
                  if ($roleParent === 'lok-ayukt') {
+                    $q->where('rep.forward_by_ps', $userId);
                     //  $q->where('rep.forward_to_lokayukt', $parentId);      
                  } elseif ($roleParent === 'up-lok-ayukt') {
-                     $q->where('rep.forward_to_uplokayukt', $parentId);
+                    //  $q->where('rep.forward_to_uplokayukt', $parentId);
+                     $q->where('rep.forward_by_ps', $userId);
                  } elseif ($roleParent === 'supervisor') {
                      $q->where('rep.forward_to_sec', $parentId);
                  } else {
@@ -1136,10 +1194,15 @@ $complainDetails->actions = $actions;
                 );
 
                 
-     $complainDetails->where('form_status', 1)
+     $complainDetails->where('form_status', 1);
+     if($roleParent === 'lok-ayukt'){
+           $complainDetails->where('approved_rejected_by_lokayukt', 0);
+     }else{
+            $complainDetails->where('approved_rejected_by_lokayukt', 1);
+     }
             // ->where('approved_rejected_by_ro', 1)
             //             ->where('approved_rejected_by_d_a',1)
-                        ->where('approved_rejected_by_lokayukt', 1);
+                        // ->where('approved_rejected_by_lokayukt', 1);
             //              ->where(function($q){
             //                 $q->where('approved_rejected_by_so_us',1)
             //                 ->Orwhere('approved_rejected_by_ds_js', 1);               

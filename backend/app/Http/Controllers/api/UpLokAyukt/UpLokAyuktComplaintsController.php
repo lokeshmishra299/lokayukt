@@ -24,7 +24,14 @@ class UpLokAyuktComplaintsController extends Controller
     $query = DB::table('complaints')
         //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
         ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
-         ->leftJoin('complainants as cmlan', 'complaints.id', '=', 'cmlan.complaint_id')
+          ->leftJoin('complainants as cmlan', function ($join) {
+                    $join->on('complaints.id', '=', 'cmlan.complaint_id')
+                        ->where('cmlan.is_main', 1);
+                })
+                    ->leftJoin('respondents as resp', function ($join) {
+                    $join->on('complaints.id', '=', 'resp.complaint_id')
+                        ->where('resp.is_main', 1);
+                })
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
         // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
         // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
@@ -35,6 +42,8 @@ class UpLokAyuktComplaintsController extends Controller
             'complaints.*',
             'dd.district_name as district_name',
               'dd1.district_name as dist_new',
+                'cmlan.complainant_name as complainantName',
+                      'resp.respondent_name as respondentName',
 
         );
 

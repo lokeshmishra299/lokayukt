@@ -4,6 +4,7 @@ use App\Http\Controllers\api\Admin\AdminDashboardController;
 use App\Http\Controllers\api\Admin\AdminReportController;
 // use App\Http\Controllers\api\Admin\AdminDashboardController;
 // use App\Http\Controllers\api\Admin\OperatorReportController;
+use App\Http\Controllers\api\Employee\EmployeesController;
 
 use App\Http\Controllers\api\LokAyukt\LokAyuktCommonController;
 use App\Http\Controllers\api\LokAyukt\LokAyuktComplaintsController;
@@ -71,6 +72,16 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/update-users/{id}',[UserManagement::class,'updateUser']);
         Route::post('/delete-users/{id}',[UserManagement::class,'deleteUser']);
         Route::post('/change-status/{id}',[UserManagement::class,'changeStatus']);
+       
+        Route::post('/add-employee',[UserManagement::class,'employee_management']);
+        Route::get('/employees',[UserManagement::class,'allEmployees']);
+        Route::get('/edit-employee/{id}',[UserManagement::class,'editEmployee']);
+        Route::post('/update-employee/{id}',[UserManagement::class,'updateEmployee']);
+        Route::post('/delete-employee/{id}',[UserManagement::class,'deleteEmployee']);
+        // Route::post('/change-status/{id}',[UserManagement::class,'changeStatus']);
+        Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
+
+
 
         /**
          * District
@@ -128,6 +139,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/department-wise-complaint',[AdminReportController::class,'complainDepartmentWise']);
         Route::get('/montly-trends',[AdminReportController::class,'getMontlyTrends']);
         Route::get('/compliance-report',[AdminReportController::class,'complianceReport']);
+        Route::get('/download-backup',[AdminReportController::class,'backupZip']);
         
         // Daishboard
         Route::get('/dashboard/{date}',[AdminDashboardController::class,'index']);
@@ -142,6 +154,15 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-all-department-count',[AdminDashboardController::class,'allDepartmentCount']);
         Route::get('/get-performance-dashboard',[AdminDashboardController::class,'performanceDashboad']);
       
+         Route::get('/topics',[CommonController::class,'fetch_topics']);
+        Route::post('/add-topic',[CommonController::class,'addTopics']);
+        Route::post('/edit-topic/{id}',[CommonController::class,'editTopics']);
+        Route::post('/delete-topic/{id}',[CommonController::class,'removeTopics']);
+        
+        Route::get('/filetypes',[CommonController::class,'fetch_fileType']);
+        Route::post('/add-filetype',[CommonController::class,'addFileType']);
+        Route::post('/edit-filetype/{id}',[CommonController::class,'editFileType']);
+        Route::post('/delete-filetype/{id}',[CommonController::class,'removeFileType']);
       
          // });
 

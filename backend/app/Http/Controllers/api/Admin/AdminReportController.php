@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use ZipArchive;
 
 class AdminReportController extends Controller
 {
@@ -485,4 +486,71 @@ $complainDetails->details = DB::table('complaints_details as cd')
 
     }
    
+
+
+public function backupZip()
+{
+    $time = date('Y_m_d_His');
+
+    $sqlFile = "backup_{$time}.sql";
+    $zipFile = "backup_{$time}.zip";
+
+    $folder = storage_path('app/public/database');
+
+    if (!file_exists($folder)) {
+        mkdir($folder, 0755, true);
+    }
+
+    $sqlPath = $folder . '/' . $sqlFile;
+    $zipPath = $folder . '/' . $zipFile;
+
+    // DB Config
+    $db   = config('database.connections.mysql.database');
+    $user = config('database.connections.mysql.username');
+    $pass = config('database.connections.mysql.password');
+    $host = config('database.connections.mysql.host');
+
+    // MySQLDump Path (Windows / Linux)
+    $mysqldump = "C:/xampp/mysql/bin/mysqldump.exe";
+    // Linux: /usr/bin/mysqldump
+
+    $command = "\"$mysqldump\" -h $host -u $user " .
+               ($pass ? "-p$pass " : "") .
+               "$db > \"$sqlPath\"";
+
+    exec($command, $output, $status);
+
+    if ($status !== 0 || !file_exists($sqlPath)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Backup failed',
+            'output'  => $output
+        ], 500);
+    }
+
+    // ZIP Create
+    $zip = new ZipArchive();
+
+    if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+        return response()->json([
+            'success' => false,
+            'message' => 'ZIP create failed'
+        ], 500);
+    }
+
+    $zip->addFile($sqlPath, $sqlFile);
+    $zip->close();
+
+    @unlink($sqlPath);
+
+    // API Download Response
+    return response()->download($zipPath, $zipFile, [
+        'Content-Type' => 'application/zip'
+    ]);
+}
+
+
+
+
+    
 }
