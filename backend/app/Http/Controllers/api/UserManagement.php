@@ -332,7 +332,7 @@ class UserManagement extends Controller
             'email'        => $request->email,
             'number'       => $request->number,
             'role_id'      => $request->role_id,
-            'sub_role_id'      => $request->sub_role_id,
+            // 'sub_role_id'      => $request->sub_role_id,
             'district_id'  => $request->district_id,
             'designation_id'  => $request->designation,
             'department_id'   => $request->department,

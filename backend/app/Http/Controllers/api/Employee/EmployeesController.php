@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class EmployeesController extends Controller
 {
+     public function index(){
+
+     }
+
       public function uploadFiles(Request $request)
 {
     $added_by = Auth::user()->id;
@@ -49,7 +53,7 @@ class EmployeesController extends Controller
 
             $fileName = 'doc_' . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
 
-            $filePath = $uploadedFile->storeAs('Document', $fileName, 'public');
+            $filePath = $uploadedFile->storeAs('employeeFiles', $fileName, 'public');
 
             $compDoc = new ComplainDocuments();
             $compDoc->complain_id = $request->complain_id;
