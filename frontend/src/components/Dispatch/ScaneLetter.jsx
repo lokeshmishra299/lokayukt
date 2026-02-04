@@ -435,7 +435,8 @@ const makeFileUrl = (filePath) => {
                 {/* Show message if no search results */}
                 {searchCase.trim() !== "" && filteredComplainList.length === 0 && (
                   <p className="text-xs text-gray-500 mt-1">
-                    No cases found matching "{searchCase}"
+                    {/* No cases found matching "{searchCase}" */}
+                    No cases found matching 
                   </p>
                 )}
                 
