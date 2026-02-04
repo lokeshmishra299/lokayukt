@@ -454,10 +454,11 @@ class PSDashboardController extends Controller
                     $query2=$query2
                     
                     ->whereYear('cmp.created_at', $date->year)
-                                ->where('cmp.approved_rejected_by_ps', 1)
-                                ->where('cmp.approved_rejected_by_lokayukt', 0)
+                                // ->where('cmp.approved_rejected_by_ps', 1)
+                                ->where('cmp.approved_rejected_by_lokayukt', 1)
                                 ->where('rep.forward_by_ps', $userId)
                                 ->whereMonth('cmp.created_at', $date->month)
+                                // ->where('rep.forward_by_uplokayukt', $parentId)
                                 ->distinct('cmp.id')
                                 ->orderByDesc('cmp.id');
 
@@ -474,7 +475,7 @@ class PSDashboardController extends Controller
                       ->whereYear('cmp.created_at', $date->year)
                 ->whereMonth('cmp.created_at', $date->month)
                 ->where('cmp.approved_rejected_by_rk', 1)
-                ->where('cmp.approved_rejected_by_lokayukt', 0)
+                // ->where('cmp.approved_rejected_by_lokayukt', 0)
                   ->distinct('cmp.id')
                      ->where('rep.forward_to_sec', $parentId)
                 ->orderByDesc('cmp.id');
@@ -502,11 +503,11 @@ class PSDashboardController extends Controller
 
             $query2=$query2->whereYear('cmp.created_at', $date->year)
                         ->where('cmp.approved_rejected_by_rk', 1)
-                        ->where('cmp.approved_rejected_by_ps', 1)
-                          ->where('cmp.approved_rejected_by_lokayukt', 1)
+                        // ->where('cmp.approved_rejected_by_ps', 1)
+                        //   ->where('cmp.approved_rejected_by_lokayukt', 1)
                         ->whereMonth('cmp.created_at', $date->month)
                           ->distinct('cmp.id')
-                     ->where('rep.forward_to_sec', $parentId)
+                     ->where('rep.forward_by_sec', $parentId)
                          ->distinct('cmp.id')
                         ->orderByDesc('cmp.id');
 
