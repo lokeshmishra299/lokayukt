@@ -164,6 +164,11 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/edit-filetype/{id}',[CommonController::class,'editFileType']);
         Route::post('/delete-filetype/{id}',[CommonController::class,'removeFileType']);
       
+        Route::get('/budgets',[CommonController::class,'fetch_budget']);
+        Route::post('/add-budget',[CommonController::class,'addBudget']);
+        Route::post('/edit-budget/{id}',[CommonController::class,'editBudget']);
+        Route::post('/delete-budget/{id}',[CommonController::class,'removeBudget']);
+      
          // });
 
     });
