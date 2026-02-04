@@ -496,6 +496,7 @@ const UserManagement = () => {
                         <thead className="bg-gray-50">
                           <tr className="border-b border-gray-200">
                             <th className="text-left py-2 px-4 font-medium text-gray-900">User</th>
+                            <th className="text-left py-2 px-4 font-medium text-gray-900">User Name</th>
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Contact</th>
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Role</th>
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Department</th>
@@ -523,6 +524,15 @@ const UserManagement = () => {
                                     <div>
                                       <div className="font-medium text-sm">{displayValue(user.name)}</div>
                                       <div className="text-xs text-gray-500">{displayValue(user.role?.name)}</div>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="py-2 px-4">
+                                  <div className="flex items-center gap-2">
+                                   
+                                    <div>
+                                      {/* <div className="font-medium text-sm">{displayValue(user.name)}</div> */}
+                                      <div className="text-[13px] font-semibold text-gray-500">{displayValue(user.role?.name)}</div>
                                     </div>
                                   </div>
                                 </td>
