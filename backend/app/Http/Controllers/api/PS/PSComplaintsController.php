@@ -1166,7 +1166,8 @@ $complainDetails->actions = $actions;
                     //  $q->where('rep.forward_to_uplokayukt', $parentId);
                      $q->where('rep.forward_by_ps', $userId);
                  } elseif ($roleParent === 'supervisor') {
-                     $q->where('rep.forward_to_sec', $parentId);
+                     $q->where('rep.forward_by_ps', $userId);
+                    //  $q->where('rep.forward_to_sec', $parentId);
                  } else {
                      // 🔥 fallback (safe)
                      $q->where('rep.forward_to_lokayukt', $parentId)
