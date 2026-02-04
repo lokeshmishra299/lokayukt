@@ -78,45 +78,56 @@ class SupervisorComplaintsController extends Controller
 
         );
 //     $query = DB::table('complaints')
-//     ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
-//     ->select(
-//         'complaints.*',
-//         'dd.district_name as district_name'
-//     )
-//     // ->where('complaints.id', $id)
-//     ->first();
-
-// $query->details = DB::table('complaints_details as cd')
-//     ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
-//     ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
-//     ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
-//     ->leftJoin('subjects as sub', 'cd.subject_id', '=', 'sub.id')
-//     ->select(
-//         'cd.*',
-//         'dp.name as department_name',
-//         'ds.name as designation_name',
-//         'ct.name as complaintype_name',
-//         'sub.name as subject_name'
-//     );
-        // ->where('form_status', 1)
-        // ->where('approved_by_ro', 1);
 
     switch ($userSubrole) {
-        // case "so-us":
-        //     $query->where('form_status', 1)
-        //           ->where('approved_rejected_by_ro', 1)
-        //           ->where('approved_rejected_by_ds_js', 0);
-        //         //   ->where('approved_by_ro', 1);
-        //     // $query->where('complaints.added_by', $user);
-        //     break;
+         case "ro":
+          $query->where('form_status', 1)
+                  ->where('approved_rejected_by_rk', 1)
+                  ->where('approved_rejected_by_ro', 0)
+                  ->where('rep.forward_to_ro', $user)
+                  ->whereOr('rep.forward_to_uplokayukt','<>',0);
+                //   ->where('forward_so', 1)
+                //   ->whereOr('forward_to_uplokayukt', 1);
 
-        // case "ds-js":
-        //   $query->where('form_status', 1)
-        //           ->where('approved_rejected_by_ro', 1)
-        //           ->where('approved_rejected_by_so_us', 0);
-        //         //   ->where('forward_so', 1)
-        //         //   ->whereOr('forward_to_uplokayukt', 1);
-        //     break;
+                 $todayCount = DB::table('complaints')
+                              ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                                ->where('in_draft', 0)
+                                ->whereDate('repN.created_at', today())
+                                 ->where('repN.forward_to_ro', $user)
+                                 ->distinct('complaints.id')
+                                ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('repN.created_at', '<', now()->subDays(7))
+                    ->where('complaints.approved_rejected_by_rk', 1)
+                    ->where('complaints.approved_rejected_by_ro', 0)
+                     ->where('repN.forward_to_ro', $user)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                ->where('complaints.in_draft', 0)
+                ->where('complaints.approved_rejected_by_rk', 1)
+                ->where('complaints.approved_rejected_by_ro', 0)
+                ->where('repN.created_at', '<', now()->subDays(7))   // <-- FIX
+                ->where('repN.forward_to_ro', $user)
+                ->distinct('complaints.id')
+                ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('fee_exempted', 0)
+                    ->where('repN.forward_to_ro', $user)
+                    ->distinct('complaints.id')
+                    ->count();
+            break;
         case "ro-aro":
           $query->where('form_status', 1)
                   ->where('approved_rejected_by_rk', 1)
@@ -223,9 +234,6 @@ class SupervisorComplaintsController extends Controller
 
         case "cio-io":
              $query
-            //  ->where('rep.type', 2)
-                                // ->where('rep.status', 'Investigation Report')
-                                // ->whereNotNull('rep.forward_to_cio_io')
                                  ->where('rep.forward_to_cio_io',$user);
         //    $query->where('form_status', 1)
         //           ->where('approved_rejected_by_ro', 1);
@@ -267,6 +275,54 @@ class SupervisorComplaintsController extends Controller
                     ->where('approved_rejected_by_rk', 1)
                     ->where('fee_exempted', 0)
                     ->where('repN.forward_to_cio_io', $user)
+                    ->distinct('complaints.id')
+                    ->count();
+
+            break;
+
+               case "io":
+             $query
+                                 ->where('rep.forward_to_io',$user);
+        //    $query->where('form_status', 1)
+        //           ->where('approved_rejected_by_ro', 1);
+                //    ->where('forward_to_lokayukt', 1)
+                //   ->whereOr('forward_to_uplokayukt', 1);
+             $todayCount = DB::table('complaints')
+                              ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                                ->where('in_draft', 0)
+                                ->whereDate('repN.created_at', today())
+                                 ->where('repN.forward_to_io', $user)
+                                 ->distinct('complaints.id')
+                                ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('repN.created_at', '<', now()->subDays(7))
+                    ->where('complaints.approved_rejected_by_rk', 1)
+                    ->where('complaints.approved_rejected_by_io', 0)
+                     ->where('repN.forward_to_io', $user)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                ->where('complaints.in_draft', 0)
+                ->where('complaints.approved_rejected_by_rk', 1)
+                ->where('complaints.approved_rejected_by_io', 0)
+                ->where('repN.created_at', '<', now()->subDays(7))   // <-- FIX
+                ->where('repN.forward_to_io', $user)
+                ->distinct('complaints.id')
+                ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('fee_exempted', 0)
+                    ->where('repN.forward_to_io', $user)
                     ->distinct('complaints.id')
                     ->count();
 
@@ -1652,6 +1708,24 @@ $complainDetails->actions = $actions;
                   ->where('approved_rejected_by_rk', 1)
                   ->where('approved_rejected_by_cio_io', 1)
                   ->where('rep.forward_by_cio_io', $user); 
+               
+            break;
+
+             case "ro":
+          $complainDetails
+          ->where('approved_rejected_by_ro', 1)
+          ->where('rep.status','Forwarded')
+          ->where('rep.forward_by_ro', $user);
+                //   ->where('approved_rejected_by_rk', 1)
+                //   ->where('cm.approved_rejected_by_ro_aro', 1)
+           
+            break;
+
+        case "io":
+           $complainDetails->where('rep.status', 'Forwarded')
+                  ->where('approved_rejected_by_rk', 1)
+                  ->where('approved_rejected_by_io', 1)
+                  ->where('rep.forward_by_io', $user); 
                
             break;
 

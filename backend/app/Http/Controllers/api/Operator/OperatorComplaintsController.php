@@ -97,7 +97,7 @@ class OperatorComplaintsController extends Controller
         | 3. Generate Complaint No
         |--------------------------------------------*/
         $year = date('Y');
-        $complaintNo = str_pad($complaintId, 6, '0', STR_PAD_LEFT) . '/' . $year;
+        $complaintNo = str_pad($complaintId, 6, '0', STR_PAD_LEFT) . '-' . $year;
 
         DB::table('complaints')->where('id', $complaintId)
             ->update(['complain_no' => $complaintNo]);

@@ -13,6 +13,9 @@ use App\Models\Role;
 use App\Models\Subjects;
 use App\Models\Category;
 use App\Models\SubRole;
+use App\Models\Topics;
+use App\Models\Budget;
+use App\Models\EmployeeFiles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -41,6 +44,24 @@ class CommonController extends Controller
         $designation = Subjects::get();
         // dd($designation->toArray());
         return ApiResponse::generateResponse('success','Subject fetch successfully',$designation);
+    }
+    public function fetch_topics(){
+
+        $topics = Topics::get();
+        // dd($topics->toArray());
+        return ApiResponse::generateResponse('success','Topics fetch successfully',$topics);
+    }
+    public function fetch_fileType(){
+
+        $fileType = EmployeeFiles::get();
+        // dd($fileType->toArray());
+        return ApiResponse::generateResponse('success','Topics fetch successfully',$fileType);
+    }
+    public function fetch_budget(){
+
+        $fileType = Budget::get();
+        // dd($fileType->toArray());
+        return ApiResponse::generateResponse('success','Budgets fetch successfully',$fileType);
     }
     
     public function fetch_complainstype(){
@@ -793,6 +814,304 @@ class CommonController extends Controller
                     ], 200);
                 }
     }
+        public function addTopic(Request $request)
+    {
+
+        $validation = Validator::make($request->all(), [
+            'name' => 'required|string|max:150',
+         
+          
+        ], [
+            'name.required' => 'Name is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        $Category = new Topics();
+        $Category->name = $request->name;
+        $Category->status = 1;
+    
+        $Category->save(); // ✅ Insert into DB
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Topic added successfully.',
+            'data' => $Category
+        ], 201);
+    }
+
+       public function editTopic(Request $request,$id)
+    {
+        // dd($request->all());
+        $validation = Validator::make($request->all(), [
+            'name' => 'required|string|max:150',
+              
+        ], [
+            'name.required' => 'Name is required.',   
+           
+        ]);
+
+       
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        $Category = Topics::find($id);
+
+         if(!$Category){
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid designation ID.'
+            ], 400);
+
+        }
+
+        $Category->name = $request->name;
+        $Category->name_h = $request->name_h;
+        $Category->status = 1;
+    
+        $Category->save(); // ✅ Insert into DB
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Topic update successfully.',
+            'data' => $Category
+        ], 200);
+    }
+    public function removeTopic(Request $request,$id)
+        {
+            $id = $request->id;
+            $Category = Topics::find($id);
+            if (!$Category) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Topic not found.'
+                ], 404);
+            }
+            if($Category->delete()){
+
+            return response()->json([
+                        'status' => true,
+                        'message' => 'Category deleted successfully.'
+                    ], 200);
+                }
+    }
+
+       public function addFileType(Request $request)
+    {
+
+        $validation = Validator::make($request->all(), [
+            'name' => 'required|string|max:150',
+         
+          
+        ], [
+            'name.required' => 'Name is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        $Category = new EmployeeFiles();
+        $Category->name = $request->name;
+        $Category->status = 1;
+    
+        $Category->save(); // ✅ Insert into DB
+
+        return response()->json([
+            'status' => true,
+            'message' => 'FileType added successfully.',
+            'data' => $Category
+        ], 201);
+    }
+
+       public function editFileType(Request $request,$id)
+    {
+        // dd($request->all());
+        $validation = Validator::make($request->all(), [
+            'name' => 'required|string|max:150',
+              
+        ], [
+            'name.required' => 'Name is required.',   
+           
+        ]);
+
+       
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        $Category = EmployeeFiles::find($id);
+
+         if(!$Category){
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid designation ID.'
+            ], 400);
+
+        }
+
+        $Category->name = $request->name;
+        $Category->name_h = $request->name_h;
+        $Category->status = 1;
+    
+        $Category->save(); // ✅ Insert into DB
+
+        return response()->json([
+            'status' => true,
+            'message' => 'FileType update successfully.',
+            'data' => $Category
+        ], 200);
+    }
+    public function removeFileType(Request $request,$id)
+        {
+            $id = $request->id;
+            $Category = EmployeeFiles::find($id);
+            if (!$Category) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'FileType not found.'
+                ], 404);
+            }
+            if($Category->delete()){
+
+            return response()->json([
+                        'status' => true,
+                        'message' => 'FileType deleted successfully.'
+                    ], 200);
+                }
+    }
+       public function addBudget(Request $request)
+    {
+
+        $validation = Validator::make($request->all(), [
+            'expense_type'   => 'required|string|max:100',
+            'expense_money' => 'required|numeric', // decimal / float allowed
+            'remark'        => 'nullable|string|max:250',
+        ], [
+            'expense_type.required'   => 'Expense type is required.',
+            'expense_type.string'     => 'Expense type must be a valid text.',
+
+            'expense_money.required' => 'Expense amount is required.',
+            'expense_money.numeric'  => 'Expense amount must be a number.',
+
+            'remark.string'          => 'Remark must be text only.',
+            'remark.max'             => 'Remark cannot exceed 250 characters.',
+        ]);
+
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        $Category = new Budget();
+        $Category->expense_type = $request->expense_type;
+        $Category->expense_money = $request->expense_money;
+        $Category->remark = $request->remark;
+        $Category->status = 1;
+    
+        $Category->save(); // ✅ Insert into DB
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Budget added successfully.',
+            'data' => $Category
+        ], 201);
+    }
+
+       public function editBudget(Request $request,$id)
+    {
+        // dd($request->all());
+       $validation = Validator::make($request->all(), [
+            'expense_type'   => 'required|string|max:100',
+            'expense_money' => 'required|numeric', // decimal / float allowed
+            'remark'        => 'nullable|string|max:250',
+        ], [
+            'expense_type.required'   => 'Expense type is required.',
+            'expense_type.string'     => 'Expense type must be a valid text.',
+
+            'expense_money.required' => 'Expense amount is required.',
+            'expense_money.numeric'  => 'Expense amount must be a number.',
+
+            'remark.string'          => 'Remark must be text only.',
+            'remark.max'             => 'Remark cannot exceed 250 characters.',
+        ]);
+
+
+       
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        $Category = Budget::find($id);
+
+         if(!$Category){
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid Budget ID.'
+            ], 400);
+
+        }
+
+       $Category->expense_type = $request->expense_type;
+        $Category->expense_money = $request->expense_money;
+        $Category->remark = $request->remark;
+        $Category->status = 1;
+    
+        $Category->save(); // ✅ Insert into DB
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Budget update successfully.',
+            'data' => $Category
+        ], 200);
+    }
+    public function removeBudget(Request $request,$id)
+        {
+            $id = $request->id;
+            $Category = Budget::find($id);
+            if (!$Category) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Budget not found.'
+                ], 404);
+            }
+            if($Category->delete()){
+
+            return response()->json([
+                        'status' => true,
+                        'message' => 'Budget deleted successfully.'
+                    ], 200);
+                }
+    }
+
+
+
        public function fetch_Category(){
 
         $cat = Category::get();

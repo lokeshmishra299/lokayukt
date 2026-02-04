@@ -398,8 +398,7 @@ class PSDashboardController extends Controller
                         // ->where('cmp.district_id', $user_district_code)
                         ->orderByDesc('cmp.id');
 
-            $query1 = $query1
-                      ->whereYear('cmp.created_at', $date->year)
+            $query1 = $query1->whereYear('cmp.created_at', $date->year)
                 ->whereMonth('cmp.created_at', $date->month)
                 ->where('cmp.approved_rejected_by_rk', 1)
                 ->where('cmp.approved_rejected_by_lokayukt', 0)
@@ -407,9 +406,10 @@ class PSDashboardController extends Controller
 
             $query2=$query2->whereYear('cmp.created_at', $date->year)
                         ->where('cmp.approved_rejected_by_rk', 1)
-                        ->where('cmp.approved_rejected_by_ps', 1)
-                          ->where('cmp.approved_rejected_by_lokayukt', 1)
+                        // ->where('cmp.approved_rejected_by_ps', 1)
+                          ->where('cmp.approved_rejected_by_lokayukt', 0)
                         ->whereMonth('cmp.created_at', $date->month)
+                         ->where('rep.forward_by_ps', $userId)
                          ->distinct('cmp.id')
                         ->orderByDesc('cmp.id');
 
@@ -421,13 +421,11 @@ class PSDashboardController extends Controller
                         ->orderByDesc('cmp.id');
     
             }elseif($roleParent ==="up-lok-ayukt"){
-                  $query = $query
-            
-                  ->whereYear('cmp.created_at', $date->year)
+                  $query = $query->join('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id')->whereYear('cmp.created_at', $date->year)
                     ->whereMonth('cmp.created_at', $date->month)
                     ->where('cmp.approved_rejected_by_rk', 1)
                     ->where('cmp.approved_rejected_by_lokayukt', 1)
-                    // ->where('rep.forward_to_ps', $userId)
+                    // ->where('rep.forward_by_uplokayukt', $parentId)
                     ->distinct('cmp.id')
                     ->orderByDesc('cmp.id');
            
@@ -481,7 +479,7 @@ class PSDashboardController extends Controller
                      ->where('rep.forward_to_sec', $parentId)
                 ->orderByDesc('cmp.id');
            
-            $queryDay = $queryDay ->join('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id')
+            $queryDay = $queryDay->join('complaint_actions as rep', 'cmp.id', '=', 'rep.complaint_id')
                         ->where('cmp.approved_rejected_by_rk', 1)
                         ->where('cmp.approved_rejected_by_lokayukt', 0)
                         ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today
