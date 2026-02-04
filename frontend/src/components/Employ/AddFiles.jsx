@@ -4,7 +4,6 @@ import { FaTimes } from "react-icons/fa";
 import { CiLock } from "react-icons/ci";
 import { FiUpload } from "react-icons/fi";
 import axios from "axios";
-// import { ToastContainer, toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -27,57 +26,55 @@ const uploadApi = axios.create({
   },
 });
 
-const AddFiles = ({ complaint }) => {
+// ✅ Removed 'complaint' from props since ID is not needed
+const AddFiles = () => {
   const [correspondenceType, setCorrespondenceType] = useState("Letter");
-  
-  // 1. New State for Title
   const [title, setTitle] = useState("");
-  
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
- const handleFileUpload = (e) => {
-  setFieldErrors((prev) => ({ ...prev, file: undefined }));
+  const handleFileUpload = (e) => {
+    setFieldErrors((prev) => ({ ...prev, file: undefined }));
 
-  const files = Array.from(e.target.files);
-  const pdfFiles = files.filter((file) => file.type === "application/pdf");
+    const files = Array.from(e.target.files);
+    const pdfFiles = files.filter((file) => file.type === "application/pdf");
 
-  if (pdfFiles.length !== files.length) {
-    toast.error("Only PDF files are allowed!");
-    return;
-  }
+    if (pdfFiles.length !== files.length) {
+      toast.error("Only PDF files are allowed!");
+      return;
+    }
 
-  setUploadedFiles((prevFiles) => {
-    let updatedFiles = [...prevFiles];
+    setUploadedFiles((prevFiles) => {
+      let updatedFiles = [...prevFiles];
 
-    pdfFiles.forEach((file) => {
-      const existingIndex = updatedFiles.findIndex(
-        (f) => f.name === file.name // same name = same file
-      );
+      pdfFiles.forEach((file) => {
+        const existingIndex = updatedFiles.findIndex(
+          (f) => f.name === file.name
+        );
 
-      const newFileObj = {
-        id: Date.now() + Math.random(),
-        file,
-        name: file.name,
-        size: (file.size / 1024).toFixed(2),
-        uploadDate: new Date().toLocaleDateString(),
-      };
+        const newFileObj = {
+          id: Date.now() + Math.random(),
+          file,
+          name: file.name,
+          size: (file.size / 1024).toFixed(2),
+          uploadDate: new Date().toLocaleDateString(),
+        };
 
-      if (existingIndex !== -1) {
-        // 🔁 Replace at same index
-        updatedFiles[existingIndex] = newFileObj;
-      } else {
-        // ➕ Add new file
-        updatedFiles.push(newFileObj);
-      }
+        if (existingIndex !== -1) {
+          // Replace at same index
+          updatedFiles[existingIndex] = newFileObj;
+        } else {
+          // Add new file
+          updatedFiles.push(newFileObj);
+        }
+      });
+
+      return updatedFiles;
     });
 
-    return updatedFiles;
-  });
-
-  e.target.value = null;
-};
+    e.target.value = null;
+  };
 
   const handleRemoveFile = (fileId) => {
     setUploadedFiles((prev) => prev.filter((file) => file.id !== fileId));
@@ -86,51 +83,48 @@ const AddFiles = ({ complaint }) => {
   const uploadDocument = async () => {
     setFieldErrors({});
 
-    if (!complaint?.id) {
-      toast.error("Complaint ID is missing");
-      return;
+    // ❌ Removed complaint ID check here
+
+    if (!title.trim()) {
+        setFieldErrors((prev) => ({ ...prev, title: ["Title is required"] }));
+        return;
     }
 
-    // Validation: Title is optional? If mandatory, uncomment below:
-    /*
-    if (!title.trim()) {
-      setFieldErrors((prev) => ({ ...prev, title: ["Title is required"] }));
-      return;
+    if (uploadedFiles.length === 0) {
+        setFieldErrors((prev) => ({ ...prev, file: ["Please select at least one file."] }));
+        return;
     }
-    */
 
     setIsUploading(true);
 
     try {
       const formData = new FormData();
 
-      // uploadedFiles.forEach((fileData) => {
-      //   formData.append("file", fileData.file);
-      // });
+      // 1. Append Files
+      uploadedFiles.forEach((fileData) => {
+        formData.append("file", fileData.file); 
+      });
 
-      // File Uplode Array
-      uploadedFiles.forEach((fileData, index) => {
-  formData.append(`file[${index}]`, fileData.file);
-});
+      // 2. Append Type and Title
       formData.append("type", correspondenceType);
-      
-      // 2. Append Title to Form Data
       formData.append("title", title);
       
-      formData.append("complain_id", complaint.id);
+      // ❌ Removed complain_id append
 
-      await uploadApi.post("/operator/upload-document", formData);
+      // 3. Send POST Request
+      await uploadApi.post("/emp/upload-file", formData);
 
       toast.success("Uploaded document successfully!");
       setUploadedFiles([]);
-      setTitle(""); // Clear title after upload
+      setTitle(""); 
+      setCorrespondenceType("Letter"); 
     } catch (error) {
       const res = error.response?.data;
 
       if (res?.errors) {
         setFieldErrors(res.errors);
-        // const firstKey = Object.keys(res.errors)[0];
-        // const firstMsg = res.errors[firstKey]?.[0];
+        const firstKey = Object.keys(res.errors)[0];
+        const firstMsg = res.errors[firstKey]?.[0];
         if (firstMsg) toast.error(firstMsg);
       } else if (res?.message) {
         toast.error(res.message);
@@ -145,16 +139,13 @@ const AddFiles = ({ complaint }) => {
   return (
     <>
       <div className="space-y-6 w-full">
-        {/* Warning Box */}
-        {/* <div className="p-4 bg-yellow-50 text-yellow-700 border border-yellow-500 rounded-lg"> */}
-          <div className="flex items-start gap-3">
-            <div>
-                <h1 className="text-xl font-bold text-gray-900">Add Files</h1>
-                <p className="text-sm sm:text-base text-gray-600 break-words">
-                 फ़ाइल जोड़ें 
-                </p>
-              </div>
-          {/* </div> */}
+        <div className="flex items-start gap-3">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Add Files</h1>
+            <p className="text-sm sm:text-base text-gray-600 break-words">
+              फ़ाइल जोड़ें
+            </p>
+          </div>
         </div>
 
         {/* Upload Box */}
@@ -169,8 +160,8 @@ const AddFiles = ({ complaint }) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             
-
-              <div>
+            {/* Title Input */}
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Document Title <span className="text-red-500">*</span>
               </label>
@@ -216,8 +207,6 @@ const AddFiles = ({ complaint }) => {
               )}
             </div>
 
-            {/* 3. Title Input Field */}
-          
           </div>
 
           {/* PDF Upload Input */}

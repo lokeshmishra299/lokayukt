@@ -26,6 +26,7 @@ import AdminEditEmploymentManagement from './components/Admin/EditEmploymentMana
 
 
 
+
 // Admin
 import EmployLayout from './components/Employ/Layout';
 import EmployDashboard from './components/Employ/Dashboard';
@@ -34,6 +35,7 @@ import EmployComplaints from './components/Employ/Complaints';
 // import EmploySearchReports from './components/Employ/SearchReports';
 import EmployUserManagement from './components/Employ/UserManagement';
 import EmployAddFiles from './components/Employ/AddFiles';
+import EmployViewFiles from './components/Employ/ViewFiles';
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
 // import EmployEditUserManagment from './components/Employ/EditUserManagment';
@@ -334,6 +336,7 @@ import DispatchScaneLetter from "./components/Dispatch/ScaneLetter"
 import DispatchUserManagement from './components/Dispatch/UserManagement';
 
 
+
 // import DispatchAddUserManagement from './components/Dispatch/AddUserManagement';
 // import LokayuktEditUserManagement from './components/LokAyukta/EditUserManagment';
 // import LokayuktMasterData from './components/LokAyukta/MasterData';
@@ -382,6 +385,7 @@ function App() {
           <Route path="dashboard" element={<EmployDashboard />} />
           <Route path="complaints" element={<EmployComplaints />} />
           <Route path="add-files" element={<EmployAddFiles />} />
+          <Route path="view-files" element={<EmployViewFiles />} />
           {/* <Route path="employment-management" element={<AdminEmploymentManagement />} /> */}
           {/* <Route path="search-reports/view/:id" element={<AdminViewComplaints />} />
           <Route path="search-reports/edit/:id" element={<AdminEditComplaint />} />
