@@ -339,16 +339,16 @@ class UserManagement extends Controller
             'user_name'    => $userName,
             'password1'    => $request->password,
             'password'     => bcrypt('password123'),
-            'user_type'     => 'employee',
+            'user_type'     => "employee",
         ]);
 
 
 
-    if ($user->role_id == 6) {
-            $user->update([
-                'parent_user_id' => $request->ps_parent
-            ]);
-        }
+    // if ($user->role_id == 6) {
+    //         $user->update([
+    //             'parent_user_id' => $request->ps_parent
+    //         ]);
+    //     }
         // dd($user);
 
         return response()->json([
