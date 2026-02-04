@@ -160,7 +160,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
             `}
           >
             <FaUserGroup  />
-            {(!isCollapsed || isMobile) && "Employ Management"}
+            {(!isCollapsed || isMobile) && "Employee Management"}
           </Link>
 
           {/* Master Data */}
