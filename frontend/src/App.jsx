@@ -19,6 +19,8 @@ import AdminEditComplaint from './components/Admin/EditComplaint';
 import AdminFileAdministrator from './components/Admin/FileAdministrator';
 import AdminEmploymentManagement from './components/Admin/EmploymentManagement';
 import AdminAddEmploymentManagement from './components/Admin/AddEmploymentManagement';
+import AdminEditEmploymentManagement from './components/Admin/EditEmploymentManagement';
+
 
 
 
@@ -31,6 +33,7 @@ import EmployComplaints from './components/Employ/Complaints';
 // import EmployProgressRegister from './components/Employ/ProgressRegister';
 // import EmploySearchReports from './components/Employ/SearchReports';
 import EmployUserManagement from './components/Employ/UserManagement';
+import EmployAddFiles from './components/Employ/AddFiles';
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
 // import EmployEditUserManagment from './components/Employ/EditUserManagment';
@@ -330,6 +333,7 @@ import DispatchScaneLetter from "./components/Dispatch/ScaneLetter"
 // import LokayuktUserManagement from './components/LokAyukta/UserManagement';
 import DispatchUserManagement from './components/Dispatch/UserManagement';
 
+
 // import DispatchAddUserManagement from './components/Dispatch/AddUserManagement';
 // import LokayuktEditUserManagement from './components/LokAyukta/EditUserManagment';
 // import LokayuktMasterData from './components/LokAyukta/MasterData';
@@ -366,15 +370,18 @@ function App() {
           <Route path="file-administrator" element={<AdminFileAdministrator />} />
           <Route path="employment-management" element={<AdminEmploymentManagement />} />
           <Route path="employment-management/add" element={<AdminAddEmploymentManagement />} />
+          <Route path="employment-management/edit/:id" element={<AdminEditEmploymentManagement />} />
+
 
         </Route>
       )}
 
 
  {role === 'emp' && (
-        <Route path="/employ" element={<EmployLayout />}>
+        <Route path="/employee" element={<EmployLayout />}>
           <Route path="dashboard" element={<EmployDashboard />} />
           <Route path="complaints" element={<EmployComplaints />} />
+          <Route path="add-files" element={<EmployAddFiles />} />
           {/* <Route path="employment-management" element={<AdminEmploymentManagement />} /> */}
           {/* <Route path="search-reports/view/:id" element={<AdminViewComplaints />} />
           <Route path="search-reports/edit/:id" element={<AdminEditComplaint />} />

@@ -70,7 +70,7 @@ const Login = () => {
           }
 
           else if (userRole === "emp"){
-            window.open("/employ/dashboard", "_self");
+            window.open("/employee/dashboard", "_self");
             localStorage.setItem('subrole', response.data.data.user.subrole.name);
 
 

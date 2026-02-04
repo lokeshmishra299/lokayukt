@@ -11,6 +11,7 @@ import {
   FaTimes
 } from "react-icons/fa";
 import { IoFileTray } from "react-icons/io5";
+import { FaFileSignature } from "react-icons/fa6";
 
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
   const location = useLocation();
@@ -24,7 +25,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
   }, []);
 
   const isActive = (href) => {
-    const fullPath = `/admin${href}`;
+    const fullPath = `/employee${href}`;
     if (href === "/dashboard") return location.pathname === fullPath;
     return location.pathname.startsWith(fullPath);
   };
@@ -69,7 +70,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
 
           {/* Dashboard */}
           <Link
-            to="/employ/dashboard"
+            to="/employee/dashboard"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
               ${isActive("/dashboard")
@@ -132,8 +133,8 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           </Link> */}
 
           {/* User Management */}
-          <Link
-            to="/employ/user-management"
+          {/* <Link
+            to="/employee/user-management"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
               ${isActive("/user-management")
@@ -145,6 +146,21 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <FaUsers />
             {(!isCollapsed || isMobile) && "User Management"}
+          </Link> */}
+          {/* User Management */}
+          <Link
+            to="/employee/add-files"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+              ${isActive("/add-files")
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-700 hover:bg-gray-200"
+              }
+              ${isCollapsed && !isMobile ? "justify-center" : ""}
+            `}
+          >
+            <FaFileSignature />
+            {(!isCollapsed || isMobile) && "Add Files"}
           </Link>
 
           {/* Master Data */}

@@ -12,7 +12,9 @@ import {
   FaFileAlt,
   FaSpinner,
   FaChartPie,
-  FaDatabase
+  FaDatabase,
+  FaExclamationTriangle
+
 } from 'react-icons/fa';
 
 // --- 1. API Configuration ---
@@ -37,12 +39,16 @@ const formatDate = (dateString) => {
 
 const FileAdministrator = () => {
   const queryClient = useQueryClient();
+  const [formErrors, setFormErrors] = useState({});
   const [activeTab, setActiveTab] = useState('topics');
+  const [modalType, setModalType] = useState('form');
+  
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [editId, setEditId] = useState(null);
   const [nameInput, setNameInput] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [budgetForm, setBudgetForm] = useState({
     expense_type: "",
@@ -80,19 +86,39 @@ const FileAdministrator = () => {
   // --- TOPICS MUTATIONS ---
   const addTopicMutation = useMutation({
     mutationFn: (data) => api.post('/admin/add-topic', data),
-    onSuccess: () => { queryClient.invalidateQueries(['topics']); toast.success('Topic added'); closeModal(); },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error adding topic')
+    onSuccess: () => { queryClient.invalidateQueries(['topics']); toast.success('Topic added');
+        setFormErrors({});
+      closeModal(); },
+    // onError: (err) => toast.error(err.response?.data?.message || 'Error adding topic')
+    onError: (err) => {
+  if (err.response?.data?.errors) {
+    setFormErrors(err.response.data.errors);
+  }
+  // toast.error("Validation error");
+}
+
   });
 
   const editTopicMutation = useMutation({
     mutationFn: ({ id, data }) => api.post(`/admin/edit-topic/${id}`, data),
-    onSuccess: () => { queryClient.invalidateQueries(['topics']); toast.success('Topic updated'); closeModal(); },
-    onError: (err) => toast.error(err.response?.data?.message || 'Error updating topic')
+    onSuccess: () => { queryClient.invalidateQueries(['topics']); toast.success('Topic updated'); 
+        setFormErrors({});
+      closeModal(); },
+    // onError: (err) => toast.error(err.response?.data?.message || 'Error updating topic')
+    onError: (err) => {
+  if (err.response?.data?.errors) {
+    setFormErrors(err.response.data.errors);
+  }
+  // toast.error("Validation error");
+}
+
   });
 
   const deleteTopicMutation = useMutation({
     mutationFn: (id) => api.post(`/admin/delete-topic/${id}`),
-    onSuccess: () => { queryClient.invalidateQueries(['topics']); toast.success('Topic deleted'); },
+    onSuccess: () => { queryClient.invalidateQueries(['topics']); 
+        setFormErrors({});
+      toast.success('Topic deleted'); },
     onError: (err) => toast.error(err.response?.data?.message || 'Error deleting topic')
   });
 
@@ -147,51 +173,47 @@ const FileAdministrator = () => {
 
 
   const openAddModal = () => {
-    setModalMode('add');
-    setEditId(null);
-    
-    // Reset inputs
-    setNameInput("");
-    setBudgetForm({
-      expense_type: "",
-      expense_money: "",
-      remark: ""
-    });
-
-    setIsModalOpen(true);
-  };
+  setFormErrors({});
+  setModalType('form');   // ⭐ ADD THIS
+  setModalMode('add');
+  setEditId(null);
+  setNameInput("");
+  setBudgetForm({ expense_type: "", expense_money: "", remark: "" });
+  setIsModalOpen(true);
+};
 
   const openEditModal = (item) => {
-    setModalMode('edit');
-    setEditId(item.id);
+  setModalType('form');   // ⭐ ADD THIS
+  setModalMode('edit');
+  setEditId(item.id);
 
-    if (activeTab === 'budget') {
-      setBudgetForm({
-        expense_type: item.expense_type,
-        expense_money: item.expense_money,
-        remark: item.remark
-      });
-    } else {
-      setNameInput(item.name);
-    }
+  if (activeTab === 'budget') {
+    setBudgetForm({
+      expense_type: item.expense_type,
+      expense_money: item.expense_money,
+      remark: item.remark
+    });
+  } else {
+    setNameInput(item.name);
+  }
 
-    setIsModalOpen(true);
-  };
+  setIsModalOpen(true);
+};
+
 
   const closeModal = () => {
+     setFormErrors({});
     setIsModalOpen(false);
     setNameInput("");
     setBudgetForm({ expense_type: "", expense_money: "", remark: "" });
     setEditId(null);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm("Delete this item?")) {
-      if (activeTab === 'topics') deleteTopicMutation.mutate(id);
-      else if (activeTab === 'filetypes') deleteFileTypeMutation.mutate(id);
-      else if (activeTab === 'budget') deleteBudgetMutation.mutate(id);
-    }
-  };
+const handleDeleteClick = (id) => {
+  setEditId(id);
+  setModalType('delete');
+  setIsModalOpen(true);
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -229,6 +251,24 @@ const FileAdministrator = () => {
       </span>
     );
   };
+
+
+ const confirmDelete = async () => {
+  try {
+    setIsDeleting(true);
+
+    if (activeTab === 'topics') await deleteTopicMutation.mutateAsync(editId);
+    else if (activeTab === 'filetypes') await deleteFileTypeMutation.mutateAsync(editId);
+    else if (activeTab === 'budget') await deleteBudgetMutation.mutateAsync(editId);
+
+    closeModal();
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setIsDeleting(false);
+  }
+};
+
 
   const getPlaceholder = () => {
   if (activeTab === 'topics') return "Enter Topic Name";
@@ -323,7 +363,13 @@ const FileAdministrator = () => {
                           <td className="p-4 text-right">
                             <div className="flex justify-end gap-3">
                               <button onClick={() => openEditModal(item)} className="text-blue-600 hover:text-blue-800"><FaEdit /></button>
-                              <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button>
+                              {/* <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button> */}
+                              <button onClick={(e) => {
+  e.stopPropagation();
+  handleDeleteClick(item.id);
+}} className="text-red-500 hover:text-red-700">
+  <FaTrash />
+</button>
                             </div>
                           </td>
                         </tr>
@@ -365,7 +411,13 @@ const FileAdministrator = () => {
                           <td className="p-4 text-right">
                             <div className="flex justify-end gap-3">
                               <button onClick={() => openEditModal(item)} className="text-blue-600 hover:text-blue-800"><FaEdit /></button>
-                              <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button>
+                              {/* <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button> */}
+                              <button onClick={(e) => {
+  e.stopPropagation();
+  handleDeleteClick(item.id);
+}} className="text-red-500 hover:text-red-700">
+  <FaTrash />
+</button>
                             </div>
                           </td>
                         </tr>
@@ -409,7 +461,13 @@ const FileAdministrator = () => {
                           <td className="p-4 text-right">
                             <div className="flex justify-end gap-3">
                                 <button onClick={() => openEditModal(item)} className="text-blue-600 hover:text-blue-800"><FaEdit /></button>
-                                <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button>
+                                {/* <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button> */}
+                                <button onClick={(e) => {
+  e.stopPropagation();
+  handleDeleteClick(item.id);
+}} className="text-red-500 hover:text-red-700">
+  <FaTrash />
+</button>
                             </div>
                           </td>
                         </tr>
@@ -440,67 +498,112 @@ const FileAdministrator = () => {
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              
-              {/* Conditional Rendering for Fields */}
-              {activeTab === 'budget' ? (
-                <>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Expense Type *</label>
-                    <input 
-                      type="text"
-                      value={budgetForm.expense_type} 
-                      onChange={(e) => setBudgetForm({...budgetForm, expense_type: e.target.value})} 
-                      required 
-                      placeholder="Enter Expense Type"
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123463] outline-none" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Expense Amount (₹) *</label>
-                    <input 
-                      type="number"
-                      value={budgetForm.expense_money} 
-                      onChange={(e) => setBudgetForm({...budgetForm, expense_money: e.target.value})} 
-                      required 
-                      placeholder="Expense Amount"
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123463] outline-none" 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Remark</label>
-                    <textarea 
-                      value={budgetForm.remark} 
-                      onChange={(e) => setBudgetForm({...budgetForm, remark: e.target.value})} 
-                      placeholder="Enter Remark"
-                      rows={3}
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123463] outline-none" 
-                    />
-                  </div>
-                </>
-              ) : (
-                // For Topics and File Types
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                  <input 
-                    value={nameInput} 
-                    // placeholder='Enter Topic Name.'
-                    placeholder={getPlaceholder()}
-                    onChange={(e) => setNameInput(e.target.value)} 
-                    required 
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#123463] outline-none" 
-                  />
-                </div>
-              )}
+        {modalType === 'form' ? (
 
-              {/* Form Footer */}
-              <div className="flex justify-end gap-3 pt-4 border-t">
-                <button type="button" onClick={closeModal} className="px-4 py-2 text-sm border rounded-lg hover:bg-gray-50">Cancel</button>
-                <button type="submit" disabled={isSubmitting} className="px-4 py-2 text-sm text-white bg-[#123463] rounded-lg hover:bg-[#0e2a4e] flex items-center gap-2">
-                  {isSubmitting ? <FaSpinner className="animate-spin" /> : <FaSave />} Save
-                </button>
-              </div>
-            </form>
+  <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+    {activeTab === 'budget' ? (
+      <>
+        <div>
+          <label className="block text-sm font-medium mb-1">Expense Type *</label>
+          <input
+            value={budgetForm.expense_type}
+            onChange={(e) => setBudgetForm({...budgetForm, expense_type: e.target.value})}
+            className="w-full px-3 py-2 border rounded-lg"
+          />
+          {formErrors.expense_type && <p className="text-red-500 text-xs mt-1">{formErrors.expense_type[0]}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Expense Amount *</label>
+          <input
+            type="number"
+            value={budgetForm.expense_money}
+            onChange={(e) => setBudgetForm({...budgetForm, expense_money: e.target.value})}
+            className="w-full px-3 py-2 border rounded-lg"
+          />
+          {formErrors.expense_money && <p className="text-red-500 text-xs mt-1">{formErrors.expense_money[0]}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Remark</label>
+          <textarea
+            value={budgetForm.remark}
+            onChange={(e) => setBudgetForm({...budgetForm, remark: e.target.value})}
+            className="w-full px-3 py-2 border rounded-lg"
+          />
+        </div>
+      </>
+    ) : (
+      <div>
+        <label className="block text-sm font-medium mb-1">Name *</label>
+        <input
+          value={nameInput}
+          placeholder={getPlaceholder()}
+          onChange={(e) => setNameInput(e.target.value)}
+          className="w-full px-3 py-2 border rounded-lg"
+        />
+        {formErrors.name && <p className="text-red-500 text-xs mt-1">{formErrors.name[0]}</p>}
+      </div>
+    )}
+
+    <div className="flex justify-end gap-3 pt-4 border-t">
+      <button type="button" onClick={closeModal} className="px-4 py-2 border rounded-lg">Cancel</button>
+      <button type="submit" className="px-4 py-2 text-white bg-[#123463] rounded-lg flex items-center gap-2">
+        {isSubmitting ? <FaSpinner className="animate-spin"/> : <FaSave />} Save
+      </button>
+    </div>
+  </form>
+
+) : (
+
+
+
+
+
+<div className="p-6">
+  <div className="flex items-center gap-3 mb-4">
+    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+      <FaExclamationTriangle className="w-5 h-5 text-red-600" />
+    </div>
+    <div>
+      <h3 className="text-lg font-semibold text-gray-900">Confirm Delete</h3>
+      <p className="text-sm text-gray-500">This action cannot be undone</p>
+    </div>
+  </div>
+
+  <p className="text-gray-700 mb-6">
+    Are you sure you want to delete this item?
+  </p>
+
+  <div className="flex justify-end gap-3">
+    <button
+      onClick={closeModal}
+      disabled={isDeleting}
+      className="px-4 py-2 text-sm border rounded-md"
+    >
+      Cancel
+    </button>
+
+    <button
+      onClick={confirmDelete}
+      disabled={isDeleting}
+      className="px-4 py-2 text-sm text-white bg-red-600 rounded-md flex items-center gap-2"
+    >
+      {isDeleting ? <FaSpinner className="animate-spin w-4 h-4" /> : <FaTrash className="w-4 h-4" />}
+      {isDeleting ? "Deleting..." : "Delete"}
+    </button>
+  </div>
+</div>
+
+
+  
+
+
+  
+
+)}
+
           </div>
         </div>
       )}

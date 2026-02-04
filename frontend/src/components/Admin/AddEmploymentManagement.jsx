@@ -278,7 +278,7 @@ const handleSubmit = async (e) => {
   console.log("Submitting payload:", payload);
 
   try {
-    const response = await api.post('/admin/add-user', payload); // ✅ सही payload भेजें
+    const response = await api.post('/admin/add-employee', payload); 
     
     if (response.data.status === true) {
       toast.success(response.data.message || 'User created successfully!');
@@ -288,7 +288,8 @@ const handleSubmit = async (e) => {
         name: '',
         email: '',
         number: '',
-        role_id: '',
+        // role_id: '',
+        role_id: '8',
         sub_role_id: '',
         ps_parent: "",
         designation: '',
@@ -350,7 +351,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Add New User</h1>
+            <h1 className="text-xl font-bold text-gray-900">Add New Employee</h1>
             <p className="text-xs sm:text-sm text-gray-600">Create a new user account</p>
           </div>
           <div>
@@ -371,8 +372,8 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
             <div className="flex items-center gap-3 mb-4">
               <FaUser className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
               <div>
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900">User Information</h2>
-                <p className="text-xs sm:text-sm text-gray-500">Basic user details</p>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Employee Information</h2>
+                <p className="text-xs sm:text-sm text-gray-500">Basic Employee details</p>
               </div>
             </div>
 
@@ -464,16 +465,22 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
     <select
       id="role_id"
       name="role_id"
+      // value="8"
       value={formData.role_id}
+      // disabled
       onChange={handleInputChange}
       className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
         errors.role_id ? 'border-red-500' : 'border-gray-300'
       }`}
     >
       <option value="">Select Role</option>
-      {roles.map(role => (
-        <option key={role.id} value={role.id}>{role.label}</option>
-      ))}
+       {roles
+    .filter(role => role.id === 8)
+    .map(role => (
+      <option key={role.id} value={role.id}>
+        {role.label}
+      </option>
+  ))}
     </select>
     {errors.role_id && (
       <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -483,44 +490,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
   </div>
 
   {/* SUB ROLE - केवल role_id != 6 होने पर दिखेगा */}
-  {!isPersonalSecretary && (
-    <div>
-      <label htmlFor="sub_role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-        Sub Role *
-      </label>
-      <select
-        id="sub_role_id"
-        name="sub_role_id"
-        value={formData.sub_role_id}
-        onChange={handleInputChange}
-        disabled={!formData.role_id || isLoadingSubRoles}
-        className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
-          errors.sub_role_id ? 'border-red-500' : 'border-gray-300'
-        } ${(!formData.role_id || isLoadingSubRoles) ? 'opacity-50 cursor-not-allowed' : ''}`}
-      >
-        <option value="">
-          {!formData.role_id 
-            ? 'First select a role' 
-            : isLoadingSubRoles 
-              ? 'Loading sub-roles...' 
-              : subRoles.length === 0 
-                ? 'No sub-roles'
-                : 'Select Sub Role'
-          }
-        </option>
-        {subRoles.map(subRole => (
-          <option key={subRole.id} value={subRole.id}>
-            {subRole.label || subRole.name}
-          </option>
-        ))}
-      </select>
-      {errors.sub_role_id && (
-        <p className="mt-1 text-sm text-red-600 flex items-center">
-          {errors.sub_role_id}
-        </p>
-      )}
-    </div>
-  )}
+ 
 
   {/* LOKAYUKT-UPLOKAYUKT - केवल role_id = 6 होने पर दिखेगा */}
   {isPersonalSecretary && (
@@ -723,7 +693,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                 ) : (
                   <>
                     <FaPaperPlane className="w-4 h-4" />
-                    Create User
+                    Create Employee
                   </>
                 )}
               </button>

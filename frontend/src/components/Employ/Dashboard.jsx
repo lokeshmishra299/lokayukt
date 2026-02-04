@@ -33,9 +33,13 @@ import {
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
+
 
 // Create axios instance with token if it exists
 const api = axios.create({
@@ -46,28 +50,12 @@ const api = axios.create({
   },
 });
 
-// ✅ NEW: Role Mapping Function
-const mapRoleToDisplayName = (apiRole) => {
-  const roleMapping = {
-    'ro-aro': 'RO/ARO',
-    'entry-operator': 'Entry Operator',
-    'review-operator': 'Review Operator', 
-    'so-us': 'Section Officer',
-    'ds-js': 'DS/JS',
-    'sec': 'Secretary',
-    'cio-io': 'CIO/IO',
-    'dea-assis': 'DEA Assistant'
-  };
-  
-  // Convert to lowercase for comparison and return mapped name or original
-  const normalizedRole = apiRole?.toLowerCase?.() || '';
-  return roleMapping[normalizedRole] || apiRole || 'Unknown Role';
-};
 
 // Utility function for className merging
 const cn = (...classes) => {
   return classes.filter(Boolean).join(' ');
 };
+
 
 // Card Components
 const Card = React.forwardRef(({ className, ...props }, ref) => (
@@ -82,6 +70,7 @@ const Card = React.forwardRef(({ className, ...props }, ref) => (
 ));
 Card.displayName = "Card";
 
+
 const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
@@ -90,6 +79,7 @@ const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
   />
 ));
 CardHeader.displayName = "CardHeader";
+
 
 const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
   <h3
@@ -103,10 +93,12 @@ const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
 ));
 CardTitle.displayName = "CardTitle";
 
+
 const CardContent = React.forwardRef(({ className, ...props }, ref) => (
   <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
+
 
 // Badge Component
 const Badge = ({ children, variant = "default", className, ...props }) => {
@@ -120,6 +112,7 @@ const Badge = ({ children, variant = "default", className, ...props }) => {
         return 'bg-blue-100 text-blue-800 border-blue-200';
     }
   };
+
 
   return (
     <div
@@ -135,6 +128,7 @@ const Badge = ({ children, variant = "default", className, ...props }) => {
   );
 };
 
+
 // Button Component
 const Button = React.forwardRef(({ className, variant = "default", size = "default", ...props }, ref) => {
   const getVariantClasses = () => {
@@ -148,6 +142,7 @@ const Button = React.forwardRef(({ className, variant = "default", size = "defau
     }
   };
 
+
   const getSizeClasses = () => {
     switch (size) {
       case 'sm':
@@ -158,6 +153,7 @@ const Button = React.forwardRef(({ className, variant = "default", size = "defau
         return 'h-10 px-4 py-2';
     }
   };
+
 
   return (
     <button
@@ -173,6 +169,7 @@ const Button = React.forwardRef(({ className, variant = "default", size = "defau
   );
 });
 Button.displayName = "Button";
+
 
 // Tabs Components
 const Tabs = ({ value, onValueChange, children, defaultValue, className, ...props }) => {
@@ -192,6 +189,7 @@ const Tabs = ({ value, onValueChange, children, defaultValue, className, ...prop
   );
 };
 
+
 const TabsList = ({ children, className, activeTab, onTabChange, ...props }) => (
   <div
     className={cn(
@@ -206,6 +204,7 @@ const TabsList = ({ children, className, activeTab, onTabChange, ...props }) => 
   </div>
 );
 
+
 const TabsTrigger = ({ value, children, activeTab, onTabChange, className, ...props }) => (
   <button
     className={cn(
@@ -219,6 +218,7 @@ const TabsTrigger = ({ value, children, activeTab, onTabChange, className, ...pr
     {children}
   </button>
 );
+
 
 const TabsContent = ({ value, children, activeTab, className, ...props }) => {
   if (activeTab !== value) return null;
@@ -235,6 +235,7 @@ const TabsContent = ({ value, children, activeTab, className, ...props }) => {
     </div>
   );
 };
+
 
 // Custom Tooltip Components
 const CustomTooltip = ({ active, payload, label }) => {
@@ -253,190 +254,75 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
+
 // Main Dashboard Component
-const Dashboard = ({ userRole = "Administrator" }) => {
-  // ✅ API State Management + Date Picker State
+const Dashboard = ({ userRole = "emp" }) => {
+
+  const navigate = useNavigate()
+  //  API State Management + Date Picker State
   const [dashboardData, setDashboardData] = useState(null);
   const [monthlyData, setMonthlyData] = useState([]);
   const [statusData, setStatusData] = useState([]);
   const [departmentData, setDepartmentData] = useState([]);
   const [districtData, setDistrictData] = useState([]);
-  const [weeklyData, setWeeklyData] = useState([]);
-  const [workloadData, setWorkloadData] = useState([]);
+  const [weeklyData, setWeeklyData] = useState([]); //  Weekly data state
   const [showMonthlyTab, setShowMonthlyTab] = useState(false);
   
-  // ✅ NEW: Performance Dashboard State
-  const [performanceData, setPerformanceData] = useState(null);
-  
-  // ✅ NEW: Compliance Section State
-  const [complianceData, setComplianceData] = useState({
-    overallCompliance: 86,
-    totalComplaints: 0,
-    approvedPercentage: 0
-  });
-  const [activeUsersCount, setActiveUsersCount] = useState(0);
-  const [departmentCount, setDepartmentCount] = useState(0);
-  
-  // ✅ Date Picker State
+  //  Date Picker State
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date().toISOString().slice(0, 7));
 
-  // ✅ NEW: Fetch Performance Dashboard Data
-  const fetchPerformanceData = async () => {
-    try {
-      console.log('🔄 Fetching performance dashboard data...');
-      const response = await api.get('/admin/get-performance-dashboard');
-      console.log('📊 Performance Dashboard API Response:', response.data);
-      
-      if (response.data && response.data.status && response.data.data) {
-        setPerformanceData(response.data.data);
-        console.log('✅ Performance data updated successfully');
-      }
-    } catch (error) {
-      console.error('💥 Error fetching performance data:', error);
-    }
-  };
 
-  // ✅ NEW: Fetch Compliance Data
-  const fetchComplianceData = async () => {
-    try {
-      console.log('🔄 Fetching compliance data...');
-      const response = await api.get('/admin/get-compliance');
-      console.log('📊 Compliance API Response:', response.data);
-      
-      if (response.data && response.data.status && response.data.data) {
-        const { total_complaints, approved_percentage } = response.data.data;
-        setComplianceData({
-          overallCompliance: parseFloat(approved_percentage) || 0,
-          totalComplaints: parseInt(total_complaints) || 0,
-          approvedPercentage: parseFloat(approved_percentage) || 0
-        });
-        console.log('✅ Compliance data updated successfully');
-      }
-    } catch (error) {
-      console.error('💥 Error fetching compliance data:', error);
-    }
-  };
-
-  // ✅ NEW: Fetch Active Users Count
-  const fetchActiveUsersCount = async () => {
-    try {
-      console.log('🔄 Fetching active users count...');
-      const response = await api.get('/admin/get-all-active-users');
-      console.log('👥 Active Users API Response:', response.data);
-      
-      if (response.data && response.data.status) {
-        setActiveUsersCount(parseInt(response.data.data) || 0);
-        console.log('✅ Active users count updated successfully');
-      }
-    } catch (error) {
-      console.error('💥 Error fetching active users count:', error);
-    }
-  };
-
-  // ✅ NEW: Fetch Department Count
-  const fetchDepartmentCount = async () => {
-    try {
-      console.log('🔄 Fetching department count...');
-      const response = await api.get('/admin/get-all-department-count');
-      console.log('🏢 Department Count API Response:', response.data);
-      
-      if (response.data && response.data.status) {
-        setDepartmentCount(parseInt(response.data.data) || 0);
-        console.log('✅ Department count updated successfully');
-      }
-    } catch (error) {
-      console.error('💥 Error fetching department count:', error);
-    }
-  };
-
-  // ✅ NEW: Fetch Weekly Graph Data
+  //  NEW: Fetch Weekly Graph Data
   const fetchWeeklyData = async () => {
     try {
-      console.log('🔄 Fetching weekly graph data...');
-      const response = await api.get('/admin/getWeeklyGraph');
-      console.log('📊 Weekly API Response:', response.data);
+      console.log('Fetching weekly graph data...');
+      const response = await api.get('/emp/getWeeklyGraph');
+      console.log('Weekly API Response:', response.data);
       
       if (response.data && response.data.labels) {
         const { labels, progress, disposed, ui } = response.data;
         
-        // ✅ Transform API data to chart format (WITHOUT total)
+        //  Transform API data to chart format (without total)
         const weeklyChartData = labels.map((label, index) => ({
           day: label,
-          progress: progress[index] || 0,      // ✅ In progress
-          disposed: disposed[index] || 0,      // ✅ Disposed
-          underInvestigation: ui[index] || 0   // ✅ Under investigation
+          progress: progress[index] || 0,
+          disposed: disposed[index] || 0,
+          underInvestigation: ui[index] || 0
         }));
         
-        console.log('🔄 Transformed weekly data:', weeklyChartData);
-        
-        // ✅ Force state update
-        setWeeklyData([...weeklyChartData]);
-        
-        console.log('✅ WeeklyData state updated successfully');
-      } else {
-        console.error('❌ Invalid API response structure:', response.data);
+        console.log('Transformed weekly data:', weeklyChartData);
+        setWeeklyData(weeklyChartData);
       }
     } catch (error) {
-      console.error('💥 Error fetching weekly data:', error);
-      console.error('💥 Error details:', error.response?.data);
+      console.error('Error fetching weekly data:', error);
+      // Fallback data if API fails
+      setWeeklyData([
+        { day: 'Mon', progress: 0, disposed: 0, underInvestigation: 0 },
+        { day: 'Tue', progress: 0, disposed: 0, underInvestigation: 0 },
+        { day: 'Wed', progress: 0, disposed: 0, underInvestigation: 0 },
+        { day: 'Thu', progress: 0, disposed: 0, underInvestigation: 0 },
+        { day: 'Fri', progress: 0, disposed: 0, underInvestigation: 0 },
+        { day: 'Sat', progress: 0, disposed: 0, underInvestigation: 0 },
+        { day: 'Sun', progress: 0, disposed: 0, underInvestigation: 0 }
+      ]);
     }
   };
 
-  // ✅ UPDATED: Fetch Role-wise Workload Data with Role Mapping
-  const fetchWorkloadData = async () => {
-    try {
-      console.log('🔄 Fetching role-wise workload data...');
-      const response = await api.get('/admin/role-wise-reports');
-      console.log('📊 Workload API Response:', response.data);
-      
-      if (response.data && response.data.data && Array.isArray(response.data.data)) {
-        // ✅ Transform API data to chart format with role mapping
-        const workloadChartData = response.data.data.map((role) => ({
-          role: mapRoleToDisplayName(role.sub_role_name), // ✅ Use mapped role name
-          pending: parseInt(role.total_pending_complains) || 0,   // ✅ Pending complaints
-          completed: parseInt(role.total_approved_complains) || 0  // ✅ Approved/Completed complaints
-        }));
-        
-        console.log('🔄 Transformed workload data with role mapping:', workloadChartData);
-        
-        // ✅ Set workload data
-        setWorkloadData(workloadChartData);
-        
-        console.log('✅ WorkloadData state updated successfully');
-      } else {
-        console.error('❌ Invalid workload API response structure:', response.data);
-      }
-    } catch (error) {
-      console.error('💥 Error fetching workload data:', error);
-      console.error('💥 Error details:', error.response?.data);
-      
-      // ✅ Fallback to empty array if API fails
-      setWorkloadData([]);
-    }
-  };
 
-  // ✅ Add useEffect to log state changes
-  useEffect(() => {
-    console.log('🔄 WeeklyData state changed:', weeklyData);
-  }, [weeklyData]);
-
-  useEffect(() => {
-    console.log('🔄 WorkloadData state changed:', workloadData);
-  }, [workloadData]);
-
-  // ✅ UPDATED: API Data Fetching Function
+  //  API Data Fetching Function
   const fetchDashboardData = async (monthParam) => {
     try {
       // 1. Dashboard Stats API
-      const dashResponse = await api.get(`/admin/dashboard/${monthParam}`);
+      const dashResponse = await api.get(`/emp/dashboard/${monthParam}`);
       if (dashResponse.data.status) {
         setDashboardData(dashResponse.data.dataDashboard);
       }
 
+
       // 2. Monthly Complaint API
-      const monthlyResponse = await api.get('/admin/montly-complaint');
+      const monthlyResponse = await api.get('/emp/montly-complaint');
       if (monthlyResponse.data) {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const monthlyTrends = months.map((month, index) => ({
@@ -448,8 +334,9 @@ const Dashboard = ({ userRole = "Administrator" }) => {
         setMonthlyData(monthlyTrends);
       }
 
+
       // 3. Status Distribution API
-      const statusResponse = await api.get('/admin/status-distribution');
+      const statusResponse = await api.get('/emp/status-distribution');
       if (statusResponse.data && statusResponse.data.data) {
         const statusInfo = statusResponse.data.data;
         const statusDistribution = [
@@ -477,8 +364,9 @@ const Dashboard = ({ userRole = "Administrator" }) => {
         setStatusData(statusDistribution);
       }
 
+
       // 4. Department-wise API
-      const deptResponse = await api.get('/admin/department-wise-complaint');
+      const deptResponse = await api.get('/emp/department-wise-complaint');
       if (deptResponse.data.status) {
         const deptData = Object.entries(deptResponse.data.data).map(([department, complaints]) => ({
           department,
@@ -488,8 +376,9 @@ const Dashboard = ({ userRole = "Administrator" }) => {
         setDepartmentData(deptData);
       }
 
+
       // 5. District-wise API
-      const districtResponse = await api.get('/admin/district-wise-company-type');
+      const districtResponse = await api.get('/emp/district-wise-company-type');
       if (districtResponse.data) {
         const { district, total, allegations, grievances } = districtResponse.data;
         const districtFormatted = district.map((districtName, index) => ({
@@ -501,32 +390,25 @@ const Dashboard = ({ userRole = "Administrator" }) => {
         setDistrictData(districtFormatted);
       }
 
-      // ✅ 6. Fetch Weekly Data
+
+      //  6. Fetch Weekly Data
       await fetchWeeklyData();
 
-      // ✅ 7. Fetch Workload Data
-      await fetchWorkloadData();
-
-      // ✅ 8. NEW: Fetch Performance Dashboard Data
-      await fetchPerformanceData();
-
-      // ✅ 9. NEW: Fetch Compliance Section Data
-      await fetchComplianceData();
-      await fetchActiveUsersCount();
-      await fetchDepartmentCount();
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
   };
 
-  // ✅ Initial Data Fetch
+
+  //  Initial Data Fetch
   useEffect(() => {
     fetchDashboardData(currentMonth);
   }, [currentMonth]);
 
-  // ✅ Handle Date Picker Change
-  const handleDateChange = (date) => {
+
+  //  Handle Date Picker Change
+const handleDateChange = (date) => {
   setSelectedDate(date);
   setShowDatePicker(false);
   const newMonth = date.toISOString().slice(0, 7);
@@ -534,7 +416,8 @@ const Dashboard = ({ userRole = "Administrator" }) => {
 };
 
 
-  // ✅ Refresh to Current Month
+
+  //  Refresh to Current Month
   const handleRefresh = () => {
     const now = new Date();
     setSelectedDate(now);
@@ -543,15 +426,35 @@ const Dashboard = ({ userRole = "Administrator" }) => {
     fetchDashboardData(currentMonthYear);
   };
 
+
   // Sample data for charts with realistic values (keeping original for other tabs)
   const processingTimeData = [
-    { stage: 'Entry to Rejected', avg: 2.3, target: 3 },
-    { stage: 'Rejected to Forward', avg: 4.1, target: 5 },
+    { stage: 'Entry to Verification', avg: 2.3, target: 3 },
+    { stage: 'Verification to Forward', avg: 4.1, target: 5 },
     { stage: 'Forward to Assignment', avg: 1.8, target: 2 },
     { stage: 'Assignment to Investigation', avg: 12.5, target: 15 },
     { stage: 'Investigation to Decision', avg: 18.7, target: 20 },
     { stage: 'Decision to Disposal', avg: 3.2, target: 5 }
   ];
+
+
+  const workloadData = [
+    { role: 'RO/ARO', pending: 23, completed: 156 },
+    { role: 'Section Officer', pending: 18, completed: 134 },
+    { role: 'DS/JS', pending: 12, completed: 98 },
+    { role: 'Secretary', pending: 8, completed: 87 },
+    { role: 'CIO/IO', pending: 15, completed: 45 },
+    { role: 'LokAyukta', pending: 6, completed: 78 }
+  ];
+
+
+  const slaCompliance = [
+    { metric: 'Entry SLA', value: 95, target: 90 },
+    { metric: 'Verification SLA', value: 87, target: 85 },
+    { metric: 'Investigation SLA', value: 78, target: 80 },
+    { metric: 'Disposal SLA', value: 82, target: 85 }
+  ];
+
 
   // Add CSS class for cursor pointer on chart elements
   const chartStyles = `
@@ -568,60 +471,119 @@ const Dashboard = ({ userRole = "Administrator" }) => {
     }
   `;
 
+  // Custom styles for the date picker
+  const datePickerCustomStyles = `
+    .custom-datepicker-wrapper .react-datepicker {
+      border: none !important;
+      background-color: transparent !important;
+      font-family: inherit;
+    }
+    .custom-datepicker-wrapper .react-datepicker__header {
+      background-color: #fff !important;
+      border-bottom: 1px solid #e5e7eb !important;
+      padding: 0.5rem 0 !important;
+    }
+    .custom-datepicker-wrapper .react-datepicker__current-month {
+      font-size: 1rem !important;
+      font-weight: 600 !important;
+      color: #111827 !important;
+      padding-bottom: 0.5rem;
+    }
+    .custom-datepicker-wrapper .react-datepicker__navigation {
+      top: 0.75rem !important;
+    }
+    .custom-datepicker-wrapper .react-datepicker__month-container {
+      padding: 0.5rem;
+    }
+    .custom-datepicker-wrapper .react-datepicker__month-wrapper {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.25rem;
+    }
+    .custom-datepicker-wrapper .react-datepicker__month-text {
+      border-radius: 0.375rem; /* rounded-md */
+      padding: 0.5rem 0;
+      transition: background-color 0.2s, color 0.2s;
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #374151; /* gray-700 */
+    }
+    .custom-datepicker-wrapper .react-datepicker__month-text:hover {
+      background-color: #f3f4f6; /* gray-100 */
+    }
+    .custom-datepicker-wrapper .react-datepicker__month--selected,
+    .custom-datepicker-wrapper .react-datepicker__month-text--selected {
+      background-color: #2563eb !important; /* blue-600 */
+      color: white !important;
+    }
+    .custom-datepicker-wrapper .react-datepicker__month-text--keyboard-selected {
+        background-color: #d1d5db !important; /* gray-300 */
+    }
+  `;
+
+
   return (
-    <div className="space-y-2 bg-gray-50 min-h-screen">
+    <div className=" sm:space-y-1 space-y-4 bg-gray-50 min-h-screen">
       {/* Add styles for chart cursor pointer */}
       <style>{chartStyles}</style>
+      {/* Add custom styles for date picker */}
+      <style>{datePickerCustomStyles}</style>
       
-      <div className="flex items-center justify-between">
-        <div>
-          {/* <h1 className="text-3xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1> */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
-            <h1 className="text-xl font-bold text-gray-900">Dashboard </h1>
-            <p className="text-sm text-gray-600">डैशबोर्ड</p>
-          </div>
-          <p className="text-gray-600">
-            Welcome back, {userRole} • Last updated: {new Date().toLocaleString()}
-          </p>
-        </div>
-        <div className="flex gap-2 relative">
-          {/* ✅ UPDATED: Month-Year Picker Button with Purple Icon */}
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => setShowDatePicker(!showDatePicker)}
-          >
-            <FaCalendarAlt className="h-4 w-4 mr-2 text-purple-600" />
-            {selectedDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
-          </Button>
-
-          {/* ✅ Date Picker Dropdown */}
-          {showDatePicker && (
-            <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
-              <DatePicker
-                selected={selectedDate}
-                onChange={handleDateChange}
-                dateFormat="MM/yyyy"
-                showMonthYearPicker
-                showFullMonthYearPicker
-                  minDate={new Date('2022-01-01')}
-  maxDate={new Date()} 
-                inline
-                className="border-0"
-              />
+                <h1 className="text-2xl sm:text-2xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
+                <p className="text-sm sm:text-base text-gray-600 break-words">
+                  Welcome Back, {userRole} • Last Updated: {new Date().toLocaleString()}
+                </p>
+              </div>
+              <div className="flex gap-2 relative justify-start sm:justify-end">
+                {/*  Month-Year Picker Button */}
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setShowDatePicker(!showDatePicker)}
+                >
+                  <FaCalendarAlt className="h-4 w-4 mr-2 text-blue-500" />
+                  <span className="hidden xs:inline-block">
+                    {selectedDate.toLocaleDateString('default', { month: 'long', year: 'numeric' })}
+                  </span>
+                  <span className="inline-block xs:hidden">
+                    {selectedDate.toLocaleDateString('default', { month: 'short', year: '2-digit' })}
+                  </span>
+                </Button>
+      
+                {/*  Date Picker Dropdown (IMPROVED DESIGN) */}
+                {showDatePicker && (
+                  <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg">
+                    <div className="custom-datepicker-wrapper">
+                      <DatePicker
+                          selected={selectedDate}
+                          onChange={handleDateChange}
+                          dateFormat="MM/yyyy"
+                          showMonthYearPicker
+                          showFullMonthYearPicker
+                           minDate={new Date('2022-01-01')}
+  maxDate={new Date()}
+                          inline
+                      />
+                    </div>
+                  </div>
+                )}
+      
+                {/*  Refresh Button */}
+                  <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => window.location.reload()} // Yeh poora page refresh karega
+                  className="flex items-center cursor-pointer"
+                >
+                  <FaChartLine className="h-4 w-4 mr-2 text-green-500" />
+                  Refresh 
+                </Button>
+              </div>
             </div>
-          )}
 
-          {/* ✅ UPDATED: Refresh Button with Orange Icon */}
-          <Button  variant="outline" 
-  size="sm" 
-  onClick={() => window.location.reload()}>
-            
-            <FaChartLine className="h-4 w-4 mr-2 text-orange-600" />
-            Refresh
-          </Button>
-        </div>
-      </div>
 
       {/* Monthly Tab */}
       {showMonthlyTab && (
@@ -650,11 +612,17 @@ const Dashboard = ({ userRole = "Administrator" }) => {
         </div>
       )}
 
+
       {/* Key Performance Indicators */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+ <div className="grid grid-cols-1 sm:grid-cols-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+
 
         {/* Total Complaints */}
-        <div className="p-5 rounded-2xl shadow-md border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
+        <div
+        onClick={()=>{
+          navigate("/emp/all-complaints ")
+        }}
+         className="p-5 rounded-2xl shadow-md border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
               <FaFileAlt className="text-2xl text-blue-600" />
@@ -665,11 +633,16 @@ const Dashboard = ({ userRole = "Administrator" }) => {
           <div className="mt-4 text-3xl font-extrabold text-blue-900">
             {dashboardData?.totalcomplains || 0}
           </div>
-          <div className="text-sm text-blue-700">All time</div>
+          <div className="text-sm text-blue-700">All Time</div>
         </div>
 
+
         {/* Today's Entry */}
-        <div className="p-5 rounded-2xl shadow-md border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
+        <div
+        //  onClick={()=>{
+        //   navigate("/emp/pending-complaints")
+        // }}
+         className="p-5 rounded-2xl shadow-md border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
               <FaClock className="text-2xl text-indigo-600" />
@@ -680,23 +653,29 @@ const Dashboard = ({ userRole = "Administrator" }) => {
           <div className="mt-4 text-3xl font-extrabold text-indigo-900">
             {dashboardData?.todaycomplains || 0}
           </div>
-          <div className="text-sm text-indigo-700">New complaints</div>
+          <div className="text-sm text-indigo-700">New Complaints</div>
         </div>
 
+
         {/* Approved */}
-        <div className="p-5 rounded-2xl shadow-md border border-green-200 bg-green-50 hover:bg-green-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
+        <div 
+          onClick={()=>{
+          navigate("/emp/approved-complaints")
+        }}
+        className="p-5 rounded-2xl shadow-md border border-green-200 bg-green-50 hover:bg-green-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
               <FaCheckCircle className="text-2xl text-green-600" />
-              <h3 className="text-sm font-medium text-green-800">Approved</h3>
+              <h3 className="text-sm font-medium text-green-800">Disposed</h3>
             </div>
             <div className="text-green-600 text-sm font-semibold">↑</div>
           </div>
           <div className="mt-4 text-3xl font-extrabold text-green-900">
             {dashboardData?.approvedcomplains || 0}
           </div>
-          <div className="text-sm text-green-700">Disposed cases</div>
+          <div className="text-sm text-green-700">Disposed Cases</div>
         </div>
+
 
         {/* Rejected */}
         <div className="p-5 rounded-2xl shadow-md border border-red-200 bg-red-50 hover:bg-red-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
@@ -713,50 +692,63 @@ const Dashboard = ({ userRole = "Administrator" }) => {
           <div className="text-sm text-red-700">Rejected cases</div>
         </div>
 
+
         {/* Pending */}
-        <div className="p-5 rounded-2xl shadow-md border border-yellow-200 bg-yellow-50 hover:bg-yellow-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
+        <div
+        //   onClick={()=>{
+        //   navigate("/emp/pending-complaints")
+        // }}
+         className="p-5 rounded-2xl shadow-md border border-yellow-200 bg-yellow-50 hover:bg-yellow-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
               <FaExclamationTriangle className="text-2xl text-yellow-600" />
-              <h3 className="text-sm font-medium text-yellow-800">Pending</h3>
+              <h3 className="text-sm font-medium text-yellow-800">In Progress</h3>
             </div>
           </div>
           <div className="mt-4 text-3xl font-extrabold text-yellow-900">
             {dashboardData?.pendingcomplains || 0}
           </div>
-          <div className="text-sm text-yellow-700">In progress</div>
+          <div className="text-sm text-yellow-700">In Progress</div>
         </div>
 
+
         {/* Avg. Processing */}
-        <div className="p-5 rounded-2xl shadow-md border border-teal-200 bg-teal-50 hover:bg-teal-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
+        <div
+        //   onClick={()=>{
+        //   navigate("/emp/pending-complaints")
+        // }}
+         className="p-5 rounded-2xl shadow-md border border-teal-200 bg-teal-50 hover:bg-teal-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
             <div className="flex items-center space-x-2">
               <FaClock className="text-2xl text-teal-600" />
-              <h3 className="text-sm font-medium text-teal-800">Avg. pending</h3>
+              <h3 className="text-sm font-medium text-teal-800">Avg. Pending</h3>
             </div>
             <div className="text-red-600 text-sm font-semibold">↓</div>
           </div>
           <div className="mt-4 text-3xl font-extrabold text-teal-900">
             {dashboardData?.avgPendingDays || '0'} days
           </div>
-          <div className="text-sm text-teal-700">Average time</div>
+          <div className="text-sm text-teal-700">Average Time</div>
         </div>
+
 
       </div>
 
+
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        {/* <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="trends">Trends</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
           <TabsTrigger value="workload">Workload</TabsTrigger>
           <TabsTrigger value="compliance">Compliance</TabsTrigger>
-        </TabsList>
+        </TabsList> */}
+
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Monthly Trends Chart */}
-            <Card className="cursor-pointer">
+        
+            {/* <Card className="cursor-pointer">
               <CardHeader>
                 <CardTitle>Monthly Complaint Trends</CardTitle>
               </CardHeader>
@@ -795,10 +787,11 @@ const Dashboard = ({ userRole = "Administrator" }) => {
                   </LineChart>
                 </ResponsiveContainer>
               </CardContent>
-            </Card>
+            </Card> */}
 
-            {/* Status Distribution Pie Chart */}
-            <Card className="cursor-pointer">
+
+        
+            {/* <Card className="cursor-pointer">
               <CardHeader>
                 <CardTitle>Current Status Distribution</CardTitle>
               </CardHeader>
@@ -823,11 +816,12 @@ const Dashboard = ({ userRole = "Administrator" }) => {
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Department-wise Bar Chart */}
+
+          {/* <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
             <Card className="cursor-pointer">
               <CardHeader>
                 <CardTitle>Department-wise Complaints</CardTitle>
@@ -845,7 +839,8 @@ const Dashboard = ({ userRole = "Administrator" }) => {
               </CardContent>
             </Card>
 
-            {/* District-wise Stacked Bar Chart */}
+
+        
             <Card className="cursor-pointer">
               <CardHeader>
                 <CardTitle>District-wise Allegations vs Grievances</CardTitle>
@@ -864,22 +859,20 @@ const Dashboard = ({ userRole = "Administrator" }) => {
                 </ResponsiveContainer>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
         </TabsContent>
+
 
         <TabsContent value="trends" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* ✅ Weekly Activity Area Chart with API Data (WITHOUT Total) */}
+            
             <Card className="cursor-pointer">
               <CardHeader>
                 <CardTitle>Weekly Activity Trends</CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={350}>
-                  <AreaChart 
-                    data={weeklyData} 
-                    key={JSON.stringify(weeklyData)} // ✅ Force re-render when data changes
-                  >
+                  <AreaChart data={weeklyData}>
                     <defs>
                       <linearGradient id="colorProgress" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.8}/>
@@ -934,7 +927,8 @@ const Dashboard = ({ userRole = "Administrator" }) => {
               </CardContent>
             </Card>
 
-            {/* Processing Time vs Target */}
+
+        
             <Card className="cursor-pointer">
               <CardHeader>
                 <CardTitle>Processing Time vs Target (Days)</CardTitle>
@@ -956,146 +950,52 @@ const Dashboard = ({ userRole = "Administrator" }) => {
           </div>
         </TabsContent>
 
+
         <TabsContent value="performance" className="space-y-6">
-      
+    
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Total Complaints</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {performanceData?.total_complaints || 0}
-                </div>
-                <div className="text-sm text-gray-500">All complaints</div>
-              </CardContent>
-            </Card> */}
-
-            <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Pending SLA</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">
-                    {performanceData?.pending_percentage || 0}%
+            {slaCompliance.map((item, index) => (
+              <Card key={index} className="cursor-pointer">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">{item.metric}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold">
+                      {item.value}%
+                    </div>
+                    <Badge 
+                      variant={item.value >= item.target ? "default" : "destructive"}
+                      className={item.value >= item.target ? "bg-green-100 text-green-600" : ""}
+                    >
+                      Target: {item.target}%
+                    </Badge>
                   </div>
-                  <Badge 
-                    variant="secondary"
-                    className="bg-yellow-100 text-yellow-600"
-                  >
-                    In Progress
-                  </Badge>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
-                  <div 
-                    className="h-2 rounded-full transition-all duration-300 bg-yellow-600"
-                    style={{ width: `${Math.min(parseFloat(performanceData?.pending_percentage || 0), 100)}%` }}
-                  ></div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Investigation SLA</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">
-                    {performanceData?.investigation_percentage || 0}%
+                  <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
+                    <div 
+                      className={`h-2 rounded-full transition-all duration-300 ${item.value >= item.target ? 'bg-green-600' : 'bg-red-600'}`}
+                      style={{ width: `${Math.min(item.value, 100)}%` }}
+                    ></div>
                   </div>
-                  <Badge 
-                    variant="default"
-                    className="bg-blue-100 text-blue-600"
-                  >
-                    Active
-                  </Badge>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
-                  <div 
-                    className="h-2 rounded-full transition-all duration-300 bg-blue-600"
-                    style={{ width: `${Math.min(parseFloat(performanceData?.investigation_percentage || 0), 100)}%` }}
-                  ></div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Approved SLA</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">
-                    {performanceData?.approved_percentage || 0}%
-                  </div>
-                  <Badge 
-                    variant="default"
-                    className="bg-green-100 text-green-600"
-                  >
-                    Completed
-                  </Badge>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
-                  <div 
-                    className="h-2 rounded-full transition-all duration-300 bg-green-600"
-                    style={{ width: `${Math.min(parseFloat(performanceData?.approved_percentage || 0), 100)}%` }}
-                  ></div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Rejected SLA</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">
-                    {performanceData?.rejected_percentage || 0}%
-                  </div>
-                  <Badge 
-                    variant="destructive"
-                    className="bg-red-100 text-red-600"
-                  >
-                    Closed
-                  </Badge>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mt-2 cursor-pointer">
-                  <div 
-                    className="h-2 rounded-full transition-all duration-300 bg-red-600"
-                    style={{ width: `${Math.min(parseFloat(performanceData?.rejected_percentage || 0), 100)}%` }}
-                  ></div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </TabsContent>
 
-        <TabsContent value="workload" className="space-y-6">
-          {/* ✅ UPDATED: Role-wise Workload with API Data and Role Mapping */}
+
+        {/* <TabsContent value="workload" className="space-y-6">
+    
           <Card className="cursor-pointer">
             <CardHeader>
-              <CardTitle>SubRole-wise Workload Distribution</CardTitle>
+              <CardTitle>Role-wise Workload Distribution</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <BarChart 
-                  data={workloadData} 
-                  layout="vertical" 
-                  margin={{ left: 130 }} // ✅ Increased left margin for longer role names
-                  key={JSON.stringify(workloadData)} // ✅ Force re-render when data changes
-                >
+                <BarChart data={workloadData} layout="vertical" margin={{ left: 100 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis type="number" stroke="#6b7280" />
-                  <YAxis 
-                    dataKey="role" 
-                    type="category" 
-                    width={130} // ✅ Increased width for longer role names
-                    stroke="#6b7280" 
-                    fontSize={12}
-                  />
+                  <YAxis dataKey="role" type="category" width={100} stroke="#6b7280" />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
                   <Bar dataKey="pending" fill="#f59e0b" name="Pending" radius={[0, 4, 4, 0]} />
@@ -1104,10 +1004,10 @@ const Dashboard = ({ userRole = "Administrator" }) => {
               </ResponsiveContainer>
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
 
-        <TabsContent value="compliance" className="space-y-6">
-          {/* ✅ UPDATED: Compliance Section with API Data */}
+
+        {/* <TabsContent value="compliance" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="cursor-pointer">
               <CardHeader>
@@ -1118,16 +1018,12 @@ const Dashboard = ({ userRole = "Administrator" }) => {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-green-600">
-                    {complianceData.approvedPercentage.toFixed(1)}%
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    {/* {complianceData.totalComplaints} total complaints */}
-                    Meeting SLA targets
-                  </p>
+                  <div className="text-4xl font-bold text-green-600">86%</div>
+                  <p className="text-sm text-gray-500">Meeting SLA targets</p>
                 </div>
               </CardContent>
             </Card>
+
 
             <Card className="cursor-pointer">
               <CardHeader>
@@ -1138,11 +1034,12 @@ const Dashboard = ({ userRole = "Administrator" }) => {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="text-4xl font-bold">{activeUsersCount}</div>
-                  <p className="text-sm text-gray-500">Currently active</p>
+                  <div className="text-4xl font-bold">24</div>
+                  <p className="text-sm text-gray-500">Currently online</p>
                 </div>
               </CardContent>
             </Card>
+
 
             <Card className="cursor-pointer">
               <CardHeader>
@@ -1153,16 +1050,17 @@ const Dashboard = ({ userRole = "Administrator" }) => {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="text-4xl font-bold">{departmentCount}</div>
+                  <div className="text-4xl font-bold">8</div>
                   <p className="text-sm text-gray-500">Total departments</p>
                 </div>
               </CardContent>
             </Card>
           </div>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );
 };
+
 
 export default Dashboard;

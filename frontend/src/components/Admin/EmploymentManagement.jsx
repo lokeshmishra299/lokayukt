@@ -36,7 +36,7 @@ const api = axios.create({
 
 // API Functions
 const fetchUsers = async () => {
-  const response = await api.get('/admin/users');
+  const response = await api.get('/admin/employees');
   if (response.data.status === true) {
     return response.data.data;
   }
@@ -52,7 +52,7 @@ const toggleUserStatus = async (userId) => {
 };
 
 const deleteUser = async (userId) => {
-  const response = await api.post(`/admin/delete-users/${userId}`);
+  const response = await api.post(`/admin/delete-employee/${userId}`);
   if (response.data.status === true) {
     return response.data;
   }
@@ -131,10 +131,12 @@ const DeleteModal = ({
 const EmploymentManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRole, setSelectedRole] = useState('all');
-  const [activeTab, setActiveTab] = useState('users');
+  // const [activeTab, setActiveTab] = useState('users');
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingUser, setDeletingUser] = useState(null);
+  const [activeTab, setActiveTab] = useState('users');
+
   
   const ITEMS_PER_PAGE = 10;
   const navigate = useNavigate();
@@ -148,7 +150,7 @@ const EmploymentManagement = () => {
     error,
     refetch 
   } = useQuery({
-    queryKey: ['users'],
+    queryKey: ['employees'],
     queryFn: fetchUsers,
     staleTime: 5 * 60 * 1000, // 5 minutes
     cacheTime: 10 * 60 * 1000, // 10 minutes
@@ -422,7 +424,7 @@ const EmploymentManagement = () => {
         {/* Tabs */}
         <div className="bg-white rounded-lg border border-gray-200 shadow-sm">
           <div className="space-y-4">
-            <div className="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500 w-full m-3">
+            {/* <div className="inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500 w-full m-3">
               <button
                 onClick={() => setActiveTab('users')}
                 className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-1.5 text-sm font-medium transition-all flex-1 ${
@@ -447,13 +449,13 @@ const EmploymentManagement = () => {
               >
                 Audit Log
               </button>
-            </div>
+            </div> */}
 
             {/* Tab Content */}
             <div className="px-4 pb-4">
               {/* Users Tab */}
-              {activeTab === 'users' && (
-                <div className="space-y-4">
+          
+                <div className="space-y-4 mt-5">
                   {/* Search and Filter with Export */}
                   <div className="bg-gray-50 p-3 rounded-md border">
                     <div className="flex items-center justify-between gap-3">
@@ -626,7 +628,7 @@ const EmploymentManagement = () => {
                     )}
                   </div>
                 </div>
-              )}
+            
 
               {/* Roles & Permissions Tab */}
               {activeTab === 'roles' && (
