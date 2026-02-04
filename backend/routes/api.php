@@ -155,9 +155,9 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-performance-dashboard',[AdminDashboardController::class,'performanceDashboad']);
       
          Route::get('/topics',[CommonController::class,'fetch_topics']);
-        Route::post('/add-topic',[CommonController::class,'addTopics']);
-        Route::post('/edit-topic/{id}',[CommonController::class,'editTopics']);
-        Route::post('/delete-topic/{id}',[CommonController::class,'removeTopics']);
+        Route::post('/add-topic',[CommonController::class,'addTopic']);
+        Route::post('/edit-topic/{id}',[CommonController::class,'editTopic']);
+        Route::post('/delete-topic/{id}',[CommonController::class,'removeTopic']);
         
         Route::get('/filetypes',[CommonController::class,'fetch_fileType']);
         Route::post('/add-filetype',[CommonController::class,'addFileType']);
