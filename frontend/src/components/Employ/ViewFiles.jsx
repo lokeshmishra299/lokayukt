@@ -136,13 +136,13 @@ const ViewFiles = () => {
                     <td className="px-6 py-4 text-sm text-gray-600">{file.size}</td>
                     <td className="px-6 py-4">{getStatusBadge(file.status)}</td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-3">
+                      <div className="flex items-center justify-end gap-3 relative right-4">
                         <button className="text-blue-600 hover:text-blue-800" title="View">
                           <FaEye />
                         </button>
-                        <button className="text-gray-600 hover:text-gray-800" title="Download">
+                        {/* <button className="text-gray-600 hover:text-gray-800" title="Download">
                           <FaDownload />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>

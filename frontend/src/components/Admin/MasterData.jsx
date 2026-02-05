@@ -691,7 +691,40 @@ const MasterData = () => {
 
   const ITEMS_PER_PAGE = 10;
 
-  // Fetch all master data on component mount
+  const [downlode, setDownlode] = useState(false)
+
+ const handleBackupDownload = async () => {
+  try {
+
+    setDownlode(true);
+    const response = await api.get("/admin/download-backup", {
+      responseType: "blob", 
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+
+    const link = document.createElement("a");
+    link.href = url;
+
+    link.setAttribute("download", `backup-${Date.now()}.zip`);
+
+    document.body.appendChild(link);
+    link.click();
+
+    link.remove();
+    window.URL.revokeObjectURL(url);
+
+    toast.success("Backup downloaded successfully ✅");
+  } catch (error) {
+    console.error("Backup download error:", error);
+    toast.error("Backup download failed ❌");
+  }
+  finally{
+    setDownlode(false);
+  }
+};
+
+
   useEffect(() => {
     const fetchMasterData = async () => {
       setIsLoading(true);
@@ -1188,10 +1221,31 @@ const MasterData = () => {
             <p className="text-sm text-gray-600">मास्टर डेटा</p>
           </div>
 
-          <button className="inline-flex items-center gap-2 px-3 py-2 border rounded-md text-sm hover:bg-gray-50">
+          {/* <button
+           onClick={handleBackupDownload}
+           className="inline-flex items-center gap-2 px-3 py-2 border rounded-md text-sm hover:bg-gray-50">
+          
             <FaDatabase className="w-4 h-4 text-slate-600" />
-            <span className="hidden sm:inline">Backup Data</span>
-          </button>
+            <span className="hidden sm:inline">{downlode ? "Downloading..." : "Backup Data"}</span>
+          </button> */}
+
+          <button
+  onClick={handleBackupDownload}
+  className="inline-flex items-center gap-2 px-3 py-2 border rounded-md text-sm hover:bg-gray-50 disabled:opacity-60"
+>
+  {downlode ? (
+    <>
+      <FaSpinner className="w-4 h-4 animate-spin" />
+      <span>Downloading...</span>
+    </>
+  ) : (
+    <>
+      <FaDatabase className="w-4 h-4 text-slate-600" />
+      <span className="hidden sm:inline">Backup Data</span>
+    </>
+  )}
+</button>
+
         </div>
 
         {/* Tabs Component */}

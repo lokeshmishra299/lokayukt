@@ -311,8 +311,8 @@ const EditEmploymentManagement = () => {
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Edit User</h1>
-            <p className="text-xs sm:text-sm text-gray-600">Update user account information</p>
+            <h1 className="text-xl font-bold text-gray-900">Edit Employee </h1>
+            <p className="text-xs sm:text-sm text-gray-600">Update Employee account information</p>
           </div>
 
             <div>

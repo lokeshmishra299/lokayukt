@@ -26,7 +26,6 @@ const uploadApi = axios.create({
   },
 });
 
-// ✅ Removed 'complaint' from props since ID is not needed
 const AddFiles = () => {
   const [correspondenceType, setCorrespondenceType] = useState("Letter");
   const [title, setTitle] = useState("");
@@ -62,10 +61,8 @@ const AddFiles = () => {
         };
 
         if (existingIndex !== -1) {
-          // Replace at same index
           updatedFiles[existingIndex] = newFileObj;
         } else {
-          // Add new file
           updatedFiles.push(newFileObj);
         }
       });
@@ -83,7 +80,6 @@ const AddFiles = () => {
   const uploadDocument = async () => {
     setFieldErrors({});
 
-    // ❌ Removed complaint ID check here
 
     if (!title.trim()) {
         setFieldErrors((prev) => ({ ...prev, title: ["Title is required"] }));
@@ -100,18 +96,14 @@ const AddFiles = () => {
     try {
       const formData = new FormData();
 
-      // 1. Append Files
       uploadedFiles.forEach((fileData) => {
         formData.append("file", fileData.file); 
       });
 
-      // 2. Append Type and Title
       formData.append("type", correspondenceType);
       formData.append("title", title);
       
-      // ❌ Removed complain_id append
-
-      // 3. Send POST Request
+    
       await uploadApi.post("/emp/upload-file", formData);
 
       toast.success("Uploaded document successfully!");
@@ -148,7 +140,6 @@ const AddFiles = () => {
           </div>
         </div>
 
-        {/* Upload Box */}
         <div className="p-4 sm:p-5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
           <h2 className="text-[17px] sm:text-[18px] text-blue-900 font-semibold mb-3">
             Attach New Incoming Correspondence
@@ -160,10 +151,9 @@ const AddFiles = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             
-            {/* Title Input */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Document Title <span className="text-red-500">*</span>
+                Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -182,10 +172,9 @@ const AddFiles = () => {
               )}
             </div>
             
-            {/* Correspondence Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Correspondence Type <span className="text-red-500">*</span>
+                FIle Types  <span className="text-red-500">*</span>
               </label>
               <select
                 value={correspondenceType}
@@ -209,7 +198,6 @@ const AddFiles = () => {
 
           </div>
 
-          {/* PDF Upload Input */}
           <div className="mb-1">
             <label
               htmlFor="pdfUpload"
@@ -244,7 +232,6 @@ const AddFiles = () => {
           </div>
         </div>
 
-        {/* Uploaded File List */}
         {uploadedFiles.length > 0 && (
           <div className="p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-sm">
             <h3 className="text-[16px] sm:text-[17px] font-semibold mb-4">
@@ -282,7 +269,6 @@ const AddFiles = () => {
           </div>
         )}
 
-        {/* Upload Button */}
         <div className="flex flex-col sm:flex-row justify-end">
           <button
             onClick={uploadDocument}

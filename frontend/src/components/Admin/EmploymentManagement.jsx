@@ -409,7 +409,7 @@ const EmploymentManagement = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Employment Management</h1>
+            <h1 className="text-xl font-bold text-gray-900">Employee Management</h1>
             <p className="text-sm text-gray-600">रोज़गार प्रबंधन</p>
           </div>
           <button
@@ -460,7 +460,7 @@ const EmploymentManagement = () => {
                   <div className="bg-gray-50 p-3 rounded-md border">
                     <div className="flex items-center justify-between gap-3">
                       <h3 className="text-base font-semibold text-gray-900">
-                        User List
+                        Employee List
                       </h3>
                       <div className="flex gap-3">
                         <input

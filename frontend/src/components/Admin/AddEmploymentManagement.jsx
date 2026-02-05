@@ -357,7 +357,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
         <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Add New Employee</h1>
-            <p className="text-xs sm:text-sm text-gray-600">Create a new user account</p>
+            <p className="text-xs sm:text-sm text-gray-600">Create a new employee account</p>
           </div>
           <div>
             <button onClick={()=>{
