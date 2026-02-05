@@ -530,9 +530,15 @@ const handleDeleteClick = (id) => {
             {/* <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50"> */}
             <div className="px-6 py-4 border-b flex justify-between items-center bg-gray-50 rounded-t-xl">
 
-              <h3 className="font-bold text-gray-800">
-                {modalMode === 'add' ? 'Add' : 'Edit'} {activeTab === 'topics' ? 'Topic' : activeTab === 'filetypes' ? 'File Type' : 'Budget'}
-              </h3>
+             <h3 className="font-bold text-gray-800">
+  {modalType === 'delete'
+    ? `Delete ${activeTab === 'topics' ? 'Topic' : activeTab === 'filetypes' ? 'File Type' : 'Budget'}`
+    : `${modalMode === 'add' ? 'Add' : 'Edit'} ${
+        activeTab === 'topics' ? 'Topic' : activeTab === 'filetypes' ? 'File Type' : 'Budget'
+      }`
+  }
+</h3>
+
               <button onClick={closeModal}><FaTimes className="text-gray-400 hover:text-red-500" /></button>
             </div>
 
