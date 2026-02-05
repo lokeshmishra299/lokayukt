@@ -463,7 +463,7 @@ const handleDeleteClick = (id) => {
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
                     <tr>
-                      <th className="p-4 border-b w-16">ID</th>
+                      <th className="p-4 border-b w-16">S.No</th>
                       <th className="p-4 border-b">Expense Type</th>
                       <th className="p-4 border-b">Expense Amount</th>
                       <th className="p-4 border-b">Remark</th>
