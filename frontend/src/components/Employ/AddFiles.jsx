@@ -38,7 +38,7 @@ const AddFiles = () => {
   // All Files
 
   const AllFiles = ()=>{
-    const res = api.get("/emp/all-files");
+    const res = api.get("/employee/all-files");
     console.log("All Files", res.data);
     return res.data;
   }
@@ -111,15 +111,15 @@ const AddFiles = () => {
     try {
       const formData = new FormData();
 
-      uploadedFiles.forEach((fileData) => {
-        formData.append("file", fileData.file); 
-      });
+uploadedFiles.forEach((fileData, index) => {
+  formData.append(`file[${index}]`, fileData.file);
+});
 
       formData.append("type", correspondenceType);
       formData.append("title", title);
       
     
-      await uploadApi.post("/emp/upload-file", formData);
+      await uploadApi.post("/employee/upload-file", formData);
 
       toast.success("Uploaded document successfully!");
       setUploadedFiles([]);
@@ -145,7 +145,8 @@ const AddFiles = () => {
 
   return (
     <>
-      <div className="space-y-6 w-full h-[90vh]">
+      {/* <div className="space-y-6 w-full h-screen"> */}
+      <div className="space-y-6 w-full min-h-screen pb-10">
         <div className="flex items-start gap-3">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Add Leave Files</h1>
@@ -195,10 +196,10 @@ const AddFiles = () => {
                   fieldErrors.type ? "border-red-500" : "border-gray-300"
                 }`}
               >
-                <option>Letter</option>
-                <option>Reminder</option>
-                <option>RTI Reply</option>
-                <option>Counter Order</option>
+                <option>Leave File</option>
+                <option>Medical File</option>
+                <option>MISC</option>
+                <option>Casual Leave File</option>
               </select>
               {fieldErrors.type && (
                 <p className="mt-1 text-xs text-red-600">{fieldErrors.type[0]}</p>
@@ -248,7 +249,9 @@ const AddFiles = () => {
               <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span>
             </h3>
 
-            <div className="space-y-3">
+            {/* <div className="space-y-3"> */}
+            <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
+
               {uploadedFiles.map((file) => (
                 <div
                   key={file.id}
