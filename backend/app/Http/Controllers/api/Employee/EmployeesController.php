@@ -5,11 +5,12 @@ namespace App\Http\Controllers\api\Employee;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\EmployeeFiles;
+use App\Models\EmployeeUploadFiles;
 
 class EmployeesController extends Controller
 {
      public function index(){
-         $empfiles = EmployeeFiles::get();
+         $empfiles = EmployeeUploadFiles::get();
         // dd($empfiles->toArray());
         return ApiResponse::generateResponse('success','Records fetch successfully',$empfiles);
      }
