@@ -740,7 +740,7 @@ class CommonController extends Controller
         $Category = new Category();
         $Category->name = $request->name;
         $Category->name_h = $request->name_h;
-        $Category->status = 1;
+        $Category->status = '1';
     
         $Category->save(); // ✅ Insert into DB
 
@@ -786,7 +786,7 @@ class CommonController extends Controller
 
         $Category->name = $request->name;
         $Category->name_h = $request->name_h;
-        $Category->status = 1;
+        $Category->status = '1';
     
         $Category->save(); // ✅ Insert into DB
 
@@ -835,7 +835,7 @@ class CommonController extends Controller
 
         $Category = new Topics();
         $Category->name = $request->name;
-        $Category->status = 1;
+        $Category->status = '1';
     
         $Category->save(); // ✅ Insert into DB
 
@@ -878,7 +878,7 @@ class CommonController extends Controller
 
         $Category->name = $request->name;
         $Category->name_h = $request->name_h;
-        $Category->status = 1;
+        $Category->status = '1';
     
         $Category->save(); // ✅ Insert into DB
 
@@ -928,7 +928,7 @@ class CommonController extends Controller
 
         $Category = new EmployeeFiles();
         $Category->name = $request->name;
-        $Category->status = 1;
+        $Category->status = '1';
     
         $Category->save(); // ✅ Insert into DB
 
@@ -971,7 +971,7 @@ class CommonController extends Controller
 
         $Category->name = $request->name;
         $Category->name_h = $request->name_h;
-        $Category->status = 1;
+        $Category->status = '1';
     
         $Category->save(); // ✅ Insert into DB
 
@@ -1029,7 +1029,7 @@ class CommonController extends Controller
         $Category->expense_type = $request->expense_type;
         $Category->expense_money = $request->expense_money;
         $Category->remark = $request->remark;
-        $Category->status = 1;
+        $Category->status = '1';
     
         $Category->save(); // ✅ Insert into DB
 
@@ -1081,7 +1081,7 @@ class CommonController extends Controller
        $Category->expense_type = $request->expense_type;
         $Category->expense_money = $request->expense_money;
         $Category->remark = $request->remark;
-        $Category->status = 1;
+        $Category->status = '1';
     
         $Category->save(); // ✅ Insert into DB
 
