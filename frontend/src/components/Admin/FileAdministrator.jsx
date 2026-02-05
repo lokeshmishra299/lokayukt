@@ -40,7 +40,7 @@ const formatDate = (dateString) => {
 const FileAdministrator = () => {
   const queryClient = useQueryClient();
   const [formErrors, setFormErrors] = useState({});
-  const [activeTab, setActiveTab] = useState('topics');
+  const [activeTab, setActiveTab] = useState('filetypes');
   const [modalType, setModalType] = useState('form');
   
   
@@ -312,7 +312,7 @@ const handleDeleteClick = (id) => {
         <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
           
           {/* Tabs */}
-          <div className="grid grid-cols-3 gap-1 p-1 bg-gray-100 rounded-lg mb-6 w-full">
+          {/* <div className="grid grid-cols-3 gap-1 p-1 bg-gray-100 rounded-lg mb-6 w-full">
             {[
                 { id: 'topics', label: 'Topics', icon: FaLayerGroup },
                 { id: 'filetypes', label: 'File Types', icon: FaFileAlt },
@@ -331,7 +331,7 @@ const handleDeleteClick = (id) => {
                 <span className="hidden sm:inline">{tab.label}</span>
                 </button>
             ))}
-          </div>
+          </div> */}
 
           {/* --- TOPICS TABLE --- */}
           {activeTab === 'topics' && (
