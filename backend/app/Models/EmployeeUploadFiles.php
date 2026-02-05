@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class EmployeeFiles extends Model
+class EmployeeUploadFiles extends Model
 {
-    protected $table = 'employeefiles'; 
+    protected $table = 'employee_files'; 
     public $timestamps = false; 
 }
