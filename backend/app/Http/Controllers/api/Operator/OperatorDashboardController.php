@@ -103,7 +103,7 @@ class OperatorDashboardController extends Controller
 
                 $avgPendingDays = DB::table('complaints as cmp')
                     // ->where('cmp.status', 'In Progress')
-                     ->where('cmp.approved_rejected_by_rk', 0)
+                 ->where('cmp.approved_rejected_by_rk', 0)
                     ->where('cmp.form_status', 0)
                     ->whereYear('cmp.created_at', $date->year)
                     ->whereMonth('cmp.created_at', $date->month)

@@ -79,7 +79,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/update-employee/{id}',[UserManagement::class,'updateEmployee']);
         Route::post('/delete-employee/{id}',[UserManagement::class,'deleteEmployee']);
         // Route::post('/change-status/{id}',[UserManagement::class,'changeStatus']);
-        Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
+       
 
 
 
@@ -548,7 +548,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::middleware('role:emp')->prefix('employee')->group(function () {
        
         // Route::get('/dashboard',[EmployeesController::class,'index']);
-       
+        Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
        
     });
 
