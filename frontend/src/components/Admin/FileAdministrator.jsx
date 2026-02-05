@@ -239,18 +239,18 @@ const handleDeleteClick = (id) => {
                        addFileTypeMutation.isPending || editFileTypeMutation.isPending ||
                        addBudgetMutation.isPending || editBudgetMutation.isPending;
 
-  const StatusBadge = ({ status }) => {
-    const isActive = status === '1' || status === 1 || status === 'Active' || status === 'active';
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
-        isActive 
-        ? 'bg-green-50 text-green-700 border-green-200' 
-        : 'bg-red-50 text-red-700 border-red-200'
-      }`}>
-        {isActive ? 'Active' : 'Inactive'}
-      </span>
-    );
-  };
+  // const StatusBadge = ({ status }) => {
+    
+  //   return (
+  //     <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
+  //       isActive 
+  //       ? 'bg-green-50 text-green-700 border-green-200' 
+  //       : 'bg-red-50 text-red-700 border-red-200'
+  //     }`}>
+  //       {isActive ? 'Active' : 'Inactive'}
+  //     </span>
+  //   );
+  // };
 
 
  const confirmDelete = async () => {
@@ -358,7 +358,22 @@ const handleDeleteClick = (id) => {
                         <tr key={item.id} className="hover:bg-blue-50/50 transition-colors">
                           <td className="p-4 text-gray-500">{index + 1}</td>
                           <td className="p-4 font-medium">{item.name}</td>
-                          <td className="p-4"><StatusBadge status={item.status || '1'} /></td>
+                          <td className="p-4 font-medium">
+  <span
+    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+      item.status == 1
+        ? "bg-green-100 text-green-700"
+        : "bg-red-100 text-red-600"
+    }`}
+  >
+    {item.status == 1 ? "Active" : "Inactive"}
+  </span>
+</td>
+
+                          {/* <td className="p-4 font-medium">{item.status == 1 ? "Active" : "InActive"}</td> */}
+
+                          {/* <td className="p-4 font-medium">{item.status == 1 ? "Active" : "InActive"}</td> */}
+                          {/* <td className="p-4"><StatusBadge status={item.status || '1'} /></td> */}
                           <td className="p-4 text-gray-500">{formatDate(item.created_at)}</td>
                           <td className="p-4 text-right">
                             <div className="flex justify-end gap-3">
@@ -406,7 +421,19 @@ const handleDeleteClick = (id) => {
                         <tr key={item.id} className="hover:bg-blue-50/50 transition-colors">
                           <td className="p-4 text-gray-500">{index + 1}</td>
                           <td className="p-4 font-medium"><span className="bg-gray-100 px-2 py-1 rounded border uppercase text-xs">{item.name}</span></td>
-                          <td className="p-4"><StatusBadge status={item.status || '1'} /></td>
+                          <td className="p-4 font-medium">
+  <span
+    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+      item.status == 1
+        ? "bg-green-100 text-green-700"
+        : "bg-red-100 text-red-600"
+    }`}
+  >
+    {item.status == 1 ? "Active" : "Inactive"}
+  </span>
+</td>
+
+                          {/* <td className="p-4"><StatusBadge status={item.status || '1'} /></td> */}
                           <td className="p-4 text-gray-500">{formatDate(item.created_at)}</td>
                           <td className="p-4 text-right">
                             <div className="flex justify-end gap-3">
@@ -436,7 +463,7 @@ const handleDeleteClick = (id) => {
                 <table className="w-full text-left border-collapse">
                   <thead className="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
                     <tr>
-                      <th className="p-4 border-b w-16">ID</th>
+                      <th className="p-4 border-b w-16">S.No</th>
                       <th className="p-4 border-b">Expense Type</th>
                       <th className="p-4 border-b">Expense Amount</th>
                       <th className="p-4 border-b">Remark</th>
@@ -457,7 +484,19 @@ const handleDeleteClick = (id) => {
                           <td className="p-4 font-medium">{item.expense_type}</td>
                           <td className="p-4 font-semibold text-gray-800">₹{item.expense_money}</td>
                           <td className="p-4 text-gray-500">{item.remark || '-'}</td>
-                          <td className="p-4"><StatusBadge status={item.status || 'Active'} /></td>
+                          <td className="p-4 font-medium">
+  <span
+    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+      item.status == 1
+        ? "bg-green-100 text-green-700"
+        : "bg-red-100 text-red-600"
+    }`}
+  >
+    {item.status == 1 ? "Active" : "Inactive"}
+  </span>
+</td>
+
+                          {/* <td className="p-4"><StatusBadge status={item.status || 'Active'} /></td> */}
                           <td className="p-4 text-right">
                             <div className="flex justify-end gap-3">
                                 <button onClick={() => openEditModal(item)} className="text-blue-600 hover:text-blue-800"><FaEdit /></button>
@@ -508,6 +547,7 @@ const handleDeleteClick = (id) => {
           <label className="block text-sm font-medium mb-1">Expense Type *</label>
           <input
             value={budgetForm.expense_type}
+            placeholder='Enter Expense Type'
             onChange={(e) => setBudgetForm({...budgetForm, expense_type: e.target.value})}
             className="w-full px-3 py-2 border rounded-lg"
           />
@@ -518,6 +558,7 @@ const handleDeleteClick = (id) => {
           <label className="block text-sm font-medium mb-1">Expense Amount *</label>
           <input
             type="number"
+            placeholder='Expense Amount Type'
             value={budgetForm.expense_money}
             onChange={(e) => setBudgetForm({...budgetForm, expense_money: e.target.value})}
             className="w-full px-3 py-2 border rounded-lg"
@@ -529,6 +570,7 @@ const handleDeleteClick = (id) => {
           <label className="block text-sm font-medium mb-1">Remark</label>
           <textarea
             value={budgetForm.remark}
+               placeholder='Enter Remark'
             onChange={(e) => setBudgetForm({...budgetForm, remark: e.target.value})}
             className="w-full px-3 py-2 border rounded-lg"
           />
