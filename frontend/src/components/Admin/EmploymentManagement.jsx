@@ -497,7 +497,7 @@ const EmploymentManagement = () => {
                       <table className="min-w-full text-sm">
                         <thead className="bg-gray-50">
                           <tr className="border-b border-gray-200">
-                            <th className="text-left py-2 px-4 font-medium text-gray-900">User</th>
+                            <th className="text-left py-2 px-4 font-medium text-gray-900">Employee</th>
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Contact</th>
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Role</th>
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Department</th>
