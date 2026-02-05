@@ -6,6 +6,7 @@ import { FiUpload } from "react-icons/fi";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
+import { useQuery } from "@tanstack/react-query";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -32,6 +33,20 @@ const AddFiles = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+
+
+  // All Files
+
+  const AllFiles = ()=>{
+    const res = api.get("/all-files");
+    console.log("All Files", res.data);
+    return res.data;
+  }
+
+  const {data: allFilesData} = useQuery({
+    queryKey: ["all-files"],
+    queryFn: AllFiles
+  })
 
   const handleFileUpload = (e) => {
     setFieldErrors((prev) => ({ ...prev, file: undefined }));
@@ -130,30 +145,24 @@ const AddFiles = () => {
 
   return (
     <>
-      <div className="space-y-6 w-full">
+      <div className="space-y-6 w-full h-[90vh]">
         <div className="flex items-start gap-3">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Add Files</h1>
+            <h1 className="text-xl font-bold text-gray-900">Add Leave Files</h1>
             <p className="text-sm sm:text-base text-gray-600 break-words">
-              फ़ाइल जोड़ें
+              छुट्टी फाइल जोड़ें
             </p>
           </div>
         </div>
 
         <div className="p-4 sm:p-5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
-          <h2 className="text-[17px] sm:text-[18px] text-blue-900 font-semibold mb-3">
-            Attach New Incoming Correspondence
-          </h2>
-
-          <p className="text-sm text-blue-800 mb-3">
-            Attach letters, reminders, RTI replies received after file movement.
-          </p>
+          
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Title <span className="text-red-500">*</span>
+                Topic <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -162,7 +171,7 @@ const AddFiles = () => {
                   setTitle(e.target.value);
                   setFieldErrors((prev) => ({ ...prev, title: undefined }));
                 }}
-                placeholder="Add Title"
+                placeholder="Add Topic"
                 className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
                   fieldErrors.title ? "border-red-500" : "border-gray-300"
                 }`}
