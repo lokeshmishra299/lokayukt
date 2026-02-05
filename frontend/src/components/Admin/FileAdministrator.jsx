@@ -77,7 +77,7 @@ const FileAdministrator = () => {
   const { data: budgets = [], isLoading: loadingBudgets } = useQuery({
     queryKey: ['budgets'],
     queryFn: async () => {
-      const res = await api.get('/admin/budget');
+      const res = await api.get('/admin/budgets');
       return res.data.data || res.data;
     }
   });
