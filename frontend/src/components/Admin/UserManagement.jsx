@@ -523,19 +523,19 @@ const UserManagement = () => {
                                     </div>
                                     <div>
                                       <div className="font-medium text-sm">{displayValue(user.name)}</div>
-                                      <div className="text-xs text-gray-500"><span className="font-semibold">User Name:</span>{displayValue(user.role?.name)}</div>  
+                                      <div className="text-xs text-gray-500"><span className="font-semibold"></span>{user?.user_name}</div>  
                                     </div>
                                   </div>
                                 </td>
-                                <td className="py-2 px-4">
+                                {/* <td className="py-2 px-4">
                                   <div className="flex items-center gap-2">
                                    
                                     <div>
-                                      {/* <div className="font-medium text-sm">{displayValue(user.name)}</div> */}
+                                      <div className="font-medium text-sm">{displayValue(user.name)}</div>
                                       <div className="text-[13px] font-semibold text-gray-500">{displayValue(user.role?.name)}</div>
                                     </div>
                                   </div>
-                                </td>
+                                </td> */}
 
                                 {/* Contact */}
                                 <td className="py-2 px-4">

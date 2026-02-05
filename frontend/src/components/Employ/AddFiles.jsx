@@ -38,7 +38,7 @@ const AddFiles = () => {
   // All Files
 
   const AllFiles = ()=>{
-    const res = api.get("/all-files");
+    const res = api.get("/emp/all-files");
     console.log("All Files", res.data);
     return res.data;
   }
