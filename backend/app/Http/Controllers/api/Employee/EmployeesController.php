@@ -8,8 +8,23 @@ use Illuminate\Http\Request;
 class EmployeesController extends Controller
 {
      public function index(){
-
+        //  $topics = Topics::get();
+        // // dd($topics->toArray());
+        // return ApiResponse::generateResponse('success','Topics fetch successfully',$topics);
      }
+
+     public function fetch_topics(){
+
+        $topics = Topics::get();
+        // dd($topics->toArray());
+        return ApiResponse::generateResponse('success','Topics fetch successfully',$topics);
+    }
+    public function fetch_fileType(){
+
+        $fileType = EmployeeFiles::get();
+        // dd($fileType->toArray());
+        return ApiResponse::generateResponse('success','Topics fetch successfully',$fileType);
+    }
 
       public function uploadFiles(Request $request)
 {
