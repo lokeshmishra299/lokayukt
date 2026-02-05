@@ -8,6 +8,6 @@ class Budget extends Model
 {
     protected $table = 'employee_budget';
 
-    // public $timestamps = false;
+    public $timestamps = false;
 
 }

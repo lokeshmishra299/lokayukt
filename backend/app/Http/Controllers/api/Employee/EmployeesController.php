@@ -4,13 +4,14 @@ namespace App\Http\Controllers\api\Employee;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\EmployeeFiles;
 
 class EmployeesController extends Controller
 {
      public function index(){
-        //  $topics = Topics::get();
-        // // dd($topics->toArray());
-        // return ApiResponse::generateResponse('success','Topics fetch successfully',$topics);
+         $empfiles = EmployeeFiles::get();
+        // dd($empfiles->toArray());
+        return ApiResponse::generateResponse('success','Records fetch successfully',$empfiles);
      }
 
      public function fetch_topics(){
@@ -34,8 +35,8 @@ class EmployeesController extends Controller
     $validation = Validator::make($request->all(), [
 
         // 'complain_id' => 'required|numeric',
-        'type'        => 'required|string',
         'title'       => 'required|string',
+        'type'        => 'required|string',
 
         // Multiple file validation
         'file'        => 'required|array',
@@ -44,8 +45,8 @@ class EmployeesController extends Controller
     ], [
 
         // 'complain_id.required' => 'Complaint Id is required.',
-        'type.required'        => 'Complaint description is required.',
         'title.required'       => 'Letter Subject is Required.',
+        'type.required'        => 'Complaint description is required.',
         'file.required'        => 'At least one file is required.',
         'file.array'           => 'Invalid file format.',
         'file.*.mimes'         => 'Only JPG, PNG and PDF files are allowed.',
@@ -71,7 +72,6 @@ class EmployeesController extends Controller
             $filePath = $uploadedFile->storeAs('employeeFiles', $fileName, 'public');
 
             $compDoc = new ComplainDocuments();
-            $compDoc->complain_id = $request->complain_id;
             $compDoc->added_by   = $added_by;
             $compDoc->type       = $request->type;
             $compDoc->title      = $request->title;
@@ -84,7 +84,7 @@ class EmployeesController extends Controller
 
         return response()->json([
             'status'  => true,
-            'message' => 'Documents uploaded successfully.',
+            'message' => 'Files uploaded successfully.',
             'data'    => $uploadedFiles
         ], 201);
     }

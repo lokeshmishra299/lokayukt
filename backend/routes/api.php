@@ -547,7 +547,9 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::middleware('role:emp')->prefix('employee')->group(function () {
        
-        // Route::get('/dashboard',[EmployeesController::class,'index']);
+        Route::get('/all-files',[EmployeesController::class,'index']);
+     Route::get('/topics',[EmployeesController::class,'fetch_topics']);
+      Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
         Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
        
     });
