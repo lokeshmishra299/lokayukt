@@ -89,17 +89,24 @@ const ViewFiles = () => {
     <div className=" bg-gray-50 min-h-screen">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Uploaded Files</h1>
-          <p className="text-sm sm:text-base text-gray-600 break-words">अपलोड फ़ाइलें.</p>
-        </div>
+      <div className="w-full  flex flex-col items-start justify-start text-left">
+  <h1 className="text-xl font-bold text-gray-900 w-full text-left">
+    Uploaded Files  
+  </h1>
+
+  <p className="text-sm sm:text-base text-gray-600 break-words w-full text-left">
+    अपलोड फ़ाइलें.
+  </p>
+</div>
+
+
 
         {/* Search Bar */}
         <div className="mt-4 md:mt-0 relative">
           <input
             type="text"
             placeholder="Search files..."
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64"
+            className="sm:pl-10 pl-20 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
