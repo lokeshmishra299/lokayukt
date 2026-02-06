@@ -245,8 +245,8 @@ uploadedFiles.forEach((fileData, index) => {
         {uploadedFiles.length > 0 && (
           <div className="p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-sm">
             <h3 className="text-[16px] sm:text-[17px] font-semibold mb-4">
-              Selected Documents ({uploadedFiles.length}) - 
-              <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span>
+              Selected Documents ({uploadedFiles.length}) 
+              {/* <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span> */}
             </h3>
 
             {/* <div className="space-y-3"> */}
@@ -287,7 +287,7 @@ uploadedFiles.forEach((fileData, index) => {
             disabled={isUploading}
             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
           >
-            {isUploading ? "Adding..." : "Add Files"}
+            {isUploading ? "Uploading..." : "Upload Files"}
           </button>
         </div>
       </div>
