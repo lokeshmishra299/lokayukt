@@ -161,26 +161,39 @@ uploadedFiles.forEach((fileData, index) => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Topic <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => {
-                  setTitle(e.target.value);
-                  setFieldErrors((prev) => ({ ...prev, title: undefined }));
-                }}
-                placeholder="Add Topic"
-                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                  fieldErrors.title ? "border-red-500" : "border-gray-300"
-                }`}
-              />
-              {fieldErrors.title && (
-                <p className="mt-1 text-xs text-red-600">{fieldErrors.title[0]}</p>
-              )}
-            </div>
+          <div className="relative">
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Topic <span className="text-red-500">*</span>
+  </label>
+
+  
+  {!title && (
+    <span className="absolute left-3 top-[32px] text-gray-400 text-base pointer-events-none font-sans">
+      Add Topic
+    </span>
+  )}
+
+  <input
+    type="text"
+    value={title}
+    onChange={(e) => {
+      setTitle(e.target.value);
+      setFieldErrors((prev) => ({ ...prev, title: undefined }));
+    }}
+    className={`border kruti-input px-3 py-2 text-base rounded-lg w-full bg-white text-gray-700
+      focus:outline-none focus:ring-2 focus:ring-blue-300
+      ${
+        fieldErrors.title ? "border-red-500" : "border-gray-300"
+      }`}
+  />
+
+  {fieldErrors.title && (
+    <p className="mt-1 text-xs text-red-600">
+      {fieldErrors.title[0]}
+    </p>
+  )}
+</div>
+
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -192,7 +205,7 @@ uploadedFiles.forEach((fileData, index) => {
                   setCorrespondenceType(e.target.value);
                   setFieldErrors((prev) => ({ ...prev, type: undefined }));
                 }}
-                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                className={`border   px-3 py-2 rounded-lg w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
                   fieldErrors.type ? "border-red-500" : "border-gray-300"
                 }`}
               >
