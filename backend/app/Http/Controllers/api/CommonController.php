@@ -19,6 +19,7 @@ use App\Models\EmployeeFiles;
 use App\Models\EmployeeUploadFiles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Auth;
 
 class CommonController extends Controller
 {
@@ -1120,9 +1121,27 @@ class CommonController extends Controller
     }
 
       public function getEmployeeFiles($id){
-         $user = Auth::user()->id;
-         $empfiles = EmployeeUploadFiles::where('added_by', $user)->get();
-        // dd($empfiles->toArray());
+        //  $user = Auth::user()->id;
+        //  dd($user);
+         $empfiles = EmployeeUploadFiles::where('added_by', $id)->get();
+        // dd($empfiles);
         return ApiResponse::generateResponse('success','Records fetch successfully',$empfiles);
      }
+
+         public function getFilePreview($id){
+ 
+        $cmpDetail = EmployeeUploadFiles::findOrFail($id);
+
+            // Correct path
+            $path = Storage::url('employeeFiles/' . $cmpDetail->file);
+
+            $cmpDetail->filepath = $path;
+
+            return response()->json([
+                'status' => true,
+                'message' => 'File Fetch successfully',
+                'data' => $path,
+            ]);
+
+    }
 }
