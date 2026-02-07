@@ -9,6 +9,7 @@ import AdminLayout from './components/Admin/Layout';
 import AdminDashboard from './components/Admin/Dashboard';
 import AdminComplaints from './components/Admin/Complaints';
 import AdminProgressRegister from './components/Admin/ProgressRegister';
+import AdminViewLeaveFiels from './components/Admin/ViewLeaveFiels';
 import AdminSearchReports from './components/Admin/SearchReports';
 import AdminUserManagement from './components/Admin/UserManagement';
 import AdminMasterData from './components/Admin/MasterData';
@@ -20,6 +21,7 @@ import AdminFileAdministrator from './components/Admin/FileAdministrator';
 import AdminEmploymentManagement from './components/Admin/EmploymentManagement';
 import AdminAddEmploymentManagement from './components/Admin/AddEmploymentManagement';
 import AdminEditEmploymentManagement from './components/Admin/EditEmploymentManagement';
+
 
 
 
@@ -337,6 +339,7 @@ import DispatchUserManagement from './components/Dispatch/UserManagement';
 
 
 
+
 // import DispatchAddUserManagement from './components/Dispatch/AddUserManagement';
 // import LokayuktEditUserManagement from './components/LokAyukta/EditUserManagment';
 // import LokayuktMasterData from './components/LokAyukta/MasterData';
@@ -372,6 +375,7 @@ function App() {
           <Route path="master-data" element={<AdminMasterData />} />
           <Route path="file-administrator" element={<AdminFileAdministrator />} />
           <Route path="employment-management" element={<AdminEmploymentManagement />} />
+          <Route path="employment-management/:id" element={<AdminViewLeaveFiels />} />
           <Route path="employment-management/add" element={<AdminAddEmploymentManagement />} />
           <Route path="employment-management/edit/:id" element={<AdminEditEmploymentManagement />} />
 

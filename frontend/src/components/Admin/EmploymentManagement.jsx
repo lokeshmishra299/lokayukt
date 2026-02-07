@@ -19,6 +19,8 @@ import Pagination from '../Pagination';
 // import { ToastContainer, toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 import { toast, Toaster } from "react-hot-toast";
+import { FaEye } from "react-icons/fa";
+
 
 import * as XLSX from "xlsx-js-style";
 import { saveAs } from "file-saver";
@@ -588,6 +590,12 @@ const EmploymentManagement = () => {
                                 <td className="py-2 px-4 text-xs text-gray-700">
                                   {formatDate(user.updated_at)}
                                 </td>
+                              <td className="py-2 px-4 text-green-600">
+  <FaEye
+  onClick={()=>navigate(`${user.id}`)}
+   className="text-lg ml-5 cursor-pointer hover:text-green-700" />
+</td>
+
 
                                 {/* Actions */}
                                 <td className="py-2 px-4">
