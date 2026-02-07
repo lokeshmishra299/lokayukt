@@ -551,6 +551,7 @@ Route::middleware('auth:sanctum')->group(function(){
      Route::get('/topics',[EmployeesController::class,'fetch_topics']);
       Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
         Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
+        Route::get('/get-file-preview/{id}',[EmployeesController::class,'getFilePreview']);
        
     });
 
