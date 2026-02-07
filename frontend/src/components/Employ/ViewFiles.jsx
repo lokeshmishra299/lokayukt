@@ -3,6 +3,8 @@ import axios from 'axios';
 import React, { useState, useMemo } from 'react';
 import { FaFilePdf, FaFileWord, FaFileImage, FaFileExcel, FaEye, FaSearch, FaSpinner, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import Pagination from '../Pagination';
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
@@ -19,6 +21,9 @@ const ViewFiles = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [viewUrl, setViewUrl] = useState(null); // Modal URL
   const [loadingDocId, setLoadingDocId] = useState(null); // Spinner
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 10;
+
 
   // 1. All Files List
   const AllFiles = async () => {
@@ -100,6 +105,17 @@ const ViewFiles = () => {
     );
   }, [filesList, searchTerm]);
 
+  const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+const currentFiles = filteredFiles.slice(
+  indexOfFirstItem,
+  indexOfLastItem
+);
+
+const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
+
+
   return (
     <div className="bg-gray-50 min-h-screen ">
       {/* Header */}
@@ -114,7 +130,11 @@ const ViewFiles = () => {
             placeholder="Search..."
             className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-64 focus:outline-none focus:border-blue-500"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            // onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+  setSearchTerm(e.target.value);
+  setCurrentPage(1);
+}}
           />
           <FaSearch className="absolute left-3 top-3 text-gray-400" />
         </div>
@@ -136,7 +156,7 @@ const ViewFiles = () => {
               {isLoading ? (
                  <tr><td colSpan="4" className="px-6 py-8 text-center text-gray-500">Loading...</td></tr>
               ) : filteredFiles.length > 0 ? (
-                filteredFiles.map((file, index) => (
+                currentFiles.map((file, index) => (
                   <tr key={file.id || index} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -168,6 +188,16 @@ const ViewFiles = () => {
           </table>
         </div>
       </div>
+
+
+            <Pagination
+  currentPage={currentPage}
+  totalPages={totalPages}
+  onPageChange={setCurrentPage}
+  // totalItems={filteredComplaints.length}
+  totalItems={filteredFiles.length}
+  itemsPerPage={itemsPerPage}
+/>
 
       {/* --- POPUP / MODAL --- */}
       {viewUrl && (
