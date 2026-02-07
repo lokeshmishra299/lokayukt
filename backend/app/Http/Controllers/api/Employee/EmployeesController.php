@@ -8,6 +8,7 @@ use App\Models\EmployeeFiles;
 use App\Models\EmployeeUploadFiles;
 use Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeesController extends Controller
 {
@@ -97,4 +98,20 @@ class EmployeesController extends Controller
         'message' => 'No files found.'
     ], 400);
 }
+
+     public function getFilePreview($id){
+ 
+        $cmpDetail = EmployeeUploadFiles::findOrFail($id);
+    
+         $path = Storage::url($cmpDetail->file);
+
+            $cmpDetail->filepath = $path;
+      
+           return response()->json([
+               'status' => true,
+               'message' => 'File Fetch successfully',
+               'data' =>  $path,
+           ]);
+
+    }
 }
