@@ -214,7 +214,7 @@ uploadedFiles.forEach((fileData, index) => {
 
 
   {allFilesData?.map((item) => (
-    <option key={item.id} value={item.id}>
+    <option key={item.id} value={item.name}>
       {item.name}
     </option>
   ))}
