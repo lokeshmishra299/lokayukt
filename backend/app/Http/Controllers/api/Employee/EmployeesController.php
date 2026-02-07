@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\EmployeeFiles;
 use App\Models\EmployeeUploadFiles;
+use Auth;
+use Illuminate\Support\Facades\Validator;
 
 class EmployeesController extends Controller
 {
@@ -25,7 +27,7 @@ class EmployeesController extends Controller
 
         $fileType = EmployeeFiles::get();
         // dd($fileType->toArray());
-        return ApiResponse::generateResponse('success','Topics fetch successfully',$fileType);
+        return ApiResponse::generateResponse('success','Files fetch successfully',$fileType);
     }
 
       public function uploadFiles(Request $request)
@@ -72,7 +74,7 @@ class EmployeesController extends Controller
 
             $filePath = $uploadedFile->storeAs('employeeFiles', $fileName, 'public');
 
-            $compDoc = new ComplainDocuments();
+            $compDoc = new EmployeeUploadFiles();
             $compDoc->added_by   = $added_by;
             $compDoc->type       = $request->type;
             $compDoc->title      = $request->title;

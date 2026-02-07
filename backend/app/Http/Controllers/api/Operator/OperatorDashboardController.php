@@ -49,7 +49,7 @@ class OperatorDashboardController extends Controller
             // ->leftJoin('users as u', 'cmp.added_by', '=', 'u.id')
             ->select(DB::raw('COUNT(cmp.id) as total_complains'),DB::raw('AVG(DATEDIFF(now(), created_at)) as avg_days'))
             ->where('cmp.approved_rejected_by_rk', 0)
-            ->where('cmp.form_status', 0)
+            // ->where('cmp.form_status', 0)
             // ->whereIn('cmp.approved_rejected_by_naibtahsildar', [0, 1, 2])
             // ->where('cmp.status', 2)
             // ->where('cmp.district_id', $user_district_code)
