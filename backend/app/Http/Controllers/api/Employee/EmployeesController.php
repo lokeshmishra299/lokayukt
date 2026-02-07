@@ -102,16 +102,17 @@ class EmployeesController extends Controller
      public function getFilePreview($id){
  
         $cmpDetail = EmployeeUploadFiles::findOrFail($id);
-    
-         $path = Storage::url('/employeeFiles'.$cmpDetail->file);
+
+            // Correct path
+            $path = Storage::url('employeeFiles/' . $cmpDetail->file);
 
             $cmpDetail->filepath = $path;
-      
-           return response()->json([
-               'status' => true,
-               'message' => 'File Fetch successfully',
-               'data' =>  $path,
-           ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'File Fetch successfully',
+                'data' => $path,
+            ]);
 
     }
 }
