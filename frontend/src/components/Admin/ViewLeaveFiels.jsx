@@ -113,7 +113,9 @@ const paginatedFiles = filteredFiles.slice(
         <div className="w-full flex items-center gap-3">
         
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Employee Files</h1>
+            <h1 className="text-xl font-bold text-gray-900">Employee Leave Files</h1>
+            <p className="text-sm text-gray-600">कर्मचारी अवकाश फाइलें</p>
+
           </div>
         </div>
 
@@ -121,8 +123,8 @@ const paginatedFiles = filteredFiles.slice(
         <div className="relative w-full md:w-auto">
           <input
             type="text"
-            placeholder="Search files..."
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-64 focus:outline-none focus:border-blue-500"
+            placeholder="Qkby [kkstsa"
+            className="pl-10 kruti-input pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-64 focus:outline-none focus:border-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />

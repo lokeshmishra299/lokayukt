@@ -297,7 +297,9 @@ const handleDeleteClick = (id) => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-900">File Administrator</h1>
-          <p className="text-sm text-gray-600">Manage Topics, File Types & Budget</p>
+          {/* <p className="text-sm text-gray-600">Manage Topics, File Types & Budget</p> */}
+            <p className="text-sm text-gray-600">फ़ाइल प्रशासक</p>
+
         </div>
         
         <button 
