@@ -167,7 +167,7 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{file.type}</td>
+                    <td className="px-6 kruti-input py-4 text-sm text-gray-600">{file.type}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{file.created_at}</td>
                     <td className="px-6 py-4 text-right">
                         <button 

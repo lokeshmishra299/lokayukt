@@ -162,7 +162,7 @@ const paginatedFiles = filteredFiles.slice(
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                        <span className="px-2 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full border border-blue-100">
+                        <span className="px-2 kruti-input py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full border border-blue-100">
                             {row.type}
                         </span>
                     </td>
