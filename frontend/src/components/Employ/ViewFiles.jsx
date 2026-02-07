@@ -1,7 +1,32 @@
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
 import React, { useState } from 'react';
 import { FaFilePdf, FaFileWord, FaFileImage, FaFileExcel, FaEye, FaDownload, FaSearch } from 'react-icons/fa';
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
+
+const token = localStorage.getItem("access_token");
+
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json", 
+    ...(token && { Authorization: `Bearer ${token}` }),
+  },
+});
 
 const ViewFiles = () => {
+
+  const AllFiles = async () => {
+  const res = await api.get("/employee/all-files");
+  console.log("All Files", res.data); 
+  return res.data;
+};
+
+  const {data: allFilesData} = useQuery({
+    queryKey: ["all-files"],
+    queryFn: AllFiles
+  })
+
   // 1. Dummy Data (फाइलों की नकली सूची)
   const dummyFiles = [
     {

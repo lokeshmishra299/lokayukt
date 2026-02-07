@@ -37,14 +37,14 @@ const AddFiles = () => {
 
   // All Files
 
-  const AllFiles = ()=>{
-    const res = api.get("/employee/all-files");
-    console.log("All Files", res.data);
-    return res.data;
-  }
+ const AllFiles = async () => {
+  const res = await api.get("/employee/filetypes");
+  console.log("All Files", res.data.data); 
+  return res.data.data;
+};
 
   const {data: allFilesData} = useQuery({
-    queryKey: ["all-files"],
+    queryKey: ["filetypes"],
     queryFn: AllFiles
   })
 
@@ -167,11 +167,11 @@ uploadedFiles.forEach((fileData, index) => {
   </label>
 
   
-  {!title && (
-    <span className="absolute left-3 top-[32px] text-gray-400 text-base pointer-events-none font-sans">
-      Add Topic
-    </span>
-  )}
+ {!title && (
+  <span className="absolute left-3 top-[32px] text-gray-400 text-base pointer-events-none kruti-input">
+    fo"k; tksM+s
+  </span>
+)}
 
   <input
     type="text"
@@ -199,21 +199,27 @@ uploadedFiles.forEach((fileData, index) => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 FIle Types  <span className="text-red-500">*</span>
               </label>
-              <select
-                value={correspondenceType}
-                onChange={(e) => {
-                  setCorrespondenceType(e.target.value);
-                  setFieldErrors((prev) => ({ ...prev, type: undefined }));
-                }}
-                className={`border   px-3 py-2 rounded-lg w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
-                  fieldErrors.type ? "border-red-500" : "border-gray-300"
-                }`}
-              >
-                <option>Leave File</option>
-                <option>Medical File</option>
-                <option>MISC</option>
-                <option>Casual Leave File</option>
-              </select>
+           <select
+  value={correspondenceType}
+  onChange={(e) => {
+    setCorrespondenceType(e.target.value);
+    setFieldErrors((prev) => ({ ...prev, type: undefined }));
+  }}
+  className={`border kruti-input px-3 py-2 rounded-lg w-full bg-white text-gray-700
+    focus:outline-none focus:ring-2 focus:ring-blue-300
+    ${fieldErrors.type ? "border-red-500" : "border-gray-300"}`}
+>
+  {/* <option value="">Select File Type</option> */}
+  <option value="">QksbZ Qkby izdkj pqusa</option>
+
+
+  {allFilesData?.map((item) => (
+    <option key={item.id} value={item.id}>
+      {item.name}
+    </option>
+  ))}
+</select>
+
               {fieldErrors.type && (
                 <p className="mt-1 text-xs text-red-600">{fieldErrors.type[0]}</p>
               )}

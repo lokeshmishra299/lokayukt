@@ -272,7 +272,8 @@ const handleDeleteClick = (id) => {
 
   const getPlaceholder = () => {
   if (activeTab === 'topics') return "Enter Topic Name";
-  if (activeTab === 'filetypes') return "Enter File Type Name";
+  // if (activeTab === 'filetypes') return "Enter File Type Name";
+    if (activeTab === 'filetypes') return "फ़ाइल टाइप का नाम दर्ज करें";
   return "";
 };
 
@@ -420,7 +421,11 @@ const handleDeleteClick = (id) => {
                       fileTypes.map((item, index) => (
                         <tr key={item.id} className="hover:bg-blue-50/50 transition-colors">
                           <td className="p-4 text-gray-500">{index + 1}</td>
-                          <td className="p-4 font-medium"><span className="bg-gray-100 px-2 py-1 rounded border uppercase text-xs">{item.name}</span></td>
+                         <td className="p-4 kruti-input font-medium">
+  <span className="bg-gray-100 px-2 py-1 text-[20px] rounded border uppercase">
+    {item.name}
+  </span>
+</td>
                           <td className="p-4 font-medium">
   <span
     className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -589,7 +594,11 @@ const handleDeleteClick = (id) => {
           value={nameInput}
           placeholder={getPlaceholder()}
           onChange={(e) => setNameInput(e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg"
+          
+           className="
+    w-full kruti-input px-3 py-2 border rounded-lg
+    placeholder:text-sm placeholder:text-gray-400
+  "
         />
         {formErrors.name && <p className="text-red-500 text-xs mt-1">{formErrors.name[0]}</p>}
       </div>
