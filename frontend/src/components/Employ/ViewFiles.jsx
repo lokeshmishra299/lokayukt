@@ -162,8 +162,8 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
                       <div className="flex items-center gap-3">
                         {getFileIcon(file.file)}
                         <div>
-                            <p className="text-sm font-medium text-gray-900">{file.title || "Untitled"}</p>
-                            <p className="text-xs text-gray-500">{file.file}</p>
+                            <p className="text-sm kruti-input font-medium text-gray-900">{file.title || "Untitled"}</p>
+                            {/* <p className="text-xs text-gray-500">{file.file}</p> */}
                         </div>
                       </div>
                     </td>
