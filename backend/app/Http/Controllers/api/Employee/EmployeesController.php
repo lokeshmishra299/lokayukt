@@ -103,7 +103,7 @@ class EmployeesController extends Controller
  
         $cmpDetail = EmployeeUploadFiles::findOrFail($id);
     
-         $path = Storage::url($cmpDetail->file);
+         $path = Storage::url('/employeeFiles'.$cmpDetail->file);
 
             $cmpDetail->filepath = $path;
       
