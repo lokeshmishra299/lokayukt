@@ -15,7 +15,7 @@ const token = localStorage.getItem("access_token");
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
-    "Content-Type": "application/json",
+    "Content-Type": "application/json", 
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
