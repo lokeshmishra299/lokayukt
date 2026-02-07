@@ -1125,4 +1125,21 @@ class CommonController extends Controller
         // dd($empfiles->toArray());
         return ApiResponse::generateResponse('success','Records fetch successfully',$empfiles);
      }
+
+         public function getFilePreview($id){
+ 
+        $cmpDetail = EmployeeUploadFiles::findOrFail($id);
+
+            // Correct path
+            $path = Storage::url('employeeFiles/' . $cmpDetail->file);
+
+            $cmpDetail->filepath = $path;
+
+            return response()->json([
+                'status' => true,
+                'message' => 'File Fetch successfully',
+                'data' => $path,
+            ]);
+
+    }
 }
