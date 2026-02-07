@@ -410,7 +410,7 @@ const EmploymentManagement = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Employee Management</h1>
-            <p className="text-sm text-gray-600">रोज़गार प्रबंधन</p>
+            <p className="text-sm text-gray-600">कर्मचारी प्रबंधन</p>
           </div>
           <button
             onClick={() => navigate("add")}
@@ -503,6 +503,7 @@ const EmploymentManagement = () => {
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Department</th>
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Status</th>
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Last Login</th>
+                            <th className="text-left py-2 px-4 font-medium text-gray-900">View Leave Files</th>
                             <th className="text-left py-2 px-4 font-medium text-gray-900">Actions</th>
                           </tr>
                         </thead>

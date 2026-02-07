@@ -422,7 +422,7 @@ const handleDeleteClick = (id) => {
                         <tr key={item.id} className="hover:bg-blue-50/50 transition-colors">
                           <td className="p-4 text-gray-500">{index + 1}</td>
                          <td className="p-4 kruti-input font-medium">
-  <span className="bg-gray-100 px-2 py-1 text-[20px] rounded border uppercase">
+  <span className="bg-gray-100 px-2 py-1 text-[20px] rounded border ">
     {item.name}
   </span>
 </td>

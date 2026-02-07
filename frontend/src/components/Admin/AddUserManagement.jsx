@@ -61,6 +61,8 @@ const AddUserManagement = () => {
   // Roles and Sub-roles
   const [roles, setRoles] = useState([]);
   const [subRoles, setSubRoles] = useState([]);
+  const [selectedSubRoleLabel, setSelectedSubRoleLabel] = useState('');
+
   const [isLoadingSubRoles, setIsLoadingSubRoles] = useState(false);
 
   // PS Under Lokayukat state
@@ -68,6 +70,7 @@ const [psUnderLokayukat, setPsUnderLokayukat] = useState('');
 const [lokayuktList, setLokayuktList] = useState([]);
 const [isLoadingLokayukt, setIsLoadingLokayukt] = useState(false);
 const isPersonalSecretary = formData.role_id === "6";
+const isSupervisor = formData.role_id === "3"; 
 
 
 
@@ -180,11 +183,15 @@ const isPersonalSecretary = formData.role_id === "6";
   
   // Handle role_id change - reset sub_role_id when role changes
   if (name === 'role_id') {
+    setSelectedSubRoleLabel('');
     setFormData(prev => ({ 
+      
       ...prev, 
+      
       [name]: value,
       sub_role_id: '', // Reset sub-role when role changes
       ps_parent: "" // Reset lokayukt-uplokayukt
+      
     }));
     
     // Clear sub-role error
@@ -339,6 +346,23 @@ const { data: fetchLokayuktData } = useQuery({
 console.log("fetchLokayuktData in component:", fetchLokayuktData)
   
 
+
+// const renderPSLikePopup = (label) => {
+//   if (!label) return null;
+
+//   return (
+//     <div className="mt-2">
+//       <select
+//         disabled
+//         className="w-full px-3 py-2 text-sm border rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+//       >
+//         <option>{label}</option>
+//       </select>
+//     </div>
+//   );
+// };
+
+
   return (
     <div className=" bg-gray-50 min-h-screen">
       <Toaster
@@ -492,7 +516,16 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
         id="sub_role_id"
         name="sub_role_id"
         value={formData.sub_role_id}
-        onChange={handleInputChange}
+        // onChange={handleInputChange}
+        onChange={(e) => {
+  handleInputChange(e);
+
+  const selected = subRoles.find(
+    (sr) => sr.id === Number(e.target.value)
+  );
+
+  setSelectedSubRoleLabel(selected?.label || selected?.name || '');
+}}
         disabled={!formData.role_id || isLoadingSubRoles}
         className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
           errors.sub_role_id ? 'border-red-500' : 'border-gray-300'
@@ -514,6 +547,9 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
           </option>
         ))}
       </select>
+
+
+
       {errors.sub_role_id && (
         <p className="mt-1 text-sm text-red-600 flex items-center">
           {errors.sub_role_id}
@@ -522,37 +558,48 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
     </div>
   )}
 
+  {/* {!isPersonalSecretary && selectedSubRoleLabel && (
+  renderPSLikePopup(selectedSubRoleLabel)
+)} */}
+
+
+
   {/* LOKAYUKT-UPLOKAYUKT - केवल role_id = 6 होने पर दिखेगा */}
-  {isPersonalSecretary && (
-    <div>
-      <label htmlFor="lokayukt_uplokayukt" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-       PS Under Hon' Lokayukt/Uplokayukt *
-      </label>
-      <select
-        id="ps_parent"
-        name="ps_parent"
-        value={formData.ps_parent}
-        onChange={handleInputChange}
-        className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
-          errors.ps_parent ? 'border-red-500' : 'border-gray-300'
-        }`}
-      >
-        <option value="">Select User</option>
-        
-        {/* ये code अपडेट करें */}
-        {fetchLokayuktData?.flat(2)?.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.user_name} ({item.name})
-          </option>
-        ))}
-      </select>
-      {errors.lokayukt_uplokayukt && (
-        <p className="mt-1 text-sm text-red-600 flex items-center">
-          {errors.lokayukt_uplokayukt}
-        </p>
-      )}
-    </div>
-  )}
+
+
+{(isPersonalSecretary || (isSupervisor && selectedSubRoleLabel)) && (
+  <div>
+    <label htmlFor="ps_parent" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+      PS Under Hon' Lokayukt/Uplokayukt *
+    </label>
+
+    <select
+      id="ps_parent"
+      name="ps_parent"
+      value={formData.ps_parent}
+      onChange={handleInputChange}
+      className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+        errors.ps_parent ? 'border-red-500' : 'border-gray-300'
+      }`}
+    >
+      <option value="">Select User</option>
+
+      {fetchLokayuktData?.flat(2)?.map((item) => (
+        <option key={item.id} value={item.id}>
+          {item.user_name} 
+          {/* {item.user_name} ({item.name}) */}
+        </option>
+      ))}
+    </select>
+
+    {errors.ps_parent && (
+      <p className="mt-1 text-sm text-red-600">
+        {errors.ps_parent}
+      </p>
+    )}
+  </div>
+)}
+
 
 
 
