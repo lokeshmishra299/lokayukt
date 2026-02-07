@@ -121,14 +121,14 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <div className="w-full flex flex-col items-start justify-start text-left">
-          <h1 className="text-xl font-bold text-gray-900">Uploaded Files</h1>
-          <p className="text-sm text-gray-600">List of all documents.</p>
+          <h1 className="text-xl font-bold text-gray-900">Leave Files</h1>
+          <p className="text-sm text-gray-600">अवकाश फाइलें</p>
         </div>
         <div className="mt-4 md:mt-0 relative w-full md:w-auto">
           <input
             type="text"
-            placeholder="Search..."
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-64 focus:outline-none focus:border-blue-500"
+              placeholder="Qkby [kkstsa"
+            className="pl-10 kruti-input pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-64 focus:outline-none focus:border-blue-500"
             value={searchTerm}
             // onChange={(e) => setSearchTerm(e.target.value)}
             onChange={(e) => {
