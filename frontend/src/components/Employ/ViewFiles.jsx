@@ -1,137 +1,118 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import React, { useState } from 'react';
-import { FaFilePdf, FaFileWord, FaFileImage, FaFileExcel, FaEye, FaDownload, FaSearch } from 'react-icons/fa';
-const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
+import React, { useState, useMemo } from 'react';
+import { FaFilePdf, FaFileWord, FaFileImage, FaFileExcel, FaEye, FaSearch, FaSpinner, FaTimes } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
+const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
 
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
-    "Content-Type": "application/json", 
+    "Content-Type": "application/json",
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
 
 const ViewFiles = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [viewUrl, setViewUrl] = useState(null); // Modal URL
+  const [loadingDocId, setLoadingDocId] = useState(null); // Spinner
 
+  // 1. All Files List
   const AllFiles = async () => {
-  const res = await api.get("/employee/all-files");
-  console.log("All Files", res.data); 
-  return res.data;
-};
+    const res = await api.get("/employee/all-files");
+    return res.data;
+  };
 
-  const {data: allFilesData} = useQuery({
+  const { data: allFilesData, isLoading } = useQuery({
     queryKey: ["all-files"],
     queryFn: AllFiles
-  })
+  });
 
-  // 1. Dummy Data (फाइलों की नकली सूची)
-  const dummyFiles = [
-    {
-      id: 1,
-      name: "Project_Proposal_2024.pdf",
-      uploader: "Amit Sharma",
-      date: "2024-01-15",
-      size: "2.4 MB",
-      type: "pdf",
-      status: "Approved",
-    },
-    {
-      id: 2,
-      name: "Site_Inspection_Image_01.jpg",
-      uploader: "Rahul Verma",
-      date: "2024-01-18",
-      size: "4.1 MB",
-      type: "image",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      name: "Financial_Report_Q1.xlsx",
-      uploader: "Sneha Gupta",
-      date: "2024-01-20",
-      size: "1.2 MB",
-      type: "excel",
-      status: "Rejected",
-    },
-    {
-      id: 4,
-      name: "Meeting_Minutes_Jan.docx",
-      uploader: "Vikram Singh",
-      date: "2024-01-22",
-      size: "800 KB",
-      type: "word",
-      status: "Approved",
-    },
-    {
-      id: 5,
-      name: "Architecture_Blueprint.pdf",
-      uploader: "Amit Sharma",
-      date: "2024-01-25",
-      size: "5.6 MB",
-      type: "pdf",
-      status: "Pending",
-    },
-  ];
+  const filesList = allFilesData?.data || [];
 
-  const [files, setFiles] = useState(dummyFiles);
-  const [searchTerm, setSearchTerm] = useState("");
+  // 2. URL Generator (Fix for /storage path)
+  const makeFileUrl = (filePath) => {
+    if (!filePath) return "";
+    
+    // BASE_URL se '/api' hata kar root domain nikalo
+    // Example: "http://localhost:8000/api" -> "http://localhost:8000"
+    const root = BASE_URL.replace(/\/api\/?$/, ""); 
+    
+    // Agar path me starting slash nahi hai to laga do
+    const cleanPath = filePath.startsWith("/") ? filePath : `/${filePath}`;
+    
+    // Combine: http://localhost:8000/storage/doc_123.pdf
+    return `${root}${cleanPath}`;
+  };
 
-  // 2. Helper Function: फाइल टाइप के हिसाब से आइकन चुनने के लिए
-  const getFileIcon = (type) => {
-    switch (type) {
-      case 'pdf': return <FaFilePdf className="text-red-500 text-xl" />;
-      case 'word': return <FaFileWord className="text-blue-500 text-xl" />;
-      case 'excel': return <FaFileExcel className="text-green-600 text-xl" />;
-      case 'image': return <FaFileImage className="text-purple-500 text-xl" />;
-      default: return <FaFilePdf className="text-gray-500 text-xl" />;
+  // 3. Handle View Click (Updated for your Response)
+  const handleViewFile = async (id) => {
+    try {
+      setLoadingDocId(id); // Spinner Start
+      
+      const res = await api.get(`/employee/get-file-preview/${id}`);
+      console.log("View API Response:", res.data); // Debugging ke liye
+
+      // CHECK: Status true hona chahiye (Boolean true ya string "success")
+      if (res.data.status === true || res.data.status === "success") {
+        
+        const filePath = res.data.data; // "/storage/doc_6986e4a19b524.pdf"
+        
+        if (filePath) {
+            const fullUrl = makeFileUrl(filePath);
+            console.log("Opening Full URL:", fullUrl);
+            setViewUrl(fullUrl); // Popup Open karega
+        } else {
+            toast.error("File path empty hai.");
+        }
+
+      } else {
+        toast.error(res.data.message || "File fetch failed.");
+      }
+
+    } catch (error) {
+      console.error("Error viewing file:", error);
+      toast.error("Server error while opening file.");
+    } finally {
+      setLoadingDocId(null); // Spinner Stop
     }
   };
 
-  // 3. Helper Function: स्टेटस के हिसाब से रंग चुनने के लिए
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case 'Approved':
-        return <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold">Approved</span>;
-      case 'Pending':
-        return <span className="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-semibold">Pending</span>;
-      case 'Rejected':
-        return <span className="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">Rejected</span>;
-      default:
-        return <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-semibold">{status}</span>;
-    }
+  // Helper: File Icon
+  const getFileIcon = (fileName) => {
+    if (!fileName) return <FaFilePdf className="text-gray-500 text-xl" />;
+    const ext = fileName.split('.').pop().toLowerCase();
+    if (['pdf'].includes(ext)) return <FaFilePdf className="text-red-500 text-xl" />;
+    if (['doc', 'docx'].includes(ext)) return <FaFileWord className="text-blue-500 text-xl" />;
+    if (['xls', 'xlsx', 'csv'].includes(ext)) return <FaFileExcel className="text-green-600 text-xl" />;
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return <FaFileImage className="text-purple-500 text-xl" />;
+    return <FaFilePdf className="text-gray-500 text-xl" />;
   };
 
-  // 4. Search Filter Logic
-  const filteredFiles = files.filter((file) =>
-    file.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    file.uploader.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filter Logic
+  const filteredFiles = useMemo(() => {
+    return filesList.filter((file) =>
+      (file.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+       file.file?.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [filesList, searchTerm]);
 
   return (
-    <div className=" bg-gray-50 min-h-screen">
-      {/* Header Section */}
+    <div className="bg-gray-50 min-h-screen ">
+      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-      <div className="w-full  flex flex-col items-start justify-start text-left">
-  <h1 className="text-xl font-bold text-gray-900 w-full text-left">
-    Uploaded Files  
-  </h1>
-
-  <p className="text-sm sm:text-base text-gray-600 break-words w-full text-left">
-    अपलोड फ़ाइलें.
-  </p>
-</div>
-
-
-
-        {/* Search Bar */}
-        <div className="mt-4 md:mt-0 relative">
+        <div className="w-full flex flex-col items-start justify-start text-left">
+          <h1 className="text-xl font-bold text-gray-900">Uploaded Files</h1>
+          <p className="text-sm text-gray-600">List of all documents.</p>
+        </div>
+        <div className="mt-4 md:mt-0 relative w-full md:w-auto">
           <input
             type="text"
-            placeholder="Search files..."
-            className="sm:pl-10 pl-20 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-64"
+            placeholder="Search..."
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-64 focus:outline-none focus:border-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -139,57 +120,107 @@ const ViewFiles = () => {
         </div>
       </div>
 
-      {/* Files Table */}
+      {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full whitespace-nowrap">
             <thead className="bg-gray-100 border-b">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Uploader</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Size</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredFiles.length > 0 ? (
-                filteredFiles.map((file) => (
-                  <tr key={file.id} className="hover:bg-gray-50 transition-colors">
+              {isLoading ? (
+                 <tr><td colSpan="4" className="px-6 py-8 text-center text-gray-500">Loading...</td></tr>
+              ) : filteredFiles.length > 0 ? (
+                filteredFiles.map((file, index) => (
+                  <tr key={file.id || index} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        {getFileIcon(file.type)}
-                        <span className="text-sm font-medium text-gray-900">{file.name}</span>
+                        {getFileIcon(file.file)}
+                        <div>
+                            <p className="text-sm font-medium text-gray-900">{file.title || "Untitled"}</p>
+                            <p className="text-xs text-gray-500">{file.file}</p>
+                        </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{file.uploader}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{file.date}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{file.size}</td>
-                    <td className="px-6 py-4">{getStatusBadge(file.status)}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{file.type}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{file.created_at}</td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-3 relative right-4">
-                        <button className="text-blue-600 hover:text-blue-800" title="View">
-                          <FaEye />
+                        <button 
+                            onClick={() => handleViewFile(file.id)}
+                            disabled={loadingDocId === file.id}
+                            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded transition"
+                        >
+                          {loadingDocId === file.id ? <FaSpinner className="animate-spin" /> : <FaEye />}
+                          View
                         </button>
-                        {/* <button className="text-gray-600 hover:text-gray-800" title="Download">
-                          <FaDownload />
-                        </button> */}
-                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
-                    No files found matching your search.
-                  </td>
-                </tr>
+                <tr><td colSpan="4" className="px-6 py-8 text-center text-gray-500">No records found.</td></tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* --- POPUP / MODAL --- */}
+      {viewUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl animate-fade-in">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold text-gray-800">Document Preview</h3>
+              <div className="flex gap-3">
+                {/* Download Button (Optional) */}
+                {/* <a 
+                  href={viewUrl} 
+                  download 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
+                >
+                  Open Original
+                </a> */}
+                <button 
+                  onClick={() => setViewUrl(null)} 
+                  className="p-2 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors"
+                >
+                  <FaTimes size={22} />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 bg-gray-200 p-1 flex justify-center items-center overflow-hidden">
+              {/* Image Handler */}
+              {viewUrl.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) ? (
+                <div className="w-full h-full overflow-auto flex justify-center">
+                    <img 
+                    src={viewUrl} 
+                    alt="Preview" 
+                    className="max-w-full max-h-full object-contain shadow-lg"
+                    />
+                </div>
+              ) : (
+                /* PDF Handler */
+                <iframe
+                  src={`${viewUrl}#toolbar=0&navpanes=0`} 
+                  className="w-full h-full border-0 bg-white shadow-lg"
+                  title="PDF Preview"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
