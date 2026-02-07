@@ -68,6 +68,9 @@ class LokAyuktDashboardController extends Controller
 
                 $avgPendingDays = DB::table('complaints as cmp')
                     // ->where('cmp.status', 'In Progress')
+                    ->where('form_status', 1)
+                        ->where('cmp.approved_rejected_by_rk', 1)
+                        ->where('cmp.approved_rejected_by_lokayukt', 0)
                     ->whereYear('cmp.created_at', $date->year)
                     ->whereMonth('cmp.created_at', $date->month)
                     ->selectRaw('Round(AVG(DATEDIFF(NOW(), cmp.created_at)),1) as avg_days');          

@@ -970,7 +970,6 @@ class CommonController extends Controller
         }
 
         $Category->name = $request->name;
-        $Category->name_h = $request->name_h;
         $Category->status = '1';
     
         $Category->save(); // ✅ Insert into DB

@@ -558,6 +558,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
        
            $query = DB::table('complaints');
           $complainDetails = $query
+           ->where('approved_rejected_by_ro' ,'0')
            ->where('in_draft','0')
           ->count();
         // dd($deadpersondetails);
