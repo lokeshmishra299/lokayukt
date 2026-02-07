@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Storage;
 class EmployeesController extends Controller
 {
      public function index(){
-         $empfiles = EmployeeUploadFiles::get();
+         $user = Auth::user()->id;
+         $empfiles = EmployeeUploadFiles::where('added_by', $user)->get();
         // dd($empfiles->toArray());
         return ApiResponse::generateResponse('success','Records fetch successfully',$empfiles);
      }
@@ -115,4 +116,6 @@ class EmployeesController extends Controller
             ]);
 
     }
+
+   
 }

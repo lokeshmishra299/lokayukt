@@ -16,6 +16,7 @@ use App\Models\SubRole;
 use App\Models\Topics;
 use App\Models\Budget;
 use App\Models\EmployeeFiles;
+use App\Models\EmployeeUploadFiles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -1117,4 +1118,11 @@ class CommonController extends Controller
         // dd($designation->toArray());
         return ApiResponse::generateResponse('success','Category fetch successfully',$cat);
     }
+
+      public function getEmployeeFiles($id){
+         $user = Auth::user()->id;
+         $empfiles = EmployeeUploadFiles::where('added_by', $user)->get();
+        // dd($empfiles->toArray());
+        return ApiResponse::generateResponse('success','Records fetch successfully',$empfiles);
+     }
 }
