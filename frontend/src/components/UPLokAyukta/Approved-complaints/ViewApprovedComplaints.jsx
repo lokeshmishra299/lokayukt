@@ -169,6 +169,7 @@ const ViewApprovedComplaints = () => {
 
         const [showReleaseModal, setShowReleaseModal] = useState(false);
 const [releaseType, setReleaseType] = useState("");
+const [targetDate, setTargetDate] = useState("");
      
    
       const handleReject = () => {
@@ -450,7 +451,8 @@ const [releaseType, setReleaseType] = useState("");
         `/uplokayukt/forward-by-uplokayukt/${complaintId}`,
         {
           forward_to: forwardTo,
-          remark: remarkData,
+          // remark: remarkData,
+             target_date: targetDate,
           sent_through_rk: sent_through_rk ? 1 : 0,
         }
       );
@@ -460,6 +462,7 @@ const [releaseType, setReleaseType] = useState("");
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setRemark("");
+        setTargetDate("");
       setSelectedForwardTo("");
       setConfirmConfig({ open: false, type: null });
     },
@@ -485,26 +488,34 @@ const [releaseType, setReleaseType] = useState("");
         remarkData: remark,
       });
     } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
-        toast.error("Please select forward to and enter a remark");
-        return;
-      }
-      forwardComplaintMutation.mutate({
-        complaintId: id,
-        forwardTo: selectedForwardTo,
-        remarkData: remark,
-      });
-    } else if (confirmConfig.type === "pullback") {
-      pullBackMutation.mutate({
-        complaintId: id,
-      });
+  if (!selectedForwardTo) {
+    toast.error("Please select officer");
+    return;
+  }
+  if (!targetDate) {
+    toast.error("Please select target date");
+    return;
+  }
+
+  forwardComplaintMutation.mutate({
+    complaintId: id,
+    forwardTo: selectedForwardTo,
+    targetDate: targetDate,
+  });
     }
+
+     else if (confirmConfig.type === "pullback") {
+    pullBackMutation.mutate({
+      complaintId: id,
+    });
+  }
   };
 
   const handleConfirmNo = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
+      setTargetDate("");
   };
 
   const getStatusColor = (status) => {
@@ -1192,7 +1203,7 @@ const [releaseType, setReleaseType] = useState("");
             {/* --- FORWARDING LOGIC END --- */}
 
             {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
-            {confirmConfig.type !== "assign" &&
+            {/* {confirmConfig.type !== "assign" &&
               confirmConfig.type !== "pullback" && (
                 <>
                   <div className="mb-5">
@@ -1208,7 +1219,43 @@ const [releaseType, setReleaseType] = useState("");
                     />
                   </div>
                 </>
-              )}
+              )} */}
+
+
+{/* RECEIVE → Remark */}
+{confirmConfig.type === "receive" && (
+  <div className="mb-5">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Remark <span className="text-red-500">*</span>
+    </label>
+    <textarea
+      value={remark}
+      placeholder="Enter your remark here…"
+      onChange={(e) => setRemark(e.target.value)}
+      rows={4}
+      className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+    />
+  </div>
+)}
+
+{/* SEND → Target Date */}
+{confirmConfig.type === "forward" && (
+  <div className="mb-5">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Target Date <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="date"
+      min={new Date().toISOString().split("T")[0]}
+      value={targetDate}
+      onChange={(e) => setTargetDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+)}
+
 
             {/* Buttons */}
             <div className="flex justify-end gap-3">
@@ -1234,10 +1281,10 @@ const [releaseType, setReleaseType] = useState("");
                   pullBackMutation.isPending || 
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
-                    (!remark.trim() ||
-                      !selectedForwardTo ||
-                      isLoadingOptions ||
-                      isFetchingOptions))
+                     (!selectedForwardTo ||
+   !targetDate ||
+   isLoadingOptions ||
+   isFetchingOptions))
                 }
                 className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >

@@ -377,7 +377,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Send To Lokayukt Successfully!", {
+        toast.success("Send To Hon’ble Lokayukt Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -741,7 +741,8 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                               onClick={(e) => handleApproveClick(e, complaint)}
                               className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
                             >
-                              Send To Lokayukt
+                              {/* Send To Lokayukt */}
+                              Sent to the Hon’ble Lokayukta
                             </button>
                           )}
                         </div>

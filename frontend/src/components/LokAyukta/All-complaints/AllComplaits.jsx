@@ -405,7 +405,7 @@ useEffect(() => {
       );
 
       if (response.data.success || response.status === 200) {
-        toast.success("Send To UpLokayukt Successfully!", {
+        toast.success("Send To Hon’ble  UpLokayukt Successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -719,7 +719,7 @@ useEffect(() => {
                               onClick={(e) => handleApproveClick(e, complaint)}
                               className="flex-1 sm:flex-none px-3 py-1.5 text-green-700 border border-green-700 hover:bg-green-700 hover:text-white rounded-md transition-colors duration-200 text-xs font-medium whitespace-nowrap"
                             >
-                              Send To UPLokayukt
+                              Send To Hon’ble UPLokayukt
                             </button>
                           )}
                         </div>
@@ -770,7 +770,7 @@ useEffect(() => {
 
             <div className="px-6 py-4 border-b">
               <h3 className="text-lg font-semibold text-gray-800">
-                Send to UPLokayukt?
+                Send to Hon’ble UPLokayukt?
               </h3>
             </div>
 

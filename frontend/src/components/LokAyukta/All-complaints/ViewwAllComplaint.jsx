@@ -185,6 +185,7 @@ const [releaseForwardTo, setReleaseForwardTo] = useState("");
   const [Rejectedloading, setRejectedloading] = useState(false);
   const [showReleaseModal, setShowReleaseModal] = useState(false);
 const [releaseRemark, setReleaseRemark] = useState("");
+const [targetDate, setTargetDate] = useState("");
 
 
   const handleReject = () => {
@@ -494,7 +495,8 @@ const releaseComplaintMutation = useMutation({
         `/lokayukt/forward-by-lokayukt/${complaintId}`,
         {
           forward_to: forwardTo,
-          remark: remarkData,
+          // remark: remarkData,
+           target_date: targetDate,
           sent_through_rk: sent_through_rk ? 1 : 0,
         },
       );
@@ -503,7 +505,8 @@ const releaseComplaintMutation = useMutation({
     onSuccess: (data) => {
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setRemark("");
+      // setRemark("");
+          setTargetDate("");
       setThroughRC(false);
       setSelectedForwardTo("");
       setConfirmConfig({ open: false, type: null });
@@ -530,15 +533,20 @@ const releaseComplaintMutation = useMutation({
         remarkData: remark,
       });
     } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
-        toast.error("Please select forward to and enter a remark");
-        return;
-      }
-      forwardComplaintMutation.mutate({
-        complaintId: id,
-        forwardTo: selectedForwardTo,
-        remarkData: remark,
-      });
+  if (!selectedForwardTo) {
+    toast.error("Please select officer to forward");
+    return;
+  }
+  if (!targetDate) {
+    toast.error("Please select target date");
+    return;
+  }
+
+  forwardComplaintMutation.mutate({
+    complaintId: id,
+    forwardTo: selectedForwardTo,
+  });
+      
     } else if (confirmConfig.type === "pullback") {
       pullBackMutation.mutate({
         complaintId: id,
@@ -1252,7 +1260,7 @@ const releaseComplaintMutation = useMutation({
               </label>
             )}
 
-            {confirmConfig.type !== "assign" &&
+            {/* {confirmConfig.type !== "assign" &&
               confirmConfig.type !== "pullback" && (
                 <>
                   <div className="mb-5 mt-3">
@@ -1268,7 +1276,42 @@ const releaseComplaintMutation = useMutation({
                     />
                   </div>
                 </>
-              )}
+              )} */}
+
+              {/* RECEIVE / RETURN → Remark */}
+{confirmConfig.type === "receive" && (
+  <div className="mb-5 mt-3">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Remark <span className="text-red-500">*</span>
+    </label>
+    <textarea
+    placeholder="Enter your remark here..."
+      value={remark}
+      onChange={(e) => setRemark(e.target.value)}
+      rows={4}
+      className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+    />
+  </div>
+)}
+
+{/* SEND → Target Date */}
+{confirmConfig.type === "forward" && (
+  <div className="mb-5 mt-3">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Target Date <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="date"
+      value={targetDate}
+      min={new Date().toISOString().split("T")[0]}
+      onChange={(e) => setTargetDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+)}
+
 
             {/* Buttons */}
             <div className="flex justify-end gap-3">
@@ -1294,8 +1337,8 @@ const releaseComplaintMutation = useMutation({
                   pullBackMutation.isPending ||
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
-                    (!remark.trim() ||
-                      !selectedForwardTo ||
+                    (!selectedForwardTo  ||
+                      !targetDate ||
                       isLoadingOptions ||
                       isFetchingOptions))
                 }
