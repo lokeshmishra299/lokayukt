@@ -148,7 +148,7 @@ const ViewApprovedComplaints = () => {
 
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("fee");
+  const [activeTab, setActiveTab] = useState("documents");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
@@ -678,7 +678,7 @@ const ViewApprovedComplaints = () => {
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -704,7 +704,7 @@ const ViewApprovedComplaints = () => {
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -756,18 +756,18 @@ const ViewApprovedComplaints = () => {
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
                 <div>
-                  <button
+                  {/* <button
                     onClick={() => {
                       setConfirmConfig({ open: true, type: "pullback" });
                     }}
                     className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                   >
                     Pull Back
-                  </button>
+                  </button> */}
                 </div>
 
                 <div className="flex gap-2">
-                  <button
+                  {/* <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -775,9 +775,9 @@ const ViewApprovedComplaints = () => {
                     {markAsReceivedMutation.isPending
                       ? "Processing..."
                       : "Return with Remarks"}
-                  </button>
+                  </button> */}
 
-                  <button
+                  {/* <button
                     onClick={handleforwardphysical}
                     disabled={forwardComplaintMutation.isPending}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -785,7 +785,7 @@ const ViewApprovedComplaints = () => {
                     {forwardComplaintMutation.isPending
                       ? "Processing..."
                       : "Send / Mark"}
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
