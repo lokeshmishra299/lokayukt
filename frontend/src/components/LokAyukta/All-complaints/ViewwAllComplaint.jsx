@@ -995,13 +995,16 @@ const releaseComplaintMutation = useMutation({
                   </button>
 
                   
+{(complaintData?.assign_to_ps != null ||
+  complaintData?.assign_to_ro_aro != null) && (
+  <button
+    onClick={opebnRelefPSPoup}
+    className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+  >
+    Release
+  </button>
+)}
 
-                  <button 
-                  onClick={opebnRelefPSPoup}
-                    className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
-                  >
-                    Relese 
-                  </button>
                 </div>
 
                 <div className="flex gap-2">
@@ -1059,34 +1062,40 @@ const releaseComplaintMutation = useMutation({
       <h2 className="text-lg font-semibold mb-4">Are You Sure you Want to Release?</h2>
 
       {/* Release PS */}
-      <div className="flex items-center mb-4">
-        <input
-          type="radio"
-          name="release"
-          id="ps"
-          checked={releaseType === "ps"}
-          onChange={() => setReleaseType("ps")}
-          className="mr-2 cursor-pointer"
-        />
-        <label htmlFor="ps" className="text-sm text-gray-700 cursor-pointer">
-          PS
-        </label>
-      </div>
+      {complaintData?.assign_to_ps != null && (
+  <div className="flex items-center mb-4">
+    <input
+      type="radio"
+      name="release"
+      id="ps"
+      checked={releaseType === "ps"}
+      onChange={() => setReleaseType("ps")}
+      className="mr-2 cursor-pointer"
+    />
+    <label htmlFor="ps" className="text-sm text-gray-700 cursor-pointer">
+      PS
+    </label>
+  </div>
+)}
+
 
       {/* Release RO / ARO */}
-      <div className="flex items-center mb-6">
-        <input
-          type="radio"
-          name="release"
-          id="roaro"
-          checked={releaseType === "ro-aro"}
-          onChange={() => setReleaseType("ro-aro")}
-          className="mr-2 cursor-pointer"
-        />
-        <label htmlFor="roaro" className="text-sm text-gray-700 cursor-pointer">
-         RO / ARO
-        </label>
-      </div>
+      {complaintData?.assign_to_ro_aro != null && (
+  <div className="flex items-center mb-6">
+    <input
+      type="radio"
+      name="release"
+      id="roaro"
+      checked={releaseType === "ro-aro"}
+      onChange={() => setReleaseType("ro-aro")}
+      className="mr-2 cursor-pointer"
+    />
+    <label htmlFor="roaro" className="text-sm text-gray-700 cursor-pointer">
+      RO / ARO
+    </label>
+  </div>
+)}
+
 
       {/* Buttons */}
       <div className="flex justify-end gap-2">
