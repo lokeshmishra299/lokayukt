@@ -347,10 +347,15 @@ const Notes = ({ complaint }) => {
     setPageRanges(updated);
   };
 
-  const isFormValid = () => {
-    const contentState = editorState.getCurrentContent();
-    return contentState.hasText() && selectedDoc !== "";
-  };
+  // const isFormValid = () => {
+  //   const contentState = editorState.getCurrentContent();
+  //   return contentState.hasText() && selectedDoc !== "";
+  // };
+
+    const isFormValid = () => {
+  const contentState = editorState.getCurrentContent();
+  return contentState.hasText(); 
+};
 
   const getDocName = (dId) => {
     if (!documents.length || !dId) return null;
