@@ -944,12 +944,23 @@ const [targetDate, setTargetDate] = useState("");
         Reject
       </button>
 
-      <button
+      {/* <button
   onClick={() => setShowReleaseModal(true)}
   className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
 >
   Release
-</button>
+</button> */}
+
+{(complaintData?.assign_to_ps != null ||
+  complaintData?.assign_to_ro_aro != null) && (
+  <button
+    onClick={opebnRelefPSPoup}
+    className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+  >
+    Release
+  </button>
+)}
+
 
                 </div>
 
@@ -1001,28 +1012,40 @@ const [targetDate, setTargetDate] = useState("");
       </h2>
 
       {/* PS */}
-      <div className="flex items-center mb-4">
-        <input
-          type="radio"
-          name="release"
-          checked={releaseType === "PS"}
-          onChange={() => setReleaseType("PS")}
-          className="mr-2"
-        />
-        <label className="text-sm text-gray-700">PS</label>
-      </div>
+     {complaintData?.assign_to_ps != null && (
+  <div className="flex items-center mb-4">
+    <input
+      type="radio"
+      name="release"
+      id="ps"
+      checked={releaseType === "ps"}
+      onChange={() => setReleaseType("ps")}
+      className="mr-2 cursor-pointer"
+    />
+    <label htmlFor="ps" className="text-sm text-gray-700 cursor-pointer">
+      PS
+    </label>
+  </div>
+)}
+
 
       {/* RO / ARO */}
-      <div className="flex items-center mb-6">
-        <input
-          type="radio"
-          name="release"
-          checked={releaseType === "RO_ARO"}
-          onChange={() => setReleaseType("RO_ARO")}
-          className="mr-2"
-        />
-        <label className="text-sm text-gray-700">RO / ARO</label>
-      </div>
+   {complaintData?.assign_to_ro_aro != null && (
+  <div className="flex items-center mb-6">
+    <input
+      type="radio"
+      name="release"
+      id="roaro"
+      checked={releaseType === "ro-aro"}
+      onChange={() => setReleaseType("ro-aro")}
+      className="mr-2 cursor-pointer"
+    />
+    <label htmlFor="roaro" className="text-sm text-gray-700 cursor-pointer">
+      RO / ARO
+    </label>
+  </div>
+)}
+
 
       {/* Buttons */}
       <div className="flex justify-end gap-2">
