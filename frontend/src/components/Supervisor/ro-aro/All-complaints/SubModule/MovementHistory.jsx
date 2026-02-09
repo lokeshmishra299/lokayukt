@@ -419,10 +419,10 @@ const MovementHistory = ({ complaint }) => {
     const cio = label("CIO", item.forward_by_cio_io_name);
     const ro = label("RO/ARO", item.forward_by_ro_aro_name);
     const sec = label("Secretary", item.forward_by_sec_name);
-    const lok = label("Lokayukt", item.forward_by_lokayukt_name);
+    const lok = label("Hon’ble Lokayukt", item.forward_by_lokayukt_name);
 
-    const toLok = label("Lokayukt", item.forward_to_lokayukt_name);
-    const toUpLok = label("UpLokayukt", item.forward_to_uplokayukt_name);
+    const toLok = label("Hon’ble Lokayukt", item.forward_to_lokayukt_name);
+    const toUpLok = label("Hon’ble UpLokayukt", item.forward_to_uplokayukt_name);
     const toSec = label("Secretary", item.forward_to_sec_name);
     const toCio = label("CIO", item.forward_to_cio_io_name);
     const toRo = label("RO/ARO", item.forward_to_ro_aro_name);
