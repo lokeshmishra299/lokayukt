@@ -460,6 +460,14 @@ const MovementHistory = ({ complaint }) => {
       return `${ro} → ${toSec}`;
     }
 
+
+// Locakyut to uplockatu
+     if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_uplokayukt) {
+      return `${toLok} → Record Section (RC) → ${toUpLok}`;
+    } else if (item.forward_by_lokayukt && item.forward_to_uplokayukt) {
+      return `${toLok} → ${toUpLok}`;
+    }
+
     if (item.forward_by_cio_io && item.sent_through_rk === 1 && item.forward_to_ps) {
       return `${cio} → Record Section (RC) → ${ps}`;
     }
