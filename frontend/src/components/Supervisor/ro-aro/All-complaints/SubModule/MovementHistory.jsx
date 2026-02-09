@@ -433,15 +433,15 @@ const MovementHistory = ({ complaint }) => {
     }
 
     if (item.forward_by_rk && item.forward_to_lokayukt) {
-      return `${rk} → ${toLok}`;
+      return `${rk} → Hon’ble ${toLok}`;
     }
 
     if (item.forward_by_ps && item.forward_to_lokayukt) {
-      return `${ps} → ${toLok}`;
+      return `${ps} → Hon’ble ${toLok}`;
     }
 
     if (item.forward_by_ps && item.forward_to_uplokayukt) {
-      return `${ps} → ${toUpLok}`;
+      return `${ps} → Hon’ble ${toUpLok}`;
     }
 
     if (item.forward_by_ps && item.forward_to_sec) {
@@ -463,9 +463,9 @@ const MovementHistory = ({ complaint }) => {
 
 // Locakyut to uplockatu
      if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_uplokayukt) {
-      return `${toLok} → Record Section (RC) → ${toUpLok}`;
+      return ` Hon’ble ${toLok} → Record Section (RC) → Hon’ble ${toUpLok}`;
     } else if (item.forward_by_lokayukt && item.forward_to_uplokayukt) {
-      return `${toLok} → ${toUpLok}`;
+      return ` Hon’ble ${toLok} → Hon’ble ${toUpLok}`;
     }
 
     if (item.forward_by_cio_io && item.sent_through_rk === 1 && item.forward_to_ps) {
@@ -473,7 +473,7 @@ const MovementHistory = ({ complaint }) => {
     }
 
     if (item.forward_by_cio_io && item.sent_through_rk === 1 && item.forward_to_lokayukt) {
-      return `${cio} → Record Section (RC) → ${toLok}`;
+      return `${cio} → Record Section (RC) → Hon’ble ${toLok}`;
     }
 
     if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_ro_aro) {
@@ -493,9 +493,9 @@ const MovementHistory = ({ complaint }) => {
     }
 
     if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_sec) {
-      return `${lok} → Record Section (RC) → ${toSec}`;
+      return `Hon’ble ${lok} → Record Section (RC) → ${toSec}`;
     } else if (item.forward_by_lokayukt && item.forward_to_sec) {
-      return `${lok} → ${toSec}`;
+      return `Hon’ble ${lok} → ${toSec}`;
     }
 
     return `${record} → Record Section (RC)`;
