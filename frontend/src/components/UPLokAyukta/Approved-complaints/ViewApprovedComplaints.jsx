@@ -159,7 +159,7 @@ const ViewApprovedComplaints = () => {
 
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("fee");
+  const [activeTab, setActiveTab] = useState("documents");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
@@ -863,7 +863,7 @@ const [targetDate, setTargetDate] = useState("");
             {/* Mobile Tab Navigation */}
             <div className="md:hidden border-b bg-white">
               <div className="flex flex-col">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => {
@@ -889,7 +889,7 @@ const [targetDate, setTargetDate] = useState("");
             {/* Desktop Tab Navigation */}
             <div className="hidden md:flex border-b px-6">
               <div className="flex gap-6 overflow-x-auto">
-                {["fee", "documents", "notings", "movement"].map((tab) => (
+                {[ "documents", "notings", "movement"].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -925,7 +925,7 @@ const [targetDate, setTargetDate] = useState("");
             </div>
 
             {/* Footer Buttons */}
-            <div className="border-t p-4">
+            {/* <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
                 <div className="flex gap-3">
                   <button
@@ -981,7 +981,7 @@ const [targetDate, setTargetDate] = useState("");
                   )}
                 </div>
               </div>
-            </div>
+            </div> */}
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-center text-gray-500">
