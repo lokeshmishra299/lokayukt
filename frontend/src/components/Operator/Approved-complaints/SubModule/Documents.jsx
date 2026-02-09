@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaArrowUpLong, FaFilePdf } from "react-icons/fa6";
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaEye, FaSpinner } from "react-icons/fa";
 import { CiLock } from "react-icons/ci";
 import { FiUpload } from "react-icons/fi";
 import axios from "axios";
-// import { ToastContainer, toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -29,55 +28,115 @@ const uploadApi = axios.create({
 
 const Documents = ({ complaint }) => {
   const [correspondenceType, setCorrespondenceType] = useState("Letter");
-  
-  // 1. New State for Title
   const [title, setTitle] = useState("");
-  
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
- const handleFileUpload = (e) => {
-  setFieldErrors((prev) => ({ ...prev, file: undefined }));
+  // --- NEW STATE FOR FETCHING DOCUMENTS ---
+  const [documents, setDocuments] = useState([]);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [pdfViewUrl, setPdfViewUrl] = useState(null);
+  const [loadingDocId, setLoadingDocId] = useState(null);
 
-  const files = Array.from(e.target.files);
-  const pdfFiles = files.filter((file) => file.type === "application/pdf");
-
-  if (pdfFiles.length !== files.length) {
-    toast.error("Only PDF files are allowed!");
-    return;
-  }
-
-  setUploadedFiles((prevFiles) => {
-    let updatedFiles = [...prevFiles];
-
-    pdfFiles.forEach((file) => {
-      const existingIndex = updatedFiles.findIndex(
-        (f) => f.name === file.name // same name = same file
-      );
-
-      const newFileObj = {
-        id: Date.now() + Math.random(),
-        file,
-        name: file.name,
-        size: (file.size / 1024).toFixed(2),
-        uploadDate: new Date().toLocaleDateString(),
-      };
-
-      if (existingIndex !== -1) {
-        // 🔁 Replace at same index
-        updatedFiles[existingIndex] = newFileObj;
-      } else {
-        // ➕ Add new file
-        updatedFiles.push(newFileObj);
+  // --- 1. FETCH DOCUMENTS API (Operator List) ---
+  const fetchDocuments = async () => {
+    if (!complaint?.id) return;
+    setIsLoadingDocs(true);
+    try {
+      // List fetch karne ke liye operator wali api
+      const res = await api.get(`/operator/get-document/${complaint.id}`);
+      if (res.data.status) {
+        setDocuments(res.data.data);
       }
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+    } finally {
+      setIsLoadingDocs(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDocuments();
+  }, [complaint?.id]);
+
+  // --- 2. VIEW DOCUMENT HELPER ---
+  const normalizePath = (filePath) => {
+    if (!filePath) return "";
+    let fp = filePath.replace(/^\//, "");
+    fp = fp.replace("storage/", "storage/Document/");
+    return fp;
+  };
+
+  const makeFileUrl = (filePath) => {
+    const root = BASE_URL.replace("/api", "");
+    const fixedPath = normalizePath(filePath);
+    return `${root}/${fixedPath}`;
+  };
+
+  const handleViewPdf = async (filename) => {
+    try {
+      setLoadingDocId(filename); 
+      // ✅ UPDATED: View ke liye 'lokayukt' wali API use ki hai
+      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+      
+      if (res.data.status && res.data.data.length > 0) {
+        const match = res.data.data.find((p) => p.includes(filename));
+        if (match) {
+          const url = makeFileUrl(match);
+          setPdfViewUrl(url);
+        } else {
+          toast.error("File not found on server.");
+        }
+      }
+    } catch (err) {
+      console.error("Preview Error", err);
+      toast.error("Unable to open file.");
+    } finally {
+      setLoadingDocId(null);
+    }
+  };
+
+  // --- EXISTING UPLOAD LOGIC ---
+  const handleFileUpload = (e) => {
+    setFieldErrors((prev) => ({ ...prev, file: undefined }));
+
+    const files = Array.from(e.target.files);
+    const pdfFiles = files.filter((file) => file.type === "application/pdf");
+
+    if (pdfFiles.length !== files.length) {
+      toast.error("Only PDF files are allowed!");
+      return;
+    }
+
+    setUploadedFiles((prevFiles) => {
+      let updatedFiles = [...prevFiles];
+
+      pdfFiles.forEach((file) => {
+        const existingIndex = updatedFiles.findIndex(
+          (f) => f.name === file.name
+        );
+
+        const newFileObj = {
+          id: Date.now() + Math.random(),
+          file,
+          name: file.name,
+          size: (file.size / 1024).toFixed(2),
+          uploadDate: new Date().toLocaleDateString(),
+        };
+
+        if (existingIndex !== -1) {
+          updatedFiles[existingIndex] = newFileObj;
+        } else {
+          updatedFiles.push(newFileObj);
+        }
+      });
+
+      return updatedFiles;
     });
 
-    return updatedFiles;
-  });
-
-  e.target.value = null;
-};
+    e.target.value = null;
+  };
 
   const handleRemoveFile = (fileId) => {
     setUploadedFiles((prev) => prev.filter((file) => file.id !== fileId));
@@ -91,47 +150,30 @@ const Documents = ({ complaint }) => {
       return;
     }
 
-    // Validation: Title is optional? If mandatory, uncomment below:
-    /*
-    if (!title.trim()) {
-      setFieldErrors((prev) => ({ ...prev, title: ["Title is required"] }));
-      return;
-    }
-    */
-
     setIsUploading(true);
 
     try {
       const formData = new FormData();
 
-      // uploadedFiles.forEach((fileData) => {
-      //   formData.append("file", fileData.file);
-      // });
-
-      // File Uplode Array
       uploadedFiles.forEach((fileData, index) => {
-  formData.append(`file[${index}]`, fileData.file);
-});
+        formData.append(`file[${index}]`, fileData.file);
+      });
       formData.append("type", correspondenceType);
-      
-      // 2. Append Title to Form Data
       formData.append("title", title);
-      
       formData.append("complain_id", complaint.id);
 
+      // Upload ke liye operator wali api
       await uploadApi.post("/operator/upload-document", formData);
 
       toast.success("Uploaded document successfully!");
       setUploadedFiles([]);
-      setTitle(""); // Clear title after upload
+      setTitle("");
+      fetchDocuments();
     } catch (error) {
       const res = error.response?.data;
-
       if (res?.errors) {
         setFieldErrors(res.errors);
-        // const firstKey = Object.keys(res.errors)[0];
-        // const firstMsg = res.errors[firstKey]?.[0];
-        if (firstMsg) toast.error(firstMsg);
+        if (res.errors.file) toast.error(res.errors.file[0]);
       } else if (res?.message) {
         toast.error(res.message);
       } else {
@@ -145,22 +187,57 @@ const Documents = ({ complaint }) => {
   return (
     <>
       <div className="space-y-6 w-full">
-        {/* Warning Box */}
-        <div className="p-4 bg-yellow-50 text-yellow-700 border border-yellow-500 rounded-lg">
-          <div className="flex items-start gap-3">
-            <CiLock size={26} className="mt-0.5 flex-shrink-0" />
-            <div>
-              <h1 className="text-[15px] sm:text-[16px] font-semibold">
-                You cannot view existing documents while the file is in motion.
-              </h1>
-              <p className="text-[13px] sm:text-[14px] mt-1 leading-snug">
-                Document contents are confidential during review by authorities.
-              </p>
+        
+        {/* --- DOCUMENT LIST --- */}
+        <div>
+          <h2 className="text-lg font-bold text-gray-800 mb-3">Existing Documents</h2>
+          
+          {isLoadingDocs ? (
+            <div className="text-center py-4 text-gray-500">Loading documents...</div>
+          ) : documents.length > 0 ? (
+            <div className="grid gap-3">
+              {documents.map((doc, index) => (
+                <div 
+                  key={doc.id || index} 
+                  className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="bg-red-50 p-2 rounded-lg">
+                      <FaFilePdf className="text-red-500 text-xl" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-gray-800 truncate">
+                        {doc.title || doc.file || "Untitled Document"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {doc.type} • {new Date(doc.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleViewPdf(doc.file)}
+                    disabled={loadingDocId === doc.file}
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-70"
+                  >
+                    {loadingDocId === doc.file ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      <FaEye />
+                    )}
+                    View
+                  </button>
+                </div>
+              ))}
             </div>
-          </div>
+          ) : (
+            <div className="p-6 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center text-gray-500">
+              No documents found for this file.
+            </div>
+          )}
         </div>
 
-        {/* Upload Box */}
+        {/* --- UPLOAD BOX --- */}
         <div className="p-4 sm:p-5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
           <h2 className="text-[17px] sm:text-[18px] text-blue-900 font-semibold mb-3">
             Attach New Incoming Correspondence
@@ -171,9 +248,7 @@ const Documents = ({ complaint }) => {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            
-
-              <div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Document Title <span className="text-red-500">*</span>
               </label>
@@ -193,8 +268,7 @@ const Documents = ({ complaint }) => {
                 <p className="mt-1 text-xs text-red-600">{fieldErrors.title[0]}</p>
               )}
             </div>
-            
-            {/* Correspondence Type */}
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Correspondence Type <span className="text-red-500">*</span>
@@ -218,12 +292,8 @@ const Documents = ({ complaint }) => {
                 <p className="mt-1 text-xs text-red-600">{fieldErrors.type[0]}</p>
               )}
             </div>
-
-            {/* 3. Title Input Field */}
-          
           </div>
 
-          {/* PDF Upload Input */}
           <div className="mb-1">
             <label
               htmlFor="pdfUpload"
@@ -258,7 +328,7 @@ const Documents = ({ complaint }) => {
           </div>
         </div>
 
-        {/* Uploaded File List */}
+        {/* Uploaded File List (Preview before upload) */}
         {uploadedFiles.length > 0 && (
           <div className="p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-sm">
             <h3 className="text-[16px] sm:text-[17px] font-semibold mb-4">
@@ -296,20 +366,41 @@ const Documents = ({ complaint }) => {
           </div>
         )}
 
-        {/* Upload Button */}
         <div className="flex flex-col sm:flex-row justify-end">
-          <button
+          {/* <button
             onClick={uploadDocument}
             disabled={isUploading}
             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
           >
             <FiUpload className="text-lg" />
             {isUploading ? "Uploading..." : "Upload Document"}
-          </button>
+          </button> */}
         </div>
       </div>
 
-      <Toaster position="top-right"  />
+      <Toaster position="top-right" />
+
+      {/* PDF View Modal */}
+      {pdfViewUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl">
+            <div className="flex items-center justify-between p-4 border-b bg-gray-50 rounded-t-lg">
+              <h3 className="text-lg font-semibold text-gray-800">Document Viewer</h3>
+              <button
+                onClick={() => setPdfViewUrl(null)}
+                className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-600"
+              >
+                <FaTimes className="w-5 h-5" />
+              </button>
+            </div>
+            <iframe
+              src={`${pdfViewUrl}#zoom=page-width`}
+              className="w-full h-full border-0 bg-gray-100"
+              title="PDF Viewer"
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 };
