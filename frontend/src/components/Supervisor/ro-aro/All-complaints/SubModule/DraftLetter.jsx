@@ -19,6 +19,7 @@ import EditDraft from "./EditDraft";
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
 const name = localStorage.getItem("name");
+const subRole  = localStorage.getItem("subrole");
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -39,6 +40,12 @@ const DraftLetter = ({ complaint }) => {
   // Preview States
   const [previewImages, setPreviewImages] = useState([]); 
   const [generatingPreview, setGeneratingPreview] = useState(false); 
+  const [sentEditorState, setSentEditorState] = useState(() =>
+  EditorState.createEmpty()
+);
+
+
+const [sentToPersonInfo, setSentToPersonInfo] = useState("")
   
   // -- Add Document State --
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -285,6 +292,8 @@ const DraftLetter = ({ complaint }) => {
       formData.append("complaint_id", complaint.id);
       formData.append("draft_note", note);
       formData.append("title", draftTitle);
+      formData.append("sent_to_person_info", sentToPersonInfo);
+
       formData.append("file", pdfBlob, `Draft_${complaint?.file_number || "File"}.pdf`);
 
       const res = await api.post("/supervisor/create-draft", formData, {
@@ -296,6 +305,7 @@ const DraftLetter = ({ complaint }) => {
         setShowSuccess(false);
         setDraftTitle("");
         setNote("");
+        setSentToPersonInfo("");
         setEditorState(EditorState.createEmpty());
         setErrors({});
         refetch();
@@ -334,6 +344,15 @@ const DraftLetter = ({ complaint }) => {
          setErrors(prev => ({...prev, draft_note: null}));
     }
   };
+
+  const onSentEditorChange = (state) => {
+  setSentEditorState(state);
+  const html = draftToHtml(
+    convertToRaw(state.getCurrentContent())
+  );
+  setSentToPersonInfo(html);
+};
+
 
   const handleViewPdf = async (filename) => {
     try {
@@ -419,6 +438,13 @@ const DraftLetter = ({ complaint }) => {
       newErrors.draft_note = ["Draft content is required."];
       hasError = true;
     }
+
+    const sentContent = sentEditorState.getCurrentContent();
+if (!sentContent.hasText()) {
+  newErrors.sent_to_person_info = ["Sent To Person Info is required."];
+  hasError = true;
+}
+
 
     if (hasError) {
         setErrors(newErrors);
@@ -611,6 +637,8 @@ const DraftLetter = ({ complaint }) => {
                 )}
               </div>
 
+              
+
               {/* Correspondence Type */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
@@ -714,19 +742,21 @@ const DraftLetter = ({ complaint }) => {
               <FaTimes className="w-5 h-5 text-gray-600" />
             </button>
             <div className="flex-1 px-4 md:p-6 overflow-y-auto">
+              <h2 className="text-lg font-semibold mb-4 md:mb-6 mt-4">Create Draft</h2>
              <label className="block text-md font-medium mb-2">
-              Title <span className="text-red-500">*</span>
+              Draft Title <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="title"
               id="title"
+              placeholder="Mªk¶V 'kZ'kZd fy[ksa"
               value={draftTitle}  
               onChange={(e) => {
                   setDraftTitle(e.target.value);
                   if(errors.title) setErrors({...errors, title: null}); 
               }}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm ${
+              className={`w-full kruti-input px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm ${
                   errors.title ? "border-red-500" : "border-gray-300"
               }`}
             />
@@ -736,7 +766,37 @@ const DraftLetter = ({ complaint }) => {
                 </p>
             )}
 
-              <h2 className="text-lg font-semibold mb-4 md:mb-6 mt-4">Create Draft</h2>
+
+
+            <label className="block text-sm font-medium mb-2">
+  Sent To Person Info
+</label>
+
+<div className="border border-gray-300 rounded-md">
+  <Editor
+    editorState={sentEditorState}
+    onEditorStateChange={onSentEditorChange}
+    // handlePastedText={handlePastedText}
+    stripPastedStyles={true}
+    editorClassName="kruti-input px-3 min-h-[100px]"
+    editorStyle={{ lineHeight: "1.2", minHeight: "120px" }}
+    placeholder="यहाँ भेजे गए व्यक्ति की जानकारी लिखें..."
+    toolbar={{
+      options: ["inline", "list", "textAlign", "history"],
+      inline: { options: ["bold", "italic", "underline"] },
+    }}
+  />
+</div>
+
+
+{errors.sent_to_person_info && (
+  <p className="text-red-500 text-xs mt-1">
+    {errors.sent_to_person_info[0]}
+  </p>
+)}
+
+
+            
               <label className="block text-sm font-medium mb-2">
                 Draft Content <span className="text-red-500">*</span>
               </label>
@@ -820,7 +880,7 @@ const DraftLetter = ({ complaint }) => {
   wrapperClassName="wrapperClassName"
   editorClassName="editorClassName kruti-input px-3 min-h-[120px] md:min-h-[150px]"
   editorStyle={{ lineHeight: '1.2', minHeight: '150px' }}
-  placeholder="Draft yahan likhen..."
+  placeholder="ड्राफ्ट यहाँ लिखें..."
   toolbar={{
     options: ["inline","blockType","fontSize","list","textAlign","colorPicker","link","emoji","remove","history"],
     inline: { options: ["bold","italic","underline"] },
@@ -846,63 +906,77 @@ const DraftLetter = ({ complaint }) => {
       )}
 
       {/* SUCCESS / PREVIEW POPUP */}
-      {showSuccess && (
-        <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl my-auto">
-            {/* --- IMPORTANT: Added ID here --- */}
-            <div 
-                ref={popupRef} 
-                id="pdf-content-div"  
-                className="bg-white rounded-lg overflow-hidden"
-            >
+     {showSuccess && (
+    <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl my-auto">
+        {/* --- IMPORTANT: Added ID here --- */}
+        <div 
+            ref={popupRef} 
+            id="pdf-content-div"  
+            className="bg-white rounded-lg overflow-hidden"
+        >
 
-            <style>{`
-                .draft-preview-content ol {
-                  list-style-type: decimal !important;
-                  padding-left: 20px !important;
-                  margin-bottom: 10px;
-                }
-                .draft-preview-content ul {
-                  list-style-type: disc !important;
-                  padding-left: 20px !important;
-                  margin-bottom: 10px;
-                }
-                .draft-preview-content li {
-                  margin-bottom: 4px;
-                }
-              `}</style>
+        <style>{`
+            .draft-preview-content ol {
+              list-style-type: decimal !important;
+              padding-left: 20px !important;
+              margin-bottom: 10px;
+            }
+            .draft-preview-content ul {
+              list-style-type: disc !important;
+              padding-left: 20px !important;
+              margin-bottom: 10px;
+            }
+            .draft-preview-content li {
+              margin-bottom: 4px;
+            }
+          `}</style>
 
-              <div className="px-4 py-3 md:px-6 md:py-4 border-b flex flex-wrap justify-between items-center bg-gray-100 pdf-hide-section gap-2">
-                <p className="text-sm font-semibold text-gray-800">
-                  Preview Note
-                </p>
-                <div className="flex items-center gap-2 ml-auto">
-                  <button
-                    onClick={handlePrint}
-                    className="p-2 rounded hover:bg-gray-200 text-gray-700 flex items-center gap-1 text-xs font-medium"
-                    title="Print"
-                  >
-                    <FaPrint /> <span className="hidden sm:inline">Print</span>
-                  </button>
-                  <button
-                    onClick={handleDownloadPdf}
-                    className="p-2 rounded hover:bg-gray-200 text-blue-600 flex items-center gap-1 text-xs font-medium"
-                    title="Download as PDF"
-                  >
-                    <FaDownload /> <span className="hidden sm:inline">Download</span>
-                  </button>
-                  <button
-                    onClick={() => setShowSuccess(false)}
-                    className="p-2 rounded hover:bg-gray-200 text-gray-600"
-                  >
-                    <FaTimes className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+          <div className="px-4 py-3 md:px-6 md:py-4 border-b flex flex-wrap justify-between items-center bg-gray-100 pdf-hide-section gap-2">
+            <p className="text-sm font-semibold text-gray-800">
+              Preview Note
+            </p>
+            <div className="flex items-center gap-2 ml-auto">
+              <button
+                onClick={handlePrint}
+                className="p-2 rounded hover:bg-gray-200 text-gray-700 flex items-center gap-1 text-xs font-medium"
+                title="Print"
+              >
+                <FaPrint /> <span className="hidden sm:inline">Print</span>
+              </button>
+              <button
+                onClick={handleDownloadPdf}
+                className="p-2 rounded hover:bg-gray-200 text-blue-600 flex items-center gap-1 text-xs font-medium"
+                title="Download as PDF"
+              >
+                <FaDownload /> <span className="hidden sm:inline">Download</span>
+              </button>
+              <button
+                onClick={() => setShowSuccess(false)}
+                className="p-2 rounded hover:bg-gray-200 text-gray-600"
+              >
+                <FaTimes className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
 
-                <div className="mt-5 py-5 px-6 w-full flex justify-between items-start font-[Mangal] text-black">
-                  <div className="w-1/3"></div>
-                  <div className="w-1/3 text-center">
+
+     
+
+            {/* --- HEADER SECTION --- */}
+            {/* Added pb-0 to remove bottom padding causing gap */}
+            <div className="mt-5 pt-5 px-6 pb-2 w-full flex justify-between items-start font-[Mangal] text-black">
+            
+                {/* Left Side Info - Removed 'relative top-9', added 'mt-8' for same look without gap */}
+                  <div className="mt-8"> 
+                    <h1>{subRole}</h1>
+                    <h1>{name}</h1>
+                    <h1>लोक आयुक्त उ०प्र०</h1>
+                    <p className="">लखनऊ |</p>
+                  </div>
+              
+                  {/* Center Logo - Removed 'relative left-6' if not needed, kept structure */}
+                  <div className="w-1/3 relative left-6 text-center">
                     <h1 className="text-xl font-bold">लोक आयुक्त</h1>
                     <h2 className="text-md font-bold mt-1">उत्तर प्रदेश</h2>
 
@@ -915,6 +989,7 @@ const DraftLetter = ({ complaint }) => {
                     </div>
                   </div>
 
+                  {/* Right Side Address */}
                   <div className="w-1/3 text-[15px] font-bold leading-6 text-right">
                     <p>पोस्ट बाक्स नं 172 (जी.पी.ओ.)</p>
                     <p>टी.सी. 46/बी-1, विभूति खण्ड</p>
@@ -928,52 +1003,75 @@ const DraftLetter = ({ complaint }) => {
 
                     <p className="mt-1">फैक्स : (0522) 2306647</p>
                   </div>
-                </div>
+            </div>
 
-              <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
-                <p className="text-sm text-center font-semibold text-gray-800">
-                  File No: {complaint?.file_number || complaint?.complain_no}
-                </p>
-                <p className="text-xs text-gray-500">
-                  Date: {new Date().toLocaleDateString()}
-                </p>
-                <div
-  className="rounded-md bg-white   min-h-[200px] md:min-h-[260px] draft-preview-content"
-  // dangerouslySetInnerHTML={{ __html: note }}
-  dangerouslySetInnerHTML={{ __html: note
-    .replace(/<li>/g, '<li style="font-family: Arial, sans-serif;"><span style="font-family: KrutiDev; font-size:22px;">')
-    .replace(/<\/li>/g, '</span></li>')
-    .replace(/<p>/g, '<p style="font-family: KrutiDev; font-size:22px;">') }}
-/>
-                <div className="flex justify-between pt-4">
-                  <div />
-                  <div className="text-right text-xs text-gray-600">
-                    <p className="uppercase tracking-wide">Noting By</p>
-                    <p className="font-semibold mt-1 text-gray-800">
-                      Hon' Lokayukt Shri Sanjay Mishra
-                    </p>
-                    <p>{name}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="px-6 py-4 md:px-8 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
-                <button
-                  className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
-                  onClick={() => setShowSuccess(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="px-6 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
-                  onClick={handleFinalSubmit} 
-                >
-                  Submit
-                </button>
+          {/* --- BODY SECTION --- */}
+          {/* Removed py-6/py-8, changed to pt-0 to pull content up */}
+          <div className="px-6 pb-6 pt-0 md:px-8 md:pb-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
+
+            {/* Removed 'relative bottom-16' which was breaking flow */}
+            <div className="-ml-5 mt-2"> 
+              
+              <div
+                className="ml-6 draft-preview-content"
+                dangerouslySetInnerHTML={{
+                  __html: sentToPersonInfo
+                    ?.replace(/<li>/g, '<li style="font-family: KrutiDev; font-size:20px;">')
+                    .replace(/<p>/g, '<p style="font-family: KrutiDev; font-size:20px; margin:0;">'),
+                }}
+              />
+            </div>
+
+
+
+            {/* File No & Date – parallel */}
+            <div className="flex justify-between  items-center">
+              <p className="text-sm relative top-1 text-gray-500">
+              संख्या: { complaint?.complain_no}
+              </p>
+              <p className="text-sm text-gray-500">
+                दिनांक: {new Date().toLocaleDateString()}
+              </p>
+            </div>
+
+            <div
+              className="rounded-md bg-white min-h-[200px] md:min-h-[260px] draft-preview-content"
+              dangerouslySetInnerHTML={{
+                __html: note
+                  .replace(/<li>/g, '<li style="font-family: Arial, sans-serif;"><span style="font-family: KrutiDev; font-size:22px;">')
+                  .replace(/<\/li>/g, '</span></li>')
+                  .replace(/<p>/g, '<p style="font-family: KrutiDev; font-size:22px;">')
+              }}
+            />
+
+            <div className="flex justify-between pt-4">
+              <div />
+              <div className="text-right text-xs text-gray-600">
+                <p className="uppercase tracking-wide">भवदीय</p>
+                <p>{name}</p>
               </div>
             </div>
+
+          </div>
+
+          <div className="px-6 py-4 md:px-8 border-t bg-gray-100 flex justify-end gap-3 pdf-hide-section">
+            <button
+              className="px-4 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-200 text-gray-700"
+              onClick={() => setShowSuccess(false)}
+            >
+              Cancel
+            </button>
+            <button
+              className="px-6 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
+              onClick={handleFinalSubmit} 
+            >
+              Submit
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    </div>
+  )}
 
       {pdfViewUrl && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
