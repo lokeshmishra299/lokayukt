@@ -350,7 +350,6 @@ const [targetDate, setTargetDate] = useState("");
   onSuccess: (data) => {
     toast.success(data?.message || "Released successfully");
     queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-     setRelefPs(false);
     setShowReleaseModal(false);
     setReleaseType("");
   },
