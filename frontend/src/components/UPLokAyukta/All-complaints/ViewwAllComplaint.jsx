@@ -166,7 +166,6 @@ const ViewAllComplaint = () => {
   const [sent_through_rk, setThroughRC] = useState(false);
      const [showModal, setShowModal] = useState(false);
         const [Rejectedloading,setRejectedloading] = useState(false)
-         const [relefPs, setRelefPs] = useState(false);
 
         const [showReleaseModal, setShowReleaseModal] = useState(false);
 const [releaseType, setReleaseType] = useState("");
@@ -343,7 +342,7 @@ const [targetDate, setTargetDate] = useState("");
     const res = await api.post(
       `/uplokayukt/released-by-uplokayukt/${id}`,
       {
-        forward_to, // PS | RO_ARO
+        forward_to, 
       }
     );
     return res.data;
@@ -356,7 +355,7 @@ const [targetDate, setTargetDate] = useState("");
     setReleaseType("");
   },
   onError: (error) => {
-    toast.error(error?.response?.data?.message || "Failed to release");
+    // toast.error(error?.response?.data?.message );
   },
 });
 
@@ -427,9 +426,9 @@ const [targetDate, setTargetDate] = useState("");
     },
   });
 
-  const opebnRelefPSPoup = ()=>{
-    setRelefPs(true)
-  }
+ const openReleasePopup = () => {
+  setShowReleaseModal(true);
+};
 
   // const forwardComplaintMutation = useMutation({
   //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
@@ -960,7 +959,7 @@ const [targetDate, setTargetDate] = useState("");
 {(complaintData?.assign_to_ps != null ||
   complaintData?.assign_to_ro_aro != null) && (
   <button
-    onClick={opebnRelefPSPoup}
+    onClick={openReleasePopup}
     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
   >
     Release
