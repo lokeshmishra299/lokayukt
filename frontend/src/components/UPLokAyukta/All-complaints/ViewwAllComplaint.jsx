@@ -166,6 +166,7 @@ const ViewAllComplaint = () => {
   const [sent_through_rk, setThroughRC] = useState(false);
      const [showModal, setShowModal] = useState(false);
         const [Rejectedloading,setRejectedloading] = useState(false)
+         const [relefPs, setRelefPs] = useState(false);
 
         const [showReleaseModal, setShowReleaseModal] = useState(false);
 const [releaseType, setReleaseType] = useState("");
@@ -350,6 +351,7 @@ const [targetDate, setTargetDate] = useState("");
   onSuccess: (data) => {
     toast.success(data?.message || "Released successfully");
     queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+     setRelefPs(false);
     setShowReleaseModal(false);
     setReleaseType("");
   },
@@ -424,6 +426,10 @@ const [targetDate, setTargetDate] = useState("");
       );
     },
   });
+
+  const opebnRelefPSPoup = ()=>{
+    setRelefPs(true)
+  }
 
   // const forwardComplaintMutation = useMutation({
   //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
