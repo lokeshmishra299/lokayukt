@@ -20,6 +20,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
+import { useQueryClient } from '@tanstack/react-query';
+
 
 // Create axios instance with token if it exists
 const api = axios.create({
@@ -31,6 +33,8 @@ const api = axios.create({
 });
 
 const AddEmploymentManagement = () => {
+    const queryClient = useQueryClient();
+  
     const navigate =useNavigate()
 
   const [formData, setFormData] = useState({
@@ -281,7 +285,9 @@ const handleSubmit = async (e) => {
     const response = await api.post('/admin/add-employee', payload); 
     
     if (response.data.status === true) {
-      toast.success(response.data.message || 'User created successfully!');
+      toast.success(response.data.message || 'Employee created successfully!');
+      queryClient.invalidateQueries({queryKey: ["employees"]})
+
 
       setTimeout(()=>{
         navigate("/admin/employment-management")

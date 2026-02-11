@@ -12,6 +12,8 @@ import {
   FaEdit 
 } from 'react-icons/fa';
 import { toast, Toaster } from "react-hot-toast";
+import { useQueryClient } from '@tanstack/react-query';
+
 
 // import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -34,6 +36,7 @@ const api = axios.create({
 });
 
 const EditUserManagement = () => {
+  const queryClient = useQueryClient();
   const { id } = useParams(); 
   const navigate = useNavigate();
 
@@ -67,7 +70,9 @@ const EditUserManagement = () => {
   const [subRoles, setSubRoles] = useState([]);
   const [isLoadingSubRoles, setIsLoadingSubRoles] = useState(false);
 
+  const [selectedSubRoleLabel, setSelectedSubRoleLabel] = useState('');
   const isPersonalSecretary = String(formData.role_id) === "6";
+  const isSupervisor = String(formData.role_id) === "3";
 
   const fetchLokayukt = async () => {
     const res = await api.get('/admin/get-lokayukt-uplokayukt');
@@ -253,13 +258,15 @@ const EditUserManagement = () => {
         district_id: formData.district_id || ''
       };
 
-      // Add specific fields based on Role (PS or Not)
       if (isPersonalSecretary) {
         updatePayload.ps_parent = formData.ps_parent || "";
-        updatePayload.sub_role_id = ""; // Clear sub_role if PS
+        updatePayload.sub_role_id = ""; 
+      } else if (isSupervisor) {
+        updatePayload.sub_role_id = formData.sub_role_id || "";
+        updatePayload.ps_parent = formData.ps_parent || ""; 
       } else {
         updatePayload.sub_role_id = formData.sub_role_id || "";
-        updatePayload.ps_parent = ""; // Clear ps_parent if not PS
+        updatePayload.ps_parent = ""; 
       }
 
       // Only include password fields if they are provided
@@ -274,6 +281,8 @@ const EditUserManagement = () => {
 
       if (response.data.status === true) {
         toast.success(response.data.message || 'User updated successfully!');
+      queryClient.invalidateQueries({queryKey: ["users"]})
+
         setTimeout(() => {
           navigate("/admin/user-management")
         }, 2000);
@@ -350,7 +359,11 @@ const EditUserManagement = () => {
                   type="text"
                   name="name"
                   value={formData.name}
-                  onChange={handleInputChange}
+                 onChange={(e) => {
+                      handleInputChange(e);
+                      const selected = subRoles.find((sr) => sr.id === Number(e.target.value));
+                      setSelectedSubRoleLabel(selected?.label || selected?.name || '');
+                    }}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
                     errors.name ? 'border-red-500' : 'border-gray-300'
                   }`}
@@ -472,7 +485,7 @@ const EditUserManagement = () => {
               )}
 
               {/* LOKAYUKT-UPLOKAYUKT - Only visible if Role is PS (ID 6) */}
-              {isPersonalSecretary && (
+           {(isPersonalSecretary || (isSupervisor && selectedSubRoleLabel)) && (
                 <div>
                   <label htmlFor="ps_parent" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                    PS Under Hon' Lokayukt/Uplokayukt *

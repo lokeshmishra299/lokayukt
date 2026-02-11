@@ -14,6 +14,8 @@ import {
 // import { ToastContainer, toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 import { toast, Toaster } from "react-hot-toast";
+import { useQueryClient } from '@tanstack/react-query';
+
 
 import axios from "axios";
 import { useQuery } from '@tanstack/react-query';
@@ -31,6 +33,8 @@ const api = axios.create({
 });
 
 const AddUserManagement = () => {
+  const queryClient = useQueryClient();
+
     const navigate =useNavigate()
 
   const [formData, setFormData] = useState({
@@ -285,12 +289,16 @@ const handleSubmit = async (e) => {
   console.log("Submitting payload:", payload);
 
   try {
-    const response = await api.post('/admin/add-user', payload); // ✅ सही payload भेजें
+    const response = await api.post('/admin/add-user', payload); 
     
     if (response.data.status === true) {
       toast.success(response.data.message || 'User created successfully!');
+      queryClient.invalidateQueries({queryKey: ["users"]})
       
-      // Reset form
+      setTimeout(()=>{
+        navigate(-1)
+      }, 2000)
+      
       setFormData({
         name: '',
         email: '',

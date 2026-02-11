@@ -419,7 +419,7 @@ const EmploymentManagement = () => {
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#13316C] text-white rounded-md text-sm hover:bg-[#0f2451] transition"
           >
             <FaUserPlus className="w-4 h-4" />
-            Add User
+            Add Employee
           </button>
         </div>
 

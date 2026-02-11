@@ -18,9 +18,12 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query'; 
+import { useQueryClient } from '@tanstack/react-query';
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
+
 
 // Create axios instance with token if it exists
 const api = axios.create({
@@ -32,6 +35,8 @@ const api = axios.create({
 });
 
 const EditEmploymentManagement = () => {
+    const queryClient = useQueryClient();
+
   const { id } = useParams(); 
   const navigate = useNavigate();
 
@@ -99,9 +104,10 @@ const EditEmploymentManagement = () => {
           });
         } else {
           toast.error('Failed to load user data');
-          navigate('/admin/user-management'); 
+          navigate('/admin/employment-management'); 
         }
-
+        
+        
         const districtsResponse = await api.get(`/admin/all-district`);
         if (districtsResponse.data.status === 'success') {
           setDistricts(districtsResponse.data.data);
@@ -121,7 +127,7 @@ const EditEmploymentManagement = () => {
         console.error('Failed to fetch data:', error);
         toast.error('Failed to load required data from server');
         if (error.response?.status === 404) {
-          navigate('/admin/user-management'); 
+          navigate('/admin/employment-management'); 
         }
       } finally {
         setIsLoadingDistricts(false);
@@ -270,11 +276,13 @@ const EditEmploymentManagement = () => {
       console.log('Update payload being sent:', updatePayload); 
 
       const response = await api.post(`/admin/update-employee/${id}`, updatePayload);
+      queryClient.invalidateQueries({queryKey: ["employees"]})
+
 
       if (response.data.status === true) {
         toast.success(response.data.message || 'User updated successfully!');
         setTimeout(() => {
-          navigate("/admin/user-management")
+          navigate("/admin/employment-management")
         }, 2000);
       }
     } catch (error) {
@@ -289,7 +297,7 @@ const EditEmploymentManagement = () => {
         toast.error(firstError || 'Please fix the validation errors');
       } else if (error.response?.status === 404) {
         toast.error('User not found');
-        navigate("/admin/user-management");
+        navigate("/admin/employment-management");
       } else if (error.response?.status === 403) {
         toast.error('You do not have permission to update this user');
       } else {
