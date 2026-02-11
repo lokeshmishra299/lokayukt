@@ -16,7 +16,6 @@ const Header = ({ toggleMobileMenu }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
-  // ================= LOGIC (UNCHANGED) =================
   const getApiInstance = () => {
     const token = localStorage.getItem("access_token");
     return axios.create({
@@ -95,16 +94,13 @@ const Header = ({ toggleMobileMenu }) => {
       ? user.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
       : "AD";
 
-  // ================= UI =================
   return (
     <>
       <Toaster position="top-right" />
 
-      {/* ✅ FULL WIDTH HEADER */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b shadow-sm z-50">
         <div className="h-full flex items-center justify-between px-6">
 
-          {/* LEFT */}
           <div className="flex items-center gap-4">
             {isMobile && (
               <button

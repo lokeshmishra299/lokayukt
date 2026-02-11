@@ -577,9 +577,9 @@ const EmploymentManagement = () => {
                                         statusMutation.isPending ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'
                                       }`}></div>
                                     </label>
-                                    {statusMutation.isPending && statusMutation.variables === user.id && (
-                                      {/* <FaSpinner className="w-3 h-3 animate-spin text-gray-500" /> */}
-                                    )}
+                                    {/* {statusMutation.isPending && statusMutation.variables === user.id && (
+                                      <FaSpinner className="w-3 h-3 animate-spin text-gray-500" />
+                                    )} */}
                                     <span className={`text-xs ${user.status === '1' || user.status === 1 ? 'text-green-600' : 'text-gray-500'}`}>
                                       {user.status === '1' || user.status === 1 ? 'active' : 'inactive'}
                                     </span>

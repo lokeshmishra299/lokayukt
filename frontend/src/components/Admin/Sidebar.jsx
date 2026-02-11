@@ -9,8 +9,8 @@ import {
   FaUsers,
   FaDatabase,
   FaTimes,
-  FaChevronDown, // New Import
-  FaChevronRight // New Import
+  FaChevronDown, 
+  FaChevronRight 
 } from "react-icons/fa";
 import { IoFileTray } from "react-icons/io5";
 import { FaUserGroup } from "react-icons/fa6";
@@ -43,7 +43,6 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isMobile && isMobileMenuOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-40 z-40"

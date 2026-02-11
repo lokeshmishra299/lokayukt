@@ -58,7 +58,7 @@ const Layout = () => {
         className="transition-all duration-300 min-h-screen"
         style={{
           marginLeft: !isMobile ? (isCollapsed ? "4rem" : "16rem") : "0",
-          paddingTop: "4rem", // header height
+          paddingTop: "4rem", 
         }}
       >
         <main className={isMobile ? "p-4" : "p-6"}>

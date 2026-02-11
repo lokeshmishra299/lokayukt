@@ -17,7 +17,6 @@ import {
 
 } from 'react-icons/fa';
 
-// --- 1. API Configuration ---
 const BASE_URL = "http://localhost:8000/api"; 
 const token = localStorage.getItem("access_token");
 
