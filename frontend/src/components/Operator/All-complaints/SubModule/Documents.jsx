@@ -171,10 +171,21 @@ const Documents = ({ complaint }) => {
       fetchDocuments();
     } catch (error) {
       const res = error.response?.data;
-      if (res?.errors) {
-        setFieldErrors(res.errors);
-        if (res.errors.file) toast.error(res.errors.file[0]);
-      } else if (res?.message) {
+     if (res?.errors) {
+  const newErrors = { ...res.errors };
+
+  // 👇 backend file.0 → frontend file
+  if (res.errors["file.0"]) {
+    newErrors.file = res.errors["file.0"];
+  }
+
+  setFieldErrors(newErrors);
+
+  if (newErrors.file) {
+    toast.error(newErrors.file[0]);
+  }
+}
+ else if (res?.message) {
         toast.error(res.message);
       } else {
         toast.error("Failed to upload documents. Please try again.");
@@ -321,10 +332,10 @@ const Documents = ({ complaint }) => {
               />
             </label>
             {fieldErrors.file && (
-              <p className="mt-1 text-xs text-red-600">
-                {fieldErrors.file[0]}
-              </p>
-            )}
+  <p className="mt-1 text-xs text-red-600">
+    {fieldErrors.file[0]}
+  </p>
+)}
           </div>
         </div>
 
@@ -333,7 +344,7 @@ const Documents = ({ complaint }) => {
           <div className="p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-sm">
             <h3 className="text-[16px] sm:text-[17px] font-semibold mb-4">
               Selected Documents ({uploadedFiles.length}) - 
-              <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span>
+              {/* <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span> */}
             </h3>
 
             <div className="space-y-3">
