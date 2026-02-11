@@ -44,7 +44,6 @@ const Documents = ({ complaint }) => {
     if (!complaint?.id) return;
     setIsLoadingDocs(true);
     try {
-      // List fetch karne ke liye operator wali api
       const res = await api.get(`/operator/get-document/${complaint.id}`);
       if (res.data.status) {
         setDocuments(res.data.data);
@@ -78,7 +77,7 @@ const Documents = ({ complaint }) => {
     try {
       setLoadingDocId(filename); 
       // ✅ UPDATED: View ke liye 'lokayukt' wali API use ki hai
-      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+      const res = await api.get(`/operator/get-file-preview/${complaint.id}`);
       
       if (res.data.status && res.data.data.length > 0) {
         const match = res.data.data.find((p) => p.includes(filename));
@@ -332,8 +331,8 @@ const Documents = ({ complaint }) => {
         {uploadedFiles.length > 0 && (
           <div className="p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-sm">
             <h3 className="text-[16px] sm:text-[17px] font-semibold mb-4">
-              Selected Documents ({uploadedFiles.length}) - 
-              <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span>
+              Selected Documents ({uploadedFiles.length}) 
+              {/* <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span> */}
             </h3>
 
             <div className="space-y-3">

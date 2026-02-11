@@ -77,8 +77,8 @@ const Documents = ({ complaint }) => {
   const handleViewPdf = async (filename) => {
     try {
       setLoadingDocId(filename); 
-      // ✅ UPDATED: View ke liye 'lokayukt' wali API use ki hai
-      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
+      // ✅ UPDATED: View ke liye 'operator' wali API use ki hai
+      const res = await api.get(`/operator/get-file-preview/${complaint.id}`);
       
       if (res.data.status && res.data.data.length > 0) {
         const match = res.data.data.find((p) => p.includes(filename));
