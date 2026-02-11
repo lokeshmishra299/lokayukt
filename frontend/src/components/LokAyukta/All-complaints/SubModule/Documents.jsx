@@ -24,7 +24,7 @@ const Documents = ({ complaint }) => {
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
   const [docPage, setDocPage] = useState(1);
-const itemsPerPage = 5;
+const itemsPerPage = 10;
 
   // -- Add Document State --
   const [isSubmitting, setIsSubmitting] = useState(false);

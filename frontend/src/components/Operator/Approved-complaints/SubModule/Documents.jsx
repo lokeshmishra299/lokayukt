@@ -367,14 +367,14 @@ const Documents = ({ complaint }) => {
         )}
 
         <div className="flex flex-col sm:flex-row justify-end">
-          {/* <button
+          <button
             onClick={uploadDocument}
             disabled={isUploading}
             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
           >
             <FiUpload className="text-lg" />
             {isUploading ? "Uploading..." : "Upload Document"}
-          </button> */}
+          </button>
         </div>
       </div>
 

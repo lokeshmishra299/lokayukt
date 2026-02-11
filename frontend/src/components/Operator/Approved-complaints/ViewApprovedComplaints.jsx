@@ -624,10 +624,10 @@
               <div className="border-t p-4">
                 <div className="flex flex-col sm:flex-row gap-3 justify-between">
                   <div className="flex gap-2">
-                    <button className="px-4 py-2 border cursor-not-allowed  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
+                    {/* <button className="px-4 py-2 border cursor-not-allowed  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm">
                       Pull Back
-                    </button>
-
+                    </button> */}
+{/* 
                     {complaintData.received_phsical === 1 ? (
                       <button
                         disabled
@@ -645,10 +645,10 @@
                           ? "Processing..."
                           : "Received Physically"}
                       </button>
-                    )}
+                    )} */}
                   </div>
 
-                  <div className="flex gap-2">
+                  {/* <div className="flex gap-2">
                     {complaintData.forward_physical === 1 ? (
                       <button
                         disabled
@@ -667,7 +667,7 @@
                           : "Send"}
                       </button>
                     )}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </>

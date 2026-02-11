@@ -15,6 +15,7 @@ import draftToHtml from "draftjs-to-html";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import EditDraft from "./EditDraft";
+import Pagination from "../../../../Pagination";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -31,6 +32,8 @@ const api = axios.create({
 
 const DraftLetter = ({ complaint }) => {
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
+  const [draftPage, setDraftPage] = useState(1);
+const itemsPerPage = 10;
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -306,6 +309,7 @@ const [sentToPersonInfo, setSentToPersonInfo] = useState("")
         setDraftTitle("");
         setNote("");
         setSentToPersonInfo("");
+          setSentEditorState(EditorState.createEmpty()); 
         setEditorState(EditorState.createEmpty());
         setErrors({});
         refetch();
@@ -482,6 +486,16 @@ if (!sentContent.hasText()) {
     enabled: !!complaint?.id,
   });
 
+  useEffect(() => {
+  setDraftPage(1);
+}, [documents]);
+
+const lastIndex = draftPage * itemsPerPage;
+const firstIndex = lastIndex - itemsPerPage;
+const currentDrafts = documents.slice(firstIndex, lastIndex);
+const totalPages = Math.ceil(documents.length / itemsPerPage);
+
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -539,7 +553,7 @@ if (!sentContent.hasText()) {
             No documents available
           </div>
         ) : (
-          documents.map((doc) => (
+          currentDrafts.map((doc) => (
             <div
               key={doc.id}
               className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
@@ -547,7 +561,7 @@ if (!sentContent.hasText()) {
               <div className="flex items-center gap-3">
                 <BsFileEarmarkPdf className="w-6 h-6 text-blue-600" />
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-800">
+                  <span className="text-sm kruti-input font-medium text-gray-800">
                     {doc.title || "NA"}
                   </span>
                   {doc.type && (
@@ -586,6 +600,16 @@ if (!sentContent.hasText()) {
           ))
         )}
       </div>
+
+      {documents.length > itemsPerPage && (
+  <Pagination
+    currentPage={draftPage}
+    totalPages={totalPages}
+    onPageChange={setDraftPage}
+    totalItems={documents.length}
+    itemsPerPage={itemsPerPage}
+  />
+)}
 
       {editDraftPopup && (
         <EditDraft
