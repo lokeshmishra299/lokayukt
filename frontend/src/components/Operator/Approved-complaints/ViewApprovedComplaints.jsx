@@ -266,9 +266,21 @@
                       <IoMdArrowBack className="w-4 h-4" /> Back
                     </button>
                   </div>
-                  <h2 className="text-lg font-semibold text-gray-800 mb-2">
-                    File No. {complaintData.complain_no}
-                  </h2>
+                     <h2 className="text-xl font-semibold text-gray-800">
+                      File No. {complaintData.complain_no}
+                      <span className="">
+                        (
+                        <span className="text-blue-600">
+                          {complaintData.case_type == 1 ?  "NEW CASE" :
+                          complaintData.case_type == 2 ? "OLD CASE"
+                          :
+                          "NEW CASE"
+                           
+                            }
+                        </span>
+                        )
+                      </span>
+                    </h2>
                   <div className="mb-3">
                     <span
                       className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
@@ -291,14 +303,17 @@
                 {/* Desktop Header */}
                 <div className="hidden md:block">
                   <div className="flex justify-between items-start mb-3">
-                    <h2 className="text-xl font-semibold text-gray-800">
+                      <h2 className="text-xl font-semibold text-gray-800">
                       File No. {complaintData.complain_no}
-                      <span className="hidden md:inline">
+                      <span className="">
                         (
                         <span className="text-blue-600">
-                          {complaintData.status == "In Progress"
-                            ? "NEW CASE"
-                            : complaintData.status}
+                          {complaintData.case_type == 1 ?  "NEW CASE" :
+                          complaintData.case_type == 2 ? "OLD CASE"
+                          :
+                          "NEW CASE"
+                           
+                            }
                         </span>
                         )
                       </span>
