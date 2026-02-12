@@ -5,6 +5,7 @@ namespace App\Http\Controllers\api\Operator;
 use App\Http\Controllers\Controller;
 use App\Models\ComplainDetails;
 use App\Models\Complaint;
+use App\Models\ComplainDocuments;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Role;
@@ -538,12 +539,29 @@ $complainDetails->details = DB::table('complaints_details as cd')
            ]);
     }
 
-        public function getFilePreview($id){
+    //     public function getFilePreview($id){
+    //     $cmp = Complaint::findOrFail($id);
+    //     $cmpDetail = ComplainDetails::where('complain_id',$cmp->id)->get();
+    //     foreach($cmpDetail as $c){
+
+    //         $path[] = Storage::url('Document/' . $c->file); 
+    //         $cmp->filepath = $path;
+    //     }
+    //        return response()->json([
+    //            'status' => true,
+    //            'message' => 'File Fetch successfully',
+    //            'data' => $cmp->filepath,
+    //        ]);
+
+    // }
+
+      public function getFilePreview($id){
         $cmp = Complaint::findOrFail($id);
-        $cmpDetail = ComplainDetails::where('complain_id',$cmp->id)->get();
+        $cmpDetail = ComplainDocuments::where('complain_id',$cmp->id)->get();
         foreach($cmpDetail as $c){
 
-            $path[] = Storage::url('Document/' . $c->file); 
+            $path[] = Storage::url($c->file);
+
             $cmp->filepath = $path;
         }
            return response()->json([
@@ -553,6 +571,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
            ]);
 
     }
+
 
          public function allComplainsDashboard(){
        
@@ -1049,5 +1068,45 @@ $records = DB::table('complaints')
                 'data' =>  $stats,
             ]);
     }
+
+    public function search(Request $request)
+{
+    $search = $request->search;
+
+    $query = Complaint::query();
+
+    if ($request->COMP_NO) {
+        $query->where('COMP_NO', $request->COMP_NO);
+    }
+
+    if ($request->YEAR) {
+        $query->where('YEAR', $request->YEAR);
+    }
+
+    if ($request->COMP_DT) {
+        $query->whereDate('COMP_DT', $request->COMP_DT);
+    }
+
+    if ($request->COMP_NM) {
+        $query->where('COMP_NM', 'like', '%'.$request->COMP_NM.'%');
+    }
+
+    if ($request->DISTT) {
+        $query->where('DISTT', $request->DISTT);
+    }
+
+    if ($request->NATURE) {
+        $query->where('NATURE', $request->NATURE);
+    }
+
+    if ($request->LETT_NO) {
+        $query->where('LETT_NO', 'like', '%'.$request->LETT_NO.'%');
+    }
+
+    $data = $query->paginate(10);
+
+
+}
+
 
 }

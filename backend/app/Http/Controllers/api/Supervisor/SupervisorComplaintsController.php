@@ -22,7 +22,18 @@ class SupervisorComplaintsController extends Controller
         $user = Auth::user()->id;
         // dd($user);
       $userSubrole = Auth::user()->subrole->name; 
-   
+    
+        $parentId = null;
+        $parentId = Auth::user()->parent_user_id;
+        // dd($parentId);
+        if($parentId){
+
+            $userParentData = User::with('role')->where('id',$parentId)->get();
+            $roleParent = $userParentData[0]->role->name;
+        }
+        // dd($roleParent);
+           $userParentSubrole = Auth::user()->userParentRole ?? '';  
+
     if ($userSubrole) {
     $query = DB::table('complaints')
         //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
@@ -129,11 +140,25 @@ class SupervisorComplaintsController extends Controller
                     ->count();
             break;
         case "ro-aro":
-          $query->where('form_status', 1)
-                  ->where('approved_rejected_by_rk', 1)
-                  ->where('approved_rejected_by_ro_aro', 0)
-                  ->where('rep.forward_to_ro_aro', $user)
-                  ->whereOr('rep.forward_to_uplokayukt','<>',0);
+        //   $query->where('form_status', 1)
+        //           ->where('approved_rejected_by_rk', 1)
+        //           ->where('approved_rejected_by_ro_aro', 0)
+        //           ->where('rep.forward_to_ro_aro', $user)
+        //           ->whereOr('rep.forward_to_uplokayukt','<>',0);
+                  $query->where(function ($q) use ($user) {
+                    $q->where('form_status', 1)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('approved_rejected_by_ro_aro', 0)
+                    ->where('rep.forward_to_ro_aro', $user)
+                    ->where('rep.forward_to_uplokayukt', '<>', 0);
+                })
+                ->orWhere(function ($q) use ($parentId) {
+                    $q->where('approved_rejected_by_rk', 1)
+                     ->where('approved_rejected_by_ro_aro', 0)
+                    ->where('complaints.approved_rejected_by_lokayukt', 1)
+                    ->where('rep.forward_to_uplokayukt', $parentId);
+                });
+
                 //   ->where('forward_so', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
 
@@ -1890,7 +1915,7 @@ $complainDetails->actions = $actions;
             // 'type' => 'required|string',
             // 'title' => 'required|string',
             'description' => 'required|string',
-            'd_id' => 'required',
+            // 'd_id' => 'required',
             // 'forward_by' => 'required',
             // 'forward_to' => 'required',
             // 'range_from' => 'required',
@@ -1901,7 +1926,7 @@ $complainDetails->actions = $actions;
             // 'type.required' => 'Complaint description is required.',
             // 'title.required' => 'Letter Subject is Required',
             'description.required' => 'Description is Required',
-            'd_id.required' => 'Document is Required',
+            // 'd_id.required' => 'Document is Required',
             'range_from.required' => 'Range From is Required',
             'range_two.required' => 'Range too is Required',
         ]);
@@ -1947,12 +1972,14 @@ $complainDetails->actions = $actions;
             
             'complaint_id' => 'required|numeric',
             'title' => 'required|string',
+            'sent_to_person_info' => 'required|string',
             'draft_note' => 'required|string',
              'file' =>  'required|file|mimes:jpg,jpeg,png,pdf',
             
         ], [
             'complaint_id.required' => 'Complaint Id is required.',
             'title.required' => 'Title is required',
+            'sent_to_person_info.required' => 'From Draft Info is required',
             'draft_note.required' => 'Description is required',
         ]);
 

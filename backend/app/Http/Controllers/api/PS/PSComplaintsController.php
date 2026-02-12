@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Storage;
 class PSComplaintsController extends Controller
 {
       public function allComplains(){
-        // $user = Auth::user()->id;
+        $user = Auth::user()->id;
         $parentId = null;
         $parentId = Auth::user()->parent_user_id;
         // dd($parentId);
@@ -72,8 +72,12 @@ if($roleParent === 'lok-ayukt'){
           ->where('complaints.approved_rejected_by_lokayukt', 0);
 
 }elseif($roleParent === 'up-lok-ayukt'){
-    $query->where('complaints.approved_rejected_by_rk', 1)
-          ->where('complaints.approved_rejected_by_lokayukt', 1);
+    // $query->where('complaints.approved_rejected_by_rk', 1)
+    //       ->where('complaints.approved_rejected_by_lokayukt', 1);
+     $query->where('complaints.approved_rejected_by_rk', 1)
+     ->where('complaints.approved_rejected_by_lokayukt', 1)
+          ->whereNotNull('rep.forward_to_ps')
+          ->where('rep.forward_to_ps', $user);
 
 }elseif($roleParent === "supervisor" && $userParentSubrole->sub_role_id == 14){
 
@@ -628,7 +632,7 @@ $complainDetails->actions = $actions;
         $validation = Validator::make($request->all(), [
             // 'forward_by_ds_js' => 'required|exists:users,id',
             'forward_to' => 'required|exists:users,id',
-            'remark' => 'required',
+            'target_date' => 'required',
          
           
         ], [
@@ -636,7 +640,7 @@ $complainDetails->actions = $actions;
             // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
             'forward_to.required' => 'Forward to user is required.',
             'forward_to.exists' => 'Forward to user does not exist.',
-            'remark.required' => 'Remark is required.',
+            'target_date.required' => 'Target Date is required.',
            
         ]);
 
@@ -672,6 +676,7 @@ $complainDetails->actions = $actions;
                          $apcAction = new ComplaintAction();
                             $apcAction->complaint_id = $complainId;
                             $apcAction->forward_by_ps = $userId;
+                            $apcAction->target_date = $request->target_date;
                            
                             if($request->sent_through_rk == 1){
                                 $apcAction->sent_through_rk = 1;
@@ -705,10 +710,10 @@ $complainDetails->actions = $actions;
                                     }elseif($subroleFwd === "ro-aro"){
 
                                             $apcAction->forward_to_ro_aro = $request->forward_to;
-                                            // if($cmp->approved_rejected_by_ro_aro == 1){
-                                            //     $cmp->approved_rejected_by_ro_aro = 0;
-                                            //     $cmp->save();
-                                            // }
+                                            if($cmp->approved_rejected_by_ro_aro == 1){
+                                                $cmp->approved_rejected_by_ro_aro = 0;
+                                                $cmp->save();
+                                            }
                                     }
                                 }
                                    
