@@ -815,7 +815,7 @@ $complainDetails->actions = $actions;
                 // $remark.= $request->remarks;
                 // $remark.='\n';
                 // $cmp->remark = $remark;
-                
+                $cmp->save();
                     if($cmp->save()){
 
                          $apcAction = new ComplaintAction();

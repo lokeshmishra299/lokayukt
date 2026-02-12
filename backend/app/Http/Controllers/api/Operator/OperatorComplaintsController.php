@@ -1058,7 +1058,23 @@ class OperatorComplaintsController extends Controller
             $uploadedFiles[] = $compDoc;
         }
 
-        return response()->json([
+      
+
+        if($request->complain_id){
+             $complaint = Complaint::find($request->complain_id);
+             $complaint->case_type = 2;
+             $complaint->status = "In Progress";
+             $complaint->form_status = 0;
+             $complaint->assign_to_ps = null;
+             $complaint->assign_to_ro_aro = null;
+             $complaint->approved_rejected_by_rk = 0;
+             $complaint->approved_rejected_by_ro_aro = 0;
+             $complaint->approved_rejected_by_lokayukt = 0;
+             $complaint->save();
+           
+        }
+
+          return response()->json([
             'status'  => true,
             'message' => 'Documents uploaded successfully.',
             'data'    => $uploadedFiles
@@ -1874,6 +1890,7 @@ class OperatorComplaintsController extends Controller
                  ->where('approved_rejected_by_rk','0')
                  ->where('in_draft','0')
                  ->distinct('cm.id')
+                 ->orderBy('cm.updated_at', 'DESC')
                 ->get();
 
                  $todayCount = DB::table('complaints')
@@ -2019,6 +2036,7 @@ class OperatorComplaintsController extends Controller
                 ->where('approved_rejected_by_rk',1)
                 // ->where('approved_rejected_by_ps',1)
                 //  ->where('in_draft','0')
+                ->orderBy('cm.updated_at','DESC')
                   ->distinct('cm.id')
                 ->get();
 
@@ -2511,4 +2529,18 @@ $complaints = $complaints->filter(function ($complaint) {
                     ], 200);
 
         }
+
+           public function getUploadDoc(Request $request,$id){
+             $added_by = Auth::user()->id;
+        if($request->isMethod('get')){
+            $complain = ComplainDocuments::where('complain_id',$id)->where('added_by',$added_by)->get();
+
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Document Fetch successfully.',
+                    'data' => $complain
+                ], 200);
+        }
+       
+    }
 }

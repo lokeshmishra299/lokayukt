@@ -13,7 +13,7 @@ class UserManagement extends Controller
 {
     public function index()
     {
-        $users = User::with('role:id,name','department:id,name')->where('user_type','user')->get();
+        $users = User::with('role:id,name,label','department:id,name')->where('user_type','user')->get();
         return response()->json([
             'status' => true,
             'data' => $users
@@ -21,7 +21,7 @@ class UserManagement extends Controller
     }
     public function allEmployees()
     {
-        $employees = User::with('role:id,name','department:id,name')->where('user_type','employee')->get();
+        $employees = User::with('role:id,name,label','department:id,name')->where('user_type','employee')->get();
         return response()->json([
             'status' => true,
             'data' => $employees
@@ -220,6 +220,12 @@ class UserManagement extends Controller
 
             $user->save();
 
+            if ($user->role_id == 6 || $user->role_id == 3) {
+                $user->update([
+                    'parent_user_id' => $request->ps_parent
+                ]);
+            }
+
         if (!$user) {
             return response()->json([
                 'status' => false,
@@ -266,6 +272,7 @@ class UserManagement extends Controller
         ]);
     }
 
+    
      public function employee_management(Request $request)
     {
         // Validate input
