@@ -536,7 +536,10 @@ else {
            {(isPersonalSecretary || isSupervisor) && (
                 <div>
                   <label htmlFor="ps_parent" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                   PS Under Hon' Lokayukt/Uplokayukt *
+                   {/* PS Under Hon' Lokayukt/Uplokayukt * */}
+                        {isPersonalSecretary
+    ? "PS Under Hon' Lokayukt/Uplokayukt *"
+    : "Under Supervisor *"}
                   </label>
                   <select
                     id="ps_parent"

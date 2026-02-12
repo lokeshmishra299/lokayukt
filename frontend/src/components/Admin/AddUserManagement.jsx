@@ -589,7 +589,10 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
 {(isPersonalSecretary || (isSupervisor && selectedSubRoleLabel)) && (
   <div>
     <label htmlFor="ps_parent" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-      PS Under Hon' Lokayukt/Uplokayukt *
+      {/* PS Under Hon' Lokayukt/Uplokayukt * */}
+       {isPersonalSecretary
+    ? "PS Under Hon' Lokayukt/Uplokayukt *"
+    : "Under Supervisor *"}
     </label>
 
     <select
@@ -605,8 +608,8 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
 
       {fetchLokayuktData?.flat(2)?.map((item) => (
         <option key={item.id} value={item.id}>
-          {item.user_name} 
-          {/* {item.user_name} ({item.name}) */}
+          {/* {item.user_name}  */}
+          {item.user_name} ({item.name})
         </option>
       ))}
     </select>
