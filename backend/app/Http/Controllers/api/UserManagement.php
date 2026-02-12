@@ -106,7 +106,7 @@ class UserManagement extends Controller
 
 
 
-    if ($user->role_id == 6) {
+    if ($user->role_id == 6 || $user->role_id == 3) {
             $user->update([
                 'parent_user_id' => $request->ps_parent
             ]);
