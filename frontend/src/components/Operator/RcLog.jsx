@@ -176,7 +176,7 @@ const totalPages = Math.ceil((rclogValue?.length || 0) / itemsPerPage);
   {indexOfFirstItem + index + 1}
 </td>
                     <td className="px-4 py-2 font-medium text-gray-800">
-                      {item.last_action?.complaint_id || "-"}
+                      {item?.complain_no || "-"}
                     </td>
                     <td className="px-4 py-2 text-blue-600 font-medium">
                       {getMovementTitle(item.last_action)}

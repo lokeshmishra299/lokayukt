@@ -303,7 +303,7 @@ const Sidebar = ({
               >
                 <div className="flex items-center gap-3">
                     <TiDocumentText size={18} className="w-[18px] h-[18px] flex-shrink-0" />
-                  {(isMobile || !isCollapsed) && <span>RCLog</span>}
+                  {(isMobile || !isCollapsed) && <span>RC Log</span>}
                 </div>
                 {isActive("/rc-log") && (isMobile) && (
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
