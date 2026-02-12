@@ -580,9 +580,9 @@ const EmploymentManagement = () => {
                                     {/* {statusMutation.isPending && statusMutation.variables === user.id && (
                                       <FaSpinner className="w-3 h-3 animate-spin text-gray-500" />
                                     )} */}
-                                    <span className={`text-xs ${user.status === '1' || user.status === 1 ? 'text-green-600' : 'text-gray-500'}`}>
+                                    {/* <span className={`text-xs ${user.status === '1' || user.status === 1 ? 'text-green-600' : 'text-gray-500'}`}>
                                       {user.status === '1' || user.status === 1 ? 'active' : 'inactive'}
-                                    </span>
+                                    </span> */}
                                   </div>
                                 </td>
 
