@@ -554,7 +554,7 @@ const UserManagement = () => {
                                 {/* Role */}
                                 <td className="py-2 px-4">
                                   <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role?.label || user.role?.name)}`}>
-                                    {displayValue(user.role?.name)}
+                                    {displayValue(user.role?.label)}
                                   </span>
                                 </td>
 
