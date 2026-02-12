@@ -75,6 +75,8 @@ const [lokayuktList, setLokayuktList] = useState([]);
 const [isLoadingLokayukt, setIsLoadingLokayukt] = useState(false);
 const isPersonalSecretary = formData.role_id === "6";
 const isSupervisor = formData.role_id === "3"; 
+const needsPsParent = isPersonalSecretary || (isSupervisor && formData.sub_role_id);
+
 
 
 
@@ -276,15 +278,24 @@ const handleSubmit = async (e) => {
   };
 
   // ✅ Role के according fields add करें
-  if (isPersonalSecretary) {
-    // Personal Secretary के लिए
-    payload.ps_parent = formData.ps_parent || "";
-    payload.sub_role_id = ""; // empty string
-  } else {
-    // दूसरे roles के लिए
-    payload.sub_role_id = formData.sub_role_id || "";
-    payload.ps_parent = ""; // empty string
-  }
+  // if (isPersonalSecretary) {
+  //   // Personal Secretary के लिए
+  //   payload.ps_parent = formData.ps_parent || "";
+  //   payload.sub_role_id = ""; // empty string
+  // } else {
+  //   // दूसरे roles के लिए
+  //   payload.sub_role_id = formData.sub_role_id || "";
+  //   payload.ps_parent = ""; // empty string
+  // }
+
+  payload.sub_role_id = formData.sub_role_id || "";
+
+if (needsPsParent) {
+  payload.ps_parent = formData.ps_parent || "";
+} else {
+  payload.ps_parent = "";
+}
+
 
   console.log("Submitting payload:", payload);
 
