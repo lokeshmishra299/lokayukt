@@ -46,7 +46,8 @@ const EditUserManagement = () => {
     number: '',
     role_id: '',
     sub_role_id: '',
-    ps_parent: "", 
+    // ps_parent: "", 
+      parent_user_id: "",
     designation: '', 
     department: '',   
     district_id: '', 
@@ -96,7 +97,8 @@ const EditUserManagement = () => {
             number: userData.number || '',
             role_id: userData.role_id || '',
             sub_role_id: userData.sub_role_id || '',
-            ps_parent: userData.ps_parent || "",
+            // ps_parent: userData.ps_parent || "",
+            parent_user_id: userData.parent_user_id || "",
             designation: userData.designation_id || '', 
             department: userData.department_id || '',   
             district_id: userData.district_id || '',
@@ -193,7 +195,8 @@ const EditUserManagement = () => {
         ...prev, 
         [name]: value,
         sub_role_id: '', 
-        ps_parent: ""    
+        // ps_parent: ""    
+        parent_user_id: ""
       }));
       
       // Clear specific errors
@@ -258,16 +261,44 @@ const EditUserManagement = () => {
         district_id: formData.district_id || ''
       };
 
-      if (isPersonalSecretary) {
-        updatePayload.ps_parent = formData.ps_parent || "";
-        updatePayload.sub_role_id = ""; 
-      } else if (isSupervisor) {
-        updatePayload.sub_role_id = formData.sub_role_id || "";
-        updatePayload.ps_parent = formData.ps_parent || ""; 
-      } else {
-        updatePayload.sub_role_id = formData.sub_role_id || "";
-        updatePayload.ps_parent = ""; 
-      }
+      // if (isPersonalSecretary) {
+      //   // updatePayload.ps_parent = formData.ps_parent || "";
+      //     updatePayload.ps_parent = formData.parent_user_id; // ✅
+      //   updatePayload.sub_role_id = ""; 
+      // } else if (isSupervisor) {
+      //   updatePayload.sub_role_id = formData.sub_role_id || "";
+      //   updatePayload.ps_parent = formData.ps_parent || ""; 
+      // } else {
+      //   updatePayload.sub_role_id = formData.sub_role_id || "";
+      //   updatePayload.ps_parent = ""; 
+      // }
+
+
+//       if (Number(formData.role_id) === 6) {
+//   updatePayload.ps_parent = formData.parent_user_id; 
+// }
+
+//       if (isPersonalSecretary) {
+//   updatePayload.ps_parent = formData.parent_user_id; // ✅
+//   updatePayload.sub_role_id = "";
+// } 
+// else if (isSupervisor) {
+//   updatePayload.sub_role_id = formData.sub_role_id || "";
+//   updatePayload.ps_parent = formData.parent_user_id; // ✅ FIX HERE
+// } 
+// else {
+//   updatePayload.sub_role_id = formData.sub_role_id || "";
+// }
+
+
+if (Number(formData.role_id) === 6) {
+  updatePayload.ps_parent = formData.parent_user_id; // ✅ ONLY THIS
+  updatePayload.sub_role_id = "";
+} else {
+  updatePayload.sub_role_id = formData.sub_role_id || "";
+}
+
+
 
       // Only include password fields if they are provided
       if (formData.password && formData.password_confirmation) {
@@ -492,8 +523,9 @@ const EditUserManagement = () => {
                   </label>
                   <select
                     id="ps_parent"
-                    name="ps_parent"
-                    value={formData.ps_parent}
+                    name="parent_user_id"
+                    // value={formData.ps_parent}
+                      value={formData.parent_user_id}
                     onChange={handleInputChange}
                     className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
                       errors.ps_parent ? 'border-red-500' : 'border-gray-300'
