@@ -61,20 +61,41 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
 
 
-  const sortComplaintsByDate = (complaints, order) => {
-    return [...complaints].sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
+  // const sortComplaintsByNo = (complaints, order) => {
+  //   return [...complaints].sort((a, b) => {
+  //     const dateA = new Date(a.created_at);
+  //     const dateB = new Date(b.created_at);
 
-      if (order === "desc") {
-        return dateB - dateA;
-      } else {
-        return dateA - dateB;
-      }
-    });
-  };
+  //     if (order === "desc") {
+  //       return dateB - dateA;
+  //     } else {
+  //       return dateA - dateB;
+  //     }
+  //   });
+  // };
 
 
+// const sortComplaintsByNo = (complaints, order) => {
+//     if (!complaints) return [];
+    
+//     return [...complaints].sort((a, b) => {
+//       // String parsing (File No nikalne ke liye)
+//       const strA = a.complain_no ? String(a.complain_no).split(/[-/]/)[0] : "0";
+//       const strB = b.complain_no ? String(b.complain_no).split(/[-/]/)[0] : "0";
+
+//       const numA = parseInt(strA, 10);
+//       const numB = parseInt(strB, 10);
+
+//       if (order === "desc") {
+//         // YAHAN BADLAV KIYA HAI: (numA - numB)
+//         // Isse chota number (jese 66) sabse upar aayega
+//         return numA - numB; 
+//       } else {
+//         // Yahan bada number pehle aayega
+//         return numB - numA; 
+//       }
+//     });
+//   };
  const getAllComplaints = async () => {
   const res = await api.get("/operator/all-approved-complaints");
   return res.data;
@@ -118,14 +139,14 @@ const stats = {
 
   });
 
-useEffect(() => {
-  if (data?.data && Array.isArray(data.data)) {
-    setAllComplaints(data.data);
-    const sorted = sortComplaintsByDate(data.data, sortOrder);
-    setFilteredComplaints(sorted);
-    setCurrentPage(1);
-  }
-}, [data, sortOrder]);
+// useEffect(() => {
+//   if (data?.data && Array.isArray(data.data)) {
+//     setAllComplaints(data.data);
+//     const sorted = sortComplaintsByNo(data.data, sortOrder);
+//     setFilteredComplaints(sorted);
+//     setCurrentPage(1);
+//   }
+// }, [data, sortOrder]);
 
 
 
@@ -150,7 +171,7 @@ useEffect(() => {
 
 //       setAllComplaints(decodedData);
       
-//       const sorted = sortComplaintsByDate(decodedData, sortOrder);
+//       const sorted = sortComplaintsByNo(decodedData, sortOrder);
 //       setFilteredComplaints(sorted);
 //       setCurrentPage(1);
 //     }
@@ -215,7 +236,7 @@ useEffect(() => {
 // }
 
 
-//     const sorted = sortComplaintsByDate(filtered, sortOrder);
+//     const sorted = sortComplaintsByNo(filtered, sortOrder);
 //     setFilteredComplaints(sorted);
 //     setCurrentPage(1);
 //   }, [
@@ -229,6 +250,49 @@ useEffect(() => {
 
 
 
+
+// useEffect(() => {
+//     // Check karo ki data kahan hai (data me ya data.data me)
+//     let complaintsList = [];
+
+//     if (data && Array.isArray(data)) {
+//        // Agar API direct array bhej raha hai
+//        complaintsList = data;
+//     } else if (data?.data && Array.isArray(data.data)) {
+//        // Agar API object bhej raha hai jisme data key hai
+//        complaintsList = data.data;
+//     }
+
+//     // Agar list mili, to use set karo aur sort karo
+//     if (complaintsList.length > 0) {
+//       setAllComplaints(complaintsList);
+      
+//       // Sorting function call
+//       const sorted = sortComplaintsByNo(complaintsList, sortOrder);
+      
+//       setFilteredComplaints(sorted);
+//       setCurrentPage(1);
+//     }
+//   }, [data, sortOrder]);
+
+
+useEffect(() => {
+  let complaintsList = [];
+
+  if (data && Array.isArray(data)) {
+    complaintsList = data;
+  } else if (data?.data && Array.isArray(data.data)) {
+    complaintsList = data.data;
+  }
+
+  if (complaintsList.length > 0) {
+    setAllComplaints(complaintsList);
+    setFilteredComplaints(complaintsList); // ✅ NO SORTING
+    setCurrentPage(1);
+  }
+}, [data]);
+
+  
   useEffect(() => {
     if (allComplaints.length === 0) return;
 
@@ -301,8 +365,9 @@ useEffect(() => {
     }
 
     // सॉर्टिंग (Sorting)
-    const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(sorted);
+    // const sorted = sortComplaintsByNo(filtered, sortOrder);
+    setFilteredComplaints(filtered);
+    // setFilteredComplaints(sorted);
     setCurrentPage(1);
 
   }, [
