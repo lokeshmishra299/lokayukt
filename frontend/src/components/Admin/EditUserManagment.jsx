@@ -291,13 +291,29 @@ const EditUserManagement = () => {
 // }
 
 
+// if (Number(formData.role_id) === 6) {
+//   updatePayload.ps_parent = formData.parent_user_id; // ✅ ONLY THIS
+//   updatePayload.sub_role_id = "";
+// } else {
+//   updatePayload.sub_role_id = formData.sub_role_id || "";
+// }
+
+
+// Role 6: Personal Secretary
 if (Number(formData.role_id) === 6) {
-  updatePayload.ps_parent = formData.parent_user_id; // ✅ ONLY THIS
+  updatePayload.ps_parent = formData.parent_user_id;
   updatePayload.sub_role_id = "";
-} else {
+} 
+// Role 3: Supervisor (Add this block)
+else if (Number(formData.role_id) === 3) {
+  updatePayload.sub_role_id = formData.sub_role_id || "";
+  // Role 3 ke liye bhi parent_user_id bhejna jaruri hai
+  updatePayload.ps_parent = formData.parent_user_id; 
+} 
+// Other Roles
+else {
   updatePayload.sub_role_id = formData.sub_role_id || "";
 }
-
 
 
       // Only include password fields if they are provided
@@ -516,7 +532,8 @@ if (Number(formData.role_id) === 6) {
               )}
 
               {/* LOKAYUKT-UPLOKAYUKT - Only visible if Role is PS (ID 6) */}
-           {(isPersonalSecretary || (isSupervisor && selectedSubRoleLabel)) && (
+           {/* {(isPersonalSecretary || (isSupervisor && selectedSubRoleLabel)) && ( */}
+           {(isPersonalSecretary || isSupervisor) && (
                 <div>
                   <label htmlFor="ps_parent" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                    PS Under Hon' Lokayukt/Uplokayukt *
@@ -546,6 +563,9 @@ if (Number(formData.role_id) === 6) {
                   )}
                 </div>
               )}
+
+
+              
 
               {/* District */}
               <div>
