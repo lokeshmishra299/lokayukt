@@ -220,6 +220,12 @@ class UserManagement extends Controller
 
             $user->save();
 
+            if ($user->role_id == 6 || $user->role_id == 3) {
+                $user->update([
+                    'parent_user_id' => $request->ps_parent
+                ]);
+            }
+
         if (!$user) {
             return response()->json([
                 'status' => false,
