@@ -12,6 +12,7 @@ use App\Models\ComplaintAction;
 use App\Models\ComplainType;
 use App\Models\Respondent;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -2542,5 +2543,46 @@ $complaints = $complaints->filter(function ($complaint) {
                 ], 200);
         }
        
+    }
+
+    public function rolesDashboard()
+    {
+        // role wise users count
+        $roleCounts = DB::table('users')
+            ->select('role_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('role_id')
+            ->pluck('total', 'role_id');
+
+        // subrole wise users count
+        $subroleCounts = DB::table('users')
+            ->select('sub_role_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('sub_role_id')
+            ->pluck('total', 'sub_role_id');
+
+        // roles with subroles
+        $roles = Role::with('subroles')->get()->map(function ($role) use ($roleCounts, $subroleCounts) {
+
+            return [
+                'role_id' => $role->id,
+                'role_name' => $role->name,
+                'role_label' => $role->label,
+                'total_users' => $roleCounts[$role->id] ?? 0,
+
+                'subroles' => $role->subroles->map(function ($sub) use ($subroleCounts) {
+                    return [
+                        'subrole_id' => $sub->id,
+                        'subrole_name' => $sub->name,
+                        'subrole_label' => $sub->label,
+                        'total_users' => $subroleCounts[$sub->id] ?? 0
+                    ];
+                })
+            ];
+        });
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Roles dashboard data fetched',
+            'data' => $roles
+        ]);
     }
 }

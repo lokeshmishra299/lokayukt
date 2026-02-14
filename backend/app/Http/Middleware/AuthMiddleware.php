@@ -47,35 +47,7 @@ class AuthMiddleware
             abort(403, 'No role assigned.');
         }
 
-        /**
-         * Example: role:admin,supervisor:so-us,ds-js,sec,cio-io,dea-assis
-         * Parsed into:
-         * [
-         *   'admin' => [],
-         *   'supervisor' => ['so-us','ds-js','sec','cio-io','dea-assis']
-         * ]
-         */
-        // $roleMap = [];
-        // foreach ($params as $param) {
-        //     if (str_contains($param, ':')) {
-        //         [$role, $subRoles] = explode(':', $param, 2);
-        //         $roleMap[$role] = explode(',', $subRoles);
-        //     } else {
-        //         $roleMap[$param] = [];
-        //     }
-        // }
-        // // dd($userRole,$userSubRole,$roleMap[$role]);
-        // // ✅ Check
-        // foreach ($roleMap as $role => $subRoles) {
-        //     if ($userRole === $role) {
-        //         // If no subroles required OR subrole matches
-        //         if (empty($subRoles) || in_array($userSubRole, $subRoles)) {
-        //             return $next($request);
-        //         }
-        //     }
-        // }
 
-        // abort(403, 'Unauthorized access.');
          $roleMap = [];
         foreach ($params as $param) {
             $parts = explode(':', $param, 2);

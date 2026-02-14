@@ -216,6 +216,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('get-section-officers',[OperatorComplaintsController::class,'getSectionOfficers']);
         Route::get('/get-users',[OperatorComplaintsController::class,'getSubROleUsers']);
         Route::get('/get-movement-history',[OperatorComplaintsController::class,'allRCmovement']);
+        Route::get('/role-dahboard',[OperatorComplaintsController::class,'rolesDashboard']);
 
         Route::get('/progress-register',[OperatorReportController::class,'progress_report']);
         Route::get('/current-report',[OperatorReportController::class,'current_report']);
