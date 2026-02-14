@@ -71,44 +71,44 @@ import RcLog from './components/Operator/RcLog';
 
 // Supervisor 
 // SubRole -> so-us
-import SupervisorLayout from './components/Supervisor/so-us/Layout';
-import SupervisorDashboard from './components/Supervisor/so-us/Dashboard';
-import SupervisorComplaints from './components/Supervisor/so-us/Complaints';
-import SupervisorProgressRegister from './components/Supervisor/so-us/ProgressRegister';
-import SupervisorSearchReports from './components/Supervisor/so-us/SearchReports';
-import SupervisorViewComplaints from './components/Supervisor/so-us/ViewComplaints';
-import SupervisorPendingComplaints from './components/Supervisor/so-us/Pending-complaints/PendingComplaints';
-import SupervisorEditPendingComplaints from './components/Supervisor/so-us/Pending-complaints/EditPendingComplaints';
-import SupervisorViewPendingComplaints from './components/Supervisor/so-us/Pending-complaints/ViewPendingComplaints';
+// import SupervisorLayout from './components/Supervisor/so-us/Layout';
+// import SupervisorDashboard from './components/Supervisor/so-us/Dashboard';
+// import SupervisorComplaints from './components/Supervisor/so-us/Complaints';
+// import SupervisorProgressRegister from './components/Supervisor/so-us/ProgressRegister';
+// import SupervisorSearchReports from './components/Supervisor/so-us/SearchReports';
+// import SupervisorViewComplaints from './components/Supervisor/so-us/ViewComplaints';
+// import SupervisorPendingComplaints from './components/Supervisor/so-us/Pending-complaints/PendingComplaints';
+// import SupervisorEditPendingComplaints from './components/Supervisor/so-us/Pending-complaints/EditPendingComplaints';
+// import SupervisorViewPendingComplaints from './components/Supervisor/so-us/Pending-complaints/ViewPendingComplaints';
 
-import SupervisorApprovedComplaints from './components/Supervisor/so-us/Approved-complaints/ApprovedComplaints';
-import SupervisorViewApprovedComplaints from './components/Supervisor/so-us/Approved-complaints/ViewApprovedComplaints';
-import SupervisorEditApprovedComplaints from './components/Supervisor/so-us/Approved-complaints/EditApprovedComplaints';
+// import SupervisorApprovedComplaints from './components/Supervisor/so-us/Approved-complaints/ApprovedComplaints';
+// import SupervisorViewApprovedComplaints from './components/Supervisor/so-us/Approved-complaints/ViewApprovedComplaints';
+// import SupervisorEditApprovedComplaints from './components/Supervisor/so-us/Approved-complaints/EditApprovedComplaints';
 
-import SupervisorAllComplaits from './components/Supervisor/so-us/All-complaints/AllComplaits';
-import SupervisorViewAllComplaint from './components/Supervisor/so-us/All-complaints/ViewwAllComplaint';
-import SupervisorEditComplaints from './components/Supervisor/so-us/All-complaints/EditAllComplaints';
+// import SupervisorAllComplaits from './components/Supervisor/so-us/All-complaints/AllComplaits';
+// import SupervisorViewAllComplaint from './components/Supervisor/so-us/All-complaints/ViewwAllComplaint';
+// import SupervisorEditComplaints from './components/Supervisor/so-us/All-complaints/EditAllComplaints';
 
-// Supervisor 
-// SubRole -> ds-js
-import SupervisorLayoutds from './components/Supervisor/ds-js/Layout';
-import SupervisorDashboardds from './components/Supervisor/ds-js/Dashboard';
-import SupervisorComplaintsds from './components/Supervisor/ds-js/Complaints';
-import SupervisorProgressRegisterds from './components/Supervisor/ds-js/ProgressRegister';
-import SupervisorSearchReportsds from './components/Supervisor/ds-js/SearchReports';
-import SupervisorViewComplaintsds from './components/Supervisor/ds-js/ViewComplaints';
-import SupervisorPendingComplaintsds from './components/Supervisor/ds-js/Pending-complaints/PendingComplaints';
-import SupervisorEditPendingComplaintsds from './components/Supervisor/ds-js/Pending-complaints/EditPendingComplaints';
-import SupervisorViewPendingComplaintsds from './components/Supervisor/ds-js/Pending-complaints/ViewPendingComplaints';
+// // Supervisor 
+// // SubRole -> ds-js
+// import SupervisorLayoutds from './components/Supervisor/ds-js/Layout';
+// import SupervisorDashboardds from './components/Supervisor/ds-js/Dashboard';
+// import SupervisorComplaintsds from './components/Supervisor/ds-js/Complaints';
+// import SupervisorProgressRegisterds from './components/Supervisor/ds-js/ProgressRegister';
+// import SupervisorSearchReportsds from './components/Supervisor/ds-js/SearchReports';
+// import SupervisorViewComplaintsds from './components/Supervisor/ds-js/ViewComplaints';
+// import SupervisorPendingComplaintsds from './components/Supervisor/ds-js/Pending-complaints/PendingComplaints';
+// import SupervisorEditPendingComplaintsds from './components/Supervisor/ds-js/Pending-complaints/EditPendingComplaints';
+// import SupervisorViewPendingComplaintsds from './components/Supervisor/ds-js/Pending-complaints/ViewPendingComplaints';
 
 
-import SupervisorApprovedComplaintsds from './components/Supervisor/ds-js/Approved-complaints/ApprovedComplaints';
-import SupervisorViewApprovedComplaintds from './components/Supervisor/ds-js/Approved-complaints/ViewApprovedComplaints';
-import SupervisorEditApprovedComplaintds from './components/Supervisor/ds-js/Approved-complaints/EditApprovedComplaints';
+// import SupervisorApprovedComplaintsds from './components/Supervisor/ds-js/Approved-complaints/ApprovedComplaints';
+// import SupervisorViewApprovedComplaintds from './components/Supervisor/ds-js/Approved-complaints/ViewApprovedComplaints';
+// import SupervisorEditApprovedComplaintds from './components/Supervisor/ds-js/Approved-complaints/EditApprovedComplaints';
 
-import SupervisorAllComplaitsds from './components/Supervisor/ds-js/All-complaints/AllComplaits';
-import SupervisorViewAllComplaintds from './components/Supervisor/ds-js/All-complaints/ViewwAllComplaint';
-import SupervisorEditComplaintsds from './components/Supervisor/ds-js/All-complaints/EditAllComplaints';
+// import SupervisorAllComplaitsds from './components/Supervisor/ds-js/All-complaints/AllComplaits';
+// import SupervisorViewAllComplaintds from './components/Supervisor/ds-js/All-complaints/ViewwAllComplaint';
+// import SupervisorEditComplaintsds from './components/Supervisor/ds-js/All-complaints/EditAllComplaints';
 
 // RO/ARO
 //----------
@@ -132,6 +132,68 @@ import SupervisorAllComplaitsro from './components/Supervisor/ro-aro/All-complai
 import SupervisorViewAllComplaintro from './components/Supervisor/ro-aro/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintsro from './components/Supervisor/ro-aro/All-complaints/EditAllComplaints';
 
+// DS
+
+import SupervisorLayoutds from './components/Supervisor/ds/Layout';
+import SupervisorDashboardds from './components/Supervisor/ds/Dashboard';
+import SupervisorComplaintsds from './components/Supervisor/ds/Complaints';
+import SupervisorProgressRegisterds from './components/Supervisor/ds/ProgressRegister';
+import SupervisorSearchReportsds from './components/Supervisor/ds/SearchReports';
+import SupervisorViewComplaintsds from './components/Supervisor/ds/ViewComplaints';
+import SupervisorPendingComplaintsds from './components/Supervisor/ds/Pending-complaints/PendingComplaints';
+import SupervisorEditPendingComplaintsds from './components/Supervisor/ds/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintsds from './components/Supervisor/ds/Pending-complaints/ViewPendingComplaints';
+
+
+import SupervisorApprovedComplaintsds from './components/Supervisor/ds/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintds from './components/Supervisor/ds/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintds from './components/Supervisor/ds/Approved-complaints/EditApprovedComplaints';
+
+import SupervisorAllComplaitsds from './components/Supervisor/ds/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintds from './components/Supervisor/ds/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintsds from './components/Supervisor/ds/All-complaints/EditAllComplaints';
+
+// JS
+
+import SupervisorLayoutjs from './components/Supervisor/js/Layout';
+import SupervisorDashboardjs from './components/Supervisor/js/Dashboard';
+import SupervisorComplaintsjs from './components/Supervisor/js/Complaints';
+import SupervisorProgressRegisterjs from './components/Supervisor/js/ProgressRegister';
+import SupervisorSearchReportsjs from './components/Supervisor/js/SearchReports';
+import SupervisorViewComplaintsjs from './components/Supervisor/js/ViewComplaints';
+import SupervisorPendingComplaintsjs from './components/Supervisor/js/Pending-complaints/PendingComplaints';
+import SupervisorEditPendingComplaintsjs from './components/Supervisor/js/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintsjs from './components/Supervisor/js/Pending-complaints/ViewPendingComplaints';
+
+
+import SupervisorApprovedComplaintsjs from './components/Supervisor/js/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintjs from './components/Supervisor/js/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintjs from './components/Supervisor/js/Approved-complaints/EditApprovedComplaints';
+
+import SupervisorAllComplaitsjs from './components/Supervisor/js/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintjs from './components/Supervisor/js/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintsjs from './components/Supervisor/js/All-complaints/EditAllComplaints';
+
+// US
+
+import SupervisorLayoutus from './components/Supervisor/js/Layout';
+import SupervisorDashboardus from './components/Supervisor/js/Dashboard';
+import SupervisorComplaintsus from './components/Supervisor/js/Complaints';
+import SupervisorProgressRegisterus from './components/Supervisor/js/ProgressRegister';
+import SupervisorSearchReportsus from './components/Supervisor/js/SearchReports';
+import SupervisorViewComplaintsus from './components/Supervisor/js/ViewComplaints';
+import SupervisorPendingComplaintsus from './components/Supervisor/js/Pending-complaints/PendingComplaints';
+import SupervisorEditPendingComplaintsus from './components/Supervisor/js/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintsus from './components/Supervisor/js/Pending-complaints/ViewPendingComplaints';
+
+
+import SupervisorApprovedComplaintsus from './components/Supervisor/js/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintus from './components/Supervisor/js/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintus from './components/Supervisor/js/Approved-complaints/EditApprovedComplaints';
+
+import SupervisorAllComplaitsus from './components/Supervisor/js/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintus from './components/Supervisor/js/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintsus from './components/Supervisor/js/All-complaints/EditAllComplaints';
 
 
 // ARO
@@ -432,7 +494,7 @@ function App() {
       
        {/* Supervisor  Routes */}
        {/* so-us */}
-      {role === 'supervisor' && subrole === 'so-us' &&(
+      {/* {role === 'supervisor' && subrole === 'so-us' &&(
         <Route path="/supervisor" element={<SupervisorLayout />}>
           <Route path="dashboard" element={<SupervisorDashboard />} />
           <Route path="complaints" element={<SupervisorComplaints />} />
@@ -453,12 +515,36 @@ function App() {
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaints />} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaints />} /> 
         </Route>
-      )}
+      )} */}
 
 
        {/* Supervisor  Routes */}
        {/* ds-js */}
-      {role === 'supervisor' && subrole === 'ds-js' && (
+
+         {role === 'supervisor' && subrole === 'ds' && (
+        <Route path="/supervisor" element={<SupervisorLayoutro />}>
+          <Route path="dashboard" element={<SupervisorDashboardro />} />
+          <Route path="complaints" element={<SupervisorComplaintsro />} />
+          <Route path="progress-register" element={<SupervisorProgressRegisterro />} />
+          <Route path="search-reports" element={<SupervisorSearchReportsro />} />
+          <Route path="search-reports/view/:id" element={<SupervisorViewComplaintsro />} />
+
+          <Route path="all-complaints" element={<SupervisorAllComplaitsro />} />
+          <Route path="all-complaints/view/:id" element={<SupervisorViewAllComplaintro />} />
+          <Route path="all-complaints/edit/:id" element={<SupervisorEditComplaintsro />} />
+
+          <Route path="pending-complaints" element={<SupervisorPendingComplaintsro />} />
+          <Route path="pending-complaints/view/:id" element={<SupervisorViewPendingComplaintsro />} />
+          <Route path="pending-complaints/edit/:id" element={<SupervisorEditPendingComplaintsro />} />
+
+          <Route path="approved-complaints" element={<SupervisorApprovedComplaintsro />} />   
+          <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintro/>} />
+          <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintro />} /> 
+        </Route>
+      )}
+
+      {/* DS */}
+      {role === 'supervisor' && subrole === 'ds' && (
         <Route path="/supervisor" element={<SupervisorLayoutds />}>
           <Route path="dashboard" element={<SupervisorDashboardds />} />
           <Route path="complaints" element={<SupervisorComplaintsds />} />
@@ -477,6 +563,79 @@ function App() {
           <Route path="approved-complaints" element={<SupervisorApprovedComplaintsds />} />   
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintds/>} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintds />} /> 
+        </Route>
+      )}
+
+
+
+        {/* JS */}
+      {role === 'supervisor' && subrole === 'js' && (
+        <Route path="/supervisor" element={<SupervisorLayoutjs />}>
+          <Route path="dashboard" element={<SupervisorDashboardjs />} />
+          <Route path="complaints" element={<SupervisorComplaintsjs />} />
+          <Route path="progress-register" element={<SupervisorProgressRegisterjs />} />
+          <Route path="search-reports" element={<SupervisorSearchReportsjs />} />
+          <Route path="search-reports/view/:id" element={<SupervisorViewComplaintsjs />} />
+
+          <Route path="all-complaints" element={<SupervisorAllComplaitsjs />} />
+          <Route path="all-complaints/view/:id" element={<SupervisorViewAllComplaintjs />} />
+          <Route path="all-complaints/edit/:id" element={<SupervisorEditComplaintsjs />} />
+
+          <Route path="pending-complaints" element={<SupervisorPendingComplaintsjs />} />
+          <Route path="pending-complaints/view/:id" element={<SupervisorViewPendingComplaintsjs />} />
+          <Route path="pending-complaints/edit/:id" element={<SupervisorEditPendingComplaintsjs />} />
+
+          <Route path="approved-complaints" element={<SupervisorApprovedComplaintsjs />} />   
+          <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintjs/>} />
+          <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintjs />} /> 
+        </Route>
+      )}
+
+
+        {/* US */}
+      {role === 'supervisor' && subrole === 'us' && (
+        <Route path="/supervisor" element={<SupervisorLayoutus />}>
+          <Route path="dashboard" element={<SupervisorDashboardus />} />
+          <Route path="complaints" element={<SupervisorComplaintsus />} />
+          <Route path="progress-register" element={<SupervisorProgressRegisterus />} />
+          <Route path="search-reports" element={<SupervisorSearchReportsus />} />
+          <Route path="search-reports/view/:id" element={<SupervisorViewComplaintsus />} />
+
+          <Route path="all-complaints" element={<SupervisorAllComplaitsus />} />
+          <Route path="all-complaints/view/:id" element={<SupervisorViewAllComplaintus />} />
+          <Route path="all-complaints/edit/:id" element={<SupervisorEditComplaintsus />} />
+
+          <Route path="pending-complaints" element={<SupervisorPendingComplaintsus />} />
+          <Route path="pending-complaints/view/:id" element={<SupervisorViewPendingComplaintsus />} />
+          <Route path="pending-complaints/edit/:id" element={<SupervisorEditPendingComplaintsus />} />
+
+          <Route path="approved-complaints" element={<SupervisorApprovedComplaintsus />} />   
+          <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintus/>} />
+          <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintus />} /> 
+        </Route>
+      )}
+
+
+         {/* US */}
+      {role === 'supervisor' && subrole === 'us' && (
+        <Route path="/supervisor" element={<SupervisorLayoutjs />}>
+          <Route path="dashboard" element={<SupervisorDashboardjs />} />
+          <Route path="complaints" element={<SupervisorComplaintsjs />} />
+          <Route path="progress-register" element={<SupervisorProgressRegisterjs />} />
+          <Route path="search-reports" element={<SupervisorSearchReportsjs />} />
+          <Route path="search-reports/view/:id" element={<SupervisorViewComplaintsjs />} />
+
+          <Route path="all-complaints" element={<SupervisorAllComplaitsjs />} />
+          <Route path="all-complaints/view/:id" element={<SupervisorViewAllComplaintjs />} />
+          <Route path="all-complaints/edit/:id" element={<SupervisorEditComplaintsjs />} />
+
+          <Route path="pending-complaints" element={<SupervisorPendingComplaintsjs />} />
+          <Route path="pending-complaints/view/:id" element={<SupervisorViewPendingComplaintsjs />} />
+          <Route path="pending-complaints/edit/:id" element={<SupervisorEditPendingComplaintsjs />} />
+
+          <Route path="approved-complaints" element={<SupervisorApprovedComplaintsjs />} />   
+          <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintjs/>} />
+          <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintjs />} /> 
         </Route>
       )}
 

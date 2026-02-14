@@ -99,6 +99,7 @@ const Header = ({ toggleMobileMenu }) => {
         toast.success('Logout Successfully');
         
         timeoutRef.current = setTimeout(() => {
+             localStorage.clear();
           localStorage.removeItem('access_token');
           localStorage.removeItem('user');
           localStorage.removeItem('role'); 
