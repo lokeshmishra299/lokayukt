@@ -609,7 +609,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
       {fetchLokayuktData?.flat(2)?.map((item) => (
         <option key={item.id} value={item.id}>
           {/* {item.user_name}  */}
-           ({item.name}) {item?.role?.label}
+          {item?.role?.label} ({item.name}) 
         </option>
       ))}
     </select>
