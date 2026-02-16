@@ -348,7 +348,7 @@ class ComplaintsController extends Controller
 
         public function getUsers(){
      
-        $usersByRole = User::with('role')
+        $usersByRole = User::with('role','subrole')
          ->whereNotNull('role_id')
         ->get()
         ->groupBy(fn ($user) => $user->role->name);

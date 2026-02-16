@@ -90,16 +90,6 @@ class LoginController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        // return response()->json([
-        //     'message' => 'Login Successful',
-        //     'access_token' => $token,
-        //     'token_type'   => 'Bearer',
-        //     'user' => [
-        //         'id' => $user->id,
-        //         'user_name' => $user->user_name,
-        //         'role' => $user->role->name ?? 'N/A',
-        //     ]
-        // ]);
         $deviceId = get_device_id();
 
         audit_log([
@@ -132,6 +122,92 @@ class LoginController extends Controller
     }
  
     }
+
+// public function login(Request $request)
+// {
+//     try {
+
+//         // VALIDATION
+//         $validator = Validator::make($request->all(), [
+//             'user_name' => 'required|exists:users,user_name',
+//             'password'  => 'required|string|min:6',
+//         ]);
+
+//         if ($validator->fails()) {
+//             return response()->json($validator->errors(), 422);
+//         }
+
+//         // ATTEMPT LOGIN (SESSION BASED)
+//         if (!Auth::attempt($request->only('user_name', 'password'))) {
+//             return ApiResponse::generateResponse(
+//                 'error',
+//                 'Invalid credentials.',
+//                 null,
+//                 401
+//             );
+//         }
+
+//         // IMPORTANT → PREVENT SESSION FIXATION
+//         $request->session()->regenerate();
+
+//         // GET LOGGED USER WITH ROLE + SUBROLE
+//         $user = Auth::user()->load('role', 'subrole');
+
+//         // CHECK USER STATUS
+//         if ($user->status == 0) {
+//             Auth::logout();
+//             return response()->json([
+//                 'error' => 'You are blocked by admin.'
+//             ], 403);
+//         }
+
+//         // AUDIT LOG
+//         $deviceId = get_device_id();
+
+//         audit_log([
+//             'user_id'    => $user->id,
+//             'action'     => 'LOGIN_SUCCESS',
+//             'entity'     => null,
+//             'entity_id'  => null,
+//             'device_id'  => $deviceId,
+//             'ip_addr'    => $request->ip(),
+//             'user_agent' => $request->userAgent(),
+//         ]);
+
+//         // RESPONSE (NO TOKEN)
+//         return ApiResponse::generateResponse(
+//             'success',
+//             'Login Successful.',
+//             [
+//                 'user' => $user,
+//                 'role' => $user->role->name ?? null,
+//                 'subrole' => $user->subrole->name ?? null,
+//             ]
+//         );
+
+//     } catch (ValidationException $e) {
+
+//         $errors = collect($e->validator->errors()->toArray())
+//             ->map(fn($messages) => $messages[0]);
+
+//         return ApiResponse::generateResponse(
+//             'error',
+//             'Validation failed.',
+//             $errors,
+//             422
+//         );
+
+//     } catch (\Exception $e) {
+
+//         return ApiResponse::generateResponse(
+//             'error',
+//             'Something went wrong during login.',
+//             ['message' => $e->getMessage()],
+//             500
+//         );
+//     }
+// }
+
 
 
 public function forgotPasswordCheck(Request $request)

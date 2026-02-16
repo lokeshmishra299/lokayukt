@@ -257,9 +257,172 @@ class SupervisorComplaintsController extends Controller
                     ->count();
             break;
 
+              case "ds":
+                //    $query->where('form_status', 1)
+                //           ->where('approved_rejected_by_ro', 1);
+                //    ->where('forward_to_lokayukt', 1)
+                //   ->whereOr('forward_to_uplokayukt', 1);
+                // $query->groupBy('rep.target_date');    
+                        $query->where('approved_rejected_by_ds', 0)
+                        ->where('rep.status', 'Forwarded')
+                                ->whereNotNull('rep.forward_to_ds')
+                                 ->where('rep.forward_to_ds',$user);
+                //  $query->where('rep.type', 2)
+                //                 ->where('rep.status', 'Report Requested')
+                //                 ->whereNotNull('rep.forward_to_ds')
+                //                  ->where('rep.forward_to_ds',$user);
+
+                 $todayCount = DB::table('complaints')
+                              ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                                ->where('in_draft', 0)
+                                ->whereDate('repN.created_at', today())
+                                 ->where('repN.forward_to_ds', $user)
+                                 ->distinct('complaints.id')
+                                ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('repN.created_at', '<', now()->subDays(7))
+                    ->where('complaints.approved_rejected_by_rk', 1)
+                    ->where('complaints.approved_rejected_by_ds', 0)
+                     ->where('repN.forward_to_ds', $user)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                ->where('complaints.in_draft', 0)
+                ->where('complaints.approved_rejected_by_rk', 1)
+                ->where('complaints.approved_rejected_by_ds', 0)
+                ->where('repN.created_at', '<', now()->subDays(7))   // <-- FIX
+                ->where('repN.forward_to_ds', $user)
+                ->distinct('complaints.id')
+                ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('fee_exempted', 0)
+                    ->where('repN.forward_to_ds', $user)
+                    ->distinct('complaints.id')
+                    ->count();
+            break;
+    case "js":
+                //    $query->where('form_status', 1)
+                //           ->where('approved_rejected_by_ro', 1);
+                //    ->where('forward_to_lokayukt', 1)
+                //   ->whereOr('forward_to_uplokayukt', 1);
+                // $query->groupBy('rep.target_date');    
+                        $query->where('approved_rejected_by_ds', 0)
+                        ->where('rep.status', 'Forwarded')
+                                ->whereNotNull('rep.forward_to_ds')
+                                 ->where('rep.forward_to_ds',$user);
+                //  $query->where('rep.type', 2)
+                //                 ->where('rep.status', 'Report Requested')
+                //                 ->whereNotNull('rep.forward_to_ds')
+                //                  ->where('rep.forward_to_ds',$user);
+
+                 $todayCount = DB::table('complaints')
+                              ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                                ->where('in_draft', 0)
+                                ->whereDate('repN.created_at', today())
+                                 ->where('repN.forward_to_ds', $user)
+                                 ->distinct('complaints.id')
+                                ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('repN.created_at', '<', now()->subDays(7))
+                    ->where('complaints.approved_rejected_by_rk', 1)
+                    ->where('complaints.approved_rejected_by_ds', 0)
+                     ->where('repN.forward_to_ds', $user)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                ->where('complaints.in_draft', 0)
+                ->where('complaints.approved_rejected_by_rk', 1)
+                ->where('complaints.approved_rejected_by_ds', 0)
+                ->where('repN.created_at', '<', now()->subDays(7))   // <-- FIX
+                ->where('repN.forward_to_ds', $user)
+                ->distinct('complaints.id')
+                ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('fee_exempted', 0)
+                    ->where('repN.forward_to_ds', $user)
+                    ->distinct('complaints.id')
+                    ->count();
+            break;
+            case "us":
+                //    $query->where('form_status', 1)
+                //           ->where('approved_rejected_by_ro', 1);
+                //    ->where('forward_to_lokayukt', 1)
+                //   ->whereOr('forward_to_uplokayukt', 1);
+                // $query->groupBy('rep.target_date');    
+                        $query->where('approved_rejected_by_us', 0)
+                        ->where('rep.status', 'Forwarded')
+                                ->whereNotNull('rep.forward_to_us')
+                                 ->where('rep.forward_to_us',$user);
+                //  $query->where('rep.type', 2)
+                //                 ->where('rep.status', 'Report Requested')
+                //                 ->whereNotNull('rep.forward_to_us')
+                //                  ->where('rep.forward_to_us',$user);
+
+                 $todayCount = DB::table('complaints')
+                              ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                                ->where('in_draft', 0)
+                                ->whereDate('repN.created_at', today())
+                                 ->where('repN.forward_to_us', $user)
+                                 ->distinct('complaints.id')
+                                ->count();
+
+             
+                $older7DaysCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('repN.created_at', '<', now()->subDays(7))
+                    ->where('complaints.approved_rejected_by_rk', 1)
+                    ->where('complaints.approved_rejected_by_us', 0)
+                     ->where('repN.forward_to_us', $user)
+                     ->distinct('complaints.id')
+                    ->count();
+
+                $older7DaysDueCount = DB::table('complaints')
+                ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                ->where('complaints.in_draft', 0)
+                ->where('complaints.approved_rejected_by_rk', 1)
+                ->where('complaints.approved_rejected_by_us', 0)
+                ->where('repN.created_at', '<', now()->subDays(7))   // <-- FIX
+                ->where('repN.forward_to_us', $user)
+                ->distinct('complaints.id')
+                ->count();
+              
+                $feePending = DB::table('complaints')
+                    ->leftJoin('complaint_actions as repN', 'complaints.id', '=', 'repN.complaint_id')
+                    ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('fee_exempted', 0)
+                    ->where('repN.forward_to_us', $user)
+                    ->distinct('complaints.id')
+                    ->count();
+            break;
+
+
         case "cio-io":
-             $query
-                                 ->where('rep.forward_to_cio_io',$user);
+             $query->where('rep.forward_to_cio_io',$user);
         //    $query->where('form_status', 1)
         //           ->where('approved_rejected_by_ro', 1);
                 //    ->where('forward_to_lokayukt', 1)
@@ -728,15 +891,15 @@ $complainDetails->actions = $actions;
 
         $validation = Validator::make($request->all(), [
             // 'forward_by_ds_js' => 'required|exists:users,id',
-            'forward_to_d_a' => 'required|exists:users,id',
+            'forward_to' => 'required|exists:users,id',
             'remarks' => 'required',
          
           
         ], [
             // 'forward_by_ds_js.required' => 'Forward by Supervisor is required.',
             // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
-            'forward_to_d_a.required' => 'Forward to user is required.',
-            'forward_to_d_a.exists' => 'Forward to user does not exist.',
+            'forward_to.required' => 'Forward to user is required.',
+            'forward_to.exists' => 'Forward to user does not exist.',
             'remarks.required' => 'Remark is required.',
            
         ]);
@@ -752,7 +915,7 @@ $complainDetails->actions = $actions;
              $cmp =  Complaint::findOrFail($complainId);
 
             if($cmp){
-                $cmp->approved_rejected_by_ds_js = 1;
+                $cmp->approved_rejected_by_ds = 1;
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Deputy Secretary / Joint Secretary';
                 // $remark.='\n';
@@ -1191,10 +1354,15 @@ $complainDetails->actions = $actions;
                         } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
 
                             switch ($subroleFwd) {
-                                case 'ds-js':
-                                    $apcAction->forward_to_ds_js = $request->forward_to;
+                                 case 'ds':
+                                    $apcAction->forward_to_ds = $request->forward_to;
                                     break;
-
+                                case 'js':
+                                    $apcAction->forward_to_js = $request->forward_to;
+                                    break;
+                                case 'us':
+                                    $apcAction->forward_to_us = $request->forward_to;
+                                    break;
                                 case 'sec':
                                     $apcAction->forward_to_sec = $request->forward_to;
                                     break;
@@ -1373,8 +1541,14 @@ $complainDetails->actions = $actions;
                         } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
 
                             switch ($subroleFwd) {
-                                case 'ds-js':
-                                    $apcAction->forward_to_ds_js = $request->forward_to;
+                                case 'ds':
+                                    $apcAction->forward_to_ds = $request->forward_to;
+                                    break;
+                                case 'js':
+                                    $apcAction->forward_to_js = $request->forward_to;
+                                    break;
+                                case 'us':
+                                    $apcAction->forward_to_us = $request->forward_to;
                                     break;
 
                                 case 'sec':
