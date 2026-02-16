@@ -327,13 +327,38 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
       filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
     }
 
+    // if (selectedCaseType !== "") {
+    //   filtered = filtered.filter((complaint) => {
+    //     const dataCategory = String(complaint.category || "").toLowerCase().trim();
+    //     const selectedValue = String(selectedCaseType).toLowerCase().trim();
+    //     return dataCategory === selectedValue;
+    //   });
+    // }
+
     if (selectedCaseType !== "") {
-      filtered = filtered.filter((complaint) => {
-        const dataCategory = String(complaint.category || "").toLowerCase().trim();
-        const selectedValue = String(selectedCaseType).toLowerCase().trim();
-        return dataCategory === selectedValue;
-      });
+  filtered = filtered.filter((complaint) => {
+
+    //  New Case
+    if (selectedCaseType === "new") {
+      return complaint.case_type == 1;
     }
+
+    //  Old Case
+    if (selectedCaseType === "old") {
+      return complaint.case_type == 2;
+    }
+
+    //  Today Case
+    if (selectedCaseType == "today") {
+      const today = new Date().toDateString();
+      const createdDate = new Date(complaint.created_at).toDateString();
+      return today === createdDate;
+    }
+
+    return true;
+  });
+}
+
 
     // सॉर्टिंग
     const sorted = sortComplaintsByDate(filtered, sortOrder);
@@ -569,10 +594,20 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                   onChange={(e) => setSelectedCaseType(e.target.value)}
                   className="border border-gray-300 px-2 py-1 rounded-md text-xs"
                 >
-                  <option value="">Case Type: All</option>
+                  <option value="">Nature: All</option>
                   <option value="complaint">Complaint</option>
                   <option value="assertion">Assertion</option>
                 </select>
+              <select
+  value={selectedCaseType}
+  onChange={(e) => setSelectedCaseType(e.target.value)}
+  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+>
+  <option value="">Case Type: All</option>
+  <option value="new">New Case</option>
+  <option value="old">Old Case</option>
+  <option value="today">Today Case</option>
+</select>
               </div>
 
               <div className="flex items-center gap-2">

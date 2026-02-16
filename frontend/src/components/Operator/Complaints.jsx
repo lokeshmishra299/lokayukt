@@ -29,7 +29,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
       : '';
 
   return (
-    <div ref={ref} className=" kruti-input rounded-md text-[12px] leading-relaxed text-gray-900">
+   <div ref={ref} className="rounded-md text-[12px] leading-relaxed text-gray-900">
       <div className="w-full h-full px-8 pt-8 pb-10">
         <div className="text-center mb-2">
           <p className="font-semibold text-[13px]">
@@ -46,7 +46,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
               <div className="mt-0.5 pl-4 space-y-0.5">
                 {complainants.map((c, idx) => (
                   <div key={c.id || idx}>
-                    परिवादी {idx + 1} {c.isMain === 1 ? '(मुख्य)' : ''} : {c.name || '——'}
+                    परिवादी {idx + 1} {c.isMain === 1 ? '(मुख्य)' : ''} : <span className="kruti-input">{c.name || '——'}</span>
                   </div>
                 ))}
               </div>
@@ -60,7 +60,9 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
               <span>पिता का नाम :</span>
               <div className="mt-0.5 pl-4 space-y-0.5">
                 {complainants.map((c, idx) => (
-                  <div key={c.id || idx}>परिवादी {idx + 1} : {c.fatherName || '——'}</div>
+                  <div key={c.id || idx}>
+                    परिवादी {idx + 1} : <span className="kruti-input">{c.fatherName || '——'}</span>
+                  </div>
                 ))}
               </div>
             </div>
@@ -74,7 +76,9 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                 <span>(क) व्यवसाय :</span>
                 <div className="mt-0.5 pl-4 space-y-0.5">
                   {complainants.map((c, idx) => (
-                    <div key={c.id || idx}>परिवादी {idx + 1} : {c.occupation || '——'}</div>
+                    <div key={c.id || idx}>
+                      परिवादी {idx + 1} : <span className="kruti-input">{c.occupation || '——'}</span>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -83,7 +87,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                 <div className="mt-0.5 pl-4 space-y-0.5">
                   {complainants.map((c, idx) => (
                     <div key={c.id || idx}>
-                      परिवादी {idx + 1} : {formatYesNo(c.isPublicServant) || '——'}
+                      परिवादी {idx + 1} : <span className="">{formatYesNo(c.isPublicServant) || '——'}</span>
                     </div>
                   ))}
                 </div>
@@ -103,31 +107,30 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                       <div className="font-semibold text-[11px] mb-0.5">
                         [ परिवादी {idx + 1} {c.isMain === 1 ? '(मुख्य)' : ''} ]
                       </div>
-                      {/* <div>(क) नाम : {c.name || '——'}</div> */}
-                      <div>(ख) स्थान : {c.place || '——'}</div>
-                      <div>(ग) डाकघर या पुलिस थाना : {c.postOffice || '——'}</div>
-                      <div>(घ) जिला : {c.district || '——'}</div>
+                      <div>(ख) स्थान : <span className="kruti-input">{c.place || '——'}</span></div>
+                      <div>(ग) डाकघर या पुलिस थाना : <span className="kruti-input">{c.postOffice || '——'}</span></div>
+                      <div>(घ) जिला : <span className="kruti-input">{c.district || '——'}</span></div>
                    </div>
                 ))}
               </div>
             </div>
           </div>
 
-                        <div>
-                <span>
-                  यदि परिवाद किसी दूसरे व्यक्ति की ओर से है तो उस व्यक्ति के साथ अपना संबंध बतायें। यह साबित करने के लिए कि
-                  आप उसकी सम्पदा का प्रतिनिधित्व करतें हैं या उसने इस निमित्त आपको प्राधिकृत किया है, दस्तावेज भी यदि कोई हो,
-                  संलग्न करें।
-                </span>
-                <div className="mt-0.5 pl-4">
-                  {formData.relation || '——'}
-                  {formData.authorizationFile && (
-                    <div className="mt-0.5 text-[11px] text-gray-700">
-                      (संलग्न दस्तावेज़: {formData.authorizationFile.name})
-                    </div>
-                  )}
+          <div>
+            <span>
+              यदि परिवाद किसी दूसरे व्यक्ति की ओर से है तो उस व्यक्ति के साथ अपना संबंध बतायें। यह साबित करने के लिए कि
+              आप उसकी सम्पदा का प्रतिनिधित्व करतें हैं या उसने इस निमित्त आपको प्राधिकृत किया है, दस्तावेज भी यदि कोई हो,
+              संलग्न करें।
+            </span>
+            <div className="mt-0.5 pl-4">
+              <span className="kruti-input">{formData.relation || '——'}</span>
+              {formData.authorizationFile && (
+                <div className="mt-0.5 text-[11px] text-gray-700">
+                  (संलग्न दस्तावेज़: <span className="kruti-input">{formData.authorizationFile.name}</span>)
                 </div>
-              </div>
+              )}
+            </div>
+          </div>
 
           {/* 5 पत्राचार पता */}
           <div className="flex gap-2">
@@ -135,10 +138,10 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
             <div className="flex-1 space-y-0.5">
               <div>पता जिसपर सूचना भेजी जाय :</div>
               <div className="pl-4 space-y-0.5">
-                <div>(क) नाम : {formData.correspondenceAddress.name || '——'}</div>
-                <div>(ख) स्थान : {formData.correspondenceAddress.place || '——'}</div>
-                <div>(ग) डाकघर या पुलिस थाना : {formData.correspondenceAddress.postOffice || '——'}</div>
-                <div>(घ) जिला : {formData.correspondenceAddress.district || '——'}</div>
+                <div>(क) नाम : <span className="kruti-input">{formData.correspondenceAddress.name || '——'}</span></div>
+                <div>(ख) स्थान : <span className="kruti-input">{formData.correspondenceAddress.place || '——'}</span></div>
+                <div>(ग) डाकघर या पुलिस थाना : <span className="kruti-input">{formData.correspondenceAddress.postOffice || '——'}</span></div>
+                <div>(घ) जिला : <span className="">{formData.correspondenceAddress.district || '——'}</span></div>
               </div>
             </div>
           </div>
@@ -158,33 +161,38 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                     className="border border-dashed border-orange-300 px-2 py-1 rounded-sm mb-1"
                   >
                     <div className="font-bold mb-0.5">व्यक्ति {idx + 1} {p.isMain === 1 ? '(मुख्य)' : ''}</div>
-                    <div>नाम : {p.name || '——'}</div>
-                    <div>पदनाम : {p.designation || '——'}</div>
-                    <div>वर्तमान पता : {p.currentAddress || '——'}</div>
-                    <div>ज़िला : {p.district || '——'}</div>
-                    <div>विभाग : {p.departmentNature || '——'}</div>
-                    <div>श्रेणी : {p.officerCategory || '——'}</div>
+                    <div>नाम : <span className="kruti-input">{p.name || '——'}</span></div>
+                    <div>पदनाम : <span className="">{p.designation || '——'}</span></div>
+                    <div>वर्तमान पता : <span className="kruti-input">{p.currentAddress || '——'}</span></div>
+                    <div>ज़िला : <span className="kruti-input">{p.district || '——'}</span></div>
+                    <div>विभाग : <span className="">{p.departmentNature || '——'}</span></div>
+                    <div>श्रेणी : <span className="">{p.officerCategory || '——'}</span></div>
                   </div>
                 ))}
               </div>
               <div className="mt-0.5">
-                (2) दिनांक जब परिवाद का कारण उत्पन्न हुआ हो : {formData.complaintDate || '——'}
+                (2) दिनांक जब परिवाद का कारण उत्पन्न हुआ हो : <span className="kruti-input">{formData.complaintDate || '——'}</span>
               </div>
               <div>
                 (3) परिवाद विलम्ब से प्रस्तुत करने का कारण, यदि परिवाद धारा 8 की उपधारा (4) के अधीन समय व्यतीत हो जाने पर किया गया हो :
-                <div className="mt-0.5 pl-4">{formData.delayReason || '——'}</div>
+                <div className="mt-0.5 pl-4 kruti-input">{formData.delayReason || '——'}</div>
               </div>
               <div>
                 (4) क्या परिवाद पहले किसी वरिष्ठ अधिकारी के समक्ष किया गया था? या किसी अधिकरण या न्यायालय के समक्ष कार्यवाही की गई थी, यदि हों तो
                 उसका क्या परिणाम निकला, यदि नही, कृपया संक्षेप में कारण बतायें।
                 <div className="mt-0.5 pl-4">
-                  {formData.previousComplaint
-                    ? `उत्तर : ${formData.previousComplaint}${
-                        formData.previousComplaint === 'हाँ' && formData.previousComplaintDetails
-                          ? `, विवरण : ${formData.previousComplaintDetails}`
-                          : ''
-                      }`
-                    : '——'}
+                  {formData.previousComplaint ? (
+                    <>
+                      उत्तर : <span className="">{formData.previousComplaint}</span>
+                      {formData.previousComplaint === 'हाँ' && formData.previousComplaintDetails && (
+                        <>
+                          , विवरण : <span className="kruti-input">{formData.previousComplaintDetails}</span>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    '——'
+                  )}
                 </div>
               </div>
             </div>
@@ -197,7 +205,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
               क्या यह,
               (क) कोई अभिकथन अधिनियम की धारा 2 (ख) में यथा परिभाषित, है? या शिकायत अधिनियम की धारा 2 (घ) में यथा परिभाषित, है।
               <div className="mt-0.5 pl-4">
-                श्रेणी : {formData.complaintType || '——'}
+                श्रेणी : <span className="">{formData.complaintType || '——'}</span>
               </div>
             </div>
           </div>
@@ -210,10 +218,10 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                 <div>
                   चालान संख्या और नियम-4 के अधीन खर्च के लिए प्रतिभूति जमा करने का दिनांक -
                   <div className="mt-0.5 pl-4 space-y-0.5">
-                    <div>चालान संख्या : {formData.challanNumber || '——'}</div>
-                    <div>दिनांक : {formData.challanDate || '——'}</div>
+                    <div>चालान संख्या : <span className="kruti-input">{formData.challanNumber || '——'}</span></div>
+                    <div>दिनांक : <span className="kruti-input">{formData.challanDate || '——'}</span></div>
                     {formData.challanFile && (
-                      <div>फ़ाइल : {formData.challanFile.name}</div>
+                      <div>फ़ाइल : <span className="kruti-input">{formData.challanFile.name}</span></div>
                     )}
                   </div>
                 </div>
@@ -238,7 +246,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                 {Array.isArray(formData.supportingPersons) && formData.supportingPersons.length > 0
                   ? formData.supportingPersons.map((p, i) => (
                       <div key={i} className="mb-0.5">
-                        {i + 1}. {p.name} {p.address ? `(पता: ${p.address})` : ''}
+                        {i + 1}. <span className="kruti-input">{p.name}</span> {p.address ? <>(पता: <span className="kruti-input">{p.address}</span>)</> : ''}
                       </div>
                     ))
                   : '——'}
@@ -255,7 +263,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                 {Array.isArray(formData.otherPersons) && formData.otherPersons.length > 0
                   ? formData.otherPersons.map((p, i) => (
                       <div key={i} className="mb-0.5">
-                        {i + 1}. {p.name} {p.address ? `(पता: ${p.address})` : ''}
+                        {i + 1}. <span className="kruti-input">{p.name}</span> {p.address ? <>(पता: <span className="kruti-input">{p.address}</span>)</> : ''}
                       </div>
                     ))
                   : '——'}
@@ -269,8 +277,14 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
             <div className="flex-1">
               परिवाद से सम्बन्धित संलग्न दस्तावेजों की सूची जिसमें परिवादी का शपथपत्र भी सम्मिलित है।
               <div className="mt-0.5 pl-4">
-                {formData.attachedDocumentsFile ? formData.attachedDocumentsFile.name : (formData.attachedDocuments || '——')}
-                {formData.attachedDocuments && <div className="text-[10px] mt-1 text-gray-600">{formData.attachedDocuments}</div>}
+                <span className="kruti-input">
+                  {formData.attachedDocumentsFile ? formData.attachedDocumentsFile.name : (formData.attachedDocuments || '——')}
+                </span>
+                {formData.attachedDocuments && (
+                  <div className="text-[10px] mt-1 text-gray-600 kruti-input">
+                    {formData.attachedDocuments}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -280,7 +294,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
             <span className="min-w-[18px]">12.</span>
             <div className="flex-1">
               परिवाद का विवरण - कृपया यहाँ पर परिवाद के सम्पूर्ण तथ्य बतायें।
-              <div className="mt-0.5 pl-4 whitespace-pre-wrap break-words">
+              <div className="mt-0.5 pl-4 whitespace-pre-wrap break-words kruti-input">
                 {formData.complaintDescription || '——'}
               </div>
             </div>
@@ -291,7 +305,6 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
     </div>
   );
 });
-
 
 ComplaintPrintView.displayName = 'ComplaintPrintView';
 
