@@ -5,6 +5,7 @@ import { AiOutlineHome } from "react-icons/ai";
 import {FiInbox,FiSend,FiFileText,FiBarChart2,FiSearch}  from "react-icons/fi";
 import { IoIosDocument } from "react-icons/io";
 import { TiDocumentText } from "react-icons/ti";
+import { TbReportSearch } from "react-icons/tb";
 import {
   
   FaHome,
@@ -289,7 +290,7 @@ const Sidebar = ({
               </Link>
             </li>
 
-
+              {/* RC Log */}
              <li>
               <Link
                 to="/operator/rc-log"
@@ -306,6 +307,30 @@ const Sidebar = ({
                   {(isMobile || !isCollapsed) && <span>RC Log</span>}
                 </div>
                 {isActive("/rc-log") && (isMobile) && (
+                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                )}
+              </Link>
+            </li>
+
+                {/* Reporting */}
+             <li>
+              <Link
+                to="/operator/reporting"
+                onClick={handleLinkClick}
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                  isActive("/reporting")
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-200"
+                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                title={!isMobile && isCollapsed ? "reporting" : ""}
+              >
+                <div className="flex items-center gap-3">
+                    <TbReportSearch size={18} className="w-[18px] h-[18px] flex-shrink-0" />
+                  {(isMobile || !isCollapsed) && <span>Reporting</span>}
+                </div>
+                {isActive("/reporting") && (isMobile) && (
                   <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
                     <div className="w-4 h-4 bg-white rounded-full"></div>
                   </div>

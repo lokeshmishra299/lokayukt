@@ -66,6 +66,8 @@ import AllDraft from './components/Operator/Draft/AllDraft';
 import ViewDraft from './components/Operator/Draft/ViewDraft';
 import EditDraft from './components/Operator/Draft/EditDraft';
 import RcLog from './components/Operator/RcLog';
+import Reporting from './components/Operator/Reporting';
+
 
 
 
@@ -486,6 +488,7 @@ function App() {
              <Route path="draft/view/:id" element={<ViewDraft />} />
              <Route path="draft/edit/:id" element={<EditDraft />} />
              <Route path="rc-log" element={<RcLog />} />
+             <Route path="reporting" element={<Reporting />} />
 
              {/* <Route path="/operator/complaints/Cheekdublicate" element={<Cheekdublicate />} /> */}
 
