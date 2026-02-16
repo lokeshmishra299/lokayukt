@@ -936,10 +936,15 @@ $complainDetails->actions = $actions;
                         } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
 
                             switch ($subroleFwd) {
-                                case 'ds-js':
-                                    $apcAction->forward_to_ds_js = $request->forward_to;
+                                 case 'ds':
+                                    $apcAction->forward_to_ds = $request->forward_to;
                                     break;
-
+                                case 'js':
+                                    $apcAction->forward_to_js = $request->forward_to;
+                                    break;
+                                case 'us':
+                                    $apcAction->forward_to_us = $request->forward_to;
+                                    break;
                                 case 'sec':
                                     $apcAction->forward_to_sec = $request->forward_to;
                                     break;

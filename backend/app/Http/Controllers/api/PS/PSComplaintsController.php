@@ -693,9 +693,15 @@ $complainDetails->actions = $actions;
                                 }
                             }elseif($roleFwd === "supervisor"){
                                 if($subroleFwd !=null){
-                                     if($subroleFwd === "ds-js"){
-                                    $apcAction->forward_to_ds_js = $request->forward_to;
+                                     if($subroleFwd === "ds"){
+                                    $apcAction->forward_to_ds = $request->forward_to;
                                 
+                                    }elseif($subroleFwd ==="js"){
+                                            $apcAction->forward_to_js = $request->forward_to;
+                            
+                                    }elseif($subroleFwd ==="us"){
+                                            $apcAction->forward_to_us = $request->forward_to;
+                            
                                     }elseif($subroleFwd ==="sec"){
                                             $apcAction->forward_to_sec = $request->forward_to;
                             

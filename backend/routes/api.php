@@ -239,7 +239,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/categories',[CommonController::class,'fetch_Category']);
     });
 
-    Route::middleware('role:supervisor:so-us|ro-aro|ro|sec|cio-io|io|dea-assis')->prefix('supervisor')->group(function () {
+    Route::middleware('role:supervisor:ds|js|us|ro-aro|ro|sec|cio-io|io')->prefix('supervisor')->group(function () {
         
         Route::get('/all-district',[SupervisorCommonController::class,'fetch_district']);
         Route::get('/all-complaints',[SupervisorComplaintsController::class,'allComplains']);
