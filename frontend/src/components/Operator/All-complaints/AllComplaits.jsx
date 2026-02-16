@@ -50,6 +50,8 @@ const AllComplaints = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [complaintToApprove, setComplaintToApprove] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
+  const [selectedNature, setSelectedNature] = useState("");
+// const [selectedCaseType, setSelectedCaseType] = useState("");
 
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -327,37 +329,60 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
       filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
     }
 
-    // if (selectedCaseType !== "") {
-    //   filtered = filtered.filter((complaint) => {
-    //     const dataCategory = String(complaint.category || "").toLowerCase().trim();
-    //     const selectedValue = String(selectedCaseType).toLowerCase().trim();
-    //     return dataCategory === selectedValue;
-    //   });
-    // }
+//     if (selectedCaseType !== "") {
+//       filtered = filtered.filter((complaint) => {
+//         const dataCategory = String(complaint.category || "").toLowerCase().trim();
+//         const selectedValue = String(selectedCaseType).toLowerCase().trim();
+//         return dataCategory === selectedValue;
+//       });
+//     }
 
-    if (selectedCaseType !== "") {
+//     // 🟢 New / Old / Today Case filter
+// if (selectedCaseType === "new") {
+//   filtered = filtered.filter((complaint) => complaint.case_type == 1);
+// }
+
+// if (selectedCaseType === "old") {
+//   filtered = filtered.filter((complaint) => complaint.case_type == 2);
+// }
+
+// if (selectedCaseType === "today") {
+//   const today = new Date().toDateString();
+//   filtered = filtered.filter((complaint) => {
+//     const createdDate = new Date(complaint.created_at).toDateString();
+//     return createdDate === today;
+//   });
+// }
+
+
+
+//New 
+
+if (selectedNature !== "") {
   filtered = filtered.filter((complaint) => {
-
-    //  New Case
-    if (selectedCaseType === "new") {
-      return complaint.case_type == 1;
-    }
-
-    //  Old Case
-    if (selectedCaseType === "old") {
-      return complaint.case_type == 2;
-    }
-
-    //  Today Case
-    if (selectedCaseType == "today") {
-      const today = new Date().toDateString();
-      const createdDate = new Date(complaint.created_at).toDateString();
-      return today === createdDate;
-    }
-
-    return true;
+    return (
+      String(complaint.category || "")
+  .toLowerCase()
+  .trim() === selectedNature.toLowerCase().trim()
+    );
   });
 }
+
+if (selectedCaseType === "new") {
+  filtered = filtered.filter((complaint) => complaint.case_type == 1);
+}
+
+if (selectedCaseType === "old") {
+  filtered = filtered.filter((complaint) => complaint.case_type == 2);
+}
+
+if (selectedCaseType === "today") {
+  const today = new Date().toDateString();
+  filtered = filtered.filter((complaint) => {
+    return new Date(complaint.created_at).toDateString() === today;
+  });
+}
+
 
 
     // सॉर्टिंग
@@ -371,6 +396,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
     selectedDistrict,
     selectedStatus,
     selectedFeeStatus,
+      selectedNature,
     selectedCaseType,
     sortOrder
   ]);
@@ -589,16 +615,17 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                 </select>
 
                 {/* Case Type Dropdown */}
-                <select
-                  value={selectedCaseType}
-                  onChange={(e) => setSelectedCaseType(e.target.value)}
-                  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
-                >
-                  <option value="">Nature: All</option>
-                  <option value="complaint">Complaint</option>
-                  <option value="assertion">Assertion</option>
-                </select>
-              <select
+               <select
+  value={selectedNature}
+  onChange={(e) => setSelectedNature(e.target.value)}
+  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+>
+  <option value="">Nature: All</option>
+  <option value="complaint">Complaint</option>
+  <option value="assertion">Assertion</option>
+</select>
+
+<select
   value={selectedCaseType}
   onChange={(e) => setSelectedCaseType(e.target.value)}
   className="border border-gray-300 px-2 py-1 rounded-md text-xs"
@@ -608,6 +635,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
   <option value="old">Old Case</option>
   <option value="today">Today Case</option>
 </select>
+
               </div>
 
               <div className="flex items-center gap-2">
