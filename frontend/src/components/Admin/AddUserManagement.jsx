@@ -595,7 +595,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
     : "Under Supervisor *"}
     </label>
 
-    <select
+    {/* <select
       id="ps_parent"
       name="ps_parent"
       value={formData.ps_parent}
@@ -608,11 +608,36 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
 
       {fetchLokayuktData?.flat(2)?.map((item) => (
         <option key={item.id} value={item.id}>
-          {/* {item.user_name}  */}
           {item?.role?.label} ({item.name}) 
         </option>
       ))}
-    </select>
+    </select> */}
+
+    <select
+  id="ps_parent"
+  name="ps_parent"
+  value={formData.ps_parent}
+  onChange={handleInputChange}
+  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+    errors.ps_parent ? "border-red-500" : "border-gray-300"
+  }`}
+>
+  <option value="">Select User</option>
+
+  {fetchLokayuktData?.flat(2)?.map((item) => {
+    const label =
+      item?.role?.name === "supervisor"
+        ? item?.subrole?.label 
+        : item?.role?.label; 
+
+    return (
+      <option key={item.id} value={item.id}>
+       {item.name} ({label})
+      </option>
+    );
+  })}
+</select>
+
 
     {errors.ps_parent && (
       <p className="mt-1 text-sm text-red-600">

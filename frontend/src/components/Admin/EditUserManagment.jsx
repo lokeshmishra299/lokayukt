@@ -1,27 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  FaUser, 
-  FaEnvelope, 
-  FaPhone, 
-  FaUserTag, 
-  FaBuilding, 
-  FaLock, 
-  FaPaperPlane, 
-  FaSpinner, 
+import React, { useState, useEffect } from "react";
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaUserTag,
+  FaBuilding,
+  FaLock,
+  FaPaperPlane,
+  FaSpinner,
   FaUsers,
-  FaEdit 
-} from 'react-icons/fa';
+  FaEdit,
+} from "react-icons/fa";
 import { toast, Toaster } from "react-hot-toast";
-import { useQueryClient } from '@tanstack/react-query';
-
+import { useQueryClient } from "@tanstack/react-query";
 
 // import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query'; 
-
-
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
@@ -37,27 +34,27 @@ const api = axios.create({
 
 const EditUserManagement = () => {
   const queryClient = useQueryClient();
-  const { id } = useParams(); 
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    number: '',
-    role_id: '',
-    sub_role_id: '',
-    // ps_parent: "", 
-      parent_user_id: "",
-    designation: '', 
-    department: '',   
-    district_id: '', 
-    password: '',
-    password_confirmation: ''
+    name: "",
+    email: "",
+    number: "",
+    role_id: "",
+    sub_role_id: "",
+    // ps_parent: "",
+    parent_user_id: "",
+    designation: "",
+    department: "",
+    district_id: "",
+    password: "",
+    password_confirmation: "",
   });
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // State for all API data
   const [districts, setDistricts] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -71,18 +68,18 @@ const EditUserManagement = () => {
   const [subRoles, setSubRoles] = useState([]);
   const [isLoadingSubRoles, setIsLoadingSubRoles] = useState(false);
 
-  const [selectedSubRoleLabel, setSelectedSubRoleLabel] = useState('');
+  const [selectedSubRoleLabel, setSelectedSubRoleLabel] = useState("");
   const isPersonalSecretary = String(formData.role_id) === "6";
   const isSupervisor = String(formData.role_id) === "3";
 
   const fetchLokayukt = async () => {
-    const res = await api.get('/admin/get-lokayukt-uplokayukt');
+    const res = await api.get("/admin/get-lokayukt-uplokayukt");
     return res.data?.data || res.data || [];
   };
 
   const { data: fetchLokayuktData } = useQuery({
     queryKey: ["get-lokayukt-uplokayukt"],
-    queryFn: fetchLokayukt
+    queryFn: fetchLokayukt,
   });
 
   useEffect(() => {
@@ -92,44 +89,43 @@ const EditUserManagement = () => {
         if (userResponse.data.status === true) {
           const userData = userResponse.data.data;
           setFormData({
-            name: userData.name || '',
-            email: userData.email || '',
-            number: userData.number || '',
-            role_id: userData.role_id || '',
-            sub_role_id: userData.sub_role_id || '',
+            name: userData.name || "",
+            email: userData.email || "",
+            number: userData.number || "",
+            role_id: userData.role_id || "",
+            sub_role_id: userData.sub_role_id || "",
             // ps_parent: userData.ps_parent || "",
             parent_user_id: userData.parent_user_id || "",
-            designation: userData.designation_id || '', 
-            department: userData.department_id || '',   
-            district_id: userData.district_id || '',
-            password: '',
-            password_confirmation: ''
+            designation: userData.designation_id || "",
+            department: userData.department_id || "",
+            district_id: userData.district_id || "",
+            password: "",
+            password_confirmation: "",
           });
         } else {
-          toast.error('Failed to load user data');
-          navigate('/admin/user-management'); 
+          toast.error("Failed to load user data");
+          navigate("/admin/user-management");
         }
 
         const districtsResponse = await api.get(`/admin/all-district`);
-        if (districtsResponse.data.status === 'success') {
+        if (districtsResponse.data.status === "success") {
           setDistricts(districtsResponse.data.data);
         }
 
         const departmentsResponse = await api.get(`/admin/department`);
-        if (departmentsResponse.data.status === 'success') {
+        if (departmentsResponse.data.status === "success") {
           setDepartments(departmentsResponse.data.data);
         }
 
         const designationsResponse = await api.get(`/admin/designation`);
-        if (designationsResponse.data.status === 'success') {
+        if (designationsResponse.data.status === "success") {
           setDesignations(designationsResponse.data.data);
         }
-
       } catch (error) {
-        console.error('Failed to fetch data:', error);
-        toast.error('Failed to load required data from server');
+        console.error("Failed to fetch data:", error);
+        toast.error("Failed to load required data from server");
         if (error.response?.status === 404) {
-          navigate('/admin/user-management'); 
+          navigate("/admin/user-management");
         }
       } finally {
         setIsLoadingDistricts(false);
@@ -167,7 +163,7 @@ const EditUserManagement = () => {
       setIsLoadingSubRoles(true);
       try {
         const res = await api.get(`/admin/get-sub-roles/${formData.role_id}`);
-        
+
         if (res.data && res.data.status === true && res.data.subrole) {
           setSubRoles(res.data.subrole);
         } else {
@@ -182,65 +178,77 @@ const EditUserManagement = () => {
     }
 
     fetchSubRoles();
-  }, [formData.role_id]); 
+  }, [formData.role_id]);
 
   const validateName = (name) => /^[A-Za-z\s]*$/.test(name);
   const validateMobile = (mobile) => /^\d{10}$/.test(mobile);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
-    if (name === 'role_id') {
-      setFormData(prev => ({ 
-        ...prev, 
+
+    if (name === "role_id") {
+      setFormData((prev) => ({
+        ...prev,
         [name]: value,
-        sub_role_id: '', 
-        // ps_parent: ""    
-        parent_user_id: ""
+        sub_role_id: "",
+        // ps_parent: ""
+        parent_user_id: "",
       }));
-      
+
       // Clear specific errors
-      if (errors.sub_role_id) setErrors(prev => ({ ...prev, sub_role_id: '' }));
-      if (errors.lokayukt_uplokayukt) setErrors(prev => ({ ...prev, lokayukt_uplokayukt: '' }));
+      if (errors.sub_role_id)
+        setErrors((prev) => ({ ...prev, sub_role_id: "" }));
+      if (errors.lokayukt_uplokayukt)
+        setErrors((prev) => ({ ...prev, lokayukt_uplokayukt: "" }));
     }
     // Handle name validation
-    else if (name === 'name') {
-      setFormData(prev => ({ ...prev, [name]: value }));
-      if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    else if (name === "name") {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     }
     // Handle mobile validation
-    else if (name === 'number') {
-      if (value === '' || validateMobile(value)) {
-        setFormData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+    else if (name === "number") {
+      if (value === "" || validateMobile(value)) {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
       } else {
-        setErrors(prev => ({ ...prev, [name]: 'Enter exactly 10 digits for mobile number' }));
+        setErrors((prev) => ({
+          ...prev,
+          [name]: "Enter exactly 10 digits for mobile number",
+        }));
         return;
       }
     }
-    // Handle password confirmation 
-    else if (name === 'password_confirmation') {
-      setFormData(prev => ({ ...prev, [name]: value }));
+    // Handle password confirmation
+    else if (name === "password_confirmation") {
+      setFormData((prev) => ({ ...prev, [name]: value }));
       if (value && formData.password && value !== formData.password) {
-        setErrors(prev => ({ ...prev, [name]: 'Passwords do not match' }));
+        setErrors((prev) => ({ ...prev, [name]: "Passwords do not match" }));
       } else {
-        setErrors(prev => ({ ...prev, [name]: '' }));
+        setErrors((prev) => ({ ...prev, [name]: "" }));
       }
     }
     // Handle other fields
     else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-      
-      if (name === 'password' && formData.password_confirmation && value !== formData.password_confirmation) {
-        setErrors(prev => ({ ...prev, password_confirmation: 'Passwords do not match' }));
-      } else if (name === 'password') {
-        setErrors(prev => ({ ...prev, password_confirmation: '' }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
+
+      if (
+        name === "password" &&
+        formData.password_confirmation &&
+        value !== formData.password_confirmation
+      ) {
+        setErrors((prev) => ({
+          ...prev,
+          password_confirmation: "Passwords do not match",
+        }));
+      } else if (name === "password") {
+        setErrors((prev) => ({ ...prev, password_confirmation: "" }));
       }
     }
 
     // Clear error generic
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -255,66 +263,62 @@ const EditUserManagement = () => {
         name: formData.name,
         email: formData.email,
         number: formData.number,
-        role_id: parseInt(formData.role_id) || '',
-        designation: formData.designation.toString(), 
-        department: formData.department.toString(),   
-        district_id: formData.district_id || ''
+        role_id: parseInt(formData.role_id) || "",
+        designation: formData.designation.toString(),
+        department: formData.department.toString(),
+        district_id: formData.district_id || "",
       };
 
       // if (isPersonalSecretary) {
       //   // updatePayload.ps_parent = formData.ps_parent || "";
       //     updatePayload.ps_parent = formData.parent_user_id; // ✅
-      //   updatePayload.sub_role_id = ""; 
+      //   updatePayload.sub_role_id = "";
       // } else if (isSupervisor) {
       //   updatePayload.sub_role_id = formData.sub_role_id || "";
-      //   updatePayload.ps_parent = formData.ps_parent || ""; 
+      //   updatePayload.ps_parent = formData.ps_parent || "";
       // } else {
       //   updatePayload.sub_role_id = formData.sub_role_id || "";
-      //   updatePayload.ps_parent = ""; 
+      //   updatePayload.ps_parent = "";
       // }
 
+      //       if (Number(formData.role_id) === 6) {
+      //   updatePayload.ps_parent = formData.parent_user_id;
+      // }
 
-//       if (Number(formData.role_id) === 6) {
-//   updatePayload.ps_parent = formData.parent_user_id; 
-// }
+      //       if (isPersonalSecretary) {
+      //   updatePayload.ps_parent = formData.parent_user_id; // ✅
+      //   updatePayload.sub_role_id = "";
+      // }
+      // else if (isSupervisor) {
+      //   updatePayload.sub_role_id = formData.sub_role_id || "";
+      //   updatePayload.ps_parent = formData.parent_user_id; // ✅ FIX HERE
+      // }
+      // else {
+      //   updatePayload.sub_role_id = formData.sub_role_id || "";
+      // }
 
-//       if (isPersonalSecretary) {
-//   updatePayload.ps_parent = formData.parent_user_id; // ✅
-//   updatePayload.sub_role_id = "";
-// } 
-// else if (isSupervisor) {
-//   updatePayload.sub_role_id = formData.sub_role_id || "";
-//   updatePayload.ps_parent = formData.parent_user_id; // ✅ FIX HERE
-// } 
-// else {
-//   updatePayload.sub_role_id = formData.sub_role_id || "";
-// }
+      // if (Number(formData.role_id) === 6) {
+      //   updatePayload.ps_parent = formData.parent_user_id; // ✅ ONLY THIS
+      //   updatePayload.sub_role_id = "";
+      // } else {
+      //   updatePayload.sub_role_id = formData.sub_role_id || "";
+      // }
 
-
-// if (Number(formData.role_id) === 6) {
-//   updatePayload.ps_parent = formData.parent_user_id; // ✅ ONLY THIS
-//   updatePayload.sub_role_id = "";
-// } else {
-//   updatePayload.sub_role_id = formData.sub_role_id || "";
-// }
-
-
-// Role 6: Personal Secretary
-if (Number(formData.role_id) === 6) {
-  updatePayload.ps_parent = formData.parent_user_id;
-  updatePayload.sub_role_id = "";
-} 
-// Role 3: Supervisor (Add this block)
-else if (Number(formData.role_id) === 3) {
-  updatePayload.sub_role_id = formData.sub_role_id || "";
-  // Role 3 ke liye bhi parent_user_id bhejna jaruri hai
-  updatePayload.ps_parent = formData.parent_user_id; 
-} 
-// Other Roles
-else {
-  updatePayload.sub_role_id = formData.sub_role_id || "";
-}
-
+      // Role 6: Personal Secretary
+      if (Number(formData.role_id) === 6) {
+        updatePayload.ps_parent = formData.parent_user_id;
+        updatePayload.sub_role_id = "";
+      }
+      // Role 3: Supervisor (Add this block)
+      else if (Number(formData.role_id) === 3) {
+        updatePayload.sub_role_id = formData.sub_role_id || "";
+        // Role 3 ke liye bhi parent_user_id bhejna jaruri hai
+        updatePayload.ps_parent = formData.parent_user_id;
+      }
+      // Other Roles
+      else {
+        updatePayload.sub_role_id = formData.sub_role_id || "";
+      }
 
       // Only include password fields if they are provided
       if (formData.password && formData.password_confirmation) {
@@ -322,35 +326,43 @@ else {
         updatePayload.password_confirmation = formData.password_confirmation;
       }
 
-      console.log('Update payload being sent:', updatePayload); 
+      console.log("Update payload being sent:", updatePayload);
 
-      const response = await api.post(`/admin/update-users/${id}`, updatePayload);
+      const response = await api.post(
+        `/admin/update-users/${id}`,
+        updatePayload,
+      );
 
       if (response.data.status === true) {
-        toast.success(response.data.message || 'User updated successfully!');
-      queryClient.invalidateQueries({queryKey: ["users"]})
+        toast.success(response.data.message || "User updated successfully!");
+        queryClient.invalidateQueries({ queryKey: ["users"] });
 
         setTimeout(() => {
-          navigate("/admin/user-management")
+          navigate("/admin/user-management");
         }, 2000);
       }
     } catch (error) {
       if (error.response?.status === 422 && error.response?.data?.errors) {
         const backendErrors = {};
-        Object.keys(error.response.data.errors).forEach(field => {
+        Object.keys(error.response.data.errors).forEach((field) => {
           const errorArray = error.response.data.errors[field];
-          backendErrors[field] = Array.isArray(errorArray) ? errorArray[0] : errorArray;
+          backendErrors[field] = Array.isArray(errorArray)
+            ? errorArray[0]
+            : errorArray;
         });
         setErrors(backendErrors);
         const firstError = Object.values(backendErrors)[0];
-        toast.error(firstError || 'Please fix the validation errors');
+        toast.error(firstError || "Please fix the validation errors");
       } else if (error.response?.status === 404) {
-        toast.error('User not found');
+        toast.error("User not found");
         navigate("/admin/user-management");
       } else if (error.response?.status === 403) {
-        toast.error('You do not have permission to update this user');
+        toast.error("You do not have permission to update this user");
       } else {
-        toast.error(error.response?.data?.message || 'Something went wrong. Please try again.');
+        toast.error(
+          error.response?.data?.message ||
+            "Something went wrong. Please try again.",
+        );
       }
     } finally {
       setIsSubmitting(false);
@@ -359,26 +371,27 @@ else {
 
   return (
     <div className=" bg-gray-50 min-h-screen">
-      <Toaster
-            position="top-right"
-         
-          />
+      <Toaster position="top-right" />
 
       {/* Header */}
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
             <h1 className="text-xl font-bold text-gray-900">Edit User</h1>
-            <p className="text-xs sm:text-sm text-gray-600">Update user account information</p>
+            <p className="text-xs sm:text-sm text-gray-600">
+              Update user account information
+            </p>
           </div>
 
-            <div>
-            <button onClick={()=>{
-              navigate(-1)
-            }} 
-             className="inline-flex items-center gap-2 px-4 py-2 bg-[#13316C] text-white rounded-md text-sm hover:bg-[#0f2451] transition"
-            
-            >Back</button>
+          <div>
+            <button
+              onClick={() => {
+                navigate(-1);
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#13316C] text-white rounded-md text-sm hover:bg-[#0f2451] transition"
+            >
+              Back
+            </button>
           </div>
         </div>
       </div>
@@ -390,15 +403,22 @@ else {
             <div className="flex items-center gap-3 mb-4">
               <FaEdit className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
               <div>
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900">User Information</h2>
-                <p className="text-xs sm:text-sm text-gray-500">Basic user details</p>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+                  User Information
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Basic user details
+                </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Full Name */}
               <div>
-                <label htmlFor="name" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="name"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                >
                   Full Name *
                 </label>
                 <input
@@ -406,24 +426,33 @@ else {
                   type="text"
                   name="name"
                   value={formData.name}
-                 onChange={(e) => {
-                      handleInputChange(e);
-                      const selected = subRoles.find((sr) => sr.id === Number(e.target.value));
-                      setSelectedSubRoleLabel(selected?.label || selected?.name || '');
-                    }}
+                  onChange={(e) => {
+                    handleInputChange(e);
+                    const selected = subRoles.find(
+                      (sr) => sr.id === Number(e.target.value),
+                    );
+                    setSelectedSubRoleLabel(
+                      selected?.label || selected?.name || "",
+                    );
+                  }}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                    errors.name ? 'border-red-500' : 'border-gray-300'
+                    errors.name ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Enter full name"
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.name}</p>
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    {errors.name}
+                  </p>
                 )}
               </div>
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="email"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                >
                   Email *
                 </label>
                 <input
@@ -433,18 +462,23 @@ else {
                   value={formData.email}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
+                    errors.email ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Enter email address"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.email}</p>
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    {errors.email}
+                  </p>
                 )}
               </div>
 
               {/* Mobile */}
               <div>
-                <label htmlFor="number" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="number"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                >
                   Mobile *
                 </label>
                 <input
@@ -455,23 +489,29 @@ else {
                   value={formData.number}
                   onChange={(e) => {
                     const onlyDigits = e.target.value.replace(/\D/g, "");
-                    setFormData(prev => ({ ...prev, number: onlyDigits }));
-                    if (errors.number) setErrors(prev => ({ ...prev, number: '' }));
+                    setFormData((prev) => ({ ...prev, number: onlyDigits }));
+                    if (errors.number)
+                      setErrors((prev) => ({ ...prev, number: "" }));
                   }}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                    errors.number ? 'border-red-500' : 'border-gray-300'
+                    errors.number ? "border-red-500" : "border-gray-300"
                   }`}
                   maxLength="10"
                   pattern="[0-9]*"
                 />
                 {errors.number && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.number}</p>
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    {errors.number}
+                  </p>
                 )}
               </div>
 
               {/* Role */}
               <div>
-                <label htmlFor="role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="role_id"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                >
                   Role *
                 </label>
                 <select
@@ -480,23 +520,30 @@ else {
                   value={formData.role_id}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
-                    errors.role_id ? 'border-red-500' : 'border-gray-300'
+                    errors.role_id ? "border-red-500" : "border-gray-300"
                   }`}
                 >
                   <option value="">Select Role</option>
-                  {roles.map(role => (
-                    <option key={role.id} value={role.id}>{role.label}</option>
+                  {roles.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.label}
+                    </option>
                   ))}
                 </select>
                 {errors.role_id && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.role_id}</p>
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    {errors.role_id}
+                  </p>
                 )}
               </div>
 
               {/* SUB ROLE - Only visible if NOT PS */}
               {!isPersonalSecretary && (
                 <div>
-                  <label htmlFor="sub_role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="sub_role_id"
+                    className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                  >
                     Sub Role *
                   </label>
                   <select
@@ -506,59 +553,68 @@ else {
                     onChange={handleInputChange}
                     disabled={!formData.role_id || isLoadingSubRoles}
                     className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
-                      errors.sub_role_id ? 'border-red-500' : 'border-gray-300'
-                    } ${(!formData.role_id || isLoadingSubRoles) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      errors.sub_role_id ? "border-red-500" : "border-gray-300"
+                    } ${!formData.role_id || isLoadingSubRoles ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <option value="">
-                      {!formData.role_id 
-                        ? 'First select a role' 
-                        : isLoadingSubRoles 
-                          ? 'Loading sub-roles...' 
-                          : subRoles.length === 0 
-                            ? 'No sub-roles'
-                            : 'Select Sub Role'
-                      }
+                      {!formData.role_id
+                        ? "First select a role"
+                        : isLoadingSubRoles
+                          ? "Loading sub-roles..."
+                          : subRoles.length === 0
+                            ? "No sub-roles"
+                            : "Select Sub Role"}
                     </option>
-                    {subRoles.map(subRole => (
+                    {subRoles.map((subRole) => (
                       <option key={subRole.id} value={subRole.id}>
                         {subRole.label || subRole.name}
                       </option>
                     ))}
                   </select>
                   {errors.sub_role_id && (
-                    <p className="mt-1 text-sm text-red-600 flex items-center">{errors.sub_role_id}</p>
+                    <p className="mt-1 text-sm text-red-600 flex items-center">
+                      {errors.sub_role_id}
+                    </p>
                   )}
                 </div>
               )}
 
               {/* LOKAYUKT-UPLOKAYUKT - Only visible if Role is PS (ID 6) */}
-           {/* {(isPersonalSecretary || (isSupervisor && selectedSubRoleLabel)) && ( */}
-           {(isPersonalSecretary || isSupervisor) && (
+              {/* {(isPersonalSecretary || (isSupervisor && selectedSubRoleLabel)) && ( */}
+              {(isPersonalSecretary || isSupervisor) && (
                 <div>
-                  <label htmlFor="ps_parent" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                   {/* PS Under Hon' Lokayukt/Uplokayukt * */}
-                        {isPersonalSecretary
-    ? "PS Under Hon' Lokayukt/Uplokayukt *"
-    : "Under Supervisor *"}
+                  <label
+                    htmlFor="ps_parent"
+                    className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                  >
+                    {/* PS Under Hon' Lokayukt/Uplokayukt * */}
+                    {isPersonalSecretary
+                      ? "PS Under Hon' Lokayukt/Uplokayukt *"
+                      : "Under Supervisor *"}
                   </label>
                   <select
                     id="ps_parent"
-                    name="parent_user_id"
-                    // value={formData.ps_parent}
-                      value={formData.parent_user_id}
+                    name="ps_parent"
+                    value={formData.ps_parent}
                     onChange={handleInputChange}
-                    className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
-                      errors.ps_parent ? 'border-red-500' : 'border-gray-300'
+                    className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+                      errors.ps_parent ? "border-red-500" : "border-gray-300"
                     }`}
                   >
                     <option value="">Select User</option>
-                    {/* Flattening the data array */}
-                    {fetchLokayuktData?.flat(2)?.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {/* {item.user_name} ({item.name}) */}
-                               {item?.role?.label} ({item.name}) 
-                      </option>
-                    ))}
+
+                    {fetchLokayuktData?.flat(2)?.map((item) => {
+                      const label =
+                        item?.role?.name === "supervisor"
+                          ? item?.subrole?.label
+                          : item?.role?.label;
+
+                      return (
+                        <option key={item.id} value={item.id}>
+                          {item.name} ({label})
+                        </option>
+                      );
+                    })}
                   </select>
                   {errors.lokayukt_uplokayukt && (
                     <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -567,9 +623,6 @@ else {
                   )}
                 </div>
               )}
-
-
-              
 
               {/* District */}
               <div>
@@ -581,25 +634,30 @@ else {
                   value={formData.district_id}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
-                    errors.district_id ? 'border-red-500' : 'border-gray-300'
+                    errors.district_id ? "border-red-500" : "border-gray-300"
                   }`}
                   disabled={isLoadingDistricts}
                 >
                   <option value="">Select District</option>
-                  {districts.map(district => (
+                  {districts.map((district) => (
                     <option key={district.id} value={district.district_code}>
                       {district.district_name}
                     </option>
                   ))}
                 </select>
                 {errors.district_id && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.district_id}</p>
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    {errors.district_id}
+                  </p>
                 )}
               </div>
 
               {/* Designation */}
               <div>
-                <label htmlFor="designation" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="designation"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                >
                   Designation *
                 </label>
                 <select
@@ -608,46 +666,53 @@ else {
                   value={formData.designation}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
-                    errors.designation ? 'border-red-500' : 'border-gray-300'
+                    errors.designation ? "border-red-500" : "border-gray-300"
                   }`}
                   disabled={isLoadingDesignations}
                 >
                   <option value="">Select Designation</option>
-                  {designations.map(designation => (
+                  {designations.map((designation) => (
                     <option key={designation.id} value={designation.id}>
                       {designation.name}
                     </option>
                   ))}
                 </select>
                 {errors.designation && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.designation}</p>
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    {errors.designation}
+                  </p>
                 )}
               </div>
 
               {/* Department */}
               <div>
-                <label htmlFor="department" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="department"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                >
                   Department *
                 </label>
                 <select
                   id="department"
-                  name="department" 
+                  name="department"
                   value={formData.department}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
-                    errors.department ? 'border-red-500' : 'border-gray-300'
+                    errors.department ? "border-red-500" : "border-gray-300"
                   }`}
                   disabled={isLoadingDepartments}
                 >
                   <option value="">Select Department</option>
-                  {departments.map(department => (
+                  {departments.map((department) => (
                     <option key={department.id} value={department.id}>
                       {department.name}
                     </option>
                   ))}
                 </select>
                 {errors.department && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.department}</p>
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    {errors.department}
+                  </p>
                 )}
               </div>
             </div>
@@ -658,15 +723,22 @@ else {
             <div className="flex items-center gap-3 mb-4">
               <FaLock className="w-4 h-4 sm:w-5 sm:h-5 text-red-600 flex-shrink-0" />
               <div>
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900">Security</h2>
-                <p className="text-xs sm:text-sm text-gray-500">Change user password (leave blank to keep current password)</p>
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+                  Security
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-500">
+                  Change user password (leave blank to keep current password)
+                </p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Password */}
               <div>
-                <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="password"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                >
                   New Password
                 </label>
                 <input
@@ -676,18 +748,23 @@ else {
                   value={formData.password}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                    errors.password ? 'border-red-500' : 'border-gray-300'
+                    errors.password ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Enter new password (optional)"
                 />
                 {errors.password && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.password}</p>
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    {errors.password}
+                  </p>
                 )}
               </div>
 
               {/* Confirm Password */}
               <div>
-                <label htmlFor="password_confirmation" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="password_confirmation"
+                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+                >
                   Confirm New Password
                 </label>
                 <input
@@ -697,12 +774,16 @@ else {
                   value={formData.password_confirmation}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                    errors.password_confirmation ? 'border-red-500' : 'border-gray-300'
+                    errors.password_confirmation
+                      ? "border-red-500"
+                      : "border-gray-300"
                   }`}
                   placeholder="Confirm new password"
                 />
                 {errors.password_confirmation && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">{errors.password_confirmation}</p>
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    {errors.password_confirmation}
+                  </p>
                 )}
               </div>
             </div>
@@ -723,8 +804,8 @@ else {
                 disabled={isSubmitting}
                 className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
                   isSubmitting
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
                 }`}
               >
                 {isSubmitting ? (

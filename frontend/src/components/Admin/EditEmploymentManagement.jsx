@@ -504,7 +504,6 @@ const EditEmploymentManagement = () => {
                     }`}
                   >
                     <option value="">Select User</option>
-                    {/* Flattening the data array */}
                     {fetchLokayuktData?.flat(2)?.map((item) => (
                       <option key={item.id} value={item.id}>
                         {item.user_name} ({item.name})
