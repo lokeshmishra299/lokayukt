@@ -21,6 +21,7 @@ import AdminFileAdministrator from './components/Admin/FileAdministrator';
 import AdminEmploymentManagement from './components/Admin/EmploymentManagement';
 import AdminAddEmploymentManagement from './components/Admin/AddEmploymentManagement';
 import AdminEditEmploymentManagement from './components/Admin/EditEmploymentManagement';
+import AdminAllLeaveFiels from './components/Admin/AllLeaveFiels';
 
 
 
@@ -406,6 +407,7 @@ import DispatchUserManagement from './components/Dispatch/UserManagement';
 
 
 
+
 // import DispatchAddUserManagement from './components/Dispatch/AddUserManagement';
 // import LokayuktEditUserManagement from './components/LokAyukta/EditUserManagment';
 // import LokayuktMasterData from './components/LokAyukta/MasterData';
@@ -444,6 +446,7 @@ function App() {
           <Route path="employment-management/:id" element={<AdminViewLeaveFiels />} />
           <Route path="employment-management/add" element={<AdminAddEmploymentManagement />} />
           <Route path="employment-management/edit/:id" element={<AdminEditEmploymentManagement />} />
+          <Route path="all-leaves-files" element={<AdminAllLeaveFiels />} />
 
 
         </Route>

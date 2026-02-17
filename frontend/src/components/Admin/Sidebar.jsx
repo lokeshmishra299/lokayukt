@@ -15,6 +15,7 @@ import {
 import { IoFileTray } from "react-icons/io5";
 import { FaUserGroup } from "react-icons/fa6";
 import { FaUserTie } from "react-icons/fa6";
+import { MdContactPage } from "react-icons/md";
 
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
   const location = useLocation();
@@ -145,6 +146,24 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
                     <FaUserTie/>
 
                   </span> All Employees
+                </Link>
+
+
+
+                 <Link
+                  to="/admin/all-leaves-files"
+                  onClick={handleLinkClick}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+                    ${isActive("/all-leaves-files")
+                      ? "text-blue-600 bg-blue-50"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    }
+                  `}
+                >
+                  <span className="text-xs">
+                    <MdContactPage/>
+
+                  </span> All Leaves
                 </Link>
 
                 {/* File Administrator (Moved Here) */}
