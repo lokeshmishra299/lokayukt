@@ -43,11 +43,13 @@ Route::post('/login',[LoginController::class,'login']);
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [LoginController::class, 'logout']);
    
+       
      
     Route::middleware('role:admin')->prefix('admin')->group(function () {
         
         Route::get('/get-roles', [CommonController::class, 'getRoles']);
         Route::get('/get-sub-roles/{roleId}', [CommonController::class, 'getSubroles']);
+        Route::get('/get-leave-details', [CommonController::class, 'fetchLeavesDetails']);
 
         // Route::prefix('admin')->group(function () {
         
@@ -182,7 +184,13 @@ Route::middleware('auth:sanctum')->group(function(){
    Route::middleware('role:operator:record-keeper|review-operator')->prefix('operator')->group(function () {
         
         // Route::prefix('admin')->group(function () {
-          
+        Route::get('/all-files',[EmployeesController::class,'index']);
+        Route::get('/topics',[EmployeesController::class,'fetch_topics']);
+        Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
+        Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
+        Route::get('/get-file-preview/{id}',[EmployeesController::class,'getFilePreview']);  
+
+
         Route::get('/all-district',[OperatorCommonController::class,'fetch_district']);
         Route::get('/department',[OperatorCommonController::class,'fetch_department']);
         Route::get('/designation',[OperatorCommonController::class,'fetch_designation']);
@@ -223,6 +231,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/analytic-report',[OperatorReportController::class,'analytics']);
         Route::get('/complain-report',[OperatorReportController::class,'complainReports']);
         Route::get('/all-complains',[OperatorReportController::class,'allComplains']);
+        Route::get('/search-by-field',[OperatorReportController::class,'search']);
 
         Route::get('/detail-by-complaintype',[OperatorReportController::class,'complainComplaintypeWise']);
         Route::get('/district-wise-complaint',[OperatorReportController::class,'complainDistrictWise']);
@@ -552,8 +561,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::middleware('role:emp')->prefix('employee')->group(function () {
        
         Route::get('/all-files',[EmployeesController::class,'index']);
-     Route::get('/topics',[EmployeesController::class,'fetch_topics']);
-      Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
+        Route::get('/topics',[EmployeesController::class,'fetch_topics']);
+        Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
         Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
         Route::get('/get-file-preview/{id}',[EmployeesController::class,'getFilePreview']);
        

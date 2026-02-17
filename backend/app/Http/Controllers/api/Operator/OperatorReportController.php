@@ -1071,7 +1071,7 @@ $records = DB::table('complaints')
 
     public function search(Request $request)
 {
-    $search = $request->search;
+    // $search = $request->search;
 
     $query = Complaint::query();
 
