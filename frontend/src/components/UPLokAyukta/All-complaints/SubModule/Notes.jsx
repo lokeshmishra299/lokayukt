@@ -747,7 +747,7 @@ const Notes = ({ complaint }) => {
                   <div />
                   <div className="text-right text-xs text-gray-600">
                     <p className="uppercase tracking-wide">Noting By</p>
-                    <p className="font-semibold mt-1 text-gray-800">Shri Sanjay Mishra</p>
+                    {/* <p className="font-semibold mt-1 text-gray-800">Shri Sanjay Mishra</p> */}
                     <p>{name}</p>
                   </div>
                 </div>
