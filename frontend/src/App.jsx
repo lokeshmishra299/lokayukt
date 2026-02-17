@@ -30,21 +30,7 @@ import AdminAllLeaveFiels from './components/Admin/AllLeaveFiels';
 
 
 
-// Admin
-import EmployLayout from './components/Employ/Layout';
-import EmployDashboard from './components/Employ/Dashboard';
-import EmployComplaints from './components/Employ/Complaints';
-// import EmployProgressRegister from './components/Employ/ProgressRegister';
-// import EmploySearchReports from './components/Employ/SearchReports';
-import EmployUserManagement from './components/Employ/UserManagement';
-import EmployAddFiles from './components/Employ/AddFiles';
-import EmployViewFiles from './components/Employ/ViewFiles';
-// import EmployMasterData from './components/Employ/MasterData';
-// import EmployAddUserManagement from './components/Employ/AddUserManagement';
-// import EmployEditUserManagment from './components/Employ/EditUserManagment';
-// import EmployViewComplaints from './components/Employ/ViewComplaints';
-// import EmployEditComplaint from './components/Employ/EditComplaint';
-// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
 
 // Operator
 import OperatorLayout from './components/Operator/Layout';
@@ -64,6 +50,22 @@ import OperatorPendingComplaints from './components/Operator/Pending-complaints/
 import OperatorViewPendingComplaint from './components/Operator/Pending-complaints/ViewPendingComplaint';
 import OperatorEditPendingComplaints from './components/Operator/Pending-complaints/EditPendingComplaints';
 import OperatorEmployUserDashboard from './components/Operator/EmployUserDashboard';
+
+// Employ
+import OperatorEmployLayout from './components/Operator/Employ/Layout';
+import OperatorEmployDashboard from './components/Operator/Employ/Dashboard';
+import OperatorEmployComplaints from './components/Operator/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import OperatorEmployUserManagement from './components/Operator/Employ/UserManagement';
+import OperatorEmployAddFiles from './components/Operator/Employ/AddFiles';
+import OperatorEmployViewFiles from './components/Operator/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
 
 import AllDraft from './components/Operator/Draft/AllDraft';
 import ViewDraft from './components/Operator/Draft/ViewDraft';
@@ -368,6 +370,8 @@ import Login from './components/Login';
 import LokayuktReporting from './components/LokAyukta/Reporting';
 
 
+
+// PS Route
 import Layout from "./components/Ps/Layout";
 import Dashboard from "./components/Ps/Dashboard";
 import Complaints from './components/Ps/Complaints';
@@ -378,6 +382,24 @@ import ViewPendingComplaint from './components/Ps/Pending-complaints/ViewPending
 import ApprovedComplaints from './components/Ps/Approved-complaints/ApprovedComplaints';
 import ViewApprovedComplaints from './components/Ps/Approved-complaints/ViewApprovedComplaints';
 import ScaneLetter from './components/LokAyukta/ScaneLetter';
+import EmployeeUserDashboard from './components/Ps/EmployUserDashboard';
+
+// Employ
+import PsEmployLayout from './components/Ps/Employ/Layout';
+import PsEmployDashboard from './components/Ps/Employ/Dashboard';
+import PsEmployComplaints from './components/Ps/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import PsEmployUserManagement from './components/Ps/Employ/UserManagement';
+import PsEmployAddFiles from './components/Ps/Employ/AddFiles';
+import PsEmployViewFiles from './components/Ps/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
 
 
 
@@ -403,6 +425,7 @@ import DispatchScaneLetter from "./components/Dispatch/ScaneLetter"
 
 // import LokayuktUserManagement from './components/LokAyukta/UserManagement';
 import DispatchUserManagement from './components/Dispatch/UserManagement';
+
 
 
 
@@ -453,29 +476,23 @@ function App() {
       )}
 
 
-     {(role === 'emp' || role === 'operator') && (
-        <Route path="/employee" element={<EmployLayout />}>
-          <Route path="dashboard" element={<EmployDashboard />} />
-          <Route path="complaints" element={<EmployComplaints />} />
-          <Route path="add-files" element={<EmployAddFiles />} />
-          <Route path="view-files" element={<EmployViewFiles />} />
-          {/* <Route path="employment-management" element={<AdminEmploymentManagement />} /> */}
-          {/* <Route path="search-reports/view/:id" element={<AdminViewComplaints />} />
-          <Route path="search-reports/edit/:id" element={<AdminEditComplaint />} />
-          <Route path="progress-register" element={<AdminProgressRegister />} />
-          <Route path="search-reports" element={<AdminSearchReports />} /> */}
-          <Route path="user-management" element={<EmployUserManagement />} />
-          {/* <Route path="user-management/add" element={<AdminAddUserManagement />} /> */}
-          {/* <Route path="user-management/edit/:id" element={<AdminEditUserManagment />} /> */}
-          {/* <Route path="master-data" element={<AdminMasterData />} /> */}
-          {/* <Route path="file-administrator" element={<AdminFileAdministrator />} /> */}
-        </Route>
-      )}
+      {/* {role === 'emp ' && (
+       
+      )} */}
       {/*  Operator Routes */}
       {role === 'operator' && (
         <>  
 
-          <Route path="user-employ-dashboard" element={<OperatorEmployUserDashboard />} />
+
+      <Route path="/employee" element={<OperatorEmployLayout />}>
+          <Route path="dashboard" element={<OperatorEmployDashboard />} />
+          <Route path="complaints" element={<OperatorEmployComplaints />} />
+          <Route path="add-files" element={<OperatorEmployAddFiles />} />
+          <Route path="view-files" element={<OperatorEmployViewFiles />} />
+          <Route path="user-management" element={<OperatorEmployUserManagement />} />
+       
+        </Route>
+          <Route path="main-dashboard" element={<OperatorEmployUserDashboard />} />
 
 
         <Route path="/operator" element={<OperatorLayout />}>
@@ -839,7 +856,22 @@ function App() {
 
       
       {role === 'ps' && (
+        <>
+
+
+         <Route path="/employee" element={<PsEmployLayout />}>
+          <Route path="dashboard" element={<PsEmployDashboard />} />
+          <Route path="complaints" element={<PsEmployComplaints />} />
+          <Route path="add-files" element={<PsEmployAddFiles />} />
+          <Route path="view-files" element={<PsEmployViewFiles />} />
+          <Route path="user-management" element={<PsEmployUserManagement />} />
+       
+        </Route>
+           <Route path="main-dashboard" element={<EmployeeUserDashboard />} />
         <Route path="/ps" element={<Layout />}>
+
+       
+
            <Route path="dashboard" element={<Dashboard/>} />
           <Route path="complaints" element={<Complaints />} />
           {/* <Route path="progress-register" element={<pro />} />
@@ -864,6 +896,7 @@ function App() {
                     <Route path="reporting" element={<PsReporting />} /> */}
          
         </Route>
+        </>
       )}
 
          {/* UPLok-ayukt  Routes */}

@@ -66,7 +66,7 @@ const Login = () => {
             localStorage.setItem('subrole', response.data.data.user.subrole.name);
             // localStorage.setItem('UserN', response.data.data.user.name);
 
-            window.open("/user-employ-dashboard", "_self");
+            window.open("/main-dashboard", "_self");
           }
 
           else if (userRole === "emp"){
@@ -93,7 +93,7 @@ const Login = () => {
 
           }
           else if (userRole === "ps") {
-            window.open("/ps/dashboard", "_self");
+            window.open("/main-dashboard", "_self");
             localStorage.setItem("UserID", response.data.data.user.id);
             localStorage.setItem('name', response?.data?.data?.user?.name);
 
