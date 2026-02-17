@@ -453,7 +453,7 @@ function App() {
       )}
 
 
-      {role === 'emp' && (
+     {(role === 'emp' || role === 'operator') && (
         <Route path="/employee" element={<EmployLayout />}>
           <Route path="dashboard" element={<EmployDashboard />} />
           <Route path="complaints" element={<EmployComplaints />} />
