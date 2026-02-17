@@ -55,7 +55,7 @@ const Login = () => {
         localStorage.setItem('user', JSON.stringify(response.data.data.user));
         localStorage.setItem('role', response.data.data.user.role.name);
         const userRole = response.data.data.user.role.name;
-        toast.success("Login Successful!");
+        toast.success("Login Successful!"); 
         setTimeout(() => {
           if (userRole === "admin") {
             window.open("/admin/dashboard", "_self");

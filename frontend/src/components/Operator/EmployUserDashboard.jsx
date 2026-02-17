@@ -1,57 +1,63 @@
 import React, { useState } from 'react';
-// React icons import kar rahe hain
-import { FaUsers, FaUserTie } from 'react-icons/fa'; 
+import { FaUsers, FaUserTie } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
-const EmployUserDashboard = () => {
+const EmployeeUserDashboard = () => {
   const [activeBox, setActiveBox] = useState('');
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   return (
-    // Screen ke bilkul center me lane ke liye
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 font-sans p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 font-sans p-4">
       
       {/* Container for Boxes */}
-      <div className="flex flex-col sm:flex-row gap-10">
+      <div className="flex flex-col sm:flex-row gap-8">
         
-        {/* User Management Box */}
+        {/* Complaint Management Box */}
         <div 
-          onClick={()=>{
-            navigate("/operator/dashboard")
+          onClick={() => {
+            setActiveBox('user');
+            navigate('/operator/dashboard');
           }}
-          className={`w-64 h-64 flex flex-col items-center justify-center gap-6 rounded-2xl shadow-lg cursor-pointer transition-all duration-300 border-4 ${
+          className={`w-[280px] h-[280px] flex flex-col justify-center p-8 rounded-2xl shadow-sm cursor-pointer transition-all duration-300 border-2 ${
             activeBox === 'user' 
-              ? 'bg-blue-50 border-blue-600 scale-105' 
-              : 'bg-white border-transparent hover:shadow-xl hover:-translate-y-2'
+              ? 'bg-blue-50 border-blue-600 scale-105 shadow-md' 
+              : 'bg-white border-transparent hover:shadow-md hover:-translate-y-1'
           }`}
         >
-          <FaUsers className={`text-7xl ${activeBox === 'user' ? 'text-blue-600' : 'text-gray-400'}`} />
-          <span className={`text-2xl font-bold ${activeBox === 'user' ? 'text-blue-600' : 'text-gray-600'}`}>
-            User
-          </span>
+          {/* Icon Wrapper (Centered) */}
+          <div className="flex justify-center mb-10">
+            <FaUsers className={`text-[80px] ${activeBox === 'user' ? 'text-blue-600' : 'text-[#8ea2b4]'}`} />
+          </div>
+          
+          {/* Text Wrapper (Left Aligned) */}
+          <div className={`text-2xl font-bold leading-tight text-left ${activeBox === 'user' ? 'text-blue-600' : 'text-[#475569]'}`}>
+            Complaint Management
+          </div>
         </div>
 
-        {/* Employee Box */}
+        {/* Employee Management Box */}
         <div 
           onClick={() => setActiveBox('employee')}
-          className={`w-64 h-64 flex flex-col items-center justify-center gap-6 rounded-2xl shadow-lg cursor-pointer transition-all duration-300 border-4 ${
+          className={`w-[280px] h-[280px] flex flex-col justify-center p-8 rounded-2xl shadow-sm cursor-pointer transition-all duration-300 border-2 ${
             activeBox === 'employee' 
-              ? 'bg-blue-50 border-blue-600 scale-105' 
-              : 'bg-white border-transparent hover:shadow-xl hover:-translate-y-2'
+              ? 'bg-blue-50 border-blue-600 scale-105 shadow-md' 
+              : 'bg-white border-transparent hover:shadow-md hover:-translate-y-1'
           }`}
         >
-          <FaUserTie className={`text-7xl ${activeBox === 'employee' ? 'text-blue-600' : 'text-gray-400'}`} />
-          <span className={`text-2xl font-bold ${activeBox === 'employee' ? 'text-blue-600' : 'text-gray-600'}`}>
-            Employee
-          </span>
+          {/* Icon Wrapper (Centered) */}
+          <div className="flex justify-center mb-10">
+            <FaUserTie className={`text-[80px] ${activeBox === 'employee' ? 'text-blue-600' : 'text-[#8ea2b4]'}`} />
+          </div>
+          
+          {/* Text Wrapper (Left Aligned) */}
+          <div className={`text-2xl font-bold leading-tight text-left ${activeBox === 'employee' ? 'text-blue-600' : 'text-[#475569]'}`}>
+            Employee Management
+          </div>
         </div>
 
       </div>
-
-    
-
     </div>
   );
 };
 
-export default EmployUserDashboard;
+export default EmployeeUserDashboard;
