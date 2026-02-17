@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FaUsers, FaUserTie } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import { TbReport } from "react-icons/tb";
 
 const EmployeeUserDashboard = () => {
   const [activeBox, setActiveBox] = useState('');
@@ -26,7 +27,7 @@ const EmployeeUserDashboard = () => {
         >
           {/* Icon Wrapper (Centered) */}
           <div className="flex justify-center mb-10">
-            <FaUsers className={`text-[80px] ${activeBox === 'user' ? 'text-blue-600' : 'text-[#8ea2b4]'}`} />
+            <TbReport className={`text-[80px] ${activeBox === 'user' ? 'text-blue-600' : 'text-[#8ea2b4]'}`} />
           </div>
           
           {/* Text Wrapper (Left Aligned) */}
@@ -37,7 +38,10 @@ const EmployeeUserDashboard = () => {
 
         {/* Employee Management Box */}
         <div 
-          onClick={() => setActiveBox('employee')}
+           onClick={() => {
+            setActiveBox('user');
+            navigate('/employee/dashboard');
+          }}
           className={`w-[280px] h-[280px] flex flex-col justify-center p-8 rounded-2xl shadow-sm cursor-pointer transition-all duration-300 border-2 ${
             activeBox === 'employee' 
               ? 'bg-blue-50 border-blue-600 scale-105 shadow-md' 
