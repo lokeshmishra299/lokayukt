@@ -21,7 +21,8 @@ class UserManagement extends Controller
     }
     public function allEmployees()
     {
-        $employees = User::with('role:id,name,label','department:id,name')->where('user_type','employee')->get();
+        // $employees = User::with('role:id,name,label','department:id,name')->where('user_type','employee')->get();
+        $employees = User::with('role:id,name,label','department:id,name')->get();
         return response()->json([
             'status' => true,
             'data' => $employees

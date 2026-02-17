@@ -1145,4 +1145,12 @@ class CommonController extends Controller
             ]);
 
     }
+
+    public function fetchLeavesDetails(){
+
+        $cat = EmployeeUploadFiles::with('user:id,name')->get();
+        // dd($designation->toArray());
+        return ApiResponse::generateResponse('success','Leaves fetch successfully',$cat);
+    }
+
 }
