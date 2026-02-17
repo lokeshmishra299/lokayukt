@@ -23,10 +23,10 @@ const Reporting = () => {
   {/* Complaint / File No */}
   <input
     type="text"
-    placeholder="Complaint / File No"
+    placeholder="f'kdk;r, Qkby la[;k"
     value={compFile}
     onChange={(e) => setCompFile(e.target.value)}
-    className="px-4 py-3 text-base border border-gray-300 rounded-md
+    className="px-4 kruti-input py-3 text-base border border-gray-300 rounded-md
       focus:outline-none focus:ring-2 focus:ring-blue-500"
   />
 
@@ -34,10 +34,10 @@ const Reporting = () => {
   <input
     type="text"
     // placeholder="Corr. / Response"
-    placeholder="Complaint / Respondent"
+    placeholder="f'kdk;r, izfriknd"
     value={corrResp}
     onChange={(e) => setCorrResp(e.target.value)}
-    className="px-4 py-3 text-base border border-gray-300 rounded-md
+    className="px-4 kruti-input py-3 text-base border border-gray-300 rounded-md
       focus:outline-none focus:ring-2 focus:ring-blue-500"
   />
 
