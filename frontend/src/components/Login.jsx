@@ -80,7 +80,7 @@ const Login = () => {
             localStorage.setItem('subrole', response.data.data.user.subrole.name);
             localStorage.setItem('name', response?.data?.data?.user?.name);
 
-            window.open("/supervisor/dashboard", "_self");
+            window.open("/main-dashboard", "_self");
           }
           else if (userRole === "lok-ayukt") {
             window.open("/lokayukt/dashboard", "_self");

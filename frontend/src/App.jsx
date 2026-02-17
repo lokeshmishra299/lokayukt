@@ -139,6 +139,26 @@ import SupervisorAllComplaitsro from './components/Supervisor/ro-aro/All-complai
 import SupervisorViewAllComplaintro from './components/Supervisor/ro-aro/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintsro from './components/Supervisor/ro-aro/All-complaints/EditAllComplaints';
 
+
+import EmployUserDashboardro from "./components/./Supervisor/ro-aro/EmployUserDashboard"
+
+
+// Employ
+import RoAroEmployLayout from './components/Supervisor/ro-aro/Employ/Layout';
+import RoAroEmployDashboard from './components/Supervisor/ro-aro/Employ/Dashboard';
+import RoAroEmployComplaints from './components/Supervisor/ro-aro/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import RoAroEmployUserManagement from './components/Supervisor/ro-aro/Employ/UserManagement';
+import RoAroEmployAddFiles from './components/Supervisor/ro-aro/Employ/AddFiles';
+import RoAroEmployViewFiles from './components/Supervisor/ro-aro/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
 // DS
 
 import SupervisorLayoutds from './components/Supervisor/ds/Layout';
@@ -246,6 +266,27 @@ import SupervisorAllComplaitssec from './components/Supervisor/sec/All-complaint
 import SupervisorViewAllComplaintsec from './components/Supervisor/sec/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintssec from './components/Supervisor/sec/All-complaints/EditAllComplaints';
 
+// import EmployUserDashboardsec from "./components/./Supervisor/sec/EmployUserDashboard"
+import EmployUserDashboardsec from "./components/Supervisor/sec/EmployUserDashboard"
+
+
+// Employ
+import SecEmployLayout from './components/Supervisor/sec/Employ/Layout';
+import SecEmployDashboard from './components/Supervisor/sec/Employ/Dashboard';
+import SecEmployComplaints from './components/Supervisor/sec/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import SecEmployUserManagement from './components/Supervisor/sec/Employ/UserManagement';
+import SecEmployAddFiles from './components/Supervisor/sec/Employ/AddFiles';
+import SecEmployViewFiles from './components/Supervisor/sec/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
+
 // Supervisor 
 // SubRole -> cio - io
 import SupervisorLayoutcio from './components/Supervisor/cio-io/Layout';
@@ -267,9 +308,28 @@ import SupervisorAllComplaitscio from './components/Supervisor/cio-io/All-compla
 import SupervisorViewAllComplaintcio from './components/Supervisor/cio-io/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintscio from './components/Supervisor/cio-io/All-complaints/EditAllComplaints';
 
+import EmployUserDashboardcio from "./components/./Supervisor/cio-io/EmployUserDashboard"
+
+// Employ
+import CioEmployLayout from './components/Supervisor/cio-io/Employ/Layout';
+import CioEmployDashboard from './components/Supervisor/cio-io/Employ/Dashboard';
+import CioEmployComplaints from './components/Supervisor/cio-io/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import CioEmployUserManagement from './components/Supervisor/cio-io/Employ/UserManagement';
+import CioEmployAddFiles from './components/Supervisor/cio-io/Employ/AddFiles';
+import CioEmployViewFiles from './components/Supervisor/cio-io/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
+
 
 // Supervisor 
-// SubRole -> cio - io
+// SubRole -> io
 import SupervisorLayoutio from './components/Supervisor/io/Layout';
 import SupervisorDashboardio from './components/Supervisor/io/Dashboard';
 import SupervisorComplaintsio from './components/Supervisor/io/Complaints';
@@ -288,6 +348,9 @@ import SupervisorEditApprovedComplaintsio from './components/Supervisor/io/Appro
 import SupervisorAllComplaitsio from './components/Supervisor/io/All-complaints/AllComplaits';
 import SupervisorViewAllComplaintio from './components/Supervisor/io/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintsio from './components/Supervisor/io/All-complaints/EditAllComplaints';
+
+
+
 
 
 // Supervisor 
@@ -672,6 +735,20 @@ function App() {
 
       {/** RO/ARO */}
          {role === 'supervisor' && subrole === 'ro-aro' && (
+          <>
+
+            <Route path="/employee" element={<RoAroEmployLayout />}>
+          <Route path="dashboard" element={<RoAroEmployDashboard />} />
+          <Route path="complaints" element={<RoAroEmployComplaints />} />
+          <Route path="add-files" element={<RoAroEmployAddFiles />} />
+          <Route path="view-files" element={<RoAroEmployViewFiles />} />
+          <Route path="user-management" element={<RoAroEmployUserManagement />} />
+       
+        </Route>
+
+          <Route path="main-dashboard" element={<EmployUserDashboardro />} />
+
+
         <Route path="/supervisor" element={<SupervisorLayoutro />}>
           <Route path="dashboard" element={<SupervisorDashboardro />} />
           <Route path="complaints" element={<SupervisorComplaintsro />} />
@@ -691,6 +768,7 @@ function App() {
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintro/>} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintro />} /> 
         </Route>
+          </>
       )}
 
 
@@ -722,6 +800,20 @@ function App() {
    {/* Supervisor  Routes */}
        {/* sec */}
        {role === 'supervisor' && subrole === 'sec' && (
+        <>
+
+
+               <Route path="/employee" element={<SecEmployLayout />}>
+          <Route path="dashboard" element={<SecEmployDashboard />} />
+          <Route path="complaints" element={<SecEmployComplaints />} />
+          <Route path="add-files" element={<SecEmployAddFiles />} />
+          <Route path="view-files" element={<SecEmployViewFiles />} />
+          <Route path="user-management" element={<SecEmployUserManagement />} />
+       
+        </Route>
+          <Route path="main-dashboard" element={<EmployUserDashboardsec />} />
+
+
         <Route path="/supervisor" element={<SupervisorLayoutsec />}>
           <Route path="dashboard" element={<SupervisorDashboardsec />} />
           <Route path="complaints" element={<SupervisorComplaintssec />} />
@@ -741,6 +833,7 @@ function App() {
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintssec />} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintssec />} /> 
         </Route>
+        </>
       )}
 
 
@@ -748,6 +841,22 @@ function App() {
        {/*cio-io*/}
       
      {role === 'supervisor' && subrole === 'cio-io' && (
+
+      
+      <>
+
+          <Route path="/employee" element={<CioEmployLayout />}>
+          <Route path="dashboard" element={<CioEmployDashboard />} />
+          <Route path="complaints" element={<CioEmployComplaints />} />
+          <Route path="add-files" element={<CioEmployAddFiles />} />
+          <Route path="view-files" element={<CioEmployViewFiles />} />
+          <Route path="user-management" element={<CioEmployUserManagement />} />
+       
+        </Route>
+
+          <Route path="main-dashboard" element={<EmployUserDashboardcio />} />
+
+
         <Route path="/supervisor" element={<SupervisorLayoutcio />}>
           <Route path="dashboard" element={<SupervisorDashboardcio />} />
           <Route path="complaints" element={<SupervisorComplaintscio />} />
@@ -767,6 +876,7 @@ function App() {
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintscio />} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintscio/>} /> 
         </Route>
+      </>
       )} 
 
 
