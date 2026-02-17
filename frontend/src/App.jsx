@@ -62,6 +62,8 @@ import OperatorEditApprovedCoplaints from './components/Operator/Approved-compla
 import OperatorPendingComplaints from './components/Operator/Pending-complaints/PendingComplaints/';
 import OperatorViewPendingComplaint from './components/Operator/Pending-complaints/ViewPendingComplaint';
 import OperatorEditPendingComplaints from './components/Operator/Pending-complaints/EditPendingComplaints';
+import OperatorEmployUserDashboard from './components/Operator/EmployUserDashboard';
+
 import AllDraft from './components/Operator/Draft/AllDraft';
 import ViewDraft from './components/Operator/Draft/ViewDraft';
 import EditDraft from './components/Operator/Draft/EditDraft';
@@ -448,7 +450,7 @@ function App() {
       )}
 
 
- {role === 'emp' && (
+      {role === 'emp' && (
         <Route path="/employee" element={<EmployLayout />}>
           <Route path="dashboard" element={<EmployDashboard />} />
           <Route path="complaints" element={<EmployComplaints />} />
@@ -468,6 +470,11 @@ function App() {
       )}
       {/*  Operator Routes */}
       {role === 'operator' && (
+        <>  
+
+          <Route path="user-employ-dahsboard" element={<OperatorEmployUserDashboard />} />
+
+
         <Route path="/operator" element={<OperatorLayout />}>
           <Route path="dashboard" element={<OperatorDashboard />} />
           <Route path="complaints" element={<OperatorComplaints />} />
@@ -493,6 +500,7 @@ function App() {
              {/* <Route path="/operator/complaints/Cheekdublicate" element={<Cheekdublicate />} /> */}
 
         </Route>
+        </>
       )}
       
        {/* Supervisor  Routes */}

@@ -66,7 +66,7 @@ const Login = () => {
             localStorage.setItem('subrole', response.data.data.user.subrole.name);
             // localStorage.setItem('UserN', response.data.data.user.name);
 
-            window.open("/operator/dashboard", "_self");
+            window.open("/user-employ-dahsboard", "_self");
           }
 
           else if (userRole === "emp"){
