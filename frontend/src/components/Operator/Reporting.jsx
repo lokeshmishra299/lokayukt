@@ -11,58 +11,71 @@ const Reporting = () => {
   return (
     <div className="bg-gray-50">
       <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-4">
-        
-        {/* Header & Search Filters */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-4">
-          <h2 className="text-base sm:text-lg font-bold text-gray-900 whitespace-nowrap">
+             <h2 className="text-base sm:text-lg font-bold mb-2 text-gray-900 whitespace-nowrap">
             Reporting
           </h2>
+        {/* Header & Search Filters */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-4">
+       
 
-          {/* Updated Search fields */}
-          <div className="flex flex-wrap items-center gap-3">
-            
-            {/* Complaint No / File No Combined Input */}
-            <input
-              type="text"
-              placeholder="Complaint / File No"
-              value={compFile}
-              onChange={(e) => setCompFile(e.target.value)}
-              className="w-40 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
+   <div className="grid grid-cols-[220px_220px_180px_140px_auto] gap-4 items-center w-full">
 
-            {/* Correspondence / Respondence Combined Input */}
-            <input
-              type="text"
-              placeholder="Corr. / Respondence"
-              value={corrResp}
-              onChange={(e) => setCorrResp(e.target.value)}
-              className="w-40 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-            
-            {/* Date Input */}
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-36 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-gray-600"
-            />
-            
-            {/* Year Input (Date jaisa feel dene ke liye type="number" use kiya hai) */}
-            <input
-              type="number"
-              placeholder="Year (YYYY)"
-              min="1990"
-              max="2099"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              className="w-28 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-            
-            <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm font-medium transition-colors">
-              <FaSearch className="text-xs" />
-              Search
-            </button>
-          </div>
+  {/* Complaint / File No */}
+  <input
+    type="text"
+    placeholder="f'kdk;r, Qkby la[;k"
+    value={compFile}
+    onChange={(e) => setCompFile(e.target.value)}
+    className="px-4 kruti-input py-3 text-base border border-gray-300 rounded-md
+      focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+
+  {/* Corr / Response */}
+  <input
+    type="text"
+    // placeholder="Corr. / Response"
+    placeholder="f'kdk;r, izfriknd"
+    value={corrResp}
+    onChange={(e) => setCorrResp(e.target.value)}
+    className="px-4 kruti-input py-3 text-base border border-gray-300 rounded-md
+      focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+
+  {/* Date */}
+  <input
+    type="date"
+    value={date}
+    onChange={(e) => setDate(e.target.value)}
+    className="px-4 py-3 text-base border border-gray-300 rounded-md
+      focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
+  />
+
+  {/* Year */}
+  <input
+    type="number"
+    placeholder="Year (YYYY)"
+    min="1990"
+    max="2099"
+    value={year}
+    onChange={(e) => setYear(e.target.value)}
+    className="px-4 py-3 text-base border border-gray-300 rounded-md
+      focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+
+  {/* Search Button */}
+  <button
+    className="flex items-center justify-center gap-2
+      bg-blue-600 hover:bg-blue-700 text-white
+      px-6 py-3 rounded-md text-base font-medium
+      transition-colors w-full"
+  >
+    <FaSearch className="text-sm" />
+    Search
+  </button>
+
+</div>
+
+
         </div>
 
         {/* Table (Purana Code, Koi change nahi kiya gaya hai) */}

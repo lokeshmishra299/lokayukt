@@ -472,7 +472,7 @@ function App() {
       {role === 'operator' && (
         <>  
 
-          <Route path="user-employ-dahsboard" element={<OperatorEmployUserDashboard />} />
+          <Route path="user-employ-dashboard" element={<OperatorEmployUserDashboard />} />
 
 
         <Route path="/operator" element={<OperatorLayout />}>
