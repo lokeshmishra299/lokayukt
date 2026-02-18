@@ -25,6 +25,7 @@ class LokAyuktComplaintsController extends Controller
     $query = DB::table('complaints')
         //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
         ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+        ->leftJoin('complaint_actions as rep', DB::raw("complaints.id"), '=', DB::raw("rep.complaint_id"))
         ->leftJoin('complainants as cmlan', function ($join) {
                     $join->on('complaints.id', '=', 'cmlan.complaint_id')
                         ->where('cmlan.is_main', 1);
@@ -47,11 +48,29 @@ class LokAyuktComplaintsController extends Controller
                       'resp.respondent_name as respondentName',
         );
 
+  $query->whereNotExists(function ($q) {
+        $q->select(DB::raw(1))
+          ->from('complaint_actions as rep')
+          ->whereColumn('rep.complaint_id', 'complaints.id')
+          ->where(function ($q2) {
+              $q2->whereNotNull('rep.forward_by_ps')
+                 ->orWhere('rep.forward_by_lokayukt', '<>', 0);
+          });
+    });
+      
+    //   ->where(function ($q) {
+    //       $q->whereNull('rep.forward_by_ps')
+    //         ->orWhere('rep.forward_by_lokayukt', 0);
+    //   });
 
-     $query->where('form_status', 1)
-                //   ->where('approved_rejected_by_ro', 1)
-                  ->where('approved_rejected_by_rk', 1)
-                  ->where('approved_rejected_by_lokayukt','<>', 1);
+
+    //  $query->where('form_status', 1)
+    //             //   ->where('approved_rejected_by_ro', 1)
+    //               ->where('approved_rejected_by_rk', 1)
+    //               ->where('approved_rejected_by_lokayukt','<>', 1)
+    //               ->whereNull('rep.forward_by_ps')
+    //               ->OrwhereNull('rep.forward_by_lokayukt')
+    //               ->where('rep.forward_by_lokayukt',0);
                     // ->where(function($q){
                     //         $q->where('approved_rejected_by_so_us',1)
                     //         ->Orwhere('approved_rejected_by_ds_js', 1);               
@@ -59,7 +78,7 @@ class LokAyuktComplaintsController extends Controller
                     // ->where('approved_rejected_by_d_a', 1);
                     // ->whereNotNull('forward_to_d_a');
 
-    $records = $query->get();
+    $records = $query->distinct('complaints.id')->get();
 
                 //  $todayCount = DB::table('complaints')
                 //     ->where('in_draft', 0)
@@ -779,7 +798,7 @@ $complainDetails->actions = $actions;
         $validation = Validator::make($request->all(), [
             // 'forward_by_ds_js' => 'required|exists:users,id',
             'forward_to' => 'required|exists:users,id',
-            'remark' => 'required',
+            'target_date' => 'required',
          
           
         ], [
@@ -787,7 +806,7 @@ $complainDetails->actions = $actions;
             // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
             'forward_to.required' => 'Forward to user is required.',
             'forward_to.exists' => 'Forward to user does not exist.',
-            'remark.required' => 'Remark is required.',
+            'target_date.required' => 'Target date is required.',
            
         ]);
 
@@ -860,6 +879,7 @@ $complainDetails->actions = $actions;
                         $apcAction = new ComplaintAction();
                         $apcAction->complaint_id = $complainId;
                         $apcAction->forward_by_lokayukt = $userId;
+                        $apcAction->target_date = $request->target_date;
 
                         if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt'])) {
 
@@ -976,6 +996,7 @@ $complainDetails->actions = $actions;
     //    $userSubrole = Auth::user()->subrole->name; 
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('complaint_actions as rep', DB::raw("cm.id"), '=', DB::raw("rep.complaint_id"))
                  ->leftJoin('complainants as cmlan', function ($join) {
                     $join->on('cm.id', '=', 'cmlan.complaint_id')
                         ->where('cmlan.is_main', 1);
@@ -1002,16 +1023,25 @@ $complainDetails->actions = $actions;
                     // 'sub.name as subject_name'
                 );
 
-                
-     $complainDetails->where('form_status', 1)
-            // ->where('approved_rejected_by_ro', 1)
-            //             ->where('approved_rejected_by_d_a',1)
-                        ->where('approved_rejected_by_lokayukt',1);
+         $complainDetails->where('form_status', 1)
+    ->where(function ($q) {
+        $q->where('approved_rejected_by_lokayukt', 1)
+          ->orWhereNotNull('rep.forward_to_ps')
+          ->orWhere('rep.forward_to_lokayukt','<>',0);
+    });
+
+     
+    //  $complainDetails->where('form_status', 1)
+    //         // ->where('approved_rejected_by_ro', 1)
+    //         //             ->where('approved_rejected_by_d_a',1)
+    //                     ->where('approved_rejected_by_lokayukt',1)
+    //                     ->whereNotNull('rep.forward_to_ps')
+    //                     ->OrwhereNotNull('rep.forward_to_ps');
             //              ->where(function($q){
             //                 $q->where('approved_rejected_by_so_us',1)
             //                 ->Orwhere('approved_rejected_by_ds_js', 1);               
                         //  });
-    $complainDetails = $complainDetails
+    $complainDetails = $complainDetails->distinct('cm.id')
                       
                         // ->toSql();
                       ->get();
