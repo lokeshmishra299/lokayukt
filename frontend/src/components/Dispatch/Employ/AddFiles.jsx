@@ -38,7 +38,7 @@ const AddFiles = () => {
   // All Files
 
  const AllFiles = async () => {
-  const res = await api.get("/ps/filetypes");
+  const res = await api.get("/dispatch/filetypes");
   console.log("All Files", res.data.data); 
   return res.data.data;
 };
@@ -119,7 +119,7 @@ uploadedFiles.forEach((fileData, index) => {
       formData.append("title", title);
       
     
-      await uploadApi.post("/ps/upload-file", formData);
+      await uploadApi.post("/dispatch/upload-file", formData);
 
       toast.success("Uploaded document successfully!");
       setUploadedFiles([]);

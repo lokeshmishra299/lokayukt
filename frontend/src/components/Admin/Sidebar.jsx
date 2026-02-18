@@ -75,7 +75,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
         <nav className="h-full overflow-y-auto px-3 py-6 space-y-2">
 
           {/* Dashboard */}
-          <Link
+          {/* <Link
             to="/admin/dashboard"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
@@ -88,7 +88,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <FaHome />
             {(!isCollapsed || isMobile) && "Dashboard"}
-          </Link>
+          </Link> */}
 
           {/* User Management */}
           <Link

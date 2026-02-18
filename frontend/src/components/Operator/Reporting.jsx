@@ -79,63 +79,75 @@ const Reporting = () => {
         
         {/* Header & Search Filters */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-6 gap-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[220px_220px_180px_140px_auto] gap-4 items-center w-full">
+  <div className="
+    grid 
+    grid-cols-1 
+    sm:grid-cols-2 
+    md:grid-cols-3 
+    lg:grid-cols-[220px_220px_180px_140px_auto] 
+    gap-3 
+    items-center 
+    w-full
+  ">
 
-            {/* Complaint / File No */}
-<input
-  type="text"
-  placeholder="शिकायत, फ़ाइल संख्या"
-  value={compFile}
-  onChange={(e) => {
-    const filtered = e.target.value.replace(/[^0-9/-]/g, "");
-    setCompFile(filtered);
-  }}
-  inputMode="numeric"
-  className="px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
+    {/* Complaint / File No */}
+    <input
+      type="text"
+      placeholder="शिकायत, फ़ाइल संख्या"
+      value={compFile}
+      onChange={(e) => {
+        const filtered = e.target.value.replace(/[^0-9/-]/g, "");
+        setCompFile(filtered);
+      }}
+      inputMode="numeric"
+      className="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
 
+    {/* Corr / Response */}
+    <input
+      type="text"
+      placeholder="f'kdk;r, izfriknd"
+      value={corrResp}
+      onChange={(e) => setCorrResp(e.target.value)}
+      className="w-full px-4 py-3 kruti-input text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
 
-            {/* Corr / Response */}
-            <input
-              type="text"
-              placeholder="f'kdk;r, izfriknd"
-              value={corrResp}
-              onChange={(e) => setCorrResp(e.target.value)}
-              className="px-4 kruti-input py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+    {/* Date */}
+    <input
+      type="date"
+      value={date}
+      onChange={(e) => setDate(e.target.value)}
+      className="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
+    />
 
-            {/* Date */}
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600"
-            />
+    {/* Year */}
+    <input
+      type="number"
+      placeholder="Year (YYYY)"
+      min="1990"
+      max="2099"
+      value={year}
+      onChange={(e) => setYear(e.target.value)}
+      className="w-full px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
 
-            {/* Year */}
-            <input
-              type="number"
-              placeholder="Year (YYYY)"
-              min="1990"
-              max="2099"
-              value={year}
-              onChange={(e) => setYear(e.target.value)}
-              className="px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+    {/* Search Button */}
+    <button
+      onClick={handleSearch}
+      disabled={isLoading}
+      className={`w-full flex items-center justify-center gap-2 text-white px-6 py-3 rounded-md text-base font-medium transition-colors ${
+        isLoading
+          ? "bg-blue-400 cursor-not-allowed"
+          : "bg-blue-600 hover:bg-blue-700"
+      }`}
+    >
+      {isLoading ? <FaSpinner className="animate-spin" /> : <FaSearch className="text-sm" />}
+      {isLoading ? "Searching..." : "Search"}
+    </button>
 
-            {/* Search Button */}
-            <button
-              onClick={handleSearch}
-              disabled={isLoading}
-              className={`flex items-center justify-center gap-2 text-white px-6 py-3 rounded-md text-base font-medium transition-colors w-full ${
-                isLoading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-              }`}
-            >
-              {isLoading ? <FaSpinner className="animate-spin" /> : <FaSearch className="text-sm" />}
-              {isLoading ? "Searching..." : "Search"}
-            </button>
-          </div>
-        </div>
+  </div>
+</div>
+
 
         {/* Table */}
         <div className="overflow-x-auto rounded-md border border-gray-200">

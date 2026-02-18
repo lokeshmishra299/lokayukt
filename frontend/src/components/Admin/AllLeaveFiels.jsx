@@ -204,7 +204,7 @@ const AllLeaveFiles = () => {
               {isLoading ? (
                  <tr>
                     <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
-                        <FaSpinner className="animate-spin inline mr-2" /> Loading...
+                     Loading... 
                     </td>
                  </tr>
               ) : filteredFiles.length > 0 ? (
@@ -248,40 +248,41 @@ const AllLeaveFiles = () => {
                     <td className="px-6 py-4 text-sm text-gray-600">{row.created_at}</td>
                     
                     {/* --- EXACT TOGGLE FROM YOUR CODE --- */}
-<td className="px-6 py-4">
-  <select
-    value={
-      row.status === 'Accepted' || row.status === '1' || row.status === 1
-        ? 'Accepted'
-        : row.status === 'Rejected' || row.status === '0' || row.status === 0
-        ? 'Rejected'
-        : ''
-    }
-    onChange={(e) => {
-      if (!e.target.value) return;
-      statusMutation.mutate({ id: row.id, status: e.target.value });
-    }}
-    disabled={statusMutation.isPending && statusMutation.variables?.id === row.id}
-    className={`px-3 py-1.5 border rounded-lg text-sm font-medium
-      ${
-        row.status === 'Accepted' || row.status === '1' || row.status === 1
-          ? 'border-green-400 text-green-700 bg-green-50'
-          : row.status === 'Rejected' || row.status === '0' || row.status === 0
-          ? 'border-red-400 text-red-700 bg-red-50'
-          : 'border-gray-300 text-gray-700 bg-white'
-      }
-      ${
-        statusMutation.isPending && statusMutation.variables?.id === row.id
-          ? 'opacity-60'
-          : 'cursor-pointer'
-      }
-    `}
-  >
-    <option value="">Select</option>
-    <option value="Accepted">Accepted</option>
-    <option value="Rejected">Rejected</option>
-  </select>
-</td>
+                      <td className="px-6 py-4">
+                        <select
+                          value={
+                            row.status == "2"
+                              ? "Accepted"
+                              : row.status == "3"
+                              ? "Rejected"
+                              : ""       
+                          }
+                          onChange={(e) => {
+                            if (!e.target.value) return;
+                            statusMutation.mutate({ id: row.id, status: e.target.value });
+                          }}
+                          disabled={statusMutation.isPending && statusMutation.variables?.id === row.id}
+                          className={`px-3 py-1.5 border rounded-lg text-sm font-medium
+                            ${
+                              row.status == "2"
+                                ? "border-green-400 text-green-700 bg-green-50"
+                                : row.status == "3"
+                                ? "border-red-400 text-red-700 bg-red-50"
+                                : "border-gray-300 text-gray-700 bg-white"   
+                            }
+                            ${
+                              statusMutation.isPending && statusMutation.variables?.id === row.id
+                                ? "opacity-60"
+                                : "cursor-pointer"
+                            }
+                          `}
+                        >
+                          <option value="">Select</option>
+                          <option value="Accepted">Accepted</option>
+                          <option value="Rejected">Rejected</option>
+                        </select>
+                      </td>
+
 
                     
                     <td className="px-6 py-4 text-right">
