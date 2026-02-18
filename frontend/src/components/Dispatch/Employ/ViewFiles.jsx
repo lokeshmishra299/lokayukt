@@ -27,7 +27,7 @@ const itemsPerPage = 10;
 
   // 1. All Files List
   const AllFiles = async () => {
-    const res = await api.get("/ps/all-files");
+    const res = await api.get("/dispatch/all-files");
     return res.data;
   };
 
@@ -58,7 +58,7 @@ const itemsPerPage = 10;
     try {
       setLoadingDocId(id); // Spinner Start
       
-      const res = await api.get(`/ps/get-file-preview/${id}`);
+      const res = await api.get(`/dispatch/get-file-preview/${id}`);
       console.log("View API Response:", res.data); // Debugging ke liye
 
       // CHECK: Status true hona chahiye (Boolean true ya string "success")
