@@ -148,7 +148,7 @@ public function uploadPrivateFiles(Request $request)
 
             $compDoc = new EmployeeUploadFiles();
             $compDoc->added_by   = $added_by;
-            $compDoc->type       = "Private Letter";
+            $compDoc->type       = "Personal File";
             $compDoc->title      = $request->title;
             $compDoc->file       = $fileName;
 
