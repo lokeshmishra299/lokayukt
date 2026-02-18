@@ -39,18 +39,24 @@ class PSComplaintsController extends Controller
                     $join->on('complaints.id', '=', 'resp.complaint_id')
                         ->where('resp.is_main', 1);
                 })
-    ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
+    ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code');
 
     // 🔥 Join only latest action
-    ->join(DB::raw('
+    if($roleParent === 'up-lok-ayukt' || $roleParent === 'supervisor'){
+            $query->join(DB::raw('
         (SELECT complaint_id, MAX(id) as max_id 
          FROM complaint_actions 
          GROUP BY complaint_id) as latest_rep
     '), 'complaints.id', '=', 'latest_rep.complaint_id')
 
-    ->join('complaint_actions as rep', 'rep.id', '=', 'latest_rep.max_id')
+    ->join('complaint_actions as rep', 'rep.id', '=', 'latest_rep.max_id');
 
-    ->select(
+    }
+    // else{
+    //     $query->join('complaint_actions as rep', 'rep.id', '=', 'complaints.id');
+    // }
+
+    $query->select(
         'complaints.id',
         'complaints.complain_no',
         'complaints.complaint_description',
@@ -68,12 +74,21 @@ class PSComplaintsController extends Controller
         'dd1.district_name as dist_new'
     );
 if($roleParent === 'lok-ayukt'){
-    $query->where('complaints.approved_rejected_by_rk', 1)
-          ->where('complaints.approved_rejected_by_lokayukt', 0)
-          ->orWhere(function ($q) {
-          $q->whereNotNull('rep.forward_by_ps')
-            ->orWhere('rep.forward_by_lokayukt','<>',0);
-      });
+      $query->whereNotExists(function ($q) {
+        $q->select(DB::raw(1))
+          ->from('complaint_actions as rep')
+          ->whereColumn('rep.complaint_id', 'complaints.id')
+          ->where(function ($q2) {
+              $q2->whereNotNull('rep.forward_by_ps')
+                 ->orWhere('rep.forward_by_lokayukt', '<>', 0);
+          });
+    });
+    // $query->where('complaints.approved_rejected_by_rk', 1)
+    //       ->where('complaints.approved_rejected_by_lokayukt', 0);
+    // //       ->orWhere(function ($q) {
+    //       $q->whereNotNull('rep.forward_by_ps')
+    //         ->orWhere('rep.forward_by_lokayukt','<>',0);
+    //   });
 
 }elseif($roleParent === 'up-lok-ayukt'){
     // $query->where('complaints.approved_rejected_by_rk', 1)

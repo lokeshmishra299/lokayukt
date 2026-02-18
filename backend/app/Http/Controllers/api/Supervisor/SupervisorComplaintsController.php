@@ -29,7 +29,7 @@ class SupervisorComplaintsController extends Controller
         if($parentId){
 
             $userParentData = User::with('role')->where('id',$parentId)->get();
-            $roleParent = $userParentData[0]->role->name;
+            $roleParent = $userParentData[0]->role->name ?? '';
         }
         // dd($roleParent);
            $userParentSubrole = Auth::user()->userParentRole ?? '';  
@@ -92,11 +92,24 @@ class SupervisorComplaintsController extends Controller
 
     switch ($userSubrole) {
          case "ro":
-          $query->where('form_status', 1)
-                  ->where('approved_rejected_by_rk', 1)
-                  ->where('approved_rejected_by_ro', 0)
-                  ->where('rep.forward_to_ro', $user)
-                  ->whereOr('rep.forward_to_uplokayukt','<>',0);
+              $query->where(function ($q) use ($user) {
+                    $q->where('form_status', 1)
+                    ->where('approved_rejected_by_rk', 1)
+                    ->where('approved_rejected_by_ro_aro', 0)
+                    ->where('rep.forward_to_ro_aro', $user)
+                    ->where('rep.forward_to_uplokayukt', '<>', 0);
+                })
+                ->orWhere(function ($q) use ($parentId) {
+                    $q->where('approved_rejected_by_rk', 1)
+                     ->where('approved_rejected_by_ro_aro', 0)
+                    ->where('complaints.approved_rejected_by_lokayukt', 1)
+                    ->where('rep.forward_to_uplokayukt', $parentId);
+                });
+        //   $query->where('form_status', 1)
+        //           ->where('approved_rejected_by_rk', 1)
+        //           ->where('approved_rejected_by_ro', 0)
+        //           ->where('rep.forward_to_ro', $user)
+        //           ->whereOr('rep.forward_to_uplokayukt','<>',0);
                 //   ->where('forward_so', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
 
@@ -311,7 +324,7 @@ class SupervisorComplaintsController extends Controller
                     ->distinct('complaints.id')
                     ->count();
             break;
-    case "js":
+         case "js":
                 //    $query->where('form_status', 1)
                 //           ->where('approved_rejected_by_ro', 1);
                 //    ->where('forward_to_lokayukt', 1)
@@ -534,7 +547,7 @@ class SupervisorComplaintsController extends Controller
             ], 400);
     }
 
-    $records = $query->distinct('complaints.id')->get();
+    $records = $query->distinct('complaints.id')->orderBy('complaints.updated_at', 'DESC')->get();
 
                
 

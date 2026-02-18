@@ -249,7 +249,12 @@ Route::middleware('auth:sanctum')->group(function(){
     });
 
     Route::middleware('role:supervisor:ds|js|us|ro-aro|ro|sec|cio-io|io')->prefix('supervisor')->group(function () {
-        
+           Route::get('/all-files',[EmployeesController::class,'index']);
+        Route::get('/topics',[EmployeesController::class,'fetch_topics']);
+        Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
+        Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
+        Route::get('/get-file-preview/{id}',[EmployeesController::class,'getFilePreview']);  
+
         Route::get('/all-district',[SupervisorCommonController::class,'fetch_district']);
         Route::get('/all-complaints',[SupervisorComplaintsController::class,'allComplains']);
         Route::get('/all-pending-complaints',[SupervisorComplaintsController::class,'allComplainspending']);
@@ -440,7 +445,12 @@ Route::middleware('auth:sanctum')->group(function(){
     });
 
      Route::middleware('role:ps')->prefix('ps')->group(function () {
-        
+           Route::get('/all-files',[EmployeesController::class,'index']);
+        Route::get('/topics',[EmployeesController::class,'fetch_topics']);
+        Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
+        Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
+        Route::get('/get-file-preview/{id}',[EmployeesController::class,'getFilePreview']);  
+
         Route::get('/all-district',[PSCommonController::class,'fetch_district']);
         Route::get('/all-complaints',[PSComplaintsController::class,'allComplains']);
         Route::get('/all-pending-complaints',[PSComplaintsController::class,'allComplainspending']);
