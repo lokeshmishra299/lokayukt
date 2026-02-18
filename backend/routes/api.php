@@ -50,6 +50,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-roles', [CommonController::class, 'getRoles']);
         Route::get('/get-sub-roles/{roleId}', [CommonController::class, 'getSubroles']);
         Route::get('/get-leave-details', [CommonController::class, 'fetchLeavesDetails']);
+        Route::get('/get-leave-personal-details', [CommonController::class, 'fetchLeavesPersonalDetails']);
+
 
         // Route::prefix('admin')->group(function () {
         

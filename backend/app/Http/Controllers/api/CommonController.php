@@ -24,87 +24,78 @@ use Illuminate\Support\Facades\Storage;
 
 class CommonController extends Controller
 {
-    public function fetch_district()
-    {
+    public function fetch_district(){
 
-        $district = District::orderBy('district_name', 'asc')->get();
+        $district=District::orderBy('district_name', 'asc')->get();
         // dd($district->toArray());
-        return ApiResponse::generateResponse('success', 'District fetch successfully', $district);
+        return ApiResponse::generateResponse('success','District fetch successfully',$district);
     }
-    public function fetch_designation()
-    {
+    public function fetch_designation(){
 
         $designation = Designation::get();
         // dd($designation->toArray());
-        return ApiResponse::generateResponse('success', 'Designation fetch successfully', $designation);
+        return ApiResponse::generateResponse('success','Designation fetch successfully',$designation);
     }
-    public function fetch_department()
-    {
+    public function fetch_department(){
 
         $department = Department::get();
         // dd($designation->toArray());
-        return ApiResponse::generateResponse('success', 'Department fetch successfully', $department);
+        return ApiResponse::generateResponse('success','Department fetch successfully',$department);
     }
-    public function fetch_subject()
-    {
+    public function fetch_subject(){
 
         $designation = Subjects::get();
         // dd($designation->toArray());
-        return ApiResponse::generateResponse('success', 'Subject fetch successfully', $designation);
+        return ApiResponse::generateResponse('success','Subject fetch successfully',$designation);
     }
-    public function fetch_topics()
-    {
+    public function fetch_topics(){
 
         $topics = Topics::get();
         // dd($topics->toArray());
-        return ApiResponse::generateResponse('success', 'Topics fetch successfully', $topics);
+        return ApiResponse::generateResponse('success','Topics fetch successfully',$topics);
     }
-    public function fetch_fileType()
-    {
+    public function fetch_fileType(){
 
         $fileType = EmployeeFiles::get();
         // dd($fileType->toArray());
-        return ApiResponse::generateResponse('success', 'Topics fetch successfully', $fileType);
+        return ApiResponse::generateResponse('success','Topics fetch successfully',$fileType);
     }
-    public function fetch_budget()
-    {
+    public function fetch_budget(){
 
         $fileType = Budget::get();
         // dd($fileType->toArray());
-        return ApiResponse::generateResponse('success', 'Budgets fetch successfully', $fileType);
+        return ApiResponse::generateResponse('success','Budgets fetch successfully',$fileType);
     }
-
-    public function fetch_complainstype()
-    {
+    
+    public function fetch_complainstype(){
 
         $designation = ComplainType::get();
         // dd($designation->toArray());
-        return ApiResponse::generateResponse('success', 'Complain Type fetch successfully', $designation);
+        return ApiResponse::generateResponse('success','Complain Type fetch successfully',$designation);
     }
-    public function fetch_rejection()
-    {
+    public function fetch_rejection(){
 
         $designation = RejectionReasons::get();
         // dd($designation->toArray());
-        return ApiResponse::generateResponse('success', 'Rejection Reasons fetch successfully', $designation);
+        return ApiResponse::generateResponse('success','Rejection Reasons fetch successfully',$designation);
     }
 
+    
 
-
-    public function addDistrict(Request $request)
+       public function addDistrict(Request $request)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'district_name' => 'required|string|max:150',
             'dist_name_hi' => 'required|string|max:150',
             'district_code' => 'required',
-
-
+         
+          
         ], [
             'district_name.required' => 'District Name is required.',
             'dist_name_hi.required' => 'Distric Name in Hindi is required.',
             'district_code.required' => 'District code is required.',
-
+           
         ]);
 
         if ($validation->fails()) {
@@ -116,10 +107,10 @@ class CommonController extends Controller
 
         $district = new District();
         $district->district_name = $request->district_name;
-        $district->dist_name_hi = $request->dist_name_hi;
-        $district->district_code = $request->district_code;
-
-
+        $district->dist_name_hi= $request->dist_name_hi;
+        $district->district_code= $request->district_code;
+        
+    
         $district->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -128,24 +119,24 @@ class CommonController extends Controller
             'data' => $district
         ], 201);
     }
-    public function editDistrict(Request $request, $id)
+     public function editDistrict(Request $request,$id)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'district_name' => 'required|string|max:150',
             'dist_name_hi' => 'required|string|max:150',
             'district_code' => 'required',
-
-
+         
+          
         ], [
-            'district_name.required' => 'District Name is required.',
+           'district_name.required' => 'District Name is required.',
             'dist_name_hi.required' => 'Distric Name in Hindi is required.',
             'district_code.required' => 'District code is required.',
-
-
+           
+           
         ]);
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -156,16 +147,17 @@ class CommonController extends Controller
 
         $district = District::find($id);
 
-        if (!$district) {
+         if(!$district){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid district ID.',
             ], 400);
+
         }
 
         $district->district_name = $request->district_name;
-        $district->dist_name_hi = $request->dist_name_hi;
-        $district->district_code = $request->district_code;
+        $district->dist_name_hi= $request->dist_name_hi;
+        $district->district_code= $request->district_code;
         $district->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -175,8 +167,8 @@ class CommonController extends Controller
         ], 200);
     }
 
-    public function removeDistrict(Request $request, $id)
-    {
+    public function removeDistrict(Request $request,$id)
+     {
         $id = $request->id;
         $district = District::find($id);
         if (!$district) {
@@ -185,9 +177,9 @@ class CommonController extends Controller
                 'message' => 'District not found.'
             ], 404);
         }
-        if ($district->delete()) {
+        if($district->delete()){
 
-            return response()->json([
+    return response()->json([
                 'status' => true,
                 'message' => 'District deleted successfully.'
             ], 200);
@@ -200,12 +192,12 @@ class CommonController extends Controller
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_hindi' => 'required|string|max:150',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
             'name_hindi.required' => 'Name in Hindi is required.',
-
+           
         ]);
 
         if ($validation->fails()) {
@@ -217,9 +209,9 @@ class CommonController extends Controller
 
         $department = new Department();
         $department->name = $request->name;
-        $department->name_hindi = $request->name_hindi;
+        $department->name_hindi= $request->name_hindi;
         $department->status = 1;
-
+    
         $department->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -228,21 +220,21 @@ class CommonController extends Controller
             'data' => $department
         ], 201);
     }
-    public function editDepartment(Request $request, $id)
+     public function editDepartment(Request $request,$id)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_hindi' => 'required|string|max:150',
-
-
+         
+          
         ], [
-            'name.required' => 'Name is required.',
+             'name.required' => 'Name is required.',
             'name_hindi.required' => 'Name in Hindi is required.',
-
+           
         ]);
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -253,17 +245,18 @@ class CommonController extends Controller
 
         $department = Department::find($id);
 
-        if (!$department) {
+         if(!$department){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid department ID.'
             ], 400);
+
         }
 
         $department->name = $request->name;
         $department->name_hindi = $request->name_hindi;
         $department->status = 1;
-
+    
         $department->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -273,8 +266,8 @@ class CommonController extends Controller
         ], 200);
     }
 
-    public function removeDepartment(Request $request, $id)
-    {
+      public function removeDepartment(Request $request,$id)
+      {
         $id = $request->id;
         $department = Department::find($id);
         if (!$department) {
@@ -283,26 +276,26 @@ class CommonController extends Controller
                 'message' => 'Department not found.'
             ], 404);
         }
-        if ($department->delete()) {
+        if($department->delete()){
 
             return response()->json([
-                'status' => true,
-                'message' => 'Department deleted successfully.'
-            ], 200);
+                        'status' => true,
+                        'message' => 'Department deleted successfully.'
+                    ], 200);
         }
     }
 
-    public function addDesignation(Request $request)
+     public function addDesignation(Request $request)
     {
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
-
+           
         ]);
 
         if ($validation->fails()) {
@@ -316,7 +309,7 @@ class CommonController extends Controller
         $designation->name = $request->name;
         $designation->name_h = $request->name_h;
         $designation->status = 1;
-
+    
         $designation->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -325,21 +318,21 @@ class CommonController extends Controller
             'data' => $designation
         ], 201);
     }
-    public function editDesignation(Request $request, $id)
+     public function editDesignation(Request $request,$id)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
-
-
+         
+          
         ], [
-            'name.required' => 'Name is required.',
+             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
-
+           
         ]);
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -350,17 +343,18 @@ class CommonController extends Controller
 
         $designation = Designation::find($id);
 
-        if (!$designation) {
+         if(!$designation){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid designation ID.'
             ], 400);
+
         }
 
         $designation->name = $request->name;
         $designation->name_h = $request->name_h;
         $designation->status = 1;
-
+    
         $designation->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -370,8 +364,8 @@ class CommonController extends Controller
         ], 200);
     }
 
-
-    public function removeDesignation(Request $request, $id)
+    
+    public function removeDesignation(Request $request,$id)
     {
         $id = $request->id;
         $designation = Designation::find($id);
@@ -381,27 +375,27 @@ class CommonController extends Controller
                 'message' => 'Designation not found.'
             ], 404);
         }
-        if ($designation->delete()) {
+        if($designation->delete()){
 
-            return response()->json([
+    return response()->json([
                 'status' => true,
                 'message' => 'Designation deleted successfully.'
             ], 200);
         }
     }
 
-    public function addSubject(Request $request)
+     public function addSubject(Request $request)
     {
 
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
-
+           
         ]);
 
         if ($validation->fails()) {
@@ -415,7 +409,7 @@ class CommonController extends Controller
         $subject->name = $request->name;
         $subject->name_h = $request->name_h;
         $subject->status = 1;
-
+    
         $subject->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -424,21 +418,21 @@ class CommonController extends Controller
             'data' => $subject
         ], 201);
     }
-    public function editSubject(Request $request, $id)
+     public function editSubject(Request $request,$id)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
-
+           
         ]);
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -449,17 +443,18 @@ class CommonController extends Controller
 
         $subject = Subjects::find($id);
 
-        if (!$subject) {
+         if(!$subject){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid designation ID.'
             ], 400);
+
         }
 
         $subject->name = $request->name;
         $subject->name_h = $request->name_h;
         $subject->status = 1;
-
+    
         $subject->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -469,8 +464,8 @@ class CommonController extends Controller
         ], 200);
     }
 
-    public function removeSubject(Request $request, $id)
-    {
+        public function removeSubject(Request $request,$id)
+         {
         $id = $request->id;
         $subject = Subjects::find($id);
         if (!$subject) {
@@ -479,29 +474,29 @@ class CommonController extends Controller
                 'message' => 'Subject not found.'
             ], 404);
         }
-        if ($subject->delete()) {
+        if($subject->delete()){
 
-            return response()->json([
+    return response()->json([
                 'status' => true,
                 'message' => 'Subject deleted successfully.'
             ], 200);
         }
     }
 
-    public function addComplainType(Request $request)
+        public function addComplainType(Request $request)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
             'description' => 'required|string|max:500',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
             'name.description' => 'Description is required.',
-
+           
         ]);
 
         if ($validation->fails()) {
@@ -516,7 +511,7 @@ class CommonController extends Controller
         $complainType->name_h = $request->name_h;
         $complainType->status = 1;
         $complainType->description = $request->description;
-
+    
         $complainType->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -525,23 +520,23 @@ class CommonController extends Controller
             'data' => $complainType
         ], 201);
     }
-    public function editComplainType(Request $request, $id)
+     public function editComplainType(Request $request,$id)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
             'description' => 'required|string|max:500',
-
-
+         
+          
         ], [
-            'name.required' => 'Name is required.',
+             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
             'discription.required' => 'Discription is required.',
-
+           
         ]);
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -552,18 +547,19 @@ class CommonController extends Controller
 
         $complaintype = ComplainType::find($id);
 
-        if (!$complaintype) {
+         if(!$complaintype){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid designation ID.'
             ], 400);
+
         }
 
         $complaintype->name = $request->name;
         $complaintype->name_h = $request->name_h;
         $complaintype->status = 1;
         $complaintype->description = $request->description;
-
+    
         $complaintype->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -573,8 +569,8 @@ class CommonController extends Controller
         ], 200);
     }
 
-    public function removeComplainType(Request $request, $id)
-    {
+    public function removeComplainType(Request $request,$id)
+     {
         $id = $request->id;
         $complainType = ComplainType::find($id);
         if (!$complainType) {
@@ -583,29 +579,29 @@ class CommonController extends Controller
                 'message' => 'ComplainType not found.'
             ], 404);
         }
-        if ($complainType->delete()) {
+        if($complainType->delete()){
 
-            return response()->json([
+    return response()->json([
                 'status' => true,
                 'message' => 'ComplainType deleted successfully.'
             ], 200);
         }
     }
 
-    public function addRejection(Request $request)
+         public function addRejection(Request $request)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
             'description' => 'required|string|max:500',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
             'name.description' => 'Description is required.',
-
+           
         ]);
 
         if ($validation->fails()) {
@@ -620,7 +616,7 @@ class CommonController extends Controller
         $rejection->name_h = $request->name_h;
         $rejection->status = 1;
         $rejection->description = $request->description;
-
+    
         $rejection->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -629,22 +625,22 @@ class CommonController extends Controller
             'data' => $rejection
         ], 201);
     }
-    public function editRejection(Request $request, $id)
+     public function editRejection(Request $request,$id)
     {
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
             'description' => 'required|string|max:500',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
             'discription.required' => 'Discription is required.',
-
+           
         ]);
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -655,18 +651,19 @@ class CommonController extends Controller
 
         $rejectionReason = RejectionReasons::find($id);
 
-        if (!$rejectionReason) {
+         if(!$rejectionReason){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid designation ID.'
             ], 400);
+
         }
 
         $rejectionReason->name = $request->name;
         $rejectionReason->name_h = $request->name_h;
         $rejectionReason->status = 1;
         $rejectionReason->description = $request->description;
-
+    
         $rejectionReason->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -676,8 +673,8 @@ class CommonController extends Controller
         ], 200);
     }
 
-    public function removeRejection(Request $request, $id)
-    {
+    public function removeRejection(Request $request,$id)
+     {
         $id = $request->id;
         $rejection = RejectionReasons::find($id);
         if (!$rejection) {
@@ -686,54 +683,54 @@ class CommonController extends Controller
                 'message' => 'Rejection not found.'
             ], 404);
         }
-        if ($rejection->delete()) {
+        if($rejection->delete()){
 
-            return response()->json([
+    return response()->json([
                 'status' => true,
                 'message' => 'Rejection deleted successfully.'
             ], 200);
         }
     }
 
-    public function getRoles()
-    {
+    public function getRoles(){
         $role = Role::get();
-        return response()->json([
-            'status' => true,
-            'message' => 'Role fetch successfully.',
-            'role' => $role
-        ], 200);
-    }
-    public function getSubroles(Request $request, $roleId)
-    {
-        $subroles = SubRole::where('role_id', $roleId)->get();
-        // dd($subroles);
-        if ($subroles) {
-
-            return response()->json([
+             return response()->json([
                 'status' => true,
-                'message' => 'Subrole fetch successfully.',
-                'subrole' => $subroles
+                'message' => 'Role fetch successfully.',
+                'role' => $role
             ], 200);
-        } else {
+        
+    }
+    public function getSubroles(Request $request,$roleId){
+        $subroles = SubRole::where('role_id',$roleId)->get();
+        // dd($subroles);
+        if($subroles){
+            
             return response()->json([
+                  'status' => true,
+                  'message' => 'Subrole fetch successfully.',
+                  'subrole' => $subroles
+              ], 200);
+        }else{
+                 return response()->json([
                 'status' => false,
                 'message' => 'SubRole not found.'
             ], 404);
         }
+        
     }
-    public function addCategory(Request $request)
+        public function addCategory(Request $request)
     {
 
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
-
+           
         ]);
 
         if ($validation->fails()) {
@@ -747,7 +744,7 @@ class CommonController extends Controller
         $Category->name = $request->name;
         $Category->name_h = $request->name_h;
         $Category->status = '1';
-
+    
         $Category->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -757,21 +754,21 @@ class CommonController extends Controller
         ], 201);
     }
 
-    public function editCategory(Request $request, $id)
+       public function editCategory(Request $request,$id)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
             'name_h' => 'required|string|max:150',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
             'name_h.required' => 'Name in Hindi is required.',
-
+           
         ]);
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -782,17 +779,18 @@ class CommonController extends Controller
 
         $Category = Category::find($id);
 
-        if (!$Category) {
+         if(!$Category){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid designation ID.'
             ], 400);
+
         }
 
         $Category->name = $request->name;
         $Category->name_h = $request->name_h;
         $Category->status = '1';
-
+    
         $Category->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -801,34 +799,34 @@ class CommonController extends Controller
             'data' => $Category
         ], 200);
     }
-    public function removeCategory(Request $request, $id)
-    {
-        $id = $request->id;
-        $Category = Category::find($id);
-        if (!$Category) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Category not found.'
-            ], 404);
-        }
-        if ($Category->delete()) {
+    public function removeCategory(Request $request,$id)
+        {
+            $id = $request->id;
+            $Category = Category::find($id);
+            if (!$Category) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Category not found.'
+                ], 404);
+            }
+            if($Category->delete()){
 
             return response()->json([
-                'status' => true,
-                'message' => 'Category deleted successfully.'
-            ], 200);
-        }
+                        'status' => true,
+                        'message' => 'Category deleted successfully.'
+                    ], 200);
+                }
     }
-    public function addTopic(Request $request)
+        public function addTopic(Request $request)
     {
 
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
-
+           
         ]);
 
         if ($validation->fails()) {
@@ -841,7 +839,7 @@ class CommonController extends Controller
         $Category = new Topics();
         $Category->name = $request->name;
         $Category->status = '1';
-
+    
         $Category->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -851,18 +849,18 @@ class CommonController extends Controller
         ], 201);
     }
 
-    public function editTopic(Request $request, $id)
+       public function editTopic(Request $request,$id)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
-
+              
         ], [
-            'name.required' => 'Name is required.',
-
+            'name.required' => 'Name is required.',   
+           
         ]);
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -873,17 +871,18 @@ class CommonController extends Controller
 
         $Category = Topics::find($id);
 
-        if (!$Category) {
+         if(!$Category){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid designation ID.'
             ], 400);
+
         }
 
         $Category->name = $request->name;
         $Category->name_h = $request->name_h;
         $Category->status = '1';
-
+    
         $Category->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -892,35 +891,35 @@ class CommonController extends Controller
             'data' => $Category
         ], 200);
     }
-    public function removeTopic(Request $request, $id)
-    {
-        $id = $request->id;
-        $Category = Topics::find($id);
-        if (!$Category) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Topic not found.'
-            ], 404);
-        }
-        if ($Category->delete()) {
+    public function removeTopic(Request $request,$id)
+        {
+            $id = $request->id;
+            $Category = Topics::find($id);
+            if (!$Category) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Topic not found.'
+                ], 404);
+            }
+            if($Category->delete()){
 
             return response()->json([
-                'status' => true,
-                'message' => 'Category deleted successfully.'
-            ], 200);
-        }
+                        'status' => true,
+                        'message' => 'Category deleted successfully.'
+                    ], 200);
+                }
     }
 
-    public function addFileType(Request $request)
+       public function addFileType(Request $request)
     {
 
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
-
-
+         
+          
         ], [
             'name.required' => 'Name is required.',
-
+           
         ]);
 
         if ($validation->fails()) {
@@ -933,7 +932,7 @@ class CommonController extends Controller
         $Category = new EmployeeFiles();
         $Category->name = $request->name;
         $Category->status = '1';
-
+    
         $Category->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -943,18 +942,18 @@ class CommonController extends Controller
         ], 201);
     }
 
-    public function editFileType(Request $request, $id)
+       public function editFileType(Request $request,$id)
     {
         // dd($request->all());
         $validation = Validator::make($request->all(), [
             'name' => 'required|string|max:150',
-
+              
         ], [
-            'name.required' => 'Name is required.',
-
+            'name.required' => 'Name is required.',   
+           
         ]);
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -965,16 +964,17 @@ class CommonController extends Controller
 
         $Category = EmployeeFiles::find($id);
 
-        if (!$Category) {
+         if(!$Category){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid designation ID.'
             ], 400);
+
         }
 
         $Category->name = $request->name;
         $Category->status = '1';
-
+    
         $Category->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -983,25 +983,25 @@ class CommonController extends Controller
             'data' => $Category
         ], 200);
     }
-    public function removeFileType(Request $request, $id)
-    {
-        $id = $request->id;
-        $Category = EmployeeFiles::find($id);
-        if (!$Category) {
-            return response()->json([
-                'status' => false,
-                'message' => 'FileType not found.'
-            ], 404);
-        }
-        if ($Category->delete()) {
+    public function removeFileType(Request $request,$id)
+        {
+            $id = $request->id;
+            $Category = EmployeeFiles::find($id);
+            if (!$Category) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'FileType not found.'
+                ], 404);
+            }
+            if($Category->delete()){
 
             return response()->json([
-                'status' => true,
-                'message' => 'FileType deleted successfully.'
-            ], 200);
-        }
+                        'status' => true,
+                        'message' => 'FileType deleted successfully.'
+                    ], 200);
+                }
     }
-    public function addBudget(Request $request)
+       public function addBudget(Request $request)
     {
 
         $validation = Validator::make($request->all(), [
@@ -1032,7 +1032,7 @@ class CommonController extends Controller
         $Category->expense_money = $request->expense_money;
         $Category->remark = $request->remark;
         $Category->status = '1';
-
+    
         $Category->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -1042,10 +1042,10 @@ class CommonController extends Controller
         ], 201);
     }
 
-    public function editBudget(Request $request, $id)
+       public function editBudget(Request $request,$id)
     {
         // dd($request->all());
-        $validation = Validator::make($request->all(), [
+       $validation = Validator::make($request->all(), [
             'expense_type'   => 'required|string|max:100',
             'expense_money' => 'required|numeric', // decimal / float allowed
             'remark'        => 'nullable|string|max:250',
@@ -1061,7 +1061,7 @@ class CommonController extends Controller
         ]);
 
 
-
+       
 
         if ($validation->fails()) {
             return response()->json([
@@ -1072,18 +1072,19 @@ class CommonController extends Controller
 
         $Category = Budget::find($id);
 
-        if (!$Category) {
+         if(!$Category){
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid Budget ID.'
             ], 400);
+
         }
 
-        $Category->expense_type = $request->expense_type;
+       $Category->expense_type = $request->expense_type;
         $Category->expense_money = $request->expense_money;
         $Category->remark = $request->remark;
         $Category->status = '1';
-
+    
         $Category->save(); // ✅ Insert into DB
 
         return response()->json([
@@ -1092,77 +1093,74 @@ class CommonController extends Controller
             'data' => $Category
         ], 200);
     }
-    public function removeBudget(Request $request, $id)
-    {
-        $id = $request->id;
-        $Category = Budget::find($id);
-        if (!$Category) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Budget not found.'
-            ], 404);
-        }
-        if ($Category->delete()) {
+    public function removeBudget(Request $request,$id)
+        {
+            $id = $request->id;
+            $Category = Budget::find($id);
+            if (!$Category) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Budget not found.'
+                ], 404);
+            }
+            if($Category->delete()){
 
             return response()->json([
-                'status' => true,
-                'message' => 'Budget deleted successfully.'
-            ], 200);
-        }
+                        'status' => true,
+                        'message' => 'Budget deleted successfully.'
+                    ], 200);
+                }
     }
 
 
 
-    public function fetch_Category()
-    {
+       public function fetch_Category(){
 
         $cat = Category::get();
         // dd($designation->toArray());
-        return ApiResponse::generateResponse('success', 'Category fetch successfully', $cat);
+        return ApiResponse::generateResponse('success','Category fetch successfully',$cat);
     }
 
-    public function getEmployeeFiles($id)
-    {
+      public function getEmployeeFiles($id){
         //  $user = Auth::user()->id;
         //  dd($user);
-        $empfiles = EmployeeUploadFiles::where('added_by', $id)->get();
+         $empfiles = EmployeeUploadFiles::where('added_by', $id)->get();
         // dd($empfiles);
-        return ApiResponse::generateResponse('success', 'Records fetch successfully', $empfiles);
-    }
+        return ApiResponse::generateResponse('success','Records fetch successfully',$empfiles);
+     }
 
-    public function getFilePreview($id)
-    {
-
+         public function getFilePreview($id){
+ 
         $cmpDetail = EmployeeUploadFiles::findOrFail($id);
 
-        // Correct path
-        $path = Storage::url('employeeFiles/' . $cmpDetail->file);
+            // Correct path
+            $path = Storage::url('employeeFiles/' . $cmpDetail->file);
 
-        $cmpDetail->filepath = $path;
+            $cmpDetail->filepath = $path;
 
-        return response()->json([
-            'status' => true,
-            'message' => 'File Fetch successfully',
-            'data' => $path,
-        ]);
+            return response()->json([
+                'status' => true,
+                'message' => 'File Fetch successfully',
+                'data' => $path,
+            ]);
+
     }
 
-    public function fetchLeavesDetails(Request $req)
-    {
+    public function fetchLeavesDetails(){
 
-
-        $req->validate([
-            'letter_type' => 'required|in:0,1'
-        ]);
-        $query = EmployeeUploadFiles::with('user:id,name');
+        $cat = EmployeeUploadFiles::with('user:id,name')
+               ->where('type','Letter')
+               ->get();
         // dd($designation->toArray());
+        return ApiResponse::generateResponse('success','Leaves fetch successfully',$cat);
+    }
 
-        if ($req->letter_type === 0) {
-            $query->where('type', 'Letter');
-        } elseif ($req->letter_type === 1) {
-            $query->where('type', 'Personal File');
-        }
-        $cat = $query->get();
-        return ApiResponse::generateResponse('success', 'Leaves fetch successfully', $cat);
+
+     public function fetchLeavesPersonalDetails(){
+
+        $cat = EmployeeUploadFiles::with('user:id,name')
+                ->where('type','Personal File')->get();
+        // dd($designation->toArray());
+        return ApiResponse::generateResponse('success','Leaves fetch successfully',$cat);
     }
 }
