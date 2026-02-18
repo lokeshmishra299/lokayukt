@@ -15,6 +15,8 @@ import {
 // import "react-toastify/dist/ReactToastify.css";
 import { toast, Toaster } from "react-hot-toast";
 import { useQueryClient } from '@tanstack/react-query';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 
 
 import axios from "axios";
@@ -61,6 +63,9 @@ const AddUserManagement = () => {
   const [isLoadingDistricts, setIsLoadingDistricts] = useState(true);
   const [isLoadingDepartments, setIsLoadingDepartments] = useState(true);
   const [isLoadingDesignations, setIsLoadingDesignations] = useState(true);
+
+  const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Roles and Sub-roles
   const [roles, setRoles] = useState([]);
@@ -750,50 +755,87 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Password */}
-              <div>
-                <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  Password *
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
-                    errors.password ? '' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter Password"
-                />
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    {errors.password}
-                  </p>
-                )}
-              </div>
+             <div>
+  <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+    Password *
+  </label>
+
+  <div className="relative">
+    {/* inline style to hide browser default eye */}
+    <style>
+      {`
+        .no-browser-eye::-ms-reveal,
+        .no-browser-eye::-ms-clear {
+          display: none;
+        }
+        .no-browser-eye::-webkit-textfield-decoration-container {
+          display: none;
+        }
+      `}
+    </style>
+
+    <input
+      id="password"
+      type={showPassword ? "text" : "password"}
+      name="password"
+      value={formData.password}
+      onChange={handleInputChange}
+      className={`no-browser-eye w-full px-3 pr-10 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
+        errors.password ? 'border-red-500' : 'border-gray-300'
+      }`}
+      placeholder="Enter Password"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+    >
+      {showPassword ? <FaEyeSlash /> : <FaEye />}
+    </button>
+  </div>
+
+  {errors.password && (
+    <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+  )}
+</div>
+
 
               {/* Confirm Password */}
-              <div>
-                <label htmlFor="password_confirmation" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  Confirm Password *
-                </label>
-                <input
-                  id="password_confirmation"
-                  type="password"
-                  name="password_confirmation"
-                  value={formData.password_confirmation}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
-                    errors.password_confirmation ? '' : 'border-gray-300'
-                  }`}
-                  placeholder="Confirm Password"
-                />
-                {errors.password_confirmation && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    {errors.password_confirmation}
-                  </p>
-                )}
-              </div>
+             <div>
+  <label htmlFor="password_confirmation" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+    Confirm Password *
+  </label>
+
+  <div className="relative">
+    <input
+      id="password_confirmation"
+      type={showConfirmPassword ? "text" : "password"}
+      name="password_confirmation"
+      value={formData.password_confirmation}
+      onChange={handleInputChange}
+      className={`no-browser-eye w-full px-3 pr-10 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
+        errors.password_confirmation ? 'border-red-500' : 'border-gray-300'
+      }`}
+      placeholder="Confirm Password"
+    />
+
+    <button
+      type="button"
+      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+      className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+    >
+      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+    </button>
+  </div>
+
+  {errors.password_confirmation && (
+    <p className="mt-1 text-sm text-red-600">
+      {errors.password_confirmation}
+    </p>
+  )}
+</div>
+
             </div>
           </div>
 
