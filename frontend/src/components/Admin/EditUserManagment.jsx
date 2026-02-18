@@ -14,8 +14,13 @@ import {
 import { toast, Toaster } from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
+
 // import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -62,6 +67,9 @@ const EditUserManagement = () => {
   const [isLoadingDistricts, setIsLoadingDistricts] = useState(true);
   const [isLoadingDepartments, setIsLoadingDepartments] = useState(true);
   const [isLoadingDesignations, setIsLoadingDesignations] = useState(true);
+  
+  const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Roles and Sub-roles - Dynamic from API
   const [roles, setRoles] = useState([]);
@@ -745,17 +753,41 @@ const EditUserManagement = () => {
                 >
                   New Password
                 </label>
-                <input
-                  id="password"
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                    errors.password ? "border-red-500" : "border-gray-300"
-                  }`}
-                  placeholder="Enter new password (optional)"
-                />
+               <div className="relative">
+  {/* hide browser default eye */}
+  <style>
+    {`
+      .no-browser-eye::-ms-reveal,
+      .no-browser-eye::-ms-clear {
+        display: none;
+      }
+      .no-browser-eye::-webkit-textfield-decoration-container {
+        display: none;
+      }
+    `}
+  </style>
+
+  <input
+    id="password"
+    type={showPassword ? "text" : "password"}
+    name="password"
+    value={formData.password}
+    onChange={handleInputChange}
+    className={`no-browser-eye w-full px-3 pr-10 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
+      errors.password ? "border-red-500" : "border-gray-300"
+    }`}
+    placeholder="Enter new password (optional)"
+  />
+
+  <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+  >
+    {showPassword ? <FaEyeSlash /> : <FaEye />}
+  </button>
+</div>
+
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
                     {errors.password}
@@ -771,19 +803,30 @@ const EditUserManagement = () => {
                 >
                   Confirm New Password
                 </label>
-                <input
-                  id="password_confirmation"
-                  type="password"
-                  name="password_confirmation"
-                  value={formData.password_confirmation}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
-                    errors.password_confirmation
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  }`}
-                  placeholder="Confirm new password"
-                />
+               <div className="relative">
+  <input
+    id="password_confirmation"
+    type={showConfirmPassword ? "text" : "password"}
+    name="password_confirmation"
+    value={formData.password_confirmation}
+    onChange={handleInputChange}
+    className={`no-browser-eye w-full px-3 pr-10 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none ${
+      errors.password_confirmation ? "border-red-500" : "border-gray-300"
+    }`}
+    placeholder="Confirm new password"
+  />
+
+  <button
+    type="button"
+    onClick={() =>
+      setShowConfirmPassword(!showConfirmPassword)
+    }
+    className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+  >
+    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+  </button>
+</div>
+
                 {errors.password_confirmation && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
                     {errors.password_confirmation}

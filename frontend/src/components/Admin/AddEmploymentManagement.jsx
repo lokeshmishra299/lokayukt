@@ -14,14 +14,15 @@ import {
 // import { ToastContainer, toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
 import { toast, Toaster } from "react-hot-toast";
+import { useQueryClient } from '@tanstack/react-query';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 
 import axios from "axios";
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
-import { useQueryClient } from '@tanstack/react-query';
-
 
 // Create axios instance with token if it exists
 const api = axios.create({
@@ -33,8 +34,8 @@ const api = axios.create({
 });
 
 const AddEmploymentManagement = () => {
-    const queryClient = useQueryClient();
-  
+  const queryClient = useQueryClient();
+
     const navigate =useNavigate()
 
   const [formData, setFormData] = useState({
@@ -62,9 +63,15 @@ const AddEmploymentManagement = () => {
   const [isLoadingDepartments, setIsLoadingDepartments] = useState(true);
   const [isLoadingDesignations, setIsLoadingDesignations] = useState(true);
 
+  
+const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   // Roles and Sub-roles
   const [roles, setRoles] = useState([]);
   const [subRoles, setSubRoles] = useState([]);
+  const [selectedSubRoleLabel, setSelectedSubRoleLabel] = useState('');
+
   const [isLoadingSubRoles, setIsLoadingSubRoles] = useState(false);
 
   // PS Under Lokayukat state
@@ -72,6 +79,9 @@ const [psUnderLokayukat, setPsUnderLokayukat] = useState('');
 const [lokayuktList, setLokayuktList] = useState([]);
 const [isLoadingLokayukt, setIsLoadingLokayukt] = useState(false);
 const isPersonalSecretary = formData.role_id === "6";
+const isSupervisor = formData.role_id === "3"; 
+const needsPsParent = isPersonalSecretary || (isSupervisor && formData.sub_role_id);
+
 
 
 
@@ -184,11 +194,15 @@ const isPersonalSecretary = formData.role_id === "6";
   
   // Handle role_id change - reset sub_role_id when role changes
   if (name === 'role_id') {
+    setSelectedSubRoleLabel('');
     setFormData(prev => ({ 
+      
       ...prev, 
+      
       [name]: value,
       sub_role_id: '', // Reset sub-role when role changes
       ps_parent: "" // Reset lokayukt-uplokayukt
+      
     }));
     
     // Clear sub-role error
@@ -248,6 +262,90 @@ const isPersonalSecretary = formData.role_id === "6";
     }));
   }
 };
+
+
+// const handleSubmit = async (e) => {
+//   e.preventDefault();
+//   setIsSubmitting(true);
+//   setErrors({});
+
+//   // ✅ पहले payload बनाएं
+//   let payload = {
+//     name: formData.name,
+//     email: formData.email,
+//     number: formData.number,
+//     role_id: parseInt(formData.role_id) || '',
+//     designation: formData.designation || '',
+//     department: formData.department_id || '',
+//     district_id: formData.district_id,
+//     password: formData.password,
+//     password_confirmation: formData.password_confirmation
+//   };
+
+//   // ✅ Role के according fields add करें
+//   // if (isPersonalSecretary) {
+//   //   // Personal Secretary के लिए
+//   //   payload.ps_parent = formData.ps_parent || "";
+//   //   payload.sub_role_id = ""; // empty string
+//   // } else {
+//   //   // दूसरे roles के लिए
+//   //   payload.sub_role_id = formData.sub_role_id || "";
+//   //   payload.ps_parent = ""; // empty string
+//   // }
+
+//   payload.sub_role_id = formData.sub_role_id || "";
+
+// if (needsPsParent) {
+//   payload.ps_parent = formData.ps_parent || "";
+// } else {
+//   payload.ps_parent = "";
+// }
+
+
+//   console.log("Submitting payload:", payload);
+
+//   try {
+//     const response = await api.post('/admin/add-user', payload); 
+    
+//     if (response.data.status === true) {
+//       toast.success(response.data.message || 'User created successfully!');
+//       queryClient.invalidateQueries({queryKey: ["users"]})
+      
+//       setTimeout(()=>{
+//         navigate(-1)
+//       }, 2000)
+      
+//       setFormData({
+//         name: '',
+//         email: '',
+//         number: '',
+//         role_id: '',
+//         sub_role_id: '',
+//         ps_parent: "",
+//         designation: '',
+//         department_id: '',
+//         district_id: '',
+//         password: '',
+//         password_confirmation: ''
+//       });
+//       setErrors({});
+//       setSubRoles([]);
+//     }
+//   } catch (error) {
+//     // Error handling
+//     if (error.response?.status === 422 && error.response?.data?.errors) {
+//       const backendErrors = {};
+//       Object.keys(error.response.data.errors).forEach(field => {
+//         const errorArray = error.response.data.errors[field];
+//         backendErrors[field] = Array.isArray(errorArray) ? errorArray[0] : errorArray;
+//       });
+//       setErrors(backendErrors);
+//     }
+//   } finally {
+//     setIsSubmitting(false);
+//   }
+// };
+
 
 
 const handleSubmit = async (e) => {
@@ -327,7 +425,6 @@ const handleSubmit = async (e) => {
   }
 };
 
-
 const fetchLokayukt = async () => {
   const res = await api.get('/admin/get-lokayukt-uplokayukt')
   console.log("Show Data", res.data)
@@ -351,6 +448,23 @@ const { data: fetchLokayuktData } = useQuery({
 console.log("fetchLokayuktData in component:", fetchLokayuktData)
   
 
+
+// const renderPSLikePopup = (label) => {
+//   if (!label) return null;
+
+//   return (
+//     <div className="mt-2">
+//       <select
+//         disabled
+//         className="w-full px-3 py-2 text-sm border rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+//       >
+//         <option>{label}</option>
+//       </select>
+//     </div>
+//   );
+// };
+
+
   return (
     <div className=" bg-gray-50 min-h-screen">
       <Toaster
@@ -362,8 +476,8 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
       <div className="mb-4 sm:mb-6">
         <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Add New Employee</h1>
-            <p className="text-xs sm:text-sm text-gray-600">Create a new employee account</p>
+            <h1 className="text-xl font-bold text-gray-900">Add Employee User</h1>
+            <p className="text-xs sm:text-sm text-gray-600">Create a new Employee account</p>
           </div>
           <div>
             <button onClick={()=>{
@@ -403,7 +517,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
                     errors.name ? '' : 'border-gray-300'
                   }`}
-                  placeholder="Enter full name (only alphabets and spaces)"
+                  placeholder="Enter Full Name"
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -426,7 +540,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
                     errors.email ? '' : 'border-gray-300'
                   }`}
-                  placeholder="Enter email address"
+                  placeholder="Enter Email Address"
                 />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -444,7 +558,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                   id="number"
                   type="tel"
                   name="number"
-                  placeholder="Enter Mobile number"
+                  placeholder="Enter Mobile Number"
                   value={formData.number}
                   onChange={(e) => {
                     const onlyDigits = e.target.value.replace(/\D/g, "");
@@ -476,22 +590,16 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
     <select
       id="role_id"
       name="role_id"
-      // value="8"
       value={formData.role_id}
-      // disabled
       onChange={handleInputChange}
       className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
         errors.role_id ? 'border-red-500' : 'border-gray-300'
       }`}
     >
       <option value="">Select Role</option>
-       {roles
-    .filter(role => role.id === 8)
-    .map(role => (
-      <option key={role.id} value={role.id}>
-        {role.label}
-      </option>
-  ))}
+      {roles.map(role => (
+        <option key={role.id} value={role.id}>{role.label}</option>
+      ))}
     </select>
     {errors.role_id && (
       <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -501,39 +609,127 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
   </div>
 
   {/* SUB ROLE - केवल role_id != 6 होने पर दिखेगा */}
- 
-
-  {/* LOKAYUKT-UPLOKAYUKT - केवल role_id = 6 होने पर दिखेगा */}
-  {isPersonalSecretary && (
+  {!isPersonalSecretary && (
     <div>
-      <label htmlFor="lokayukt_uplokayukt" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-       PS Under Hon' Lokayukt/Uplokayukt *
+      <label htmlFor="sub_role_id" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+        Sub Role *
       </label>
       <select
-        id="ps_parent"
-        name="ps_parent"
-        value={formData.ps_parent}
-        onChange={handleInputChange}
+        id="sub_role_id"
+        name="sub_role_id"
+        value={formData.sub_role_id}
+        // onChange={handleInputChange}
+        onChange={(e) => {
+  handleInputChange(e);
+
+  const selected = subRoles.find(
+    (sr) => sr.id === Number(e.target.value)
+  );
+
+  setSelectedSubRoleLabel(selected?.label || selected?.name || '');
+}}
+        disabled={!formData.role_id || isLoadingSubRoles}
         className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
-          errors.ps_parent ? 'border-red-500' : 'border-gray-300'
-        }`}
+          errors.sub_role_id ? 'border-red-500' : 'border-gray-300'
+        } ${(!formData.role_id || isLoadingSubRoles) ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
-        <option value="">Select User</option>
-        
-        {/* ये code अपडेट करें */}
-        {fetchLokayuktData?.flat(2)?.map((item) => (
-          <option key={item.id} value={item.id}>
-            {item.user_name} ({item.name})
+        <option value="">
+          {!formData.role_id 
+            ? 'First Select a role' 
+            : isLoadingSubRoles 
+              ? 'Loading sub-roles...' 
+              : subRoles.length === 0 
+                ? 'No sub-roles'
+                : 'Select Sub Role'
+          }
+        </option>
+        {subRoles.map(subRole => (
+          <option key={subRole.id} value={subRole.id}>
+            {subRole.label || subRole.name}
           </option>
         ))}
       </select>
-      {errors.lokayukt_uplokayukt && (
+
+
+
+      {errors.sub_role_id && (
         <p className="mt-1 text-sm text-red-600 flex items-center">
-          {errors.lokayukt_uplokayukt}
+          {errors.sub_role_id}
         </p>
       )}
     </div>
   )}
+
+  {/* {!isPersonalSecretary && selectedSubRoleLabel && (
+  renderPSLikePopup(selectedSubRoleLabel)
+)} */}
+
+
+
+  {/* LOKAYUKT-UPLOKAYUKT - केवल role_id = 6 होने पर दिखेगा */}
+
+
+{(isPersonalSecretary || (isSupervisor && selectedSubRoleLabel)) && (
+  <div>
+    <label htmlFor="ps_parent" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+      {/* PS Under Hon' Lokayukt/Uplokayukt * */}
+       {isPersonalSecretary
+    ? "PS Under Hon' Lokayukt/Uplokayukt *"
+    : "Under Supervisor *"}
+    </label>
+
+    {/* <select
+      id="ps_parent"
+      name="ps_parent"
+      value={formData.ps_parent}
+      onChange={handleInputChange}
+      className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+        errors.ps_parent ? 'border-red-500' : 'border-gray-300'
+      }`}
+    >
+      <option value="">Select User</option>
+
+      {fetchLokayuktData?.flat(2)?.map((item) => (
+        <option key={item.id} value={item.id}>
+          {item?.role?.label} ({item.name}) 
+        </option>
+      ))}
+    </select> */}
+
+    <select
+  id="ps_parent"
+  name="ps_parent"
+  value={formData.ps_parent}
+  onChange={handleInputChange}
+  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none bg-white ${
+    errors.ps_parent ? "border-red-500" : "border-gray-300"
+  }`}
+>
+  <option value="">Select User</option>
+
+  {fetchLokayuktData?.flat(2)?.map((item) => {
+    const label =
+      item?.role?.name === "supervisor"
+        ? item?.subrole?.label 
+        : item?.role?.label; 
+
+    return (
+      <option key={item.id} value={item.id}>
+       {item.name} ({label})
+      </option>
+    );
+  })}
+</select>
+
+
+    {errors.ps_parent && (
+      <p className="mt-1 text-sm text-red-600">
+        {errors.ps_parent}
+      </p>
+    )}
+  </div>
+)}
+
 
 
 
@@ -641,17 +837,41 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                 <label htmlFor="password" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Password *
                 </label>
-                <input
-                  id="password"
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
-                    errors.password ? '' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter password"
-                />
+              <div className="relative">
+  {/* hide browser default eye */}
+  <style>
+    {`
+      .no-browser-eye::-ms-reveal,
+      .no-browser-eye::-ms-clear {
+        display: none;
+      }
+      .no-browser-eye::-webkit-textfield-decoration-container {
+        display: none;
+      }
+    `}
+  </style>
+
+  <input
+    id="password"
+    type={showPassword ? "text" : "password"}
+    name="password"
+    value={formData.password}
+    onChange={handleInputChange}
+    className={`no-browser-eye w-full px-3 pr-10 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
+      errors.password ? "border-red-500" : "border-gray-300"
+    }`}
+    placeholder="Enter Password"
+  />
+
+  <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+  >
+    {showPassword ? <FaEyeSlash /> : <FaEye />}
+  </button>
+</div>
+
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
                     {errors.password}
@@ -664,17 +884,30 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                 <label htmlFor="password_confirmation" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
                   Confirm Password *
                 </label>
-                <input
-                  id="password_confirmation"
-                  type="password"
-                  name="password_confirmation"
-                  value={formData.password_confirmation}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
-                    errors.password_confirmation ? '' : 'border-gray-300'
-                  }`}
-                  placeholder="Confirm password"
-                />
+              <div className="relative">
+  <input
+    id="password_confirmation"
+    type={showConfirmPassword ? "text" : "password"}
+    name="password_confirmation"
+    value={formData.password_confirmation}
+    onChange={handleInputChange}
+    className={`no-browser-eye w-full px-3 pr-10 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
+      errors.password_confirmation ? "border-red-500" : "border-gray-300"
+    }`}
+    placeholder="Confirm Password"
+  />
+
+  <button
+    type="button"
+    onClick={() =>
+      setShowConfirmPassword(!showConfirmPassword)
+    }
+    className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+  >
+    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+  </button>
+</div>
+
                 {errors.password_confirmation && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
                     {errors.password_confirmation}

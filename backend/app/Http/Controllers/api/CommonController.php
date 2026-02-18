@@ -1148,9 +1148,19 @@ class CommonController extends Controller
 
     public function fetchLeavesDetails(){
 
-        $cat = EmployeeUploadFiles::with('user:id,name')->get();
+        $cat = EmployeeUploadFiles::with('user:id,name')
+               ->where('type','Letter')
+               ->get();
         // dd($designation->toArray());
         return ApiResponse::generateResponse('success','Leaves fetch successfully',$cat);
     }
 
+
+     public function fetchLeavesPersonalDetails(){
+
+        $cat = EmployeeUploadFiles::with('user:id,name')
+                ->where('type','Personal File')->get();
+        // dd($designation->toArray());
+        return ApiResponse::generateResponse('success','Leaves fetch successfully',$cat);
+    }
 }

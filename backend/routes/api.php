@@ -50,6 +50,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-roles', [CommonController::class, 'getRoles']);
         Route::get('/get-sub-roles/{roleId}', [CommonController::class, 'getSubroles']);
         Route::get('/get-leave-details', [CommonController::class, 'fetchLeavesDetails']);
+        Route::get('/get-leave-personal-details', [CommonController::class, 'fetchLeavesPersonalDetails']);
+
 
         // Route::prefix('admin')->group(function () {
         
@@ -188,6 +190,9 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/topics',[EmployeesController::class,'fetch_topics']);
         Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
         Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
+
+        Route::post('/upload-private-file',[EmployeesController::class,'uploadPrivateFiles']);
+
         Route::get('/get-file-preview/{id}',[EmployeesController::class,'getFilePreview']);  
 
 

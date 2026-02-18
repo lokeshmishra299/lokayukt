@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaUser, FaLock, FaBalanceScale, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,6 +14,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [generalError, setGeneralError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     user_name: '',
     password: ''
@@ -58,7 +60,7 @@ const Login = () => {
         toast.success("Login Successful!"); 
         setTimeout(() => {
           if (userRole === "admin") {
-            window.open("/admin/dashboard", "_self");
+            window.open("/admin/user-management", "_self");
             
           }
 
@@ -231,19 +233,44 @@ const Login = () => {
               <label className="block text-gray-700 text-sm font-medium mb-2">
                 Password / पासवर्ड
               </label>
-              <div className="relative">
-                <FaLock className="absolute left-3 top-3 text-gray-400" />
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
-                    errors.password || generalError ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter Password"
-                />
-              </div>
+   <div className="relative">
+  {/* INLINE STYLE — ONLY FOR THIS INPUT */}
+  <style>
+    {`
+      .no-browser-eye::-ms-reveal,
+      .no-browser-eye::-ms-clear {
+        display: none;
+      }
+      .no-browser-eye::-webkit-textfield-decoration-container {
+        display: none;
+      }
+    `}
+  </style>
+
+  <FaLock className="absolute left-3 top-3 text-gray-400" />
+
+  <input
+    type={showPassword ? "text" : "password"}
+    name="password"
+    value={formData.password}
+    onChange={handleInputChange}
+    className={`no-browser-eye w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+      errors.password || generalError ? "border-red-500" : "border-gray-300"
+    }`}
+    placeholder="Enter Password"
+  />
+
+  {/* React Icon Eye Button */}
+  <button
+    type="button"
+    onClick={() => setShowPassword(!showPassword)}
+    className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+  >
+    {showPassword ? <FaEyeSlash /> : <FaEye />}
+  </button>
+</div>
+
+
               {/* Show field-specific password error */}
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
