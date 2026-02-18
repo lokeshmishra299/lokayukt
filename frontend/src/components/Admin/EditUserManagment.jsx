@@ -43,7 +43,7 @@ const EditUserManagement = () => {
     number: "",
     role_id: "",
     sub_role_id: "",
-    // ps_parent: "",
+    ps_parent: "",
     parent_user_id: "",
     designation: "",
     department: "",
@@ -95,6 +95,7 @@ const EditUserManagement = () => {
             role_id: userData.role_id || "",
             sub_role_id: userData.sub_role_id || "",
             // ps_parent: userData.ps_parent || "",
+            ps_parent: userData.parent_user_id || "",
             parent_user_id: userData.parent_user_id || "",
             designation: userData.designation_id || "",
             department: userData.department_id || "",
@@ -191,8 +192,8 @@ const EditUserManagement = () => {
         ...prev,
         [name]: value,
         sub_role_id: "",
-        // ps_parent: ""
-        parent_user_id: "",
+        ps_parent: ""
+        // parent_user_id: "",
       }));
 
       // Clear specific errors
@@ -306,14 +307,17 @@ const EditUserManagement = () => {
 
       // Role 6: Personal Secretary
       if (Number(formData.role_id) === 6) {
-        updatePayload.ps_parent = formData.parent_user_id;
+        // updatePayload.ps_parent = formData.parent_user_id;
+         updatePayload.ps_parent = formData.ps_parent;
         updatePayload.sub_role_id = "";
       }
       // Role 3: Supervisor (Add this block)
       else if (Number(formData.role_id) === 3) {
         updatePayload.sub_role_id = formData.sub_role_id || "";
         // Role 3 ke liye bhi parent_user_id bhejna jaruri hai
-        updatePayload.ps_parent = formData.parent_user_id;
+        // updatePayload.ps_parent = formData.parent_user_id;
+        //  updatePayload.ps_parent = formData.ps_parent;
+          updatePayload.ps_parent = formData.ps_parent;
       }
       // Other Roles
       else {
