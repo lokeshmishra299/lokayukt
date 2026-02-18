@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import Pagination from '../Pagination';
+import { FaPaperPlane } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -26,6 +27,9 @@ const AllLeaveFiles = () => {
   
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [openSendPoup, setopenSendPoup] = useState(false);
+  const [selectedAuthority, setSelectedAuthority] = useState("committee");
   const itemsPerPage = 10;
 
   const [viewUrl, setViewUrl] = useState(null); 
@@ -33,12 +37,12 @@ const AllLeaveFiles = () => {
 
   // --- API Fetching (GET) ---
   const getAllFiles = async () => {
-    const res = await api.get("/admin/get-personal-details");
+    const res = await api.get("/admin/get-leave-personal-details");
     return res.data;
   };
 
   const { data: allFileData, isLoading } = useQuery({
-    queryKey: ["get-personal-details"],
+    queryKey: ["get-leave-personal-details"],
     queryFn: getAllFiles
   });
 
@@ -160,8 +164,8 @@ const AllLeaveFiles = () => {
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
         <div className="w-full flex items-center gap-3">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">All Employee Leave Files</h1>
-            <p className="text-sm text-gray-600">सभी कर्मचारियों की अवकाश फाइलें</p>
+            <h1 className="text-xl font-bold text-gray-900">All Personal File</h1>
+            <p className="text-sm text-gray-600">समस्त व्यक्तिगत फाइलें</p>
           </div>
         </div>
 
@@ -191,7 +195,7 @@ const AllLeaveFiles = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Upload Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Accepted/Rejected</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Permission</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</th>
               </tr>
             </thead>
@@ -244,39 +248,22 @@ const AllLeaveFiles = () => {
                     
                     {/* --- EXACT TOGGLE FROM YOUR CODE --- */}
                       <td className="px-6 py-4">
-                        <select
-                          value={
-                            row.status == "2"
-                              ? "Accepted"
-                              : row.status == "3"
-                              ? "Rejected"
-                              : ""       
-                          }
-                          onChange={(e) => {
-                            if (!e.target.value) return;
-                            statusMutation.mutate({ id: row.id, status: e.target.value });
-                          }}
-                          disabled={statusMutation.isPending && statusMutation.variables?.id === row.id}
-                          className={`px-3 py-1.5 border rounded-lg text-sm font-medium
-                            ${
-                              row.status == "2"
-                                ? "border-green-400 text-green-700 bg-green-50"
-                                : row.status == "3"
-                                ? "border-red-400 text-red-700 bg-red-50"
-                                : "border-gray-300 text-gray-700 bg-white"   
-                            }
-                            ${
-                              statusMutation.isPending && statusMutation.variables?.id === row.id
-                                ? "opacity-60"
-                                : "cursor-pointer"
-                            }
-                          `}
-                        >
-                          <option value="">Select</option>
-                          <option value="Accepted">Accepted</option>
-                          <option value="Rejected">Rejected</option>
-                        </select>
-                      </td>
+  <button
+
+  onClick={()=>{
+    setopenSendPoup(true)
+  }}
+    className="inline-flex items-center gap-2 px-4 py-2 
+               bg-green-600 text-white text-sm font-medium
+               rounded-md shadow
+               hover:bg-green-700
+               focus:outline-none focus:ring-2 focus:ring-green-400
+               transition"
+  >
+    Send
+  </button>
+</td>
+
 
 
                     
@@ -350,6 +337,76 @@ const AllLeaveFiles = () => {
           </div>
         </div>
       )}
+
+
+     {openSendPoup && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div className="bg-white w-full max-w-md rounded-lg shadow-xl animate-fadeIn">
+
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-3 border-b">
+        <h2 className="text-lg font-semibold text-gray-800">
+          Send Personal File
+        </h2>
+        <button
+          onClick={() => setopenSendPoup(false)}
+          className="text-gray-500 hover:text-red-600"
+        >
+          <FaTimes />
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="p-5 space-y-4">
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Select 
+          </label>
+
+          <select
+            value={selectedAuthority}
+            onChange={(e) => setSelectedAuthority(e.target.value)}
+            className="w-full px-3 py-2 border rounded-md text-sm
+                       focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            <option value="committee">Loakyukt</option>
+            <option value="committee">Loakyukt</option>
+            <option value="committee">Loakyukt</option>
+        
+          </select>
+        </div>
+
+      </div>
+
+      {/* Footer */}
+      <div className="flex justify-end gap-3 px-5 py-4 border-t bg-gray-50">
+        <button
+          onClick={() => setopenSendPoup(false)}
+          className="px-4 py-2 text-sm rounded-md border border-gray-300
+                     hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            toast.success("File sent successfully");
+            setopenSendPoup(false);
+          }}
+          className="inline-flex items-center gap-2 px-4 py-2
+                     bg-green-600 text-white text-sm font-medium
+                     rounded-md shadow
+                     hover:bg-green-700 transition"
+        >
+          <FaPaperPlane />
+          Send
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
