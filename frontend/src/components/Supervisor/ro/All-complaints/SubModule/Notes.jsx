@@ -351,6 +351,7 @@ const Notes = ({ complaint }) => {
   //   const contentState = editorState.getCurrentContent();
   //   return contentState.hasText() && selectedDoc !== "";
   // };
+
     const isFormValid = () => {
   const contentState = editorState.getCurrentContent();
   return contentState.hasText(); 

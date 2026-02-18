@@ -140,7 +140,7 @@ import SupervisorViewAllComplaintro from './components/Supervisor/ro-aro/All-com
 import SupervisorEditComplaintsro from './components/Supervisor/ro-aro/All-complaints/EditAllComplaints';
 
 
-import EmployUserDashboardro from "./components/./Supervisor/ro-aro/EmployUserDashboard"
+import EmployUserDashboardroaro from "./components/./Supervisor/ro-aro/EmployUserDashboard"
 
 
 // Employ
@@ -180,6 +180,25 @@ import SupervisorAllComplaitsds from './components/Supervisor/ds/All-complaints/
 import SupervisorViewAllComplaintds from './components/Supervisor/ds/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintsds from './components/Supervisor/ds/All-complaints/EditAllComplaints';
 
+
+import EmployUserDashboardds from "./components/./Supervisor/ds/EmployUserDashboard"
+
+// Employ
+import DsEmployLayout from './components/Supervisor/ds/Employ/Layout';
+import DsEmployDashboard from './components/Supervisor/ds/Employ/Dashboard';
+import DsEmployComplaints from './components/Supervisor/ds/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import DsEmployUserManagement from './components/Supervisor/ds/Employ/UserManagement';
+import DsEmployAddFiles from './components/Supervisor/ds/Employ/AddFiles';
+import DsEmployViewFiles from './components/Supervisor/ds/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
 // JS
 
 import SupervisorLayoutjs from './components/Supervisor/js/Layout';
@@ -201,49 +220,108 @@ import SupervisorAllComplaitsjs from './components/Supervisor/js/All-complaints/
 import SupervisorViewAllComplaintjs from './components/Supervisor/js/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintsjs from './components/Supervisor/js/All-complaints/EditAllComplaints';
 
+
+import EmployUserDashboardjs from "./components/./Supervisor/js/EmployUserDashboard"
+
+// Employ
+import JsEmployLayout from './components/Supervisor/js/Employ/Layout';
+import JsEmployDashboard from './components/Supervisor/js/Employ/Dashboard';
+import JsEmployComplaints from './components/Supervisor/js/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import JsEmployUserManagement from './components/Supervisor/js/Employ/UserManagement';
+import JsEmployAddFiles from './components/Supervisor/js/Employ/AddFiles';
+import JsEmployViewFiles from './components/Supervisor/js/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
 // US
 
-import SupervisorLayoutus from './components/Supervisor/js/Layout';
-import SupervisorDashboardus from './components/Supervisor/js/Dashboard';
-import SupervisorComplaintsus from './components/Supervisor/js/Complaints';
-import SupervisorProgressRegisterus from './components/Supervisor/js/ProgressRegister';
-import SupervisorSearchReportsus from './components/Supervisor/js/SearchReports';
-import SupervisorViewComplaintsus from './components/Supervisor/js/ViewComplaints';
-import SupervisorPendingComplaintsus from './components/Supervisor/js/Pending-complaints/PendingComplaints';
-import SupervisorEditPendingComplaintsus from './components/Supervisor/js/Pending-complaints/EditPendingComplaints';
-import SupervisorViewPendingComplaintsus from './components/Supervisor/js/Pending-complaints/ViewPendingComplaints';
+import SupervisorLayoutus from './components/Supervisor/us/Layout';
+import SupervisorDashboardus from './components/Supervisor/us/Dashboard';
+import SupervisorComplaintsus from './components/Supervisor/us/Complaints';
+import SupervisorProgressRegisterus from './components/Supervisor/us/ProgressRegister';
+import SupervisorSearchReportsus from './components/Supervisor/us/SearchReports';
+import SupervisorViewComplaintsus from './components/Supervisor/us/ViewComplaints';
+import SupervisorPendingComplaintsus from './components/Supervisor/us/Pending-complaints/PendingComplaints';
+import SupervisorEditPendingComplaintsus from './components/Supervisor/us/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintsus from './components/Supervisor/us/Pending-complaints/ViewPendingComplaints';
 
 
-import SupervisorApprovedComplaintsus from './components/Supervisor/js/Approved-complaints/ApprovedComplaints';
-import SupervisorViewApprovedComplaintus from './components/Supervisor/js/Approved-complaints/ViewApprovedComplaints';
-import SupervisorEditApprovedComplaintus from './components/Supervisor/js/Approved-complaints/EditApprovedComplaints';
+import SupervisorApprovedComplaintsus from './components/Supervisor/us/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintus from './components/Supervisor/us/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintus from './components/Supervisor/us/Approved-complaints/EditApprovedComplaints';
 
-import SupervisorAllComplaitsus from './components/Supervisor/js/All-complaints/AllComplaits';
-import SupervisorViewAllComplaintus from './components/Supervisor/js/All-complaints/ViewwAllComplaint';
-import SupervisorEditComplaintsus from './components/Supervisor/js/All-complaints/EditAllComplaints';
+import SupervisorAllComplaitsus from './components/Supervisor/us/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintus from './components/Supervisor/us/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintsus from './components/Supervisor/us/All-complaints/EditAllComplaints';
+
+import EmployUserDashboardus from "./components/./Supervisor/us/EmployUserDashboard"
+
+// Employ
+import UsEmployLayout from './components/Supervisor/us/Employ/Layout';
+import UsEmployDashboard from './components/Supervisor/us/Employ/Dashboard';
+import UsEmployComplaints from './components/Supervisor/us/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import UsEmployUserManagement from './components/Supervisor/us/Employ/UserManagement';
+import UsEmployAddFiles from './components/Supervisor/us/Employ/AddFiles';
+import UsEmployViewFiles from './components/Supervisor/us/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
 
 
 // ARO
 //----------
 
-import SupervisorLayoutaro from './components/Supervisor/ro-aro/Layout';
-import SupervisorDashboardaro from './components/Supervisor/ro-aro/Dashboard';
-import SupervisorComplaintsaro from './components/Supervisor/ro-aro/Complaints';
-import SupervisorProgressRegisteraro from './components/Supervisor/ro-aro/ProgressRegister';
-import SupervisorSearchReportsaro from './components/Supervisor/ro-aro/SearchReports';
-import SupervisorViewComplaintsaro from './components/Supervisor/ro-aro/ViewComplaints';
-import SupervisorPendingComplaintsaro from './components/Supervisor/ro-aro/Pending-complaints/PendingComplaints';
-import SupervisorEditPendingComplaintsaro from './components/Supervisor/ro-aro/Pending-complaints/EditPendingComplaints';
-import SupervisorViewPendingComplaintsaro from './components/Supervisor/ro-aro/Pending-complaints/ViewPendingComplaints';
+import SupervisorLayoutaro from './components/Supervisor/ro/Layout';
+import SupervisorDashboardaro from './components/Supervisor/ro/Dashboard';
+import SupervisorComplaintsaro from './components/Supervisor/ro/Complaints';
+import SupervisorProgressRegisteraro from './components/Supervisor/ro/ProgressRegister';
+import SupervisorSearchReportsaro from './components/Supervisor/ro/SearchReports';
+import SupervisorViewComplaintsaro from './components/Supervisor/ro/ViewComplaints';
+import SupervisorPendingComplaintsaro from './components/Supervisor/ro/Pending-complaints/PendingComplaints';
+import SupervisorEditPendingComplaintsaro from './components/Supervisor/ro/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintsaro from './components/Supervisor/ro/Pending-complaints/ViewPendingComplaints';
 
 
-import SupervisorApprovedComplaintsaro from './components/Supervisor/ro-aro/Approved-complaints/ApprovedComplaints';
-import SupervisorViewApprovedComplaintaro from './components/Supervisor/ro-aro/Approved-complaints/ViewApprovedComplaints';
-import SupervisorEditApprovedComplaintaro from './components/Supervisor/ro-aro/Approved-complaints/EditApprovedComplaints';
+import SupervisorApprovedComplaintsaro from './components/Supervisor/ro/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintaro from './components/Supervisor/ro/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintaro from './components/Supervisor/ro/Approved-complaints/EditApprovedComplaints';
 
-import SupervisorAllComplaitsaro from './components/Supervisor/ro-aro/All-complaints/AllComplaits';
-import SupervisorViewAllComplaintaro from './components/Supervisor/ro-aro/All-complaints/ViewwAllComplaint';
-import SupervisorEditComplaintsaro from './components/Supervisor/ro-aro/All-complaints/EditAllComplaints';
+import SupervisorAllComplaitsaro from './components/Supervisor/ro/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintaro from './components/Supervisor/ro/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintsaro from './components/Supervisor/ro/All-complaints/EditAllComplaints';
+
+import EmployUserDashboardaro from "./components/./Supervisor/ro/EmployUserDashboard"
+
+
+// Employ
+import AroEmployLayout from './components/Supervisor/ro/Employ/Layout';
+import AroEmployDashboard from './components/Supervisor/ro/Employ/Dashboard';
+import AroEmployComplaints from './components/Supervisor/ro/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import AroEmployUserManagement from './components/Supervisor/ro/Employ/UserManagement';
+import AroEmployAddFiles from './components/Supervisor/ro/Employ/AddFiles';
+import AroEmployViewFiles from './components/Supervisor/ro/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
+
+
 
 
 // Supervisor 
@@ -348,6 +426,24 @@ import SupervisorEditApprovedComplaintsio from './components/Supervisor/io/Appro
 import SupervisorAllComplaitsio from './components/Supervisor/io/All-complaints/AllComplaits';
 import SupervisorViewAllComplaintio from './components/Supervisor/io/All-complaints/ViewwAllComplaint';
 import SupervisorEditComplaintsio from './components/Supervisor/io/All-complaints/EditAllComplaints';
+
+import EmployUserDashboardio from "./components/./Supervisor/io/EmployUserDashboard"
+
+// Employ
+import ioEmployLayout from './components/Supervisor/io/Employ/Layout';
+import ioEmployDashboard from './components/Supervisor/io/Employ/Dashboard';
+import ioEmployComplaints from './components/Supervisor/io/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import ioEmployUserManagement from './components/Supervisor/io/Employ/UserManagement';
+import ioEmployAddFiles from './components/Supervisor/io/Employ/AddFiles';
+import ioEmployViewFiles from './components/Supervisor/io/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
 
 
 
@@ -470,7 +566,7 @@ import PsEmployViewFiles from './components/Ps/Employ/ViewFiles';
 
 
 
-//Lok-ayukt
+// Dispatch
 import DispatchLayout from './components/Dispatch/Layout';
 import DispatchDashboard from './components/Dispatch/Dashboard';
 import DispatchComplaints from './components/Dispatch/Complaints';
@@ -488,6 +584,26 @@ import DispatchScaneLetter from "./components/Dispatch/ScaneLetter"
 
 // import LokayuktUserManagement from './components/LokAyukta/UserManagement';
 import DispatchUserManagement from './components/Dispatch/UserManagement';
+
+
+
+import EmployeeUserDashboarddsp from './components/Dispatch/EmployUserDashboard';
+
+// Employ
+import DspEmployLayout from './components/Dispatch/Employ/Layout';
+import DspEmployDashboard from './components/Dispatch/Employ/Dashboard';
+import DspEmployComplaints from './components/Dispatch/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import DspEmployUserManagement from './components/Dispatch/Employ/UserManagement';
+import DspEmployAddFiles from './components/Dispatch/Employ/AddFiles';
+import DspEmployViewFiles from './components/Dispatch/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
 
 
 
@@ -639,6 +755,19 @@ function App() {
 
       {/* DS */}
       {role === 'supervisor' && subrole === 'ds' && (
+
+        <>
+
+              <Route path="/employee" element={<DsEmployLayout />}>
+          <Route path="dashboard" element={<DsEmployDashboard />} />
+          <Route path="complaints" element={<DsEmployComplaints />} />
+          <Route path="add-files" element={<DsEmployAddFiles />} />
+          <Route path="view-files" element={<DsEmployViewFiles />} />
+          <Route path="user-management" element={<DsEmployUserManagement />} />
+       
+        </Route>
+          <Route path="main-dashboard" element={<EmployUserDashboardds />} />
+
         <Route path="/supervisor" element={<SupervisorLayoutds />}>
           <Route path="dashboard" element={<SupervisorDashboardds />} />
           <Route path="complaints" element={<SupervisorComplaintsds />} />
@@ -658,12 +787,26 @@ function App() {
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintds/>} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintds />} /> 
         </Route>
+        </>
       )}
 
 
 
         {/* JS */}
       {role === 'supervisor' && subrole === 'js' && (
+        <>
+
+        
+              <Route path="/employee" element={<JsEmployLayout />}>
+          <Route path="dashboard" element={<JsEmployDashboard />} />
+          <Route path="complaints" element={<JsEmployComplaints />} />
+          <Route path="add-files" element={<JsEmployAddFiles />} />
+          <Route path="view-files" element={<JsEmployViewFiles />} />
+          <Route path="user-management" element={<JsEmployUserManagement />} />
+       
+        </Route>
+          <Route path="main-dashboard" element={<EmployUserDashboardjs />} />
+
         <Route path="/supervisor" element={<SupervisorLayoutjs />}>
           <Route path="dashboard" element={<SupervisorDashboardjs />} />
           <Route path="complaints" element={<SupervisorComplaintsjs />} />
@@ -683,11 +826,28 @@ function App() {
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintjs/>} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintjs />} /> 
         </Route>
+        </>
       )}
 
 
         {/* US */}
       {role === 'supervisor' && subrole === 'us' && (
+
+        <>
+
+        
+              <Route path="/employee" element={<UsEmployLayout />}>
+          <Route path="dashboard" element={<UsEmployDashboard />} />
+          <Route path="complaints" element={<UsEmployComplaints />} />
+          <Route path="add-files" element={<UsEmployAddFiles />} />
+          <Route path="view-files" element={<UsEmployViewFiles />} />
+          <Route path="user-management" element={<UsEmployUserManagement />} />
+       
+        </Route>
+
+          <Route path="main-dashboard" element={<EmployUserDashboardus />} />
+
+
         <Route path="/supervisor" element={<SupervisorLayoutus />}>
           <Route path="dashboard" element={<SupervisorDashboardus />} />
           <Route path="complaints" element={<SupervisorComplaintsus />} />
@@ -707,10 +867,11 @@ function App() {
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintus/>} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintus />} /> 
         </Route>
+        </>
       )}
 
 
-         {/* US */}
+         {/* US No */}
       {role === 'supervisor' && subrole === 'us' && (
         <Route path="/supervisor" element={<SupervisorLayoutjs />}>
           <Route path="dashboard" element={<SupervisorDashboardjs />} />
@@ -746,7 +907,7 @@ function App() {
        
         </Route>
 
-          <Route path="main-dashboard" element={<EmployUserDashboardro />} />
+          <Route path="main-dashboard" element={<EmployUserDashboardroaro />} />
 
 
         <Route path="/supervisor" element={<SupervisorLayoutro />}>
@@ -775,6 +936,23 @@ function App() {
 
           {/** ARO */}
          {role === 'supervisor' && subrole === 'ro' && (
+          <>
+
+
+          
+            <Route path="/employee" element={<AroEmployLayout />}>
+          <Route path="dashboard" element={<AroEmployDashboard />} />
+          <Route path="complaints" element={<AroEmployComplaints />} />
+          <Route path="add-files" element={<AroEmployAddFiles />} />
+          <Route path="view-files" element={<AroEmployViewFiles />} />
+          <Route path="user-management" element={<AroEmployUserManagement />} />
+       
+        </Route>
+
+          <Route path="main-dashboard" element={<EmployUserDashboardaro />} />
+
+
+
         <Route path="/supervisor" element={<SupervisorLayoutaro />}>
           <Route path="dashboard" element={<SupervisorDashboardaro />} />
           <Route path="complaints" element={<SupervisorComplaintsaro />} />
@@ -794,6 +972,7 @@ function App() {
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintaro/>} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintaro />} /> 
         </Route>
+          </>
       )}
 
 
@@ -883,6 +1062,21 @@ function App() {
           {/*io*/}
       
      {role === 'supervisor' && subrole === 'io' && (
+      <>
+
+
+      
+          <Route path="/employee" element={<ioEmployLayout />}>
+          <Route path="dashboard" element={<ioEmployDashboard />} />
+          <Route path="complaints" element={<ioEmployComplaints />} />
+          <Route path="add-files" element={<ioEmployAddFiles />} />
+          <Route path="view-files" element={<ioEmployViewFiles />} />
+          <Route path="user-management" element={<ioEmployUserManagement />} />
+       
+        </Route>
+
+          <Route path="main-dashboard" element={<EmployUserDashboardio />} />
+
         <Route path="/supervisor" element={<SupervisorLayoutio />}>
           <Route path="dashboard" element={<SupervisorDashboardio />} />
           <Route path="complaints" element={<SupervisorComplaintsio />} />
@@ -902,6 +1096,7 @@ function App() {
           <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintsio />} />
           <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintsio/>} /> 
         </Route>
+      </>
       )}
 
 
@@ -1039,6 +1234,21 @@ function App() {
       {/* Dispatch */}
 
         {role === 'dispatch' && (
+
+          <>
+
+             <Route path="/employee" element={<DspEmployLayout />}>
+          <Route path="dashboard" element={<DspEmployDashboard />} />
+          <Route path="complaints" element={<DspEmployComplaints />} />
+          <Route path="add-files" element={<DspEmployAddFiles />} />
+          <Route path="view-files" element={<DspEmployViewFiles />} />
+          <Route path="user-management" element={<DspEmployUserManagement />} />
+       
+        </Route>
+
+           <Route path="main-dashboard" element={<EmployeeUserDashboarddsp />} />
+
+
         <Route path="/dispatch" element={<DispatchLayout />}>
            <Route path="dashboard" element={<DispatchDashboard />} />
           <Route path="complaints" element={<DispatchComplaints />} />
@@ -1069,6 +1279,7 @@ function App() {
 
          
         </Route>
+          </>
       )}
 
 

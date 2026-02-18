@@ -99,7 +99,7 @@ const Login = () => {
 
           }
           else if (userRole === "dispatch") {
-            window.open("/dispatch/dashboard", "_self");
+            window.open("/main-dashboard", "_self");
             localStorage.setItem("UserID", response.data.data.user.id);
           }
           else {

@@ -309,6 +309,8 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
 ComplaintPrintView.displayName = 'ComplaintPrintView';
 
 const Complaints = () => {
+
+  
   const printRef = useRef(null);
 
 
@@ -2301,6 +2303,12 @@ const handleMainRespondent = (id) => {
                                 handleFormDataChange("supportingPersons", updated);
                             }}
                             />
+
+                            {errors[`support_name.${index}`] && (
+  <p className="text-red-500 text-sm mt-1">
+    {errors[`support_name.${index}`][0]}
+  </p>
+)}
                         </div>
 
                         {/* ADDRESS */}
@@ -2391,6 +2399,12 @@ const handleMainRespondent = (id) => {
                             handleFormDataChange("otherPersons", updated);
                         }}
                         />
+
+                        {errors[`support_name.${index}`] && (
+  <p className="text-red-500 text-sm mt-1">
+    {errors[`support_name.${index}`][0]}
+  </p>
+)}
                     </div>
 
                     {/* ADDRESS */}
@@ -2437,6 +2451,13 @@ const handleMainRespondent = (id) => {
               value={formData.attachedDocuments}
               onChange={(e) => handleFormDataChange('attachedDocuments', e.target.value)}
             />
+
+            {errors.attached_documents_description && (
+  <p className="text-red-500 text-sm mb-2">
+    {errors.attached_documents_description[0]}
+  </p>
+)}
+
 
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <label

@@ -82,13 +82,18 @@ const Reporting = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[220px_220px_180px_140px_auto] gap-4 items-center w-full">
 
             {/* Complaint / File No */}
-            <input
-              type="text"
-              placeholder="शिकायत, फ़ाइल संख्या"
-              value={compFile}
-              onChange={(e) => setCompFile(e.target.value)}
-              className="px-4  py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+<input
+  type="text"
+  placeholder="शिकायत, फ़ाइल संख्या"
+  value={compFile}
+  onChange={(e) => {
+    const filtered = e.target.value.replace(/[^0-9/-]/g, "");
+    setCompFile(filtered);
+  }}
+  inputMode="numeric"
+  className="px-4 py-3 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
+
 
             {/* Corr / Response */}
             <input

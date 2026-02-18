@@ -234,7 +234,7 @@ const AllLeaveFiles = () => {
                       <div className="flex items-center gap-3">
                         {getFileIcon(row.file)}
                         <div>
-                            <p className="text-sm font-medium text-gray-900">{row.title || "Untitled"}</p>
+                            <p className="text-sm kruti-input font-medium text-gray-900">{row.title || "Untitled"}</p>
                         </div>
                       </div>
                     </td>
@@ -248,26 +248,41 @@ const AllLeaveFiles = () => {
                     <td className="px-6 py-4 text-sm text-gray-600">{row.created_at}</td>
                     
                     {/* --- EXACT TOGGLE FROM YOUR CODE --- */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={isAccepted}
-                            onChange={() => handleToggleStatus(row.id, row.status)}
-                            disabled={statusMutation.isPending && statusMutation.variables?.id === row.id}
-                            className="sr-only peer"
-                          />
-                          <div className={`w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer transition-all ease-in-out duration-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-400 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#13316C] ${
-                            (statusMutation.isPending && statusMutation.variables?.id === row.id) ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'
-                          }`}></div>
-                        </label>
-                        {/* Text indicating Accepted or Rejected */}
-                        <span className={`text-xs font-medium ${isAccepted ? 'text-green-600' : 'text-red-500'}`}>
-                          {isAccepted ? 'Accepted' : 'Rejected'}
-                        </span>
-                      </div>
-                    </td>
+<td className="px-6 py-4">
+  <select
+    value={
+      row.status === 'Accepted' || row.status === '1' || row.status === 1
+        ? 'Accepted'
+        : row.status === 'Rejected' || row.status === '0' || row.status === 0
+        ? 'Rejected'
+        : ''
+    }
+    onChange={(e) => {
+      if (!e.target.value) return;
+      statusMutation.mutate({ id: row.id, status: e.target.value });
+    }}
+    disabled={statusMutation.isPending && statusMutation.variables?.id === row.id}
+    className={`px-3 py-1.5 border rounded-lg text-sm font-medium
+      ${
+        row.status === 'Accepted' || row.status === '1' || row.status === 1
+          ? 'border-green-400 text-green-700 bg-green-50'
+          : row.status === 'Rejected' || row.status === '0' || row.status === 0
+          ? 'border-red-400 text-red-700 bg-red-50'
+          : 'border-gray-300 text-gray-700 bg-white'
+      }
+      ${
+        statusMutation.isPending && statusMutation.variables?.id === row.id
+          ? 'opacity-60'
+          : 'cursor-pointer'
+      }
+    `}
+  >
+    <option value="">Select</option>
+    <option value="Accepted">Accepted</option>
+    <option value="Rejected">Rejected</option>
+  </select>
+</td>
+
                     
                     <td className="px-6 py-4 text-right">
                         <button 

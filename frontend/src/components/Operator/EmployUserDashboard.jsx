@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaUsers, FaUserTie } from 'react-icons/fa';
+import { FaUserTie } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { TbReport } from "react-icons/tb";
 
@@ -10,51 +10,47 @@ const EmployeeUserDashboard = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 font-sans p-4">
       
-      {/* Container for Boxes */}
+      {/* Container */}
       <div className="flex flex-col sm:flex-row gap-8">
         
-        {/* Complaint Management Box */}
+        {/* Complaint Management */}
         <div 
           onClick={() => {
             setActiveBox('user');
             navigate('/operator/dashboard');
           }}
-          className={`w-[280px] h-[280px] flex flex-col justify-center p-8 rounded-2xl shadow-sm cursor-pointer transition-all duration-300 border-2 ${
-            activeBox === 'user' 
-              ? 'bg-blue-50 border-blue-600 scale-105 shadow-md' 
+          className={`w-[360px] h-[300px] flex flex-col items-center justify-center p-8 rounded-2xl cursor-pointer transition-all duration-300 border-2 ${
+            activeBox === 'user'
+              ? 'bg-blue-50 border-blue-600 scale-105 shadow-md'
               : 'bg-white border-transparent hover:shadow-md hover:-translate-y-1'
           }`}
         >
-          {/* Icon Wrapper (Centered) */}
-          <div className="flex justify-center mb-10">
-            <TbReport className={`text-[80px] ${activeBox === 'user' ? 'text-blue-600' : 'text-[#8ea2b4]'}`} />
-          </div>
+          <TbReport className={`text-[80px] mb-10 ${activeBox === 'user' ? 'text-blue-600' : 'text-[#8ea2b4]'}`} />
           
-          {/* Text Wrapper (Left Aligned) */}
-          <div className={`text-2xl font-bold leading-tight text-left ${activeBox === 'user' ? 'text-blue-600' : 'text-[#475569]'}`}>
+          <div className={`text-2xl font-bold whitespace-nowrap text-center ${
+            activeBox === 'user' ? 'text-blue-600' : 'text-[#475569]'
+          }`}>
             Complaint Management
           </div>
         </div>
 
-        {/* Employee Management Box */}
+        {/* Employee Management */}
         <div 
-           onClick={() => {
-            setActiveBox('user');
+          onClick={() => {
+            setActiveBox('employee');
             navigate('/employee/dashboard');
           }}
-          className={`w-[280px] h-[280px] flex flex-col justify-center p-8 rounded-2xl shadow-sm cursor-pointer transition-all duration-300 border-2 ${
-            activeBox === 'employee' 
-              ? 'bg-blue-50 border-blue-600 scale-105 shadow-md' 
+          className={`w-[360px] h-[300px] flex flex-col items-center justify-center p-8 rounded-2xl cursor-pointer transition-all duration-300 border-2 ${
+            activeBox === 'employee'
+              ? 'bg-blue-50 border-blue-600 scale-105 shadow-md'
               : 'bg-white border-transparent hover:shadow-md hover:-translate-y-1'
           }`}
         >
-          {/* Icon Wrapper (Centered) */}
-          <div className="flex justify-center mb-10">
-            <FaUserTie className={`text-[80px] ${activeBox === 'employee' ? 'text-blue-600' : 'text-[#8ea2b4]'}`} />
-          </div>
+          <FaUserTie className={`text-[80px] mb-10 ${activeBox === 'employee' ? 'text-blue-600' : 'text-[#8ea2b4]'}`} />
           
-          {/* Text Wrapper (Left Aligned) */}
-          <div className={`text-2xl font-bold leading-tight text-left ${activeBox === 'employee' ? 'text-blue-600' : 'text-[#475569]'}`}>
+          <div className={`text-2xl font-bold whitespace-nowrap text-center ${
+            activeBox === 'employee' ? 'text-blue-600' : 'text-[#475569]'
+          }`}>
             Employee Management
           </div>
         </div>
