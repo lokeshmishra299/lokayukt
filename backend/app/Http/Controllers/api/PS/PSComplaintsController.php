@@ -69,7 +69,11 @@ class PSComplaintsController extends Controller
     );
 if($roleParent === 'lok-ayukt'){
     $query->where('complaints.approved_rejected_by_rk', 1)
-          ->where('complaints.approved_rejected_by_lokayukt', 0);
+          ->where('complaints.approved_rejected_by_lokayukt', 0)
+          ->where(function ($q) {
+          $q->whereNotNull('rep.forward_by_ps')
+            ->orWhere('rep.forward_by_lokayukt','<>',0);
+      });
 
 }elseif($roleParent === 'up-lok-ayukt'){
     // $query->where('complaints.approved_rejected_by_rk', 1)
