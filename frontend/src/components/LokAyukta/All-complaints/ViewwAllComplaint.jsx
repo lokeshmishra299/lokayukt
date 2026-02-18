@@ -59,6 +59,17 @@ const SearchableDropdown = ({
   // const selectedOption = options.find((opt) => opt.id == value);
   const selectedOption = options?.find((opt) => opt && opt.id == value);
 
+  const getDisplayLabel = (option) => {
+  if (!option) return "";
+
+  const name = option.name || option.user_name || `User ${option.id}`;
+  const roleLabel =
+    option.role?.label || option.subrole?.label || "";
+
+  return roleLabel ? `${name} (${roleLabel})` : name;
+};
+
+
   // const filteredOptions = options.filter((option) => {
     
   //   const label = option.name || option.user_name || `User ${option.id}`;
@@ -73,7 +84,7 @@ const SearchableDropdown = ({
   const filteredOptions = (options || []).filter((option) => {
   if (!option) return false;   // 🔥 important
 
-  const label = option.name || option.user_name || `User ${option.id}`;
+  const label = getDisplayLabel(option);
   const district = option.district_name || "";
   const search = searchTerm.toLowerCase();
 
@@ -105,12 +116,9 @@ const SearchableDropdown = ({
           }`}
         >
           {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+  ? getDisplayLabel(selectedOption)
+  : placeholder}
+
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -129,24 +137,23 @@ const SearchableDropdown = ({
           <div className="overflow-y-auto flex-1">
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
-                <div
-                  key={option.id}
-                  className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
-                    value == option.id
-                      ? "bg-blue-100 text-blue-800"
-                      : "text-gray-700"
-                  }`}
-                  onClick={() => handleSelect(option)}
-                >
-                  {option.name || option.user_name || `User ${option.id}`}
-                  {option.district_name ? (
-                    <span className="text-gray-500 text-xs ml-1">
-                      ({option.district_name})
-                    </span>
-                  ) : (
-                    ""
-                  )}
-                </div>
+              <div
+  key={option.id}
+  className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
+    value == option.id
+      ? "bg-blue-100 text-blue-800"
+      : "text-gray-700"
+  }`}
+  onClick={() => handleSelect(option)}
+>
+  {getDisplayLabel(option)}
+  {option.district_name ? (
+    <span className="text-gray-500 text-xs ml-1">
+      ({option.district_name})
+    </span>
+  ) : null}
+</div>
+
               ))
             ) : (
               <div className="px-3 py-2 text-sm text-gray-500">

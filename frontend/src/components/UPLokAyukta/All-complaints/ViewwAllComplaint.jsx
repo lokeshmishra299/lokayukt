@@ -60,9 +60,21 @@ const SearchableDropdown = ({
   // const selectedOption = options.find((opt) => opt.id == value);
   const selectedOption = options?.find((opt) => opt && opt.id == value);
 
+  const getDisplayLabel = (option) => {
+  if (!option) return "";
+
+  const name = option.name || option.user_name || `User ${option.id}`;
+  const roleLabel =
+    option.role?.label || option.subrole?.label || "";
+
+  return roleLabel ? `${name} (${roleLabel})` : name;
+};
+
+
   const filteredOptions = options.filter((option) => {
     if (!option) return false;
-    const label = option.name || option.user_name || `User ${option.id}`;
+    // const label = option.name || option.user_name || `User ${option.id}`;
+    const label = getDisplayLabel(option);
     const district = option.district_name || "";
     const search = searchTerm.toLowerCase();
     return (
@@ -93,12 +105,9 @@ const SearchableDropdown = ({
           }`}
         >
           {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+  ? getDisplayLabel(selectedOption)
+  : placeholder}
+
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -126,14 +135,12 @@ const SearchableDropdown = ({
                   }`}
                   onClick={() => handleSelect(option)}
                 >
-                  {option.name || option.user_name || `User ${option.id}`}
-                  {option.district_name ? (
-                    <span className="text-gray-500 text-xs ml-1">
-                      ({option.district_name})
-                    </span>
-                  ) : (
-                    ""
-                  )}
+                 {getDisplayLabel(option)}
+{option.district_name ? (
+  <span className="text-gray-500 text-xs ml-1">
+    ({option.district_name})
+  </span>
+) : null}
                 </div>
               ))
             ) : (
