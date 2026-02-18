@@ -204,7 +204,7 @@ const AllLeaveFiles = () => {
               {isLoading ? (
                  <tr>
                     <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
-                        <FaSpinner className="animate-spin inline mr-2" /> Loading...
+                     Loading... 
                     </td>
                  </tr>
               ) : filteredFiles.length > 0 ? (

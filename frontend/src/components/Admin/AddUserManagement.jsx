@@ -434,7 +434,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
                     errors.name ? '' : 'border-gray-300'
                   }`}
-                  placeholder="Enter full name (only alphabets and spaces)"
+                  placeholder="Enter Full Name"
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -457,7 +457,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
                     errors.email ? '' : 'border-gray-300'
                   }`}
-                  placeholder="Enter email address"
+                  placeholder="Enter Email Address"
                 />
                 {errors.email && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -475,7 +475,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                   id="number"
                   type="tel"
                   name="number"
-                  placeholder="Enter Mobile number"
+                  placeholder="Enter Mobile Number"
                   value={formData.number}
                   onChange={(e) => {
                     const onlyDigits = e.target.value.replace(/\D/g, "");
@@ -552,7 +552,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
       >
         <option value="">
           {!formData.role_id 
-            ? 'First select a role' 
+            ? 'First Select a role' 
             : isLoadingSubRoles 
               ? 'Loading sub-roles...' 
               : subRoles.length === 0 
@@ -763,7 +763,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
                     errors.password ? '' : 'border-gray-300'
                   }`}
-                  placeholder="Enter password"
+                  placeholder="Enter Password"
                 />
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -786,7 +786,7 @@ console.log("fetchLokayuktData in component:", fetchLokayuktData)
                   className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-[#123463] focus:border-[#123463] outline-none ${
                     errors.password_confirmation ? '' : 'border-gray-300'
                   }`}
-                  placeholder="Confirm password"
+                  placeholder="Confirm Password"
                 />
                 {errors.password_confirmation && (
                   <p className="mt-1 text-sm text-red-600 flex items-center">

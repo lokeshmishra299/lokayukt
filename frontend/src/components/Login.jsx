@@ -58,7 +58,7 @@ const Login = () => {
         toast.success("Login Successful!"); 
         setTimeout(() => {
           if (userRole === "admin") {
-            window.open("/admin/dashboard", "_self");
+            window.open("/admin/user-management", "_self");
             
           }
 
