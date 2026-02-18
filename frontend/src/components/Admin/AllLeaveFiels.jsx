@@ -10,21 +10,16 @@ import Pagination from '../Pagination';
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
-// 1. Axios Setup
+const token = localStorage.getItem("access_token");
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
 
 const AllLeaveFiles = () => {
   const queryClient = useQueryClient(); 
