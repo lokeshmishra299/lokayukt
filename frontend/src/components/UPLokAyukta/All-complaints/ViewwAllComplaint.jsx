@@ -60,15 +60,24 @@ const SearchableDropdown = ({
   // const selectedOption = options.find((opt) => opt.id == value);
   const selectedOption = options?.find((opt) => opt && opt.id == value);
 
-  const getDisplayLabel = (option) => {
+const getDisplayLabel = (option) => {
   if (!option) return "";
 
-  const name = option.name || option.user_name || `User ${option.id}`;
-  const roleLabel =
-    option.role?.label || option.subrole?.label || "";
+  const name =
+    option.name ||
+    option.user_name ||
+    option.full_name ||
+    `User ${option.id}`;
 
-  return roleLabel ? `${name} (${roleLabel})` : name;
+  const subRole =
+    option.subrole_name ||      // ✅ get-users se
+    option.subrole?.label ||    // backup
+    option.role?.label ||       // backup
+    "";
+
+  return subRole ? `${name} (${subRole})` : name;
 };
+
 
 
   const filteredOptions = options.filter((option) => {
