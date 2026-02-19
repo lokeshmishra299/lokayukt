@@ -179,6 +179,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/delete-budget/{id}',[CommonController::class,'removeBudget']);
         Route::get('/get-employee-files/{id}',[CommonController::class,'getEmployeeFiles']);
         Route::get('/get-file-pdf/{id}',[CommonController::class,'getFilePreview']);
+        Route::get('/change-employee-status/{id}',[CommonController::class,'approveRejectedEmployee']);
       
          // });
 
