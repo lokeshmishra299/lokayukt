@@ -48,6 +48,25 @@
       type: null,
     });
 
+
+    const getUserLabel = (option) => {
+  if (!option) return "";
+
+  const name =
+    option.name ||
+    option.user_name ||
+    `User ${option.id}`;
+
+  const subrole =
+    option.subrole_name ||    
+    option.subrole?.label ||
+    option.role?.label ||
+    "";
+
+  return subrole ? `${name} (${subrole})` : name;
+};
+
+
     const [remark, setRemark] = useState("");
     const [selectedForwardTo, setSelectedForwardTo] = useState("");
     const [priviewPopup, setPriviewPopup] = useState(false);
@@ -771,14 +790,9 @@
                       {Array.isArray(forwardOptionsData) &&
                       forwardOptionsData.length > 0 ? (
                         forwardOptionsData.filter(Boolean).map((option) => (
-                          <option key={option.id} value={option.id}>
-                            {option.name ||
-                              option.user_name ||
-                              `User ${option.id}`}
-                            {option.district_name
-                              ? ` (${option.district_name})`
-                              : ""}
-                          </option>
+                        <option key={option.id} value={option.id}>
+  {getUserLabel(option)}
+</option>
                         ))
                       ) : (
                         <option disabled>No options available</option>

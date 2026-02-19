@@ -532,7 +532,7 @@ const Dashboard = ({ userRole = "uplokayukt" }) => {
       
       <div className="flex items-center justify-between">
          <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+                          <h1 className="text-2xl sm:text-2xl font-bold text-gray-900">Dashboard / डैशबोर्ड</h1>
           <p className="text-sm sm:text-base text-gray-600 break-words">
             Welcome Back, {userRole} • Last Updated: {new Date().toLocaleString()}
           </p>

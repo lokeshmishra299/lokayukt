@@ -46,6 +46,25 @@ const SearchableDropdown = ({
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
 
+
+  const getDisplayLabel = (option) => {
+  if (!option || typeof option !== "object") return "";
+
+  const name =
+    option.name ||
+    option.user_name ||
+    `User ${option.id}`;
+
+  const subRole =
+    option.subrole_name ||        // ✅ ps/get-users
+    option.subrole?.label ||
+    option.role?.label ||
+    "";
+
+  return subRole ? `${name} (${subRole})` : name;
+};
+
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -67,7 +86,9 @@ const selectedOption = (options || []).find(
 const filteredOptions = (options || []).filter((option) => {
   if (!option || typeof option !== "object") return false; // 🛡 protection
 
-  const label = option.name || option.user_name;
+
+  const label = getDisplayLabel(option);
+
   if (!label) return false; // remove nameless entries
 
   const district = option.district_name || "";
@@ -102,12 +123,8 @@ const filteredOptions = (options || []).filter((option) => {
           }`}
         >
           {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+  ? getDisplayLabel(selectedOption)
+  : placeholder}
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -135,7 +152,7 @@ const filteredOptions = (options || []).filter((option) => {
                   }`}
                   onClick={() => handleSelect(option)}
                 >
-                  {option.name || option.user_name || `User ${option.id}`}
+                  {getDisplayLabel(option)}
                   {option.district_name ? (
                     <span className="text-gray-500 text-xs ml-1">
                       ({option.district_name})
