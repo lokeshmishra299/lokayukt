@@ -1038,13 +1038,25 @@ const releaseComplaintMutation = useMutation({
                 </div>
 
                 <div className="flex gap-2">
-                  <button
-                    onClick={diposeShow}
-                    disabled={dispose.isPending}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {dispose.isPending ? "Processing..." : "Dispose"}
-                  </button>
+<button
+  onClick={diposeShow}
+  disabled={dispose.isPending || complaintData?.status === "Final Disposal/Closed"}
+  className={`px-4 py-2 border rounded text-sm
+    ${
+      complaintData?.status === "Final Disposal/Closed"
+        ? "border-gray-300 text-gray-400 cursor-not-allowed bg-gray-100"
+        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+    }
+    ${dispose.isPending ? "opacity-50 cursor-not-allowed" : ""}
+  `}
+>
+  {dispose.isPending
+    ? "Processing..."
+    : complaintData?.status === "Final Disposal/Closed"
+      ? "Disposed"
+      : "Dispose"}
+</button>
+
 
                   <button
                     onClick={handleMarkAsReceived}
@@ -1423,8 +1435,8 @@ const releaseComplaintMutation = useMutation({
                 value={remark}
                 onChange={(e) => setRemark(e.target.value)}
                 rows={4}
-                placeholder="Enter disposal remark..."
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                placeholder="fuLrkj.k fVIi.kh ntZ djsa"
+                className="w-full kruti-input px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
               />
             </div>
 

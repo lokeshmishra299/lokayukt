@@ -60,15 +60,24 @@ const SearchableDropdown = ({
   // const selectedOption = options.find((opt) => opt.id == value);
   const selectedOption = options?.find((opt) => opt && opt.id == value);
 
-  const getDisplayLabel = (option) => {
+const getDisplayLabel = (option) => {
   if (!option) return "";
 
-  const name = option.name || option.user_name || `User ${option.id}`;
-  const roleLabel =
-    option.role?.label || option.subrole?.label || "";
+  const name =
+    option.name ||
+    option.user_name ||
+    option.full_name ||
+    `User ${option.id}`;
 
-  return roleLabel ? `${name} (${roleLabel})` : name;
+  const subRole =
+    option.subrole_name ||      // ✅ get-users se
+    option.subrole?.label ||    // backup
+    option.role?.label ||       // backup
+    "";
+
+  return subRole ? `${name} (${subRole})` : name;
 };
+
 
 
   const filteredOptions = options.filter((option) => {
@@ -173,6 +182,8 @@ const ViewAllComplaint = () => {
   const [sent_through_rk, setThroughRC] = useState(false);
      const [showModal, setShowModal] = useState(false);
         const [Rejectedloading,setRejectedloading] = useState(false)
+        const [showDisposePopup, setShowDisposePopup] = useState(false);
+        const [remark, setRemark] = useState("");
 
         const [showReleaseModal, setShowReleaseModal] = useState(false);
 const [releaseType, setReleaseType] = useState("");
@@ -196,7 +207,6 @@ const [targetDate, setTargetDate] = useState("");
     type: null,
   });
 
-  const [remark, setRemark] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
   const [forwardType, setForwardType] = useState("self");
 
@@ -280,6 +290,11 @@ const [targetDate, setTargetDate] = useState("");
     staleTime: 1000 * 60 * 5,
     retry: 2,
   });
+
+  const isDisposed =
+  complaintData?.status === "Final Disposal/Closed" ||
+  complaintData?.status === "Disposed";
+
 
   // const {
   //   data: forwardOptionsData,
@@ -408,6 +423,30 @@ const [targetDate, setTargetDate] = useState("");
     },
   });
 
+
+  // ===== DISPOSE API =====
+const disposeMutation = useMutation({
+  mutationFn: async ({ complaintId, remark }) => {
+    const res = await api.post(`/uplokayukt/dispose-complain/${id}`, {
+      complaint_id: complaintId,
+      remark: remark, 
+    });
+    return res.data;
+  },
+  onSuccess: (data) => {
+    toast.success(data?.message || "Disposed successfully");
+    queryClient.invalidateQueries({
+      queryKey: ["complaint-details", id],
+    });
+  },
+  onError: (error) => {
+    toast.error(
+      error?.response?.data?.message || "Failed to Dispose"
+    );
+  },
+});
+
+
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
       const res = await api.post(
@@ -487,6 +526,10 @@ const [targetDate, setTargetDate] = useState("");
 
   const handleforwardphysical = () =>
     setConfirmConfig({ open: true, type: "forward" });
+
+  const handleDispose = () => {
+  // disposeMutation.mutate({ complaintId: id });
+};
 
   const handleConfirmYes = () => {
     if (confirmConfig.type === "receive") {
@@ -971,6 +1014,26 @@ const [targetDate, setTargetDate] = useState("");
     Release
   </button>
 )}
+
+<button
+  onClick={() => setShowDisposePopup(true)}
+  disabled={disposeMutation.isPending || isDisposed}
+  className={`px-4 py-2 border rounded text-sm
+    ${
+      isDisposed
+        ? "border-gray-300 text-gray-400 cursor-not-allowed bg-gray-100"
+        : "border-gray-300 text-gray-700 hover:bg-gray-50"
+    }
+  `}
+>
+  {disposeMutation.isPending
+    ? "Processing..."
+    : isDisposed
+      ? "Disposed"
+      : "Dispose"}
+</button>
+
+
 
 
                 </div>
@@ -1764,6 +1827,81 @@ const [targetDate, setTargetDate] = useState("");
           </div>
         </div>
       )}
+
+
+      {showDisposePopup && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+      
+      {/* Close */}
+      <button
+        onClick={() => {
+          setShowDisposePopup(false);
+          setRemark("");
+        }}
+        className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full"
+      >
+        <FaTimes className="w-5 h-5 text-gray-600" />
+      </button>
+
+      <h3 className="text-lg font-semibold mb-4">
+        Dispose Complaint
+      </h3>
+
+      {/* Remark */}
+      <div className="mb-5">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Disposal Remark <span className="text-red-500">*</span>
+        </label>
+
+        <textarea
+          value={remark}
+          onChange={(e) => setRemark(e.target.value)}
+          rows={4}
+          placeholder="fuLrkj.k fVIi.kh ntZ djsa"
+          className="w-full kruti-input px-3 py-2 border border-gray-300 rounded
+                     focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => {
+            setShowDisposePopup(false);
+            setRemark("");
+          }}
+          className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={() => {
+            if (!remark.trim()) {
+              toast.error("Please enter disposal remark");
+              return;
+            }
+
+            // disposeMutation.mutate({ complaintId: id });
+            disposeMutation.mutate({
+  complaintId: id,
+  remark: remark,
+});
+            setShowDisposePopup(false);
+            setRemark("");
+          }}
+          disabled={disposeMutation.isPending}
+          className="px-4 py-2 text-sm rounded bg-red-600 text-white
+                     hover:bg-red-700 disabled:opacity-50"
+        >
+          {disposeMutation.isPending ? "Disposing..." : "Dispose Now"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
