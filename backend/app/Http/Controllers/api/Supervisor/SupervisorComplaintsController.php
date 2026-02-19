@@ -1756,6 +1756,146 @@ $complainDetails->actions = $actions;
         }
 
     }
+     public function forwardComplaintbyio(Request $request,$complainId){
+        //    dd($request->all());
+        // $user = Auth::user()->id;
+        // dd($complainId);
+
+        $userRole = User::with('role')->where('id',$request->forward_to)->get();
+
+        
+            $roleFwd = $userRole[0]->role->name ?? null;
+        // dd($roleFwd);
+        
+          $user = User::with('role','subrole')->where('id',$request->forward_to)->get();
+            $subroleFwd = '';
+            
+            $subroleFwd = $user[0]->subrole->name ?? '';
+
+       
+ 
+
+        $userId = Auth::user()->id;
+   
+
+        $validation = Validator::make($request->all(), [
+            // 'forward_by_ds_js' => 'required|exists:users,id',
+            'forward_to' => 'required|exists:users,id',
+            'remark' => 'required',
+         
+          
+        ], [
+            // 'forward_by_ds_js.required' => 'Forward by Supervisor is required.',
+            // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
+            'forward_to.required' => 'Forward to user is required.',
+            'forward_to.exists' => 'Forward to user does not exist.',
+            'remark.required' => 'Remark is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        if(isset($complainId) && $request->isMethod('post')){
+
+            //  $userRole = User::with('role')->where('id',$request->forward_to)->get();
+            // dd($user[0]->role->name);
+            // $roleFwd = $userRole[0]->role->name;
+
+              
+            $cmp =  Complaint::findOrFail($complainId);
+            // dd($cmp);
+
+               if($cmp){
+                $cmp->approved_rejected_by_io= 1;
+                $cmp->status = "Final Report";
+                // $remark ='Remark By Deputy Secretary / Joint Secretary';
+                // $remark.='\n';
+                // $remark.= $request->remarks;
+                // $remark.='\n';
+                // $cmp->remark = $remark;
+                
+                    if($cmp->save()){
+
+                    
+
+                        $apcAction = new ComplaintAction();
+                        $apcAction->complaint_id = $complainId;
+                        $apcAction->forward_by_io = $userId;
+                        // $apcAction->approved_rejected_by_ro_aro = $userId;
+
+                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','ps'])) {
+
+                            if ($roleFwd === 'lok-ayukt') {
+                                $apcAction->forward_to_lokayukt = $request->forward_to;
+                            } elseif($roleFwd === 'ps'){
+                                 $apcAction->forward_to_ps = $request->forward_to;
+                            }else {
+                                $apcAction->forward_to_uplokayukt = $request->forward_to;
+                            }
+
+                        } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
+
+                            switch ($subroleFwd) {
+                               
+
+                                case 'sec':
+                                    $apcAction->forward_to_sec = $request->forward_to;
+                                    break;
+
+                                case 'cio-io':
+                                    $apcAction->forward_to_cio_io = $request->forward_to;
+                                    break;
+                              
+                                    case 'io':
+                                    $apcAction->forward_to_io = $request->forward_to;
+                                    break;
+
+                              
+                            }
+                        }
+
+                        if($request->sent_through_rk == 1){
+                             $apcAction->sent_through_rk = 1;
+                             $apcAction->sent_through_rk_id = $cmp->added_by;
+                        }
+
+                        $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        $apcAction->remarks = $request->remark;
+                        $apcAction->save();
+
+
+                        // $apcAction = new ComplaintAction();
+                        // $apcAction->complaint_id = $complainId;
+                        // $apcAction->forward_by_ps = $userId;
+
+                        // $apcAction->forward_to_lokayukt = $request->forward_to;
+                       
+                        // $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        // $apcAction->remarks = $request->remark;
+                        // $apcAction->save();
+                    }
+                
+                }
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Forwarded Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
     
 
     public function allComplainspending(){

@@ -284,6 +284,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyRoAro']);
         Route::post('/forward-by-sec/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySec']);
         Route::post('/forward-by-cio/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyCio']);
+        Route::post('/forward-by-io/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyio']);
         Route::post('/forward-report-by-so/{complainId}',[SupervisorReportController::class,'forwardReporttbySo']);
         Route::post('/forward-report-by-ds/{complainId}',[SupervisorReportController::class,'forwardReporttbyds']);
         Route::post('/forward-report-by-sec/{complainId}',[SupervisorReportController::class,'forwardReporttbysec']);

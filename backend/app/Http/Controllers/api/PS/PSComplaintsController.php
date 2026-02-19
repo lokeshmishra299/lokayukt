@@ -728,6 +728,10 @@ $complainDetails->actions = $actions;
 
                                             $apcAction->forward_to_cio_io = $request->forward_to;
                                             $cmp->status = "Under investigation";
+                                    }elseif($subroleFwd ==="io"){
+
+                                            $apcAction->forward_to_io = $request->forward_to;
+                                            $cmp->status = "Under investigation";
                                     }elseif($subroleFwd ==="so-us"){
 
                                             $apcAction->forward_to_so_us = $request->forward_to;
@@ -1343,7 +1347,7 @@ $complainDetails->actions = $actions;
             // 'type' => 'required|string',
             // 'title' => 'required|string',
             'description' => 'required|string',
-            'd_id' => 'required',
+            // 'd_id' => 'required',
             // 'forward_by' => 'required',
             // 'forward_to' => 'required',
             // 'range_from' => 'required',
@@ -1354,7 +1358,7 @@ $complainDetails->actions = $actions;
             // 'type.required' => 'Complaint description is required.',
             // 'title.required' => 'Letter Subject is Required',
             'description.required' => 'Description is Required',
-            'd_id.required' => 'Document is Required',
+            // 'd_id.required' => 'Document is Required',
             'range_from.required' => 'Range From is Required',
             'range_two.required' => 'Range too is Required',
         ]);
