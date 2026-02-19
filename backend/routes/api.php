@@ -265,6 +265,10 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
         Route::get('/get-file-preview/{id}',[EmployeesController::class,'getFilePreview']);  
 
+        Route::get('/personal-file-list',[EmployeesController::class,'personalFileList']);
+        Route::post('personal-file-send', [EmployeesController::class, 'sendPersonalFile']);
+
+
         Route::get('/all-district',[SupervisorCommonController::class,'fetch_district']);
         Route::get('/all-complaints',[SupervisorComplaintsController::class,'allComplains']);
         Route::get('/all-pending-complaints',[SupervisorComplaintsController::class,'allComplainspending']);
