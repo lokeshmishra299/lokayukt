@@ -17,6 +17,7 @@ use App\Models\Topics;
 use App\Models\Budget;
 use App\Models\EmployeeFiles;
 use App\Models\EmployeeUploadFiles;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Auth;
@@ -1163,4 +1164,36 @@ class CommonController extends Controller
         // dd($designation->toArray());
         return ApiResponse::generateResponse('success','Leaves fetch successfully',$cat);
     }
+
+
+    public function getRolesSupervisor(){
+
+    $user=User::where('role_id',3)->select('id','name','role_id')
+                ->with('role')
+                ->get();
+    // dd($user->toArray());
+
+    return ApiResponse::generateResponse('success','User data fetch succesfully',$user,201);
+    }
+
+   public function accessFilePermission(Request $request)
+{
+    $request->validate([
+        'file_id' => 'required|exists:employee_files,id',
+        'user_id' => 'required|exists:users,id',
+    ]);
+
+    $file = EmployeeUploadFiles::find($request->file_id);
+
+    $file->permission_user_id = $request->user_id;
+    $file->save();
+
+    return ApiResponse::generateResponse(
+        'success',
+        'Permission granted successfully',
+        $file,
+        200
+    );
+}
+
 }
