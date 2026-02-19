@@ -29,6 +29,9 @@ const AllLeaveFiles = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const [openSendPoup, setopenSendPoup] = useState(false);
+  const [selectedFileId, setSelectedFileId] = useState(null);   
+  const [formErrors, setFormErrors] = useState({});
+
   const [selectedAuthority, setSelectedAuthority] = useState("committee");
   const itemsPerPage = 10;
 
@@ -46,10 +49,32 @@ const AllLeaveFiles = () => {
     queryFn: getAllFiles
   });
 
+
+  const getRoleSubrole = async ()=>{
+    const res = await api.get("/admin/get-roles-supervisor");
+    console.log("Role Subrole", res.data)
+    return res.data.data
+  }
+
+  const {data: roleSubrole} = useQuery({
+    queryKey: ["get-roles-supervisor"],
+    queryFn: getRoleSubrole
+  }) 
+
+
+  const sendFilePermission = async ({ file_id, user_id }) => {
+  const res = await api.post("/admin/access-files-permission", {
+    file_id,
+    user_id,
+  });
+  return res.data;
+};
+
+
+
+
   const filesList = Array.isArray(allFileData) ? allFileData : allFileData?.data || [];
 
-  // --- API Mutation (TOGGLE STATUS) ---
-  // API URL अपने हिसाब से एडजस्ट कर लेना अगर अलग हो
   const updateLeaveStatus = async ({ id, status }) => {
     const res = await api.post(`/admin/update-leave-status/${id}`, { status });
     return res.data;
@@ -86,6 +111,28 @@ const AllLeaveFiles = () => {
       queryClient.invalidateQueries({ queryKey: ["get-leave-details"] });
     }
   });
+
+  const sendPermissionMutation = useMutation({
+  mutationFn: sendFilePermission,
+  onSuccess: (data) => {
+    toast.success(data.message || "File sent successfully");
+    setopenSendPoup(false);
+    setSelectedAuthority("");
+    setSelectedFileId(null);
+      setFormErrors({});
+  },
+ onError: (err) => {
+  const resErrors = err.response?.data?.errors;
+
+  if (resErrors) {
+    setFormErrors(resErrors);   
+  } else {
+    toast.error(err.response?.data?.message || "Failed to send file");
+  }
+},
+
+});
+
 
   // --- Handlers ---
   const handleToggleStatus = (id, currentStatus) => {
@@ -248,20 +295,18 @@ const AllLeaveFiles = () => {
                     
                     {/* --- EXACT TOGGLE FROM YOUR CODE --- */}
                       <td className="px-6 py-4">
-  <button
-
-  onClick={()=>{
-    setopenSendPoup(true)
+<button
+  onClick={() => {
+    setSelectedFileId(row.id);   
+    setopenSendPoup(true);
   }}
-    className="inline-flex items-center gap-2 px-4 py-2 
-               bg-green-600 text-white text-sm font-medium
-               rounded-md shadow
-               hover:bg-green-700
-               focus:outline-none focus:ring-2 focus:ring-green-400
-               transition"
-  >
-    Send
-  </button>
+  className="inline-flex items-center gap-2 px-4 py-2 
+             bg-green-600 text-white text-sm font-medium
+             rounded-md shadow hover:bg-green-700"
+>
+  Send
+</button>
+
 </td>
 
 
@@ -364,17 +409,33 @@ const AllLeaveFiles = () => {
             Select 
           </label>
 
-          <select
-            value={selectedAuthority}
-            onChange={(e) => setSelectedAuthority(e.target.value)}
-            className="w-full px-3 py-2 border rounded-md text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            <option value="committee">Loakyukt</option>
-            <option value="committee">Loakyukt</option>
-            <option value="committee">Loakyukt</option>
-        
-          </select>
+       <select
+  value={selectedAuthority}
+  onChange={(e) => setSelectedAuthority(e.target.value)}
+  className="w-full px-3 py-2 border rounded-md text-sm
+             focus:outline-none focus:ring-2 focus:ring-blue-400"
+>
+  <option value="">Select Authority</option>
+
+  {roleSubrole?.map((item) => {
+    const roleLabel = item.role?.label;
+    const subroleLabel = item.subrole?.label;
+
+    return (
+      <option key={item.id} value={item.id}>
+        {roleLabel}
+        {subroleLabel ? ` (${subroleLabel})` : ""}
+      </option>
+    );
+  })}
+</select>
+
+{formErrors?.user_id && (
+  <p className="mt-1 text-sm text-red-600">
+    {formErrors.user_id[0]}
+  </p>
+)}
+
         </div>
 
       </div>
@@ -389,19 +450,38 @@ const AllLeaveFiles = () => {
           Cancel
         </button>
 
-        <button
-          onClick={() => {
-            toast.success("File sent successfully");
-            setopenSendPoup(false);
-          }}
-          className="inline-flex items-center gap-2 px-4 py-2
-                     bg-green-600 text-white text-sm font-medium
-                     rounded-md shadow
-                     hover:bg-green-700 transition"
-        >
-          <FaPaperPlane />
-          Send
-        </button>
+       <button
+  onClick={() => {
+    if (!selectedFileId || !selectedAuthority) {
+      return;
+    }
+
+    sendPermissionMutation.mutate({
+      file_id: selectedFileId,
+      user_id: selectedAuthority,
+    });
+  }}
+  disabled={sendPermissionMutation.isPending}
+  className={`inline-flex items-center gap-2 px-4 py-2
+    text-sm font-medium rounded-md shadow transition
+    ${
+      sendPermissionMutation.isPending
+        ? "bg-green-400 cursor-not-allowed"
+        : "bg-green-600 hover:bg-green-700 text-white"
+    }`}
+>
+  {sendPermissionMutation.isPending ? (
+    <>
+      Sending...
+    </>
+  ) : (
+    <>
+      <FaPaperPlane />
+      Send
+    </>
+  )}
+</button>
+
       </div>
     </div>
   </div>
