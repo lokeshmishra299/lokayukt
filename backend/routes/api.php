@@ -52,6 +52,11 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-leave-details', [CommonController::class, 'fetchLeavesDetails']);
         Route::get('/get-leave-personal-details', [CommonController::class, 'fetchLeavesPersonalDetails']);
 
+        Route::get('/get-roles-supervisor', [CommonController::class, 'getRolesSupervisor']);
+
+        Route::post('/access-files-permission',[CommonController::class,'accessFilePermission']);
+
+
 
         // Route::prefix('admin')->group(function () {
         
@@ -260,6 +265,10 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
         Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
         Route::get('/get-file-preview/{id}',[EmployeesController::class,'getFilePreview']);  
+
+        Route::get('/personal-file-list',[EmployeesController::class,'personalFileList']);
+        Route::post('personal-file-send', [EmployeesController::class, 'sendPersonalFile']);
+
 
         Route::get('/all-district',[SupervisorCommonController::class,'fetch_district']);
         Route::get('/all-complaints',[SupervisorComplaintsController::class,'allComplains']);

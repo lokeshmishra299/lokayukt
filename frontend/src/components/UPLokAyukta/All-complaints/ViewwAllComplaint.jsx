@@ -14,13 +14,11 @@ import { IoMdArrowBack } from "react-icons/io";
 import { toast, Toaster } from "react-hot-toast";
 import { krutiToUnicode } from "../../../components/utils/krutiToUnicode";
 
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Notes from "./SubModule/Notes";
 import Documents from "./SubModule/Documents";
 import MovementHistory from "./SubModule/MovementHistory";
 import Fees from "./SubModule/Fees";
-
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const APP_URL = BASE_URL.replace("/api", "");
@@ -60,25 +58,23 @@ const SearchableDropdown = ({
   // const selectedOption = options.find((opt) => opt.id == value);
   const selectedOption = options?.find((opt) => opt && opt.id == value);
 
-const getDisplayLabel = (option) => {
-  if (!option) return "";
+  const getDisplayLabel = (option) => {
+    if (!option) return "";
 
-  const name =
-    option.name ||
-    option.user_name ||
-    option.full_name ||
-    `User ${option.id}`;
+    const name =
+      option.name ||
+      option.user_name ||
+      option.full_name ||
+      `User ${option.id}`;
 
-  const subRole =
-    option.subrole_name ||      // ✅ get-users se
-    option.subrole?.label ||    // backup
-    option.role?.label ||       // backup
-    "";
+    const subRole =
+      option.subrole_name || // ✅ get-users se
+      option.subrole?.label || // backup
+      option.role?.label || // backup
+      "";
 
-  return subRole ? `${name} (${subRole})` : name;
-};
-
-
+    return subRole ? `${name} (${subRole})` : name;
+  };
 
   const filteredOptions = options.filter((option) => {
     if (!option) return false;
@@ -113,10 +109,7 @@ const getDisplayLabel = (option) => {
             !selectedOption ? "text-gray-500" : "text-gray-900"
           }`}
         >
-          {selectedOption
-  ? getDisplayLabel(selectedOption)
-  : placeholder}
-
+          {selectedOption ? getDisplayLabel(selectedOption) : placeholder}
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -144,12 +137,12 @@ const getDisplayLabel = (option) => {
                   }`}
                   onClick={() => handleSelect(option)}
                 >
-                 {getDisplayLabel(option)}
-{option.district_name ? (
-  <span className="text-gray-500 text-xs ml-1">
-    ({option.district_name})
-  </span>
-) : null}
+                  {getDisplayLabel(option)}
+                  {option.district_name ? (
+                    <span className="text-gray-500 text-xs ml-1">
+                      ({option.district_name})
+                    </span>
+                  ) : null}
                 </div>
               ))
             ) : (
@@ -180,17 +173,16 @@ const ViewAllComplaint = () => {
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
-     const [showModal, setShowModal] = useState(false);
-        const [Rejectedloading,setRejectedloading] = useState(false)
-        const [showDisposePopup, setShowDisposePopup] = useState(false);
-        const [remark, setRemark] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [Rejectedloading, setRejectedloading] = useState(false);
+  const [showDisposePopup, setShowDisposePopup] = useState(false);
+  const [remark, setRemark] = useState("");
 
-        const [showReleaseModal, setShowReleaseModal] = useState(false);
-const [releaseType, setReleaseType] = useState("");
-const [targetDate, setTargetDate] = useState("");
-     
-   
-      const handleReject = () => {
+  const [showReleaseModal, setShowReleaseModal] = useState(false);
+  const [releaseType, setReleaseType] = useState("");
+  const [targetDate, setTargetDate] = useState("");
+
+  const handleReject = () => {
     console.log("Rejected!");
     setShowModal(false); // close modal after action
   };
@@ -210,31 +202,29 @@ const [targetDate, setTargetDate] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
   const [forwardType, setForwardType] = useState("self");
 
-
-
   //  const transformComplaintData = (data) => {
   //     if (!data) return null;
-  
+
   //     const decode = (text) => krutiToUnicode(text || "");
-  
+
   //     return {
   //       ...data,
   //       // Main Fields
   //       complain_no: decode(data.complain_no),
   //       complaint_description: decode(data.complaint_description),
   //       delay_reason: decode(data.delay_reason),
-        
+
   //       main_complainant_name: decode(data.main_complainant_name),
   //       main_complainant_father: decode(data.main_complainant_father),
   //       main_complainant_district: data.main_complainant_district,
-        
+
   //       main_respondent_name: decode(data.main_respondent_name),
   //       main_respondent_designation: data.main_respondent_designation,
   //       main_respondant_district: data.main_respondant_district,
-        
+
   //       relation_with_person: decode(data.relation_with_person),
-  //       category: data.category, 
-  
+  //       category: data.category,
+
   //       // Complainants Array
   //       complainants: data.complainants?.map((comp) => ({
   //         ...comp,
@@ -245,7 +235,7 @@ const [targetDate, setTargetDate] = useState("");
   //         is_public_servant: decode(comp.is_public_servant),
   //         permanent_place: decode(comp.permanent_place),
   //       })) || [],
-  
+
   //       // Respondents Array
   //       respondant: data.respondant?.map((resp) => ({
   //         ...resp,
@@ -256,14 +246,14 @@ const [targetDate, setTargetDate] = useState("");
   //         officer_category: resp.officer_category,
   //         current_address: decode(resp.current_address),
   //       })) || [],
-  
+
   //       // Support Array
   //       support: data.support?.map((item) => ({
   //         ...item,
   //         support_name: decode(item.support_name),
   //         support_address: decode(item.support_address),
   //       })) || [],
-  
+
   //       // Witness Array
   //       witness: data.witness?.map((item) => ({
   //         ...item,
@@ -284,7 +274,6 @@ const [targetDate, setTargetDate] = useState("");
       const res = await api.get(`/uplokayukt/view-complaint/${id}`);
       return res.data.data;
       // return transformComplaintData(res.data.data);
-
     },
     enabled: !!id,
     staleTime: 1000 * 60 * 5,
@@ -292,9 +281,8 @@ const [targetDate, setTargetDate] = useState("");
   });
 
   const isDisposed =
-  complaintData?.status === "Final Disposal/Closed" ||
-  complaintData?.status === "Disposed";
-
+    complaintData?.status === "Final Disposal/Closed" ||
+    complaintData?.status === "Disposed";
 
   // const {
   //   data: forwardOptionsData,
@@ -357,56 +345,43 @@ const [targetDate, setTargetDate] = useState("");
     staleTime: 0,
   });
 
-   
-
   const releaseComplaintMutation = useMutation({
-  mutationFn: async ({ forward_to }) => {
-    const res = await api.post(
-      `/uplokayukt/released-by-uplokayukt/${id}`,
-      {
-        forward_to, 
-      }
-    );
-    return res.data;
-  },
-  onSuccess: (data) => {
-    toast.success(data?.message || "Released successfully");
-    queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-    setShowReleaseModal(false);
-    setReleaseType("");
-  },
-  onError: (error) => {
-    // toast.error(error?.response?.data?.message );
-  },
-});
-
-
-   const {
-        mutate: rejectComplaint,
-        isPending,
-      } = useMutation({
-        mutationFn: async ({ complaintId }) => {
-          const res = await api.post(
-            `/uplokayukt/reject-complaint-by-uplokayukt/${complaintId}`
-          );
-          return res.data;
-        },
-        onSuccess: () => {
-          toast.success("Rejected successfully");
-          queryClient.invalidateQueries({
-            queryKey: ["complaint-details", id],
-          });
-          setConfirmConfig({ open: false, type: null });
-          setShowModal(false);
-        },
-        onError: (error) => {
-          toast.error(
-            error?.response?.data?.message || "Failed to Reject"
-          );
-        },
+    mutationFn: async ({ forward_to }) => {
+      const res = await api.post(`/uplokayukt/released-by-uplokayukt/${id}`, {
+        forward_to,
       });
-  
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.message || "Released successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+      setShowReleaseModal(false);
+      setReleaseType("");
+    },
+    onError: (error) => {
+      // toast.error(error?.response?.data?.message );
+    },
+  });
 
+  const { mutate: rejectComplaint, isPending } = useMutation({
+    mutationFn: async ({ complaintId }) => {
+      const res = await api.post(
+        `/uplokayukt/reject-complaint-by-uplokayukt/${complaintId}`,
+      );
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Rejected successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["complaint-details", id],
+      });
+      setConfirmConfig({ open: false, type: null });
+      setShowModal(false);
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to Reject");
+    },
+  });
 
   // --- PULL BACK API (UpLokayukt) ---
   const pullBackMutation = useMutation({
@@ -423,29 +398,25 @@ const [targetDate, setTargetDate] = useState("");
     },
   });
 
-
   // ===== DISPOSE API =====
-const disposeMutation = useMutation({
-  mutationFn: async ({ complaintId, remark }) => {
-    const res = await api.post(`/uplokayukt/dispose-complain/${id}`, {
-      complaint_id: complaintId,
-      remark: remark, 
-    });
-    return res.data;
-  },
-  onSuccess: (data) => {
-    toast.success(data?.message || "Disposed successfully");
-    queryClient.invalidateQueries({
-      queryKey: ["complaint-details", id],
-    });
-  },
-  onError: (error) => {
-    toast.error(
-      error?.response?.data?.message || "Failed to Dispose"
-    );
-  },
-});
-
+  const disposeMutation = useMutation({
+    mutationFn: async ({ complaintId, remark }) => {
+      const res = await api.post(`/uplokayukt/dispose-complain/${id}`, {
+        complaint_id: complaintId,
+        remark: remark,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.message || "Disposed successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["complaint-details", id],
+      });
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to Dispose");
+    },
+  });
 
   const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
@@ -454,7 +425,7 @@ const disposeMutation = useMutation({
         {
           complaint_id: complaintId,
           remark: remarkData,
-        }
+        },
       );
       return res.data;
     },
@@ -466,14 +437,14 @@ const disposeMutation = useMutation({
     },
     onError: (error) => {
       toast.error(
-        error?.response?.data?.message || "Failed to mark as received"
+        error?.response?.data?.message || "Failed to mark as received",
       );
     },
   });
 
- const openReleasePopup = () => {
-  setShowReleaseModal(true);
-};
+  const openReleasePopup = () => {
+    setShowReleaseModal(true);
+  };
 
   // const forwardComplaintMutation = useMutation({
   //   mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
@@ -502,9 +473,9 @@ const disposeMutation = useMutation({
         {
           forward_to: forwardTo,
           // remark: remarkData,
-             target_date: targetDate,
+          target_date: targetDate,
           sent_through_rk: sent_through_rk ? 1 : 0,
-        }
+        },
       );
       return res.data;
     },
@@ -512,7 +483,7 @@ const disposeMutation = useMutation({
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setRemark("");
-        setTargetDate("");
+      setTargetDate("");
       setSelectedForwardTo("");
       setConfirmConfig({ open: false, type: null });
     },
@@ -528,8 +499,8 @@ const disposeMutation = useMutation({
     setConfirmConfig({ open: true, type: "forward" });
 
   const handleDispose = () => {
-  // disposeMutation.mutate({ complaintId: id });
-};
+    // disposeMutation.mutate({ complaintId: id });
+  };
 
   const handleConfirmYes = () => {
     if (confirmConfig.type === "receive") {
@@ -542,34 +513,32 @@ const disposeMutation = useMutation({
         remarkData: remark,
       });
     } else if (confirmConfig.type === "forward") {
-  if (!selectedForwardTo) {
-    toast.error("Please select officer");
-    return;
-  }
-  if (!targetDate) {
-    toast.error("Please select target date");
-    return;
-  }
+      if (!selectedForwardTo) {
+        toast.error("Please select officer");
+        return;
+      }
+      if (!targetDate) {
+        toast.error("Please select target date");
+        return;
+      }
 
-  forwardComplaintMutation.mutate({
-    complaintId: id,
-    forwardTo: selectedForwardTo,
-    targetDate: targetDate,
-  });
+      forwardComplaintMutation.mutate({
+        complaintId: id,
+        forwardTo: selectedForwardTo,
+        targetDate: targetDate,
+      });
+    } else if (confirmConfig.type === "pullback") {
+      pullBackMutation.mutate({
+        complaintId: id,
+      });
     }
-
-     else if (confirmConfig.type === "pullback") {
-    pullBackMutation.mutate({
-      complaintId: id,
-    });
-  }
   };
 
   const handleConfirmNo = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
-      setTargetDate("");
+    setTargetDate("");
   };
 
   const getStatusColor = (status) => {
@@ -631,7 +600,7 @@ const disposeMutation = useMutation({
 
   return (
     <div className="w-full min-h-screen bg-gray-50">
-      <Toaster position="top-right"  />
+      <Toaster position="top-right" />
       <div className="w-full bg-white flex flex-col min-h-screen">
         {complaintData ? (
           <>
@@ -652,7 +621,7 @@ const disposeMutation = useMutation({
                 <div className="mb-3">
                   <span
                     className={`px-3 py-1.5 text-xs rounded-full ${getStatusColor(
-                      complaintData.status
+                      complaintData.status,
                     )}`}
                   >
                     {complaintData.approved_rejected_by_lokayukt === 1
@@ -673,7 +642,7 @@ const disposeMutation = useMutation({
                   <div className="flex gap-2">
                     <span
                       className={`px-3 py-1 rounded ${getStatusColor(
-                        complaintData.status
+                        complaintData.status,
                       )}`}
                     >
                       {complaintData.approved_rejected_by_lokayukt === 1
@@ -697,9 +666,11 @@ const disposeMutation = useMutation({
                 {/* Description:{" "} */}
                 विवरण:{" "}
                 <span className=" text-gray-500">
-                <span className="kruti-input">  {complaintData.complaint_description ||
-                    "No detailed description available for this complaint."}</span>
-                
+                  <span className="kruti-input">
+                    {" "}
+                    {complaintData.complaint_description ||
+                      "No detailed description available for this complaint."}
+                  </span>
                 </span>
               </p>
 
@@ -728,9 +699,7 @@ const disposeMutation = useMutation({
                         नाम
                       </p>
                       <p className="text-gray-800 kruti-input text-sm">
-                        {
-                          complaintData.main_complainant_name
-                         || "N/A"}
+                        {complaintData.main_complainant_name || "N/A"}
                       </p>
                     </div>
 
@@ -740,9 +709,7 @@ const disposeMutation = useMutation({
                         पिता का नाम
                       </p>
                       <p className="text-gray-800 kruti-input text-sm">
-                        {
-                          complaintData.main_complainant_father
-                         || "N/A"}
+                        {complaintData.main_complainant_father || "N/A"}
                       </p>
                     </div>
 
@@ -753,7 +720,7 @@ const disposeMutation = useMutation({
                       </p>
                       <p className="text-gray-800 text-sm">
                         {capitalizeFirstLetter(
-                          complaintData.main_complainant_district
+                          complaintData.main_complainant_district,
                         ) || "N/A"}
                       </p>
                     </div>
@@ -772,9 +739,7 @@ const disposeMutation = useMutation({
                         नाम
                       </p>
                       <p className="text-gray-800 kruti-input text-sm">
-                        {
-                          complaintData.main_respondent_name
-                         || "N/A"}
+                        {complaintData.main_respondent_name || "N/A"}
                       </p>
                     </div>
 
@@ -785,7 +750,7 @@ const disposeMutation = useMutation({
                       </p>
                       <p className="text-gray-800 text-sm">
                         {capitalizeFirstLetter(
-                          complaintData.main_respondent_designation
+                          complaintData.main_respondent_designation,
                         ) || "N/A"}
                       </p>
                     </div>
@@ -797,7 +762,7 @@ const disposeMutation = useMutation({
                       </p>
                       <p className="text-gray-800 text-sm">
                         {capitalizeFirstLetter(
-                          complaintData.main_respondant_district
+                          complaintData.main_respondant_district,
                         ) || "N/A"}
                       </p>
                     </div>
@@ -813,9 +778,7 @@ const disposeMutation = useMutation({
                         व्यक्ति से संबंध
                       </p>
                       <p className="text-gray-800 kruti-input text-sm">
-                        {
-                          complaintData.relation_with_person
-                         || "NA"}
+                        {complaintData.relation_with_person || "NA"}
                       </p>
                     </div>
 
@@ -855,7 +818,13 @@ const disposeMutation = useMutation({
                   }`}
                 >
                   शुल्क का प्रकार:{" "}
-                   {complaintData.fee_exempted == 3 ? "Exempted" : complaintData.fee_exempted == 2 ? "Partial" : complaintData.fee_exempted == 1 ? "Paid" : "Pending"}
+                  {complaintData.fee_exempted == 3
+                    ? "Exempted"
+                    : complaintData.fee_exempted == 2
+                      ? "Partial"
+                      : complaintData.fee_exempted == 1
+                        ? "Paid"
+                        : "Pending"}
                 </span>
 
                 <span
@@ -867,7 +836,9 @@ const disposeMutation = useMutation({
                   }`}
                 >
                   स्थिति:{" "}
-                  {complaintData.fee_approved_by_lokayukt === 1 ? "Approved" : "Awaiting approval"}
+                  {complaintData.fee_approved_by_lokayukt === 1
+                    ? "Approved"
+                    : "Awaiting approval"}
                 </span>
 
                 {complaintData.challan_no && (
@@ -982,64 +953,93 @@ const disposeMutation = useMutation({
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => {
-                      setConfirmConfig({ open: true, type: "pullback" });
-                    }}
-                    className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
-                  >
-                    Pull Back
-                  </button>
+                  {complaintData?.status == "Final Disposal/Closed" || complaintData?.status == "Rejected" ? (
+                    <div></div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setConfirmConfig({ open: true, type: "pullback" });
+                      }}
+                      className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+                    >
+                      Pull Back
+                    </button>
+                  )}
 
-                         <button
-        className="px-4 py-2 bg-red-600 border border-red-600 text-white rounded hover:bg-red-700 text-sm"
-        onClick={() => setShowModal(true)}
-      >
-        Reject
-      </button>
+               {complaintData?.status === "Final Disposal/Closed" ? (
+  <div></div>
+) : (
+  <button
+    className={`px-4 py-2 border rounded text-sm
+      ${
+        complaintData?.status === "Rejected"
+          ? "bg-gray-400 border-gray-400 text-white cursor-not-allowed"
+          : "bg-red-600 border-red-600 text-white hover:bg-red-700"
+      }
+    `}
+    onClick={() => {
+      if (complaintData?.status === "Rejected") return;
+      setShowModal(true);
+    }}
+    disabled={complaintData?.status === "Rejected"}
+  >
+    {complaintData?.status === "Rejected" ? "Rejected" : "Reject"}
+  </button>
+)}
 
-      {/* <button
+
+                  {/* <button
   onClick={() => setShowReleaseModal(true)}
   className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
 >
   Release
 </button> */}
 
-{(complaintData?.assign_to_ps != null ||
-  complaintData?.assign_to_ro_aro != null) && (
-  <button
-    onClick={openReleasePopup}
-    className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
-  >
-    Release
-  </button>
-)}
+                  {(complaintData?.assign_to_ps != null ||
+                    complaintData?.assign_to_ro_aro != null) && (
+                    <button
+                      onClick={openReleasePopup}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+                    >
+                      Release
+                    </button>
+                  )}
 
-<button
-  onClick={() => setShowDisposePopup(true)}
-  disabled={disposeMutation.isPending || isDisposed}
-  className={`px-4 py-2 border rounded text-sm
-    ${
-      isDisposed
-        ? "border-gray-300 text-gray-400 cursor-not-allowed bg-gray-100"
-        : "border-gray-300 text-gray-700 hover:bg-gray-50"
-    }
-  `}
->
-  {disposeMutation.isPending
-    ? "Processing..."
-    : isDisposed
-      ? "Disposed"
-      : "Dispose"}
-</button>
+                  {
+                    complaintData?.status == "Rejected" ? <div>
 
-
-
-
+                    </div>
+                    :
+                      <button
+                    onClick={() => setShowDisposePopup(true)}
+                    disabled={disposeMutation.isPending || isDisposed}
+                    className={`px-4 py-2 border rounded text-sm
+                ${
+                  isDisposed
+                    ? "border-gray-300 text-gray-400 cursor-not-allowed bg-gray-100"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }
+              `}
+                  >
+                    {disposeMutation.isPending
+                      ? "Processing..."
+                      : isDisposed
+                        ? "Disposed"
+                        : "Dispose"}
+                  </button>
+                  }
+                  
                 </div>
 
                 <div className="flex gap-2">
-                  <button
+
+                {
+                     complaintData?.status == "Final Disposal/Closed" || complaintData?.status == "Rejected" ?
+                     <div>
+
+                     </div>
+                     :
+                       <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1047,9 +1047,34 @@ const disposeMutation = useMutation({
                     {markAsReceivedMutation.isPending
                       ? "Processing..."
                       : "Return with Remarks"}
-                  </button>
+                  </button> 
+                }
+                 
 
-                  {complaintData.approved_rejected_by_uplokayukt == "1" ? (
+                 {
+  complaintData?.status === "Final Disposal/Closed" || complaintData?.status == "Rejected" ? (
+    <div></div>
+  ) : complaintData?.approved_rejected_by_uplokayukt === "1" ? (
+    <span className="px-4 py-2 bg-blue-600 text-white rounded text-sm cursor-not-allowed">
+      Forwarded
+    </span>
+  ) : (
+    <button
+      onClick={handleforwardphysical}
+      disabled={forwardComplaintMutation.isPending}
+      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 
+                 text-sm sm:ml-auto mt-2 sm:mt-0 
+                 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {forwardComplaintMutation.isPending
+        ? "Processing..."
+        : "Sent / Mark"}
+    </button>
+  )
+}
+
+
+                  {/* {complaintData.approved_rejected_by_uplokayukt == "1" ? (
                     <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
                       Forwarded
                     </span>
@@ -1063,7 +1088,7 @@ const disposeMutation = useMutation({
                         ? "Processing..."
                         : "Sent / Mark"}
                     </button>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -1079,108 +1104,112 @@ const disposeMutation = useMutation({
       </div>
 
       {showReleaseModal && (
-  <div className="fixed inset-0 flex items-center justify-center pt-20 bg-black bg-opacity-50 z-50">
-    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
-      <h2 className="text-lg font-semibold mb-4">
-        Are you sure you want to Release?
-      </h2>
+        <div className="fixed inset-0 flex items-center justify-center pt-20 bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
+            <h2 className="text-lg font-semibold mb-4">
+              Are you sure you want to Release?
+            </h2>
 
-      {/* PS */}
-     {complaintData?.assign_to_ps != null && (
-  <div className="flex items-center mb-4">
-    <input
-      type="radio"
-      name="release"
-      id="ps"
-      checked={releaseType === "ps"}
-      onChange={() => setReleaseType("ps")}
-      className="mr-2 cursor-pointer"
-    />
-    <label htmlFor="ps" className="text-sm text-gray-700 cursor-pointer">
-      PS
-    </label>
-  </div>
-)}
+            {/* PS */}
+            {complaintData?.assign_to_ps != null && (
+              <div className="flex items-center mb-4">
+                <input
+                  type="radio"
+                  name="release"
+                  id="ps"
+                  checked={releaseType === "ps"}
+                  onChange={() => setReleaseType("ps")}
+                  className="mr-2 cursor-pointer"
+                />
+                <label
+                  htmlFor="ps"
+                  className="text-sm text-gray-700 cursor-pointer"
+                >
+                  PS
+                </label>
+              </div>
+            )}
 
+            {/* RO / ARO */}
+            {complaintData?.assign_to_ro_aro != null && (
+              <div className="flex items-center mb-6">
+                <input
+                  type="radio"
+                  name="release"
+                  id="roaro"
+                  checked={releaseType === "ro-aro"}
+                  onChange={() => setReleaseType("ro-aro")}
+                  className="mr-2 cursor-pointer"
+                />
+                <label
+                  htmlFor="roaro"
+                  className="text-sm text-gray-700 cursor-pointer"
+                >
+                  RO / ARO
+                </label>
+              </div>
+            )}
 
-      {/* RO / ARO */}
-   {complaintData?.assign_to_ro_aro != null && (
-  <div className="flex items-center mb-6">
-    <input
-      type="radio"
-      name="release"
-      id="roaro"
-      checked={releaseType === "ro-aro"}
-      onChange={() => setReleaseType("ro-aro")}
-      className="mr-2 cursor-pointer"
-    />
-    <label htmlFor="roaro" className="text-sm text-gray-700 cursor-pointer">
-      RO / ARO
-    </label>
-  </div>
-)}
+            {/* Buttons */}
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setShowReleaseModal(false);
+                  setReleaseType("");
+                }}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Back
+              </button>
 
+              <button
+                onClick={() => {
+                  if (!releaseType) {
+                    toast.error("Please select release type");
+                    return;
+                  }
 
-      {/* Buttons */}
-      <div className="flex justify-end gap-2">
-        <button
-          onClick={() => {
-            setShowReleaseModal(false);
-            setReleaseType("");
-          }}
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-        >
-          Back
-        </button>
+                  releaseComplaintMutation.mutate({
+                    forward_to: releaseType,
+                  });
+                }}
+                disabled={releaseComplaintMutation.isPending}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              >
+                {releaseComplaintMutation.isPending
+                  ? "Processing..."
+                  : "Release"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-        <button
-          onClick={() => {
-            if (!releaseType) {
-              toast.error("Please select release type");
-              return;
-            }
-
-            releaseComplaintMutation.mutate({
-              forward_to: releaseType,
-            });
-          }}
-          disabled={releaseComplaintMutation.isPending}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
-        >
-          {releaseComplaintMutation.isPending ? "Processing..." : "Release"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-          {showModal && (
-  <div className="fixed inset-0 flex items-center justify-center  pt-20 bg-black bg-opacity-50 z-50">
-    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
-      <h2 className="text-lg font-semibold mb-4">Confirm Rejection</h2>
-      <p className="mb-4">Are you sure you want to reject this?</p>
-      <div className="flex justify-end gap-2">
-        <button
-          className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          onClick={() => setShowModal(false)}
-        >
-          Cancel
-        </button>
-       <button
-  onClick={() => rejectComplaint({ complaintId: id })}
-  disabled={isPending}
-  className={`px-4 py-2 rounded text-white
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center  pt-20 bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full animate-slideDown">
+            <h2 className="text-lg font-semibold mb-4">Confirm Rejection</h2>
+            <p className="mb-4">Are you sure you want to reject this?</p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => rejectComplaint({ complaintId: id })}
+                disabled={isPending}
+                className={`px-4 py-2 rounded text-white
     ${isPending ? "bg-red-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"}
   `}
->
-  {isPending ? "Rejecting..." : "Reject"}
-</button>
-
-      </div>
-    </div>
-  </div>
-)}
+              >
+                {isPending ? "Rejecting..." : "Reject"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Unified Confirmation Modal (Receive/Forward/Pullback) */}
       {confirmConfig.open && (
@@ -1204,10 +1233,10 @@ const disposeMutation = useMutation({
               {confirmConfig.type === "receive"
                 ? "Return with Remarks?"
                 : confirmConfig.type === "forward"
-                ? "Sent"
-                : confirmConfig.type === "pullback"
-                ? "Are you sure you want to pull back?"
-                : "Assign to Yourself?"}
+                  ? "Sent"
+                  : confirmConfig.type === "pullback"
+                    ? "Are you sure you want to pull back?"
+                    : "Assign to Yourself?"}
             </h3>
 
             {/* --- FORWARDING LOGIC START --- */}
@@ -1318,41 +1347,39 @@ const disposeMutation = useMutation({
                 </>
               )} */}
 
-
-{/* RECEIVE → Remark */}
-{confirmConfig.type === "receive" && (
-  <div className="mb-5">
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-      Remark <span className="text-red-500">*</span>
-    </label>
-    <textarea
-      value={remark}
-      placeholder="Enter your remark here…"
-      onChange={(e) => setRemark(e.target.value)}
-      rows={4}
-      className="w-full px-3 py-2 border border-gray-300 rounded
+            {/* RECEIVE → Remark */}
+            {confirmConfig.type === "receive" && (
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Remark <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={remark}
+                  placeholder="Enter your remark here…"
+                  onChange={(e) => setRemark(e.target.value)}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded
                  focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-    />
-  </div>
-)}
+                />
+              </div>
+            )}
 
-{/* SEND → Target Date */}
-{confirmConfig.type === "forward" && (
-  <div className="mb-5">
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-      Target Date <span className="text-red-500">*</span>
-    </label>
-    <input
-      type="date"
-      min={new Date().toISOString().split("T")[0]}
-      value={targetDate}
-      onChange={(e) => setTargetDate(e.target.value)}
-      className="w-full px-3 py-2 border border-gray-300 rounded
+            {/* SEND → Target Date */}
+            {confirmConfig.type === "forward" && (
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Target Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  min={new Date().toISOString().split("T")[0]}
+                  value={targetDate}
+                  onChange={(e) => setTargetDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded
                  focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-  </div>
-)}
-
+                />
+              </div>
+            )}
 
             {/* Buttons */}
             <div className="flex justify-end gap-3">
@@ -1375,13 +1402,13 @@ const disposeMutation = useMutation({
                 disabled={
                   markAsReceivedMutation.isPending ||
                   forwardComplaintMutation.isPending ||
-                  pullBackMutation.isPending || 
+                  pullBackMutation.isPending ||
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
-                     (!selectedForwardTo ||
-   !targetDate ||
-   isLoadingOptions ||
-   isFetchingOptions))
+                    (!selectedForwardTo ||
+                      !targetDate ||
+                      isLoadingOptions ||
+                      isFetchingOptions))
                 }
                 className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
@@ -1390,9 +1417,9 @@ const disposeMutation = useMutation({
                 pullBackMutation.isPending // ✅ Ye check add kiya
                   ? "Processing..."
                   : confirmConfig.type === "assign" ||
-                    confirmConfig.type === "pullback"
-                  ? "Yes"
-                  : "Send"}
+                      confirmConfig.type === "pullback"
+                    ? "Yes"
+                    : "Send"}
               </button>
             </div>
           </div>
@@ -1420,10 +1447,10 @@ const disposeMutation = useMutation({
               {viewModalConfig.type === "correspondence"
                 ? "शिकायतकर्ता का विवरण"
                 : viewModalConfig.type === "respondent"
-                ? "प्रतिवादी का विवरण"
-                : viewModalConfig.type === "support"
-                ? " सहायक व्यक्तियों का विवरण"
-                : "गवाह का विवरण"}
+                  ? "प्रतिवादी का विवरण"
+                  : viewModalConfig.type === "support"
+                    ? " सहायक व्यक्तियों का विवरण"
+                    : "गवाह का विवरण"}
             </h3>
 
             {/* Correspondence Content */}
@@ -1828,80 +1855,75 @@ const disposeMutation = useMutation({
         </div>
       )}
 
-
       {showDisposePopup && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-    <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
-      
-      {/* Close */}
-      <button
-        onClick={() => {
-          setShowDisposePopup(false);
-          setRemark("");
-        }}
-        className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full"
-      >
-        <FaTimes className="w-5 h-5 text-gray-600" />
-      </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+            {/* Close */}
+            <button
+              onClick={() => {
+                setShowDisposePopup(false);
+                setRemark("");
+              }}
+              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full"
+            >
+              <FaTimes className="w-5 h-5 text-gray-600" />
+            </button>
 
-      <h3 className="text-lg font-semibold mb-4">
-        Dispose Complaint
-      </h3>
+            <h3 className="text-lg font-semibold mb-4">Dispose Complaint</h3>
 
-      {/* Remark */}
-      <div className="mb-5">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Disposal Remark <span className="text-red-500">*</span>
-        </label>
+            {/* Remark */}
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Disposal Remark <span className="text-red-500">*</span>
+              </label>
 
-        <textarea
-          value={remark}
-          onChange={(e) => setRemark(e.target.value)}
-          rows={4}
-          placeholder="fuLrkj.k fVIi.kh ntZ djsa"
-          className="w-full kruti-input px-3 py-2 border border-gray-300 rounded
+              <textarea
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+                rows={4}
+                placeholder="fuLrkj.k fVIi.kh ntZ djsa"
+                className="w-full kruti-input px-3 py-2 border border-gray-300 rounded
                      focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
-        />
-      </div>
+              />
+            </div>
 
-      {/* Buttons */}
-      <div className="flex justify-end gap-3">
-        <button
-          onClick={() => {
-            setShowDisposePopup(false);
-            setRemark("");
-          }}
-          className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
-        >
-          Cancel
-        </button>
+            {/* Buttons */}
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDisposePopup(false);
+                  setRemark("");
+                }}
+                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
 
-        <button
-          onClick={() => {
-            if (!remark.trim()) {
-              toast.error("Please enter disposal remark");
-              return;
-            }
+              <button
+                onClick={() => {
+                  if (!remark.trim()) {
+                    toast.error("Please enter disposal remark");
+                    return;
+                  }
 
-            // disposeMutation.mutate({ complaintId: id });
-            disposeMutation.mutate({
-  complaintId: id,
-  remark: remark,
-});
-            setShowDisposePopup(false);
-            setRemark("");
-          }}
-          disabled={disposeMutation.isPending}
-          className="px-4 py-2 text-sm rounded bg-red-600 text-white
+                  // disposeMutation.mutate({ complaintId: id });
+                  disposeMutation.mutate({
+                    complaintId: id,
+                    remark: remark,
+                  });
+                  setShowDisposePopup(false);
+                  setRemark("");
+                }}
+                disabled={disposeMutation.isPending}
+                className="px-4 py-2 text-sm rounded bg-red-600 text-white
                      hover:bg-red-700 disabled:opacity-50"
-        >
-          {disposeMutation.isPending ? "Disposing..." : "Dispose Now"}
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+              >
+                {disposeMutation.isPending ? "Disposing..." : "Dispose Now"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

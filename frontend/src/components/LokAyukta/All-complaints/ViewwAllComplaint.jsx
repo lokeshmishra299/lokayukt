@@ -1009,7 +1009,14 @@ const releaseComplaintMutation = useMutation({
             <div className="border-t p-4">
               <div className="flex flex-col sm:flex-row gap-3 justify-between">
                 <div className="flex gap-3">
-                  <button
+
+                {
+                  complaintData?.status == "Final Disposal/Closed" || complaintData?.status == "Rejected" ? 
+                  <div>
+
+                  </div>
+                  :
+                     <button
                     onClick={() => {
                       setConfirmConfig({ open: true, type: "pullback" });
                     }}
@@ -1017,12 +1024,33 @@ const releaseComplaintMutation = useMutation({
                   >
                     Pull Back
                   </button>
-                  <button
-                    className="px-4 py-2 bg-red-600 border border-red-600 text-white rounded hover:bg-red-700 text-sm"
-                    onClick={() => setShowModal(true)}
-                  >
-                    Reject
-                  </button>
+                }
+                 
+
+                  {complaintData?.status == "Final Disposal/Closed" ? 
+                  <div>
+
+                  </div>
+                  : 
+                 <button
+  className={`px-4 py-2 rounded text-sm border
+    ${
+      complaintData?.status === "Rejected"
+        ? "bg-gray-400 border-gray-400 text-white cursor-not-allowed"
+        : "bg-red-600 border-red-600 text-white hover:bg-red-700"
+    }`}
+  onClick={() => {
+    if (complaintData?.status === "Rejected") return;
+    setShowModal(true);
+  }}
+  disabled={complaintData?.status === "Rejected"}
+>
+  {complaintData?.status === "Rejected" ? "Rejected" : "Reject"}
+</button>
+
+
+                  }
+                 
 
                   
 {(complaintData?.assign_to_ps != null ||
@@ -1038,27 +1066,39 @@ const releaseComplaintMutation = useMutation({
                 </div>
 
                 <div className="flex gap-2">
-<button
-  onClick={diposeShow}
-  disabled={dispose.isPending || complaintData?.status === "Final Disposal/Closed"}
-  className={`px-4 py-2 border rounded text-sm
-    ${
+{complaintData?.status !== "Rejected" && (
+  <button
+    onClick={diposeShow}
+    disabled={
+      dispose.isPending ||
       complaintData?.status === "Final Disposal/Closed"
-        ? "border-gray-300 text-gray-400 cursor-not-allowed bg-gray-100"
-        : "border-gray-300 text-gray-700 hover:bg-gray-50"
     }
-    ${dispose.isPending ? "opacity-50 cursor-not-allowed" : ""}
-  `}
->
-  {dispose.isPending
-    ? "Processing..."
-    : complaintData?.status === "Final Disposal/Closed"
-      ? "Disposed"
-      : "Dispose"}
-</button>
+    className={`px-4 py-2 border rounded text-sm
+      ${
+        complaintData?.status === "Final Disposal/Closed"
+          ? "border-gray-300 text-gray-400 cursor-not-allowed bg-gray-100"
+          : "border-gray-300 text-gray-700 hover:bg-gray-50"
+      }
+      ${dispose.isPending ? "opacity-50 cursor-not-allowed" : ""}
+    `}
+  >
+    {dispose.isPending
+      ? "Processing..."
+      : complaintData?.status === "Final Disposal/Closed"
+        ? "Disposed"
+        : "Dispose"}
+  </button>
+)}
 
 
-                  <button
+
+      {
+        complaintData?.status == "Final Disposal/Closed" || complaintData?.status == "Rejected" ? 
+        <div>
+
+        </div>
+        :
+         <button
                     onClick={handleMarkAsReceived}
                     disabled={markAsReceivedMutation.isPending}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1067,22 +1107,31 @@ const releaseComplaintMutation = useMutation({
                       ? "Processing..."
                       : "Return with Remarks"}
                   </button>
+      } 
+                 
+{
+  complaintData?.status === "Final Disposal/Closed" || complaintData?.status == "Rejected" ? (
+    <div></div>
+  ) : complaintData?.approved_rejected_by_lokayukt === "1" ? (
+    <span className="px-4 py-2 bg-blue-600 text-white rounded text-sm cursor-not-allowed">
+      Forwarded
+    </span>
+  ) : (
+    <button
+      onClick={handleforwardphysical}
+      disabled={forwardComplaintMutation.isPending}
+      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 
+                 text-sm sm:ml-auto mt-2 sm:mt-0 
+                 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {forwardComplaintMutation.isPending
+        ? "Processing..."
+        : "Send / Mark"}
+    </button>
+  )
+}
 
-                  {complaintData.approved_rejected_by_lokayukt == "1" ? (
-                    <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
-                      Forwarded
-                    </span>
-                  ) : (
-                    <button
-                      onClick={handleforwardphysical}
-                      disabled={forwardComplaintMutation.isPending}
-                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {forwardComplaintMutation.isPending
-                        ? "Processing..."
-                        : "Send / Mark"}
-                    </button>
-                  )}
+               
                 </div>
               </div>
             </div>

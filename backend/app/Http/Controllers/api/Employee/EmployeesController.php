@@ -188,5 +188,14 @@ public function uploadPrivateFiles(Request $request)
 
     }
 
+    public function personalFileList(){
+
+        $user=Auth()->id();
+        // dd($user);
+        $employeFile=EmployeeUploadFiles::where('permission_user_id',$user)->get();
+        // dd($employeFile);
+        return ApiResponse::generateResponse('success','Employee personal file fetch successfully',$employeFile,200);
+    }
+
    
 }
