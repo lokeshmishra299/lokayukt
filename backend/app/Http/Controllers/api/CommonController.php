@@ -1186,6 +1186,8 @@ class CommonController extends Controller
     $file = EmployeeUploadFiles::find($request->file_id);
 
     $file->permission_user_id = $request->user_id;
+    $file->permission_user_by_admin = $request->user_id;
+    $file->user_id=Auth()->id();
     $file->save();
 
     return ApiResponse::generateResponse(
@@ -1195,5 +1197,15 @@ class CommonController extends Controller
         200
     );
 }
+
+  public function getRolesSupervisors(){
+
+    $user=User::where('role_id',3)->select('id','name','role_id','sub_role_id')
+                ->with('role','subrole')
+                ->get();
+    // dd($user->toArray());
+
+    return ApiResponse::generateResponse('success','User data fetch succesfully',$user,201);
+    }
 
 }
