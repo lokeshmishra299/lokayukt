@@ -44,10 +44,8 @@ const AllLeaveFiles = () => {
 
   const filesList = Array.isArray(allFileData) ? allFileData : allFileData?.data || [];
 
-  // --- API Mutation (TOGGLE STATUS) ---
-  // API URL अपने हिसाब से एडजस्ट कर लेना अगर अलग हो
   const updateLeaveStatus = async ({ id, status }) => {
-    const res = await api.post(`/admin/update-leave-status/${id}`, { status });
+    const res = await api.post(`/admin/change-employee-status/${id}`, { status });
     return res.data;
   };
 
@@ -85,7 +83,6 @@ const AllLeaveFiles = () => {
 
   // --- Handlers ---
   const handleToggleStatus = (id, currentStatus) => {
-    // अगर पहले से Accepted है तो Rejected कर दो, वरना Accepted कर दो
     const newStatus = (currentStatus === 'Accepted' || currentStatus === '1' || currentStatus === 1) ? 'Rejected' : 'Accepted';
     statusMutation.mutate({ id, status: newStatus });
   };
@@ -252,10 +249,21 @@ const AllLeaveFiles = () => {
                               ? "Rejected"
                               : ""       
                           }
-                          onChange={(e) => {
-                            if (!e.target.value) return;
-                            statusMutation.mutate({ id: row.id, status: e.target.value });
-                          }}
+                         onChange={(e) => {
+  const value = e.target.value;
+  if (!value) return;
+
+  const statusMap = {
+    Accepted: 2,
+    Rejected: 3,
+  };
+
+  statusMutation.mutate({
+    id: row.id,
+    status: statusMap[value], 
+  });
+}}
+
                           disabled={statusMutation.isPending && statusMutation.variables?.id === row.id}
                           className={`px-3 py-1.5 border rounded-lg text-sm font-medium
                             ${
