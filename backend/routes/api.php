@@ -52,7 +52,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-leave-details', [CommonController::class, 'fetchLeavesDetails']);
         Route::get('/get-leave-personal-details', [CommonController::class, 'fetchLeavesPersonalDetails']);
 
-        Route::get('/get-roles-spervisor', [CommonController::class, 'getRolesSupervisor']);
+        Route::get('/get-roles-supervisor', [CommonController::class, 'getRolesSupervisor']);
 
         Route::post('/access-files-permission',[CommonController::class,'accessFilePermission']);
 
