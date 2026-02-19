@@ -61,7 +61,14 @@ const SearchableDropdown = ({
 
   const filteredOptions = options.filter((option) => {
     if (!option) return false;
-    const label = option.name || option.user_name || `User ${option.id}`;
+    // const label = option.name || option.user_name || `User ${option.id}`;
+    const roleLabel = getRoleLabel(option);
+
+const label =
+  `${option.name || option.user_name || `User ${option.id}`}` +
+  (roleLabel ? ` (${roleLabel})` : "");
+
+
     const district = option.district_name || "";
     const search = searchTerm.toLowerCase();
     return (
@@ -91,13 +98,16 @@ const SearchableDropdown = ({
             !selectedOption ? "text-gray-500" : "text-gray-900"
           }`}
         >
-          {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+         {selectedOption
+  ? `${selectedOption.name || selectedOption.user_name}${
+      selectedOption.subrole_name
+        ? ` (${selectedOption.subrole_name})`
+        : selectedOption.district_name
+        ? ` (${selectedOption.district_name})`
+        : ""
+    }`
+  : placeholder}
+
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -117,23 +127,23 @@ const SearchableDropdown = ({
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
                 <div
-                  key={option.id}
-                  className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
-                    value == option.id
-                      ? "bg-blue-100 text-blue-800"
-                      : "text-gray-700"
-                  }`}
-                  onClick={() => handleSelect(option)}
-                >
-                  {option.name || option.user_name || `User ${option.id}`}
-                  {option.district_name ? (
-                    <span className="text-gray-500 text-xs ml-1">
-                      ({option.district_name})
-                    </span>
-                  ) : (
-                    ""
-                  )}
-                </div>
+  key={option.id}
+  className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
+    value == option.id
+      ? "bg-blue-100 text-blue-800"
+      : "text-gray-700"
+  }`}
+  onClick={() => handleSelect(option)}
+>
+  {option.name || option.user_name || `User ${option.id}`}
+
+  {getRoleLabel(option) && (
+    <span className="">
+      ({getRoleLabel(option)})
+    </span>
+  )}
+</div>
+
               ))
             ) : (
               <div className="px-3 py-2 text-sm text-gray-500">
@@ -146,6 +156,13 @@ const SearchableDropdown = ({
     </div>
   );
 };
+
+const getRoleLabel = (option) => {
+  if (option?.subrole_name) return option.subrole_name;
+  if (option?.role?.label) return option.role.label;
+  return "";
+};
+
 
 const ViewAllComplaint = () => {
   const navigate = useNavigate();
@@ -173,6 +190,7 @@ const ViewAllComplaint = () => {
   const [showMobileTabs, setShowMobileTabs] = useState(false);
   const [showDispatch, setshowDispatch] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
+  const [targetDate, setTargetDate] = useState("");
 
   function diposeShow() {
     setshowDispatch(true);
@@ -372,7 +390,8 @@ const ViewAllComplaint = () => {
         `/supervisor/forward-by-sec/${complaintId}`,
         {
           forward_to: forwardTo,
-          remark: remarkData,
+          // remark: remarkData,
+                  target_date: targetDate, 
           sent_through_rk: sent_through_rk ? 1 : 0,
         }
       );
@@ -408,10 +427,7 @@ const ViewAllComplaint = () => {
         remarkData: remark,
       });
     } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
-        toast.error("Please select forward to and enter a remark");
-        return;
-      }
+    
       forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
@@ -1095,16 +1111,17 @@ const ViewAllComplaint = () => {
                         Checkbox If Send through RC
                       </span>
                     </label>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Remark <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      value={remark}
-                      onChange={(e) => setRemark(e.target.value)}
-                      rows={4}
-                      placeholder="Enter your remark here..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
+                   <label className="block text-sm font-medium text-gray-700 mb-2">
+  Target Date <span className="text-red-500">*</span>
+</label>
+                   <input
+  type="date"
+  value={targetDate}
+  min={new Date().toISOString().split("T")[0]}
+  onChange={(e) => setTargetDate(e.target.value)}
+  className="w-full px-3 py-2 border border-gray-300 rounded
+             focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
                   </div>
                 </>
               )}
@@ -1134,7 +1151,7 @@ const ViewAllComplaint = () => {
                   pullBackMutation.isPending || // ✅ Pull Back Loading
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
-                    (!remark.trim() ||
+                    (!targetDate ||
                       !selectedForwardTo ||
                       isLoadingOptions ||
                       isFetchingOptions))

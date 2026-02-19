@@ -53,6 +53,13 @@ const SearchableDropdown = ({
 
   const selectedOption = options?.find((opt) => opt && opt.id == value);
 
+  const getRoleLabel = (option) => {
+  if (option?.subrole_name) return option.subrole_name;   // CIO / RO etc
+  if (option?.role?.label) return option.role.label;     // UpLokayukt
+  return "";
+};
+
+
   const filteredOptions = options.filter((option) => {
      if (!option) return false;
     const label = option.name || option.user_name || `User ${option.id}`;
@@ -85,13 +92,13 @@ const SearchableDropdown = ({
             !selectedOption ? "text-gray-500" : "text-gray-900"
           }`}
         >
-          {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+         {selectedOption
+  ? `${selectedOption.name || selectedOption.user_name}${
+      getRoleLabel(selectedOption)
+        ? ` (${getRoleLabel(selectedOption)})`
+        : ""
+    }`
+  : placeholder}
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -120,13 +127,11 @@ const SearchableDropdown = ({
                   onClick={() => handleSelect(option)}
                 >
                   {option.name || option.user_name || `User ${option.id}`}
-                  {option.district_name ? (
-                    <span className="text-gray-500 text-xs ml-1">
-                      ({option.district_name})
-                    </span>
-                  ) : (
-                    ""
-                  )}
+                  {getRoleLabel(option) && (
+  <span className="">
+    ({getRoleLabel(option)})
+  </span>
+)}
                 </div>
               ))
             ) : (
@@ -157,6 +162,7 @@ const ViewAllComplaint = () => {
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
     const [sent_through_rk, setThroughRC] = useState(false);
+    const [targetDate, setTargetDate] = useState("");
   
 
   // Single config for Action modals (Receive, Forward, Pullback)
@@ -313,9 +319,10 @@ const ViewAllComplaint = () => {
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-io/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-cio/${complaintId}`, {
           forward_to: forwardTo,
-          remark: remarkData,
+          // remark: remarkData,
+            target_date: targetDate, 
          sent_through_rk: sent_through_rk ? 1 : 0
 
         });
@@ -324,7 +331,10 @@ const ViewAllComplaint = () => {
       onSuccess: (data) => {
         toast.success(data.message || "Forwarded successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-        setRemark("");
+        // setRemark("");
+        setTargetDate("");
+        setThroughRC(false);
+
         setSelectedForwardTo("");
         setConfirmConfig({ open: false, type: null });
       },
@@ -350,11 +360,11 @@ const ViewAllComplaint = () => {
         remarkData: remark,
 
       });
-    } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
-        toast.error("Please select forward to and enter a remark");
-        return;
-      }
+    }  else if (confirmConfig.type === "forward") {
+  if (!selectedForwardTo || !targetDate) {
+    toast.error("Please select officer and target date");
+    return;
+  }
       forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
@@ -933,22 +943,27 @@ const ViewAllComplaint = () => {
                 )}
 
 
-             {confirmConfig.type === "forward" && (
-  <label className="flex items-center gap-2 cursor-pointer mt-2">
+  {confirmConfig.type === "forward" && (
+  <div className="mb-5 mt-3">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Target Date <span className="text-red-500">*</span>
+    </label>
     <input
-      type="checkbox"
-      checked={sent_through_rk}
-      onChange={(e) => setThroughRC(e.target.checked)}
-      className="w-4 h-4"
+      type="date"
+      value={targetDate}
+      min={new Date().toISOString().split("T")[0]}
+      onChange={(e) => setTargetDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
-    <span className="text-sm">Checkbox If Send through RC</span>
-  </label>
+  </div>
 )}
+
     
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
                     <>
-                      <div className="mb-5">
+                      {/* <div className="mb-5">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Remark <span className="text-red-500">*</span>
                         </label>
@@ -959,7 +974,7 @@ const ViewAllComplaint = () => {
                           placeholder="Enter your remark here..."
                           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                         />
-                      </div>
+                      </div> */}
                     </>
                   )}
     
@@ -986,10 +1001,10 @@ const ViewAllComplaint = () => {
     pullBackMutation.isPending || // ✅ Ye add kiya (Button disable hoga)
     (confirmConfig.type === "receive" && !remark.trim()) ||
     (confirmConfig.type === "forward" &&
-      (!remark.trim() ||
-        !selectedForwardTo ||
-        isLoadingOptions ||
-        isFetchingOptions))
+  (!selectedForwardTo ||
+   !targetDate ||
+   isLoadingOptions ||
+   isFetchingOptions))
   }
   className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
 >
