@@ -1163,4 +1163,23 @@ class CommonController extends Controller
         // dd($designation->toArray());
         return ApiResponse::generateResponse('success','Leaves fetch successfully',$cat);
     }
+
+        public function approveRejectedEmployee(Request $request, $id)
+    {
+        $user = EmployeeUploadFiles::find($id);
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+        // $user->status = "1" ? "0" : "1";
+        $user->status = $request->status;
+        $user->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'Employee status updated successfully',
+            'data' => $user
+        ]);
+    }
 }
