@@ -38,6 +38,22 @@ const SearchableDropdown = ({
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
 
+const getDisplayLabel = (option) => {
+  if (!option) return "";
+
+  const name =
+    option.name ||
+    option.user_name ||
+    `User ${option.id}`;
+
+  const roleLabel =
+    option.role?.label || option.role?.name || "";
+
+  return roleLabel ? `${name} (${roleLabel})` : name;
+};
+
+
+
 
 
   useEffect(() => {
@@ -89,13 +105,7 @@ const SearchableDropdown = ({
             !selectedOption ? "text-gray-500" : "text-gray-900"
           }`}
         >
-          {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+          {selectedOption ? getDisplayLabel(selectedOption) : placeholder}
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -123,7 +133,8 @@ const SearchableDropdown = ({
                   }`}
                   onClick={() => handleSelect(option)}
                 >
-                  {option.name || option.user_name || `User ${option.id}`}
+                  {/* {option.name || option.user_name || `User ${option.id}`} */}
+                  {getDisplayLabel(option)}
                   {option.district_name ? (
                     <span className="text-gray-500 text-xs ml-1">
                       ({option.district_name})
@@ -176,6 +187,7 @@ function takefile(){
   const [showMobileTabs, setShowMobileTabs] = useState(false);
   const [showDispatch, setshowDispatch] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
+  const [targetDate, setTargetDate] = useState("");
 
   function diposeShow (){
     setshowDispatch(true)
@@ -334,7 +346,8 @@ function takefile(){
     mutationFn: async ({ complaintId, remarkData }) => {
       const res = await api.post(`/supervisor/dispose-complain/${id}`, {
         complaint_id: complaintId,
-        remark: remarkData,
+        // remark: remarkData,
+        target_date: targetDate,
       });
       return res.data;
     },
@@ -411,7 +424,7 @@ function takefile(){
         remarkData: remark,
       });
     } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
+      if (!selectedForwardTo || !targetDate) {
         toast.error("Please select forward to and enter a remark");
         return;
       }
@@ -1107,33 +1120,22 @@ function takefile(){
 )}
 
 
-                {confirmConfig.type !== "assign" &&
-                  confirmConfig.type !== "pullback" && (
-                    <>
-                      <div className="mb-5 mt-3">
+                {confirmConfig.type === "forward" && (
+  <div className="mb-5 mt-3">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Target Date <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="date"
+      value={targetDate}
+      min={new Date().toISOString().split("T")[0]}
+      onChange={(e) => setTargetDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+)}
 
-                       {/* <label className="flex items-center gap-2 cursor-pointer mt-2">
-  <input
-    type="checkbox"
-    checked={sent_through_rk}
-    onChange={(e) => setThroughRC(e.target.checked)}
-    className="w-4 h-4"
-  />
-  <span className="text-sm">Checkbox If Send through RC</span>
-</label> */}
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Remark <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                          value={remark}
-                          onChange={(e) => setRemark(e.target.value)}
-                          rows={4}
-                          placeholder="Enter your remark here..."
-                          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                        />
-                      </div>
-                    </>
-                  )}
     
                 {/* Buttons */}
                 <div className="flex justify-end gap-3">
