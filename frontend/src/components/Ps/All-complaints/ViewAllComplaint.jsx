@@ -984,14 +984,32 @@ return flatList.filter(
               <div className="border-t p-4">
                 <div className="flex flex-col sm:flex-row gap-3 justify-between">
                   <div>
-                    <button
+
+                  {complaintData?.status == "Rejected" ? 
+                  <div>
+
+                  </div>
+                  :
+                       <button
                       onClick={handlePullBack}
                       className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                     >
                       Pull Back
                     </button>
+                  }
+                  
 
-                    {complaintData.assign_to_ps ? (
+                  
+
+                    {complaintData?.status == "Rejected" ? 
+
+                    <div>
+
+                    </div>
+                    :
+                      
+                      
+                      complaintData.assign_to_ps  ? (
                       <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
                         Assigned
                       </span>
@@ -1007,14 +1025,33 @@ return flatList.filter(
 
                   <div className="flex gap-2">
 
-         <button
-        className="px-4 py-2 bg-red-600 border border-red-600 text-white rounded hover:bg-red-700 text-sm"
-        onClick={() => setShowModal(true)}
-      >
-        Reject
-      </button>
 
-                    <button
+                
+        <button
+  className={`px-4 py-2 border rounded text-sm
+    ${
+      complaintData?.status === "Rejected"
+        ? "bg-gray-400 border-gray-400 text-white cursor-not-allowed"
+        : "bg-red-600 border-red-600 text-white hover:bg-red-700"
+    }`}
+  onClick={() => {
+    if (complaintData?.status === "Rejected") return;
+    setShowModal(true);
+  }}
+  disabled={complaintData?.status === "Rejected"}
+>
+  {complaintData?.status === "Rejected" ? "Rejected" : "Reject"}
+</button>
+
+           
+     
+                    {complaintData?.status === "Rejected" ? 
+                    <div>
+
+                    </div>
+                    :
+                    
+                        <button
                       onClick={handleMarkAsReceived}
                       disabled={returnWithRemarksMutation.isPending}
                       className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1023,6 +1060,8 @@ return flatList.filter(
                         ? "Processing..."
                         : "Return with Remarks"}
                     </button>
+                    }
+                  
 
 
 
@@ -1031,7 +1070,13 @@ return flatList.filter(
                         Forwarded
                       </span> */}
                     {/* ) : ( */}
-                      <button
+
+                    {complaintData?.status === "Rejected" ? 
+                    <div>
+                      
+                    </div>
+                    :
+                        <button
                         onClick={handleforwardphysical}
                         disabled={forwardComplaintMutation.isPending}
                         className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1040,6 +1085,8 @@ return flatList.filter(
                           ? "Processing..."
                           : "Send / Mark"}
                       </button>
+                    }
+                    
                     {/* )} */}
                   </div>
                 </div>
