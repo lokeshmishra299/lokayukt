@@ -1168,8 +1168,8 @@ class CommonController extends Controller
 
     public function getRolesSupervisor(){
 
-    $user=User::where('role_id',3)->select('id','name','role_id')
-                ->with('role')
+    $user=User::where('role_id',3)->select('id','name','role_id','sub_role_id')
+                ->with('role','subrole')
                 ->get();
     // dd($user->toArray());
 
