@@ -13,6 +13,8 @@ import {
 import { IoFileTray } from "react-icons/io5";
 import { FaFileSignature } from "react-icons/fa6";
 import { RiFileSearchLine } from "react-icons/ri";
+import { TbFileSearch } from "react-icons/tb";
+
 
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
   const location = useLocation();
@@ -178,6 +180,22 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <RiFileSearchLine />
             {(!isCollapsed || isMobile) && "View Files"}
+          </Link>
+
+          
+           <Link
+            to="/employee/view-personal-files"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+              ${isActive("/view-personal-files")
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-700 hover:bg-gray-200"
+              }
+              ${isCollapsed && !isMobile ? "justify-center" : ""}
+            `}
+          >
+            <TbFileSearch />
+            {(!isCollapsed || isMobile) && "View Personal Files"}
           </Link>
 
           {/* Master Data */}

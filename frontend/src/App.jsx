@@ -61,6 +61,7 @@ import OperatorEmployComplaints from './components/Operator/Employ/Complaints';
 import OperatorEmployUserManagement from './components/Operator/Employ/UserManagement';
 import OperatorEmployAddFiles from './components/Operator/Employ/AddFiles';
 import OperatorEmployViewFiles from './components/Operator/Employ/ViewFiles';
+import OperatorEmployViewPersonalFile from './components/Operator/Employ/ViewPersonalFiles';
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
 // import EmployEditUserManagment from './components/Employ/EditUserManagment';
@@ -159,6 +160,9 @@ import RoAroEmployViewFiles from './components/Supervisor/ro-aro/Employ/ViewFile
 // import EmployViewComplaints from './components/Employ/ViewComplaints';
 // import EmployEditComplaint from './components/Employ/EditComplaint';
 // import EmployFileAdministrator from './components/Employ/FileAdministrator';
+import RoAroViewPersonalFiles from './components/Supervisor/ro-aro/Employ/PersonalFiles/ViewPersonalFiles';
+import RoAroPersonalFileById from './components/Supervisor/ro-aro/Employ/PersonalFiles/PersonalFileById';
+
 
 // DS
 
@@ -600,6 +604,7 @@ import DspEmployUserManagement from './components/Dispatch/Employ/UserManagement
 import DspEmployAddFiles from './components/Dispatch/Employ/AddFiles';
 import DspEmployViewFiles from './components/Dispatch/Employ/ViewFiles';
 
+
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
 // import EmployEditUserManagment from './components/Employ/EditUserManagment';
@@ -672,6 +677,7 @@ function App() {
           <Route path="add-files" element={<OperatorEmployAddFiles />} />
           <Route path="view-files" element={<OperatorEmployViewFiles />} />
           <Route path="user-management" element={<OperatorEmployUserManagement />} />
+          <Route path="view-personal-files" element={<OperatorEmployViewPersonalFile />} />
        
         </Route>
           <Route path="main-dashboard" element={<OperatorEmployUserDashboard />} />
@@ -907,6 +913,8 @@ function App() {
           <Route path="add-files" element={<RoAroEmployAddFiles />} />
           <Route path="view-files" element={<RoAroEmployViewFiles />} />
           <Route path="user-management" element={<RoAroEmployUserManagement />} />
+          <Route path="view-personal-files" element={<RoAroViewPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<RoAroPersonalFileById />} />
        
         </Route>
 
@@ -949,6 +957,7 @@ function App() {
           <Route path="add-files" element={<AroEmployAddFiles />} />
           <Route path="view-files" element={<AroEmployViewFiles />} />
           <Route path="user-management" element={<AroEmployUserManagement />} />
+          
        
         </Route>
 
