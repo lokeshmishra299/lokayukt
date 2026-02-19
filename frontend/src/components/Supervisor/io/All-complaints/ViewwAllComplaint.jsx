@@ -313,7 +313,7 @@ const ViewAllComplaint = () => {
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-cio/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-io/${complaintId}`, {
           forward_to: forwardTo,
           remark: remarkData,
          sent_through_rk: sent_through_rk ? 1 : 0

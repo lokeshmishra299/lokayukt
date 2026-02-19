@@ -78,8 +78,8 @@ class LokAyuktComplaintsController extends Controller
                     // ->where('approved_rejected_by_d_a', 1);
                     // ->whereNotNull('forward_to_d_a');
 
-    $records = $query->distinct('complaints.id')->get();
-
+    $records = $query->distinct('complaints.id')->orderBy('complaints.updated_at','DESC')->get();
+ 
                 //  $todayCount = DB::table('complaints')
                 //     ->where('in_draft', 0)
                 //     ->whereDate('created_at', today())
