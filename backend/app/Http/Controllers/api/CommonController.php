@@ -1165,15 +1165,23 @@ class CommonController extends Controller
         return ApiResponse::generateResponse('success','Leaves fetch successfully',$cat);
     }
 
-
-    public function getRolesSupervisor(){
-
-    $user=User::where('role_id',3)->select('id','name','role_id','sub_role_id')
-                ->with('role','subrole')
-                ->get();
-    // dd($user->toArray());
-
-    return ApiResponse::generateResponse('success','User data fetch succesfully',$user,201);
+        public function approveRejectedEmployee(Request $request, $id)
+    {
+        $user = EmployeeUploadFiles::find($id);
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found'
+            ], 404);
+        }
+        // $user->status = "1" ? "0" : "1";
+        $user->status = $request->status;
+        $user->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'Employee status updated successfully',
+            'data' => $user
+        ]);
     }
 
    public function accessFilePermission(Request $request)
@@ -1186,6 +1194,8 @@ class CommonController extends Controller
     $file = EmployeeUploadFiles::find($request->file_id);
 
     $file->permission_user_id = $request->user_id;
+    $file->permission_user_by_admin = $request->user_id;
+    $file->user_id=Auth()->id();
     $file->save();
 
     return ApiResponse::generateResponse(
@@ -1195,5 +1205,15 @@ class CommonController extends Controller
         200
     );
 }
+
+  public function getRolesSupervisors(){
+
+    $user=User::where('role_id',3)->select('id','name','role_id','sub_role_id')
+                ->with('role','subrole')
+                ->get();
+    // dd($user->toArray());
+
+    return ApiResponse::generateResponse('success','User data fetch succesfully',$user,201);
+    }
 
 }
