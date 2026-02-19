@@ -46,11 +46,16 @@ const getDisplayLabel = (option) => {
     option.user_name ||
     `User ${option.id}`;
 
+  // 👇 yahin subrole_name add kiya
   const roleLabel =
-    option.role?.label || option.role?.name || "";
+    option.subrole_name ||
+    option.role?.label ||
+    option.role?.name ||
+    "";
 
   return roleLabel ? `${name} (${roleLabel})` : name;
 };
+
 
 
 
@@ -389,7 +394,8 @@ function takefile(){
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
         const res = await api.post(`/supervisor/forward-by-ro-aro/${complaintId}`, {
           forward_to: forwardTo,
-          remark: remarkData,
+          // remark: remarkData,
+          target_date: targetDate,
           sent_through_rk: sent_through_rk ? 1 : 0
         });
         return res.data;
@@ -1161,11 +1167,10 @@ function takefile(){
                   assignToSelfMutation.isPending || 
                   pullBackMutation.isPending || 
                   (confirmConfig.type === "receive" && !remark.trim()) ||
-                  (confirmConfig.type === "forward" &&
-                    (!remark.trim() ||
-                      !selectedForwardTo ||
-                      isLoadingOptions ||
-                      isFetchingOptions))
+                (confirmConfig.type === "forward" &&
+  (!selectedForwardTo ||
+    isLoadingOptions ||
+    isFetchingOptions))
                 }
                 className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
