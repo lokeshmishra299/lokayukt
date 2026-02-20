@@ -505,6 +505,24 @@ if (item.forward_by_io && item.sent_through_rk === 1 && item.forward_to_ps) {
       return `Hon’ble ${toLok} → Hon’ble ${toUpLok}`;
     }
 
+    /* ================= LOKAYUKT → CIO ================= */
+if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_cio_io) {
+  return `Hon’ble ${lok} → Record Section (RC) → ${toCio}`;
+}
+
+if (item.forward_by_lokayukt && item.forward_to_cio_io) {
+  return `Hon’ble ${lok} → ${toCio}`;
+}
+
+/* ================= LOKAYUKT → IO ================= */
+if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_io) {
+  return `Hon’ble ${lok} → Record Section (RC) → ${toio}`;
+}
+
+if (item.forward_by_lokayukt && item.forward_to_io) {
+  return `Hon’ble ${lok} → ${toio}`;
+}
+
     return `${record} → Record Section (RC)`;
   };
 
