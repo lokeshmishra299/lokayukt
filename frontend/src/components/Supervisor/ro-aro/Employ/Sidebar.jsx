@@ -15,19 +15,20 @@ import { FaFileSignature } from "react-icons/fa6";
 import { RiFileSearchLine } from "react-icons/ri";
 import { TbFileSearch } from "react-icons/tb";
 
-
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
 
-  const isFilesActive = (path) => {
-  return location.pathname.startsWith("/employee/view-files") ||
-         location.pathname.startsWith("/employee/add-files");
-};
-  const isFilesActivee = (path) => {
-  return location.pathname.startsWith("/employee/view-personal-files") ||
-         location.pathname.startsWith("/employee/add-personal-files");
-};
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
+
+  const isFilesActive = (path) => {
+    return location.pathname.startsWith("/employee/view-files") ||
+           location.pathname.startsWith("/employee/add-files");
+  };
+
+  const isFilesActivee = (path) => {
+    return location.pathname.startsWith("/employee/view-personal-files") ||
+           location.pathname.startsWith("/employee/add-personal-files");
+  };
 
   useEffect(() => {
     const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
@@ -100,126 +101,66 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           {/* <Link
             to="/admin/complaints"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/complaints")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <FaFileAlt />
-            {(!isCollapsed || isMobile) && "Complaints"}
+            ...
           </Link> */}
 
           {/* Progress Register */}
           {/* <Link
             to="/admin/progress-register"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/progress-register")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <FaChartBar />
-            {(!isCollapsed || isMobile) && "Progress Register"}
+            ...
           </Link> */}
 
           {/* Search & Reports */}
           {/* <Link
             to="/admin/search-reports"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/search-reports")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <FaSearch />
-            {(!isCollapsed || isMobile) && "Search & Reports"}
+            ...
           </Link> */}
 
           {/* User Management */}
           {/* <Link
             to="/employee/user-management"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/user-management")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <FaUsers />
-            {(!isCollapsed || isMobile) && "User Management"}
+            ...
           </Link> */}
-          {/* User Management */}
+
+          {/* Add Files */}
           {/* <Link
             to="/employee/add-files"
             onClick={handleLinkClick}
+            ...
+          </Link> */}
+
+          <Link
+            to="/employee/view-files"
+            onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/add-files")
+              ${isFilesActive()
                 ? "bg-blue-600 text-white shadow-md"
                 : "text-gray-700 hover:bg-gray-200"
               }
               ${isCollapsed && !isMobile ? "justify-center" : ""}
             `}
           >
-            <FaFileSignature />
-            {(!isCollapsed || isMobile) && "Add Files"}
-          </Link> */}
+            <RiFileSearchLine />
+            {(!isCollapsed || isMobile) && "Files"}
+          </Link>
 
-<Link
-  to="/employee/view-files"
-  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-    ${isFilesActive()
-      ? "bg-blue-600 text-white shadow-md"
-      : "text-gray-700 hover:bg-gray-200"
-    }
-    ${isCollapsed && !isMobile ? "justify-center" : ""}
-  `}
->
-  <RiFileSearchLine />
-  {(!isCollapsed || isMobile) && "Files"}
-</Link>
-
-<Link
-  to="/employee/view-personal-files"
-  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-    ${isFilesActivee()
-      ? "bg-blue-600 text-white shadow-md"
-      : "text-gray-700 hover:bg-gray-200"
-    }
-    ${isCollapsed && !isMobile ? "justify-center" : ""}
-  `}
->
-  <RiFileSearchLine />
-  {(!isCollapsed || isMobile) && "Personal Files"}
-</Link>
-
-{/*           
-           <Link
+          <Link
             to="/employee/view-personal-files"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/view-personal-files")
+              ${isFilesActivee()
                 ? "bg-blue-600 text-white shadow-md"
                 : "text-gray-700 hover:bg-gray-200"
               }
               ${isCollapsed && !isMobile ? "justify-center" : ""}
             `}
           >
-            <TbFileSearch />
+            <RiFileSearchLine />
             {(!isCollapsed || isMobile) && "Personal Files"}
-          </Link> */}
-
-          
+          </Link>
 
         </nav>
       </aside>
