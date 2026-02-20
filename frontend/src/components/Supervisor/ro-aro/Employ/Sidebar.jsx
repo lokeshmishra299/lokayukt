@@ -14,6 +14,7 @@ import { IoFileTray } from "react-icons/io5";
 import { FaFileSignature } from "react-icons/fa6";
 import { RiFileSearchLine } from "react-icons/ri";
 import { TbFileSearch } from "react-icons/tb";
+import { MdOutlinePendingActions } from "react-icons/md";
 
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
 
@@ -28,6 +29,11 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
   const isFilesActivee = (path) => {
     return location.pathname.startsWith("/employee/view-personal-files") ||
            location.pathname.startsWith("/employee/add-personal-files");
+  };
+
+  const isFilesActiveee = (path) => {
+    return location.pathname.startsWith("/employee/view-pending-files") 
+          //  location.pathname.startsWith("/employee/add-pending-files");
   };
 
   useEffect(() => {
@@ -158,8 +164,24 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
               ${isCollapsed && !isMobile ? "justify-center" : ""}
             `}
           >
-            <RiFileSearchLine />
+            <TbFileSearch />
             {(!isCollapsed || isMobile) && "Personal Files"}
+          </Link>
+
+
+          <Link
+            to="/employee/view-pending-files"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+              ${isFilesActiveee()
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-700 hover:bg-gray-200"
+              }
+              ${isCollapsed && !isMobile ? "justify-center" : ""}
+            `}
+          >
+            <MdOutlinePendingActions />
+            {(!isCollapsed || isMobile) && "Pending Files"}
           </Link>
 
         </nav>

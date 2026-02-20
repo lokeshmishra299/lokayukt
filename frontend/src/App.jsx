@@ -152,8 +152,10 @@ import RoAroEmployComplaints from './components/Supervisor/ro-aro/Employ/Complai
 // import EmployProgressRegister from './components/Employ/ProgressRegister';
 // import EmploySearchReports from './components/Employ/SearchReports';
 import RoAroEmployUserManagement from './components/Supervisor/ro-aro/Employ/UserManagement';
-import RoAroEmployAddFiles from './components/Supervisor/ro-aro/Employ/AddFiles';
-import RoAroEmployViewFiles from './components/Supervisor/ro-aro/Employ/ViewFiles';
+import RoAroEmployAddFiles from './components/Supervisor/ro-aro/Employ/ViewLeaveFiels/AddFiles';
+import RoAroEmployViewFiles from './components/Supervisor/ro-aro/Employ/ViewLeaveFiels/ViewFiles';
+import RoAroViewFielsById from './components/Supervisor/ro-aro/Employ/ViewLeaveFiels/ViewFielsById';
+
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
 // import EmployEditUserManagment from './components/Employ/EditUserManagment';
@@ -163,6 +165,11 @@ import RoAroEmployViewFiles from './components/Supervisor/ro-aro/Employ/ViewFile
 import RoAroViewPersonalFiles from './components/Supervisor/ro-aro/Employ/PersonalFiles/ViewPersonalFiles';
 import RoAroAddPersonalFiles from "./components/Supervisor/ro-aro/Employ/PersonalFiles//AddpersonalFiles"
 import RoAroPersonalFileById from './components/Supervisor/ro-aro/Employ/PersonalFiles/PersonalFileById';
+
+import RoAroPendingFiles from './components/Supervisor/ro-aro/Employ/PendingFiles/PendingFiles';
+import RoAroPendingFileBYId from './components/Supervisor/ro-aro/Employ/PendingFiles/PendingFileBYId';
+
+
 
 
 // DS
@@ -913,10 +920,16 @@ function App() {
           <Route path="complaints" element={<RoAroEmployComplaints />} />
           <Route path="add-files" element={<RoAroEmployAddFiles />} />
           <Route path="view-files" element={<RoAroEmployViewFiles />} />
+          <Route path="view-files/:id" element={<RoAroViewFielsById />} />
           <Route path="user-management" element={<RoAroEmployUserManagement />} />
           <Route path="view-personal-files" element={<RoAroViewPersonalFiles />} />
           <Route path="add-personal-files" element={<RoAroAddPersonalFiles />} />
           <Route path="view-personal-files/:id" element={<RoAroPersonalFileById />} />
+          <Route path="view-pending-files" element={<RoAroPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<RoAroPendingFileBYId />} />
+
+
+
        
         </Route>
 

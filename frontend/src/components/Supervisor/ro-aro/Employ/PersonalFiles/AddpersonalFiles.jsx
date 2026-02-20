@@ -127,7 +127,7 @@ uploadedFiles.forEach((fileData, index) => {
 
       setTimeout(()=>{
         navigate("/employee/view-personal-files")
-      }, 1500)
+      }, 2000)
 
       setUploadedFiles([]);
       setTitle(""); 

@@ -18,7 +18,7 @@ const api = axios.create({
   },
 });
 
-const PersonalFileById = () => {
+const ViewFielsById = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("notings");
@@ -143,7 +143,6 @@ const PersonalFileById = () => {
               >
                 {tab === "notings" && "Notes / Notings"}
                 {tab === "movement" && "Movement History"}
-                {/* {tab === "documents" && "Related Documents"} */}
                 {activeTab === tab && (
                   <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
                 )}
@@ -171,4 +170,4 @@ const PersonalFileById = () => {
   );
 };
 
-export default PersonalFileById;
+export default ViewFielsById;

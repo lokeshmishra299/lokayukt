@@ -33,8 +33,8 @@ const ViewPersonalFiles = () => {
 
   // --- API Fetching (GET ONLY) ---
   const getAllFiles = async () => {
-    const res = await api.get("/supervisor/all-personal-files");
-    console.log("Personal Files", res.data)
+    const res = await api.get("/supervisor/personal-file-list");
+    console.log("Personal Files", res.data);
     return res.data;
   };
 
@@ -87,16 +87,18 @@ const ViewPersonalFiles = () => {
       
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        
         {/* Title */}
         <div className="w-full flex items-center gap-3">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">All Personal File</h1>
-            <p className="text-sm text-gray-600">समस्त व्यक्तिगत फाइलें</p>
+            <h1 className="text-xl font-bold text-gray-900">Pending Personal Files</h1>
+            <p className="text-sm text-gray-600">लंबित व्यक्तिगत फाइलें</p>
           </div>
         </div>
 
         {/* Search + Button */}
         <div className="w-full flex flex-col sm:flex-row sm:items-center gap-3">
+
           {/* Search */}
           <div className="relative w-full sm:w-80">
             <FaSearch className="absolute left-3 top-2.5 text-gray-400 text-sm" />
@@ -115,14 +117,6 @@ const ViewPersonalFiles = () => {
             />
           </div>
 
-          {/* Button */}
-          <button
-            onClick={() => navigate("/employee/add-personal-files")}
-            className="w-full sm:w-auto px-5 py-2 bg-blue-600 text-white
-                       rounded-lg hover:bg-blue-700 whitespace-nowrap"
-          >
-            Add Personal Files
-          </button>
         </div>
       </div>
 
@@ -144,11 +138,18 @@ const ViewPersonalFiles = () => {
                  <tr>
                     <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
                       <div className="flex justify-center items-center gap-2">
-                        <span>Loading...</span>
+                         <FaSpinner className="animate-spin text-blue-600" size={20} />
+                         <span>Loading files...</span>
                       </div>
                     </td>
                  </tr>
-              ) : filteredFiles.length > 0 ? (
+              ) : filteredFiles.length === 0 ? (
+                <tr>
+                    <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                        No files found.
+                    </td>
+                </tr>
+              ) : (
                 paginatedFiles.map((row, index) => {
                   return (
                   <tr key={row.id} className="hover:bg-gray-50 transition-colors">
@@ -189,8 +190,6 @@ const ViewPersonalFiles = () => {
                     </td>
                   </tr>
                 )})
-              ) : (
-                <tr><td colSpan="5" className="px-6 py-8 text-center text-gray-500">No files found.</td></tr>
               )}
             </tbody>
           </table>

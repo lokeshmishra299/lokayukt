@@ -18,7 +18,7 @@ const api = axios.create({
   },
 });
 
-const PersonalFileById = () => {
+const PendingFileBYId = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("notings");
@@ -171,4 +171,4 @@ const PersonalFileById = () => {
   );
 };
 
-export default PersonalFileById;
+export default PendingFileBYId;

@@ -3,7 +3,7 @@ import axios from 'axios';
 import React, { useState, useMemo } from 'react';
 import { FaFilePdf, FaFileWord, FaFileImage, FaFileExcel, FaEye, FaSearch, FaSpinner, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-import Pagination from '../../../Pagination';
+import Pagination from '../../../../Pagination';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -193,8 +193,9 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
                     <td className="px-6 py-4 text-sm text-gray-600">{file.created_at}</td>
                     <td className="px-6 py-4 text-right">
                         <button 
-                            onClick={() => handleViewFile(file.id)}
-                            disabled={loadingDocId === file.id}
+         onClick={() => {
+    navigate(`${file.id}`)
+  }}
                             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded transition"
                         >
                           {loadingDocId === file.id ? <FaSpinner className="animate-spin" /> : <FaEye />}
