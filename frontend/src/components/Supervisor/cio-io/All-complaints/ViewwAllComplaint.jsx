@@ -942,6 +942,20 @@ const ViewAllComplaint = () => {
                   </>
                 )}
 
+                {confirmConfig.type === "forward" && (
+  <label className="flex items-center gap-2 mt-2 cursor-pointer">
+    <input
+      type="checkbox"
+      checked={sent_through_rk}
+      onChange={(e) => setThroughRC(e.target.checked)}
+      className="w-4 h-4 accent-blue-600"
+    />
+    <span className="text-sm text-gray-700">
+      Send through Record Section (RC)
+    </span>
+  </label>
+)}
+
 
   {confirmConfig.type === "forward" && (
   <div className="mb-5 mt-3">
