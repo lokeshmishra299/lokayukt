@@ -161,6 +161,7 @@ import RoAroEmployViewFiles from './components/Supervisor/ro-aro/Employ/ViewFile
 // import EmployEditComplaint from './components/Employ/EditComplaint';
 // import EmployFileAdministrator from './components/Employ/FileAdministrator';
 import RoAroViewPersonalFiles from './components/Supervisor/ro-aro/Employ/PersonalFiles/ViewPersonalFiles';
+import RoAroAddPersonalFiles from "./components/Supervisor/ro-aro/Employ/PersonalFiles//AddpersonalFiles"
 import RoAroPersonalFileById from './components/Supervisor/ro-aro/Employ/PersonalFiles/PersonalFileById';
 
 
@@ -914,6 +915,7 @@ function App() {
           <Route path="view-files" element={<RoAroEmployViewFiles />} />
           <Route path="user-management" element={<RoAroEmployUserManagement />} />
           <Route path="view-personal-files" element={<RoAroViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<RoAroAddPersonalFiles />} />
           <Route path="view-personal-files/:id" element={<RoAroPersonalFileById />} />
        
         </Route>

@@ -230,17 +230,36 @@ const ViewPersonalFiles = () => {
         </div>
 
         {/* Search */}
-        <div className="relative w-full md:w-auto">
-          <input
-            type="text"
-            placeholder="Qkby [kkstsa"
-            className="pl-10 kruti-input pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-64 focus:outline-none focus:border-blue-500"
-
-            // className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-72 focus:outline-none focus:border-blue-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <FaSearch className="absolute left-3 top-3 text-gray-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        
+          {/* Search */}
+          <div className="relative w-full sm:w-80">
+            <FaSearch className="absolute left-3 top-3 text-gray-400" />
+        <input
+          type="text"
+          placeholder="फाइल खोजे"
+          className="pl-10 py-1 kruti-input border border-gray-300 rounded-lg w-full
+                     text-[14px]
+                     placeholder:text-[15px] placeholder:text-gray-400
+                     focus:outline-none focus:border-blue-500"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
+        />
+          </div>
+        
+          {/* Button */}
+          <button
+          onClick={()=>{
+            navigate("/employee/add-personal-files")
+          }}
+            className="w-full sm:w-auto px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 whitespace-nowrap"
+          >
+            Add Personal Files
+          </button>
+        
         </div>
       </div>
 

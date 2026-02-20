@@ -351,6 +351,18 @@ const MovementHistory = ({ complaint }) => {
   const label = (role, name) => (name ? `${name} (${role})` : role);
 
   const getMovementTitle = (item) => {
+
+    if (
+  complaint?.status === "Final Disposal/Closed" &&
+  item?.status === "Final Decision" &&
+  item?.forward_by_lokayukt !== undefined &&
+  item?.forward_by_lokayukt !== null
+) {
+  if (item.sent_through_rk === 1) {
+    return "Hon’ble Lokayukt → Record Section (RC) → Disposed";
+  }
+  return "Hon’ble Lokayukt → Disposed";
+}
     const record = "Received";
 
     // FROM
