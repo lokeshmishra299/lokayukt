@@ -46,18 +46,18 @@ const itemsPerPage = 10;
 
 
 
-  const sortComplaintsByDate = (complaints, order) => {
-    return [...complaints].sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
+  // const sortComplaintsByDate = (complaints, order) => {
+  //   return [...complaints].sort((a, b) => {
+  //     const dateA = new Date(a.created_at);
+  //     const dateB = new Date(b.created_at);
 
-      if (order === "desc") {
-        return dateB - dateA;
-      } else {
-        return dateA - dateB;
-      }
-    });
-  };
+  //     if (order === "desc") {
+  //       return dateB - dateA;
+  //     } else {
+  //       return dateA - dateB;
+  //     }
+  //   });
+  // };
 
 
  const getAllComplaints = async () => {
@@ -125,22 +125,20 @@ const itemsPerPage = 10;
 useEffect(() => {
   if (!data) return;
 
-  // 👇 LIST ke liye (niche wali UI)
   const complaints = data.data || [];
   setAllComplaints(complaints);
 
-  const sorted = sortComplaintsByDate(complaints, sortOrder);
-  setFilteredComplaints(sorted);
+  // सीधा complaints सेट करें
+  setFilteredComplaints(complaints); 
   setCurrentPage(1);
 
-  // 👇 STATS ke liye (top badges)
   setApiStats({
     feePending: data.feePending || 0,
     older7DaysCount: data.older7DaysCount || 0,
     older7DaysDueCount: data.older7DaysDueCount || 0,
     todayCount: data.todayCount || 0,
   });
-}, [data, sortOrder]);
+}, [data]); // sortOrder हटा दिया
 
 
   // useEffect(() => {
@@ -318,14 +316,14 @@ useEffect(() => {
         filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
     }
 
-    if (selectedCaseType !== "") {
+   if (selectedCaseType !== "") {
         filtered = filtered.filter((complaint) => {
             return complaint.category?.toLowerCase() === selectedCaseType.toLowerCase();
         });
     }
 
-    const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(sorted);
+    // const sorted = sortComplaintsByDate(filtered, sortOrder);
+    setFilteredComplaints(filtered); 
     setCurrentPage(1);
     
   }, [
@@ -335,7 +333,7 @@ useEffect(() => {
     selectedStatus,
     selectedFeeStatus,
     selectedCaseType,
-    sortOrder 
+    // sortOrder 
   ]);
 
 const indexOfLastItem = currentPage * itemsPerPage;

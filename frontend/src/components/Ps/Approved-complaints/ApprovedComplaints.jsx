@@ -75,18 +75,18 @@ const [apiStats, setApiStats] = useState({
 
 
 
-  const sortComplaintsByDate = (complaints, order) => {
-    return [...complaints].sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
+  // const sortComplaintsByDate = (complaints, order) => {
+  //   return [...complaints].sort((a, b) => {
+  //     const dateA = new Date(a.created_at);
+  //     const dateB = new Date(b.created_at);
 
-      if (order === "desc") {
-        return dateB - dateA;
-      } else {
-        return dateA - dateB;
-      }
-    });
-  };
+  //     if (order === "desc") {
+  //       return dateB - dateA;
+  //     } else {
+  //       return dateA - dateB;
+  //     }
+  //   });
+  // };
 
   
 
@@ -162,15 +162,15 @@ const handleSendToUPLokayukt = async () => {
 
   });
 
- useEffect(() => {
+useEffect(() => {
   if (!data) return;
 
   // 👇 complaint list (niche wali UI)
   const complaints = data.data || [];
   setAllComplaints(complaints);
 
-  const sorted = sortComplaintsByDate(complaints, sortOrder);
-  setFilteredComplaints(sorted);
+  // const sorted = sortComplaintsByDate(complaints, sortOrder);
+  setFilteredComplaints(complaints); // <--- FIXED: Removed the extra 's'
   setCurrentPage(1);
 
   // 👇 top stats (badges)
@@ -181,7 +181,7 @@ const handleSendToUPLokayukt = async () => {
     todayCount: data.todayCount || 0,
   });
 
-}, [data, sortOrder]);
+}, [data]);
 
 
 //   useEffect(() => {
@@ -325,8 +325,8 @@ const handleSendToUPLokayukt = async () => {
     }
 
     // सॉर्टिंग
-    const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(sorted);
+    setFilteredComplaints(filtered);
+
     setCurrentPage(1);
 
   }, [
@@ -336,7 +336,7 @@ const handleSendToUPLokayukt = async () => {
     selectedStatus,
     selectedFeeStatus,
     selectedCaseType,
-    sortOrder
+    // sortOrder
   ]);
 
   useEffect(() => {

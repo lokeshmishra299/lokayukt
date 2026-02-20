@@ -292,14 +292,23 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
 
 
+  // useEffect(() => {
+  //   if (data) {
+  //     setAllComplaints(data);
+  //     const sorted = sortComplaintsByDate(data, sortOrder);
+  //     setFilteredComplaints(sorted);
+  //     setCurrentPage(1); 
+  //   }
+  // }, [data, sortOrder]);
+
   useEffect(() => {
     if (data) {
       setAllComplaints(data);
-      const sorted = sortComplaintsByDate(data, sortOrder);
-      setFilteredComplaints(sorted);
+      // सीधे API वाला डेटा सेट करें, कोई सॉर्टिंग नहीं
+      setFilteredComplaints(data); 
       setCurrentPage(1); 
     }
-  }, [data, sortOrder]);
+  }, [data]); 
 
 
  useEffect(() => {
@@ -355,14 +364,15 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
         filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
     }
 
-    if (selectedCaseType !== "") {
+   if (selectedCaseType !== "") {
         filtered = filtered.filter((complaint) => {
             return complaint.category?.toLowerCase() === selectedCaseType.toLowerCase();
         });
     }
 
     const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(sorted);
+   // जो डेटा फ़िल्टर होकर आया है, उसे बिना सॉर्ट किए सेट कर दें
+    setFilteredComplaints(filtered);
     setCurrentPage(1);
     
   }, [
@@ -372,7 +382,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
     selectedStatus,
     selectedFeeStatus,
     selectedCaseType,
-    sortOrder 
+    // sortOrder 
   ]);
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();

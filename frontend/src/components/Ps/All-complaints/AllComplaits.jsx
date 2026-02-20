@@ -78,18 +78,18 @@ const [apiStats, setApiStats] = useState({
 
 
 
-  const sortComplaintsByDate = (complaints, order) => {
-    return [...complaints].sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
+  // const sortComplaintsByDate = (complaints, order) => {
+  //   return [...complaints].sort((a, b) => {
+  //     const dateA = new Date(a.created_at);
+  //     const dateB = new Date(b.created_at);
 
-      if (order === "desc") {
-        return dateB - dateA;
-      } else {
-        return dateA - dateB;
-      }
-    });
-  };
+  //     if (order === "desc") {
+  //       return dateB - dateA;
+  //     } else {
+  //       return dateA - dateB;
+  //     }
+  //   });
+  // };
 
 
   const getAllComplaints = async () => {
@@ -163,18 +163,16 @@ const handleSendToUPLokayukt = async () => {
 
   });
 
- useEffect(() => {
+useEffect(() => {
   if (!data) return;
 
-  // 👇 complaint list (niche wali UI)
   const complaints = data.data || [];
   setAllComplaints(complaints);
 
-  const sorted = sortComplaintsByDate(complaints, sortOrder);
-  setFilteredComplaints(sorted);
+  // Set directly without sorting
+  setFilteredComplaints(complaints);
   setCurrentPage(1);
 
-  // 👇 top stats (badges)
   setApiStats({
     feePending: data.feePending || 0,
     older7DaysCount: data.older7DaysCount || 0,
@@ -182,8 +180,7 @@ const handleSendToUPLokayukt = async () => {
     todayCount: data.todayCount || 0,
   });
 
-}, [data, sortOrder]);
-
+}, [data]);
 
 //   useEffect(() => {
 //     if (allComplaints.length === 0) return;
@@ -316,7 +313,7 @@ const handleSendToUPLokayukt = async () => {
       filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
     }
 
-    if (selectedCaseType !== "") {
+  if (selectedCaseType !== "") {
       filtered = filtered.filter((complaint) => {
         const dataCategory = String(complaint.category || "").toLowerCase().trim();
         const selectedValue = String(selectedCaseType).toLowerCase().trim();
@@ -325,8 +322,7 @@ const handleSendToUPLokayukt = async () => {
     }
 
     // सॉर्टिंग
-    const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(sorted);
+  setFilteredComplaints(filtered);
     setCurrentPage(1);
 
   }, [
@@ -336,7 +332,7 @@ const handleSendToUPLokayukt = async () => {
     selectedStatus,
     selectedFeeStatus,
     selectedCaseType,
-    sortOrder
+    // sortOrder
   ]);
   useEffect(() => {
   if (isConfirmModalOpen) {

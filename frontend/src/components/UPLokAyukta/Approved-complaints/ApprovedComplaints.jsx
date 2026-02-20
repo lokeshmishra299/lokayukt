@@ -47,18 +47,18 @@ const itemsPerPage = 10;
 
 
 
-  const sortComplaintsByDate = (complaints, order) => {
-    return [...complaints].sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
+  // const sortComplaintsByDate = (complaints, order) => {
+  //   return [...complaints].sort((a, b) => {
+  //     const dateA = new Date(a.created_at);
+  //     const dateB = new Date(b.created_at);
 
-      if (order === "desc") {
-        return dateB - dateA;
-      } else {
-        return dateA - dateB;
-      }
-    });
-  };
+  //     if (order === "desc") {
+  //       return dateB - dateA;
+  //     } else {
+  //       return dateA - dateB;
+  //     }
+  //   });
+  // };
 
 
  const getAllComplaints = async () => {
@@ -130,8 +130,8 @@ useEffect(() => {
   const complaints = data.data || [];
   setAllComplaints(complaints);
 
-  const sorted = sortComplaintsByDate(complaints, sortOrder);
-  setFilteredComplaints(sorted);
+  // Directly set the filtered complaints without sorting
+  setFilteredComplaints(complaints);
   setCurrentPage(1);
 
   // 👇 STATS ke liye (top badges)
@@ -141,8 +141,7 @@ useEffect(() => {
     older7DaysDueCount: data.older7DaysDueCount || 0,
     todayCount: data.todayCount || 0,
   });
-}, [data, sortOrder]);
-
+}, [data]); // Removed sortOrder from dependencies
 
 
   // useEffect(() => {
@@ -326,8 +325,8 @@ useEffect(() => {
         });
     }
 
-    const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(sorted);
+    // const sorted = sortComplaintsByDate(filtered, sortOrder);
+    setFilteredComplaints(filtered);
     setCurrentPage(1);
     
   }, [
@@ -337,7 +336,7 @@ useEffect(() => {
     selectedStatus,
     selectedFeeStatus,
     selectedCaseType,
-    sortOrder 
+    // sortOrder 
   ]);
   
 const indexOfLastItem = currentPage * itemsPerPage;
