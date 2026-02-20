@@ -351,6 +351,18 @@ const MovementHistory = ({ complaint }) => {
   const label = (role, name) => (name ? `${name} (${role})` : role);
 
   const getMovementTitle = (item) => {
+
+    if (
+  complaint?.status === "Final Disposal/Closed" &&
+  item?.status === "Final Decision" &&
+  item?.forward_by_lokayukt !== undefined &&
+  item?.forward_by_lokayukt !== null
+) {
+  if (item.sent_through_rk === 1) {
+    return "Hon’ble Lokayukt → Record Section (RC) → Disposed";
+  }
+  return "Hon’ble Lokayukt → Disposed";
+}
     const record = "Received";
 
     // FROM
@@ -504,6 +516,24 @@ if (item.forward_by_io && item.sent_through_rk === 1 && item.forward_to_ps) {
     if (item.forward_by_lokayukt && item.forward_to_uplokayukt) {
       return `Hon’ble ${toLok} → Hon’ble ${toUpLok}`;
     }
+
+    /* ================= LOKAYUKT → CIO ================= */
+if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_cio_io) {
+  return `Hon’ble ${lok} → Record Section (RC) → ${toCio}`;
+}
+
+if (item.forward_by_lokayukt && item.forward_to_cio_io) {
+  return `Hon’ble ${lok} → ${toCio}`;
+}
+
+/* ================= LOKAYUKT → IO ================= */
+if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_io) {
+  return `Hon’ble ${lok} → Record Section (RC) → ${toio}`;
+}
+
+if (item.forward_by_lokayukt && item.forward_to_io) {
+  return `Hon’ble ${lok} → ${toio}`;
+}
 
     return `${record} → Record Section (RC)`;
   };

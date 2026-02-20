@@ -17,6 +17,15 @@ import { TbFileSearch } from "react-icons/tb";
 
 
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
+
+  const isFilesActive = (path) => {
+  return location.pathname.startsWith("/employee/view-files") ||
+         location.pathname.startsWith("/employee/add-files");
+};
+  const isFilesActivee = (path) => {
+  return location.pathname.startsWith("/employee/view-personal-files") ||
+         location.pathname.startsWith("/employee/add-personal-files");
+};
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
 
@@ -151,7 +160,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
             {(!isCollapsed || isMobile) && "User Management"}
           </Link> */}
           {/* User Management */}
-          <Link
+          {/* <Link
             to="/employee/add-files"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
@@ -164,25 +173,37 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <FaFileSignature />
             {(!isCollapsed || isMobile) && "Add Files"}
-          </Link>
+          </Link> */}
 
+<Link
+  to="/employee/view-files"
+  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+    ${isFilesActive()
+      ? "bg-blue-600 text-white shadow-md"
+      : "text-gray-700 hover:bg-gray-200"
+    }
+    ${isCollapsed && !isMobile ? "justify-center" : ""}
+  `}
+>
+  <RiFileSearchLine />
+  {(!isCollapsed || isMobile) && "Files"}
+</Link>
 
-           <Link
-            to="/employee/view-files"
-            onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/view-files")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <RiFileSearchLine />
-            {(!isCollapsed || isMobile) && "View Files"}
-          </Link>
+<Link
+  to="/employee/view-personal-files"
+  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+    ${isFilesActivee()
+      ? "bg-blue-600 text-white shadow-md"
+      : "text-gray-700 hover:bg-gray-200"
+    }
+    ${isCollapsed && !isMobile ? "justify-center" : ""}
+  `}
+>
+  <RiFileSearchLine />
+  {(!isCollapsed || isMobile) && "Personal Files"}
+</Link>
 
-          
+{/*           
            <Link
             to="/employee/view-personal-files"
             onClick={handleLinkClick}
@@ -195,41 +216,10 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
             `}
           >
             <TbFileSearch />
-            {(!isCollapsed || isMobile) && "View Personal Files"}
-          </Link>
-
-          {/* Master Data */}
-          {/* <Link
-            to="/admin/master-data"
-            onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/master-data")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <FaDatabase />
-            {(!isCollapsed || isMobile) && "Master Data"}
+            {(!isCollapsed || isMobile) && "Personal Files"}
           </Link> */}
 
-
-           {/* File Administrator */}
-          {/* <Link
-            to="/admin/file-administrator"
-            onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/file-administrator")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <IoFileTray />
-            {(!isCollapsed || isMobile) && "File Administrator"}
-          </Link> */}
+          
 
         </nav>
       </aside>
