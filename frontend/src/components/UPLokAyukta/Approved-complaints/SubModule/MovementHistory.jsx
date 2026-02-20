@@ -541,7 +541,6 @@
 
 
 
-
 import React from "react";
 
 const MovementHistory = ({ complaint }) => {
@@ -552,6 +551,18 @@ const MovementHistory = ({ complaint }) => {
   const label = (role, name) => (name ? `${name} (${role})` : role);
 
   const getMovementTitle = (item) => {
+
+        if (
+  complaint?.status === "Final Disposal/Closed" &&
+  item?.status === "Final Decision" &&
+  item?.forward_by_uplokayukt !== undefined &&
+  item?.forward_by_uplokayukt !== null
+) {
+  if (item.sent_through_rk === 1) {
+    return "Hon’ble UpLokayukt → Record Section (RC) → Disposed";
+  }
+  return "Hon’ble UpLokayukt → Disposed";
+}
     const record = "Received";
 
     // FROM
