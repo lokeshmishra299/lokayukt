@@ -661,7 +661,7 @@ const MovementHistory = ({ complaint }) => {
       return `${cio} → Record Section (RC) → ${ps}`;
     }
 
-     if (item.forward_by_cio_io  && item.forward_to_ps) {
+     else if (item.forward_by_cio_io  && item.forward_to_ps) {
       return `${cio} → ${ps}`;
     }
 
