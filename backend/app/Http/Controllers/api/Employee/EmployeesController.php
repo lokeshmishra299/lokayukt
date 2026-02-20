@@ -195,26 +195,30 @@ class EmployeesController extends Controller
     }
 
     public function personalFileList()
+    {
+
+        $user = Auth()->id();
+        // dd($user);
+        $employeFile = EmployeeUploadFiles::where('permission_user_id', $user)->get();
+        // dd($employeFile);
+        return ApiResponse::generateResponse('success', 'Employee personal file fetch successfully', $employeFile, 200);
+    }
+
+   public function personalFileListById($id)
 {
-    $employeFile = EmployeeUploadFiles::all();
-
-    return ApiResponse::generateResponse(
-        'success',
-        'Employee personal file fetch successfully',
-        $employeFile,
-        200
-    );
-}
-
-
-  public function personalFileListById($id)
-{
-    $file = EmployeeUploadFiles::find($id);
+    $userId = auth()->id();
+    // dd($userId);
+    $file = EmployeeUploadFiles::where('id', $id)
+        ->where(function($q) use ($userId) {
+            $q->where('permission_user_id', $userId)
+              ->orWhere('added_by', $userId);
+        })
+        ->first();
 
     if (!$file) {
         return ApiResponse::generateResponse(
             'error',
-            'File not found',
+            'File not found or you do not have permission to view it',
             null,
             404
         );
@@ -227,7 +231,6 @@ class EmployeesController extends Controller
         200
     );
 }
-
 
 
     public function sendPersonalFile(Request $request)
