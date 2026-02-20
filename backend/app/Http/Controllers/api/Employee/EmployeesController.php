@@ -26,6 +26,19 @@ class EmployeesController extends Controller
         return ApiResponse::generateResponse('success', 'Records fetch successfully', $empfiles);
     }
 
+
+     public function fileDetails($id)
+    {
+        // dd("lok0");
+        // $user = Auth::user()->id;
+        $empfiles = EmployeeUploadFiles::where('id',$id)
+        // ->where('type', 'Letter')
+        ->get();
+        // dd($empfiles->toArray());
+        return ApiResponse::generateResponse('success', 'Records fetch successfully', $empfiles);
+    }
+
+
      public function viewPersonalFile()
     {
         // dd("lok0");

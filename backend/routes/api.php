@@ -193,9 +193,10 @@ Route::middleware('auth:sanctum')->group(function(){
         
         // Route::prefix('admin')->group(function () {
         Route::get('/all-files',[EmployeesController::class,'index']);
+        Route::get('/all-files/{id}',[EmployeesController::class,'fileDetails']);
 
         Route::get('/all-personal-files',[EmployeesController::class,'viewPersonalFile']);
-        
+
         Route::get('/topics',[EmployeesController::class,'fetch_topics']);
         Route::get('/filetypes',[EmployeesController::class,'fetch_fileType']);
         Route::post('/upload-file',[EmployeesController::class,'uploadFiles']);
@@ -264,6 +265,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::middleware('role:supervisor:ds|js|us|ro-aro|ro|sec|cio-io|io')->prefix('supervisor')->group(function () {
            Route::get('/all-files',[EmployeesController::class,'index']);
+        Route::get('/all-files/{id}',[EmployeesController::class,'fileDetails']);
           Route::get('/all-personal-files',[EmployeesController::class,'viewPersonalFile']);
 
         Route::get('/topics',[EmployeesController::class,'fetch_topics']);
@@ -476,6 +478,8 @@ Route::middleware('auth:sanctum')->group(function(){
 
      Route::middleware('role:ps')->prefix('ps')->group(function () {
            Route::get('/all-files',[EmployeesController::class,'index']);
+                   Route::get('/all-files/{id}',[EmployeesController::class,'fileDetails']);
+
         Route::get('/all-personal-files',[EmployeesController::class,'viewPersonalFile']);
 
         Route::get('/topics',[EmployeesController::class,'fetch_topics']);
@@ -605,6 +609,8 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::middleware('role:emp')->prefix('employee')->group(function () {
        
         Route::get('/all-files',[EmployeesController::class,'index']);
+                Route::get('/all-files/{id}',[EmployeesController::class,'fileDetails']);
+
          Route::get('/all-personal-files',[EmployeesController::class,'viewPersonalFile']);
 
         Route::get('/topics',[EmployeesController::class,'fetch_topics']);
