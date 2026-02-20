@@ -669,6 +669,12 @@ const MovementHistory = ({ complaint }) => {
       return `${cio} → Record Section (RC) → Hon’ble ${toLok}`;
     }
 
+    else if (item.forward_by_cio_io && item.forward_to_lokayukt) {
+      return `${cio} → Hon’ble ${toLok}`;
+    }
+
+    
+
     /* ================= IO ================= */
 if (item.forward_by_io && item.sent_through_rk === 1 && item.forward_to_ps) {
   return `${io} → Record Section (RC) → ${ps}`;

@@ -138,8 +138,7 @@ const ViewPersonalFiles = () => {
                  <tr>
                     <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
                       <div className="flex justify-center items-center gap-2">
-                         <FaSpinner className="animate-spin text-blue-600" size={20} />
-                         <span>Loading files...</span>
+                         <span>Loading...</span>
                       </div>
                     </td>
                  </tr>
