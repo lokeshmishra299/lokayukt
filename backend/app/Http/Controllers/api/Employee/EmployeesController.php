@@ -17,8 +17,22 @@ class EmployeesController extends Controller
 {
     public function index()
     {
+        // dd("lok0");
         $user = Auth::user()->id;
-        $empfiles = EmployeeUploadFiles::where('added_by', $user)->get();
+        $empfiles = EmployeeUploadFiles::where('added_by', $user)
+        ->where('type', 'Letter')
+        ->get();
+        // dd($empfiles->toArray());
+        return ApiResponse::generateResponse('success', 'Records fetch successfully', $empfiles);
+    }
+
+     public function viewPersonalFile()
+    {
+        // dd("lok0");
+        $user = Auth::user()->id;
+        $empfiles = EmployeeUploadFiles::where('added_by', $user)
+        ->where('type', 'Personal File')
+        ->get();
         // dd($empfiles->toArray());
         return ApiResponse::generateResponse('success', 'Records fetch successfully', $empfiles);
     }
