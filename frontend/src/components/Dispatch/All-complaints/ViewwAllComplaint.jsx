@@ -48,16 +48,32 @@ const SearchableDropdown = ({
     };
   }, [wrapperRef]);
 
-  const selectedOption = options.find((opt) => opt.id == value);
+  // Naya Helper function jo Name aur Role dono dikhayega
+  const getDisplayLabel = (option) => {
+    if (!option) return "";
+    
+    const baseName = option.name || option.user_name || `User ${option.id}`;
+    
+    // Agar get-users API (subrole) ka data hai
+    if (option.subrole_name) {
+      return `${baseName} / ${option.subrole_name}`;
+    }
+    
+    // Agar get-uplokayukt API (role.label) ka data hai
+    if (option.role && option.role.label) {
+      return `${baseName} / ${option.role.label}`;
+    }
+    
+    return baseName;
+  };
+
+  const selectedOption = options.find((opt) => opt?.id == value);
 
   const filteredOptions = options.filter((option) => {
-    const label = option.name || option.user_name || `User ${option.id}`;
-    const district = option.district_name || "";
+    if (!option) return false;
+    const displayLabel = getDisplayLabel(option);
     const search = searchTerm.toLowerCase();
-    return (
-      label.toLowerCase().includes(search) ||
-      district.toLowerCase().includes(search)
-    );
+    return displayLabel.toLowerCase().includes(search);
   });
 
   const handleSelect = (option) => {
@@ -81,13 +97,7 @@ const SearchableDropdown = ({
             !selectedOption ? "text-gray-500" : "text-gray-900"
           }`}
         >
-          {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+          {selectedOption ? getDisplayLabel(selectedOption) : placeholder}
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -115,14 +125,7 @@ const SearchableDropdown = ({
                   }`}
                   onClick={() => handleSelect(option)}
                 >
-                  {option.name || option.user_name || `User ${option.id}`}
-                  {option.district_name ? (
-                    <span className="text-gray-500 text-xs ml-1">
-                      ({option.district_name})
-                    </span>
-                  ) : (
-                    ""
-                  )}
+                  {getDisplayLabel(option)}
                 </div>
               ))
             ) : (
@@ -165,9 +168,10 @@ const ViewAllComplaint = () => {
     type: null,
   });
 
-  const [remark, setRemark] = useState("");
+  const [targetData, setTargetData] = useState("");
   const [selectedForwardTo, setSelectedForwardTo] = useState("");
   const [forwardType, setForwardType] = useState("self");
+  const [targetDate, setTargetDate] = useState("");
 
   const {
     data: complaintData,
@@ -247,18 +251,18 @@ const ViewAllComplaint = () => {
       staleTime: 0,
     });
 
-  const markAsReceivedMutation = useMutation({
+ const markAsReceivedMutation = useMutation({
     mutationFn: async ({ complaintId, remarkData }) => {
       const res = await api.post("/dispatch/received-physical", {
         complaint_id: complaintId,
-        remark: remarkData,
+        target_data: remarkData, // <-- Yahan 'remark' ki jagah 'target_data' kar diya
       });
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data.message || "Marked as received successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      setRemark("");
+     setTargetData("");
       setConfirmConfig({ open: false, type: null });
     },
     onError: (error) => {
@@ -279,7 +283,7 @@ const ViewAllComplaint = () => {
   //   onSuccess: (data) => {
   //     toast.success(data.message || "Forwarded successfully");
   //     queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-  //     setRemark("");
+  //    setTargetData("");
   //     setSelectedForwardTo("");
   //     setConfirmConfig({ open: false, type: null });
   //   },
@@ -289,26 +293,28 @@ const ViewAllComplaint = () => {
   // });
 
   
-  const forwardComplaintMutation = useMutation({
-      mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+const forwardComplaintMutation = useMutation({
+      // ✅ Add targetDate to the destructuring
+      mutationFn: async ({ complaintId, forwardTo, remarkData, targetDate }) => { 
         const res = await api.post(`/dispatch/forward-by-lokayukt/${complaintId}`, {
           forward_to: forwardTo,
-          remark: remarkData,
+          target_data: remarkData,
+          target_date: targetDate, // ✅ Add this line so it goes in the payload
         });
         return res.data;
       },
-      onSuccess: (data) => {
-        toast.success(data.message || "Forwarded successfully");
-        queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-        setRemark("");
-        setSelectedForwardTo("");
-        setConfirmConfig({ open: false, type: null });
-      },
+     onSuccess: (data) => {
+    toast.success(data.message || "Forwarded successfully");
+    queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+    setTargetData("");
+    setTargetDate("");
+    setSelectedForwardTo("");
+    setConfirmConfig({ open: false, type: null });
+  },
       onError: (error) => {
         toast.error(error?.response?.data?.message || "Failed to forward");
       },
     });
-
   const handleMarkAsReceived = () =>
     setConfirmConfig({ open: true, type: "receive" });
 
@@ -316,34 +322,39 @@ const ViewAllComplaint = () => {
     setConfirmConfig({ open: true, type: "forward" });
 
   const handleConfirmYes = () => {
-    if (confirmConfig.type === "receive") {
-      if (!remark.trim()) {
-        toast.error("Please enter a remark");
-        return;
-      }
+  if (confirmConfig.type === "receive") {
+    
       markAsReceivedMutation.mutate({
         complaintId: id,
-        remarkData: remark,
+        remarkData: targetData, // <-- Yahan API ko targetData bheja
       });
-    } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
-        toast.error("Please select forward to and enter a remark");
-        return;
-      }
-      forwardComplaintMutation.mutate({
-        complaintId: id,
-        forwardTo: selectedForwardTo,
-        remarkData: remark,
-      });
-    } else if (confirmConfig.type === "pullback") {
+    }else if (confirmConfig.type === "forward") {
+  if (!selectedForwardTo) {
+    toast.error("Please select officer");
+    return;
+  }
+
+  if (!targetDate) {
+    toast.error("Please select target date");
+    return;
+  }
+
+
+  forwardComplaintMutation.mutate({
+    complaintId: id,
+    forwardTo: selectedForwardTo,
+    remarkData: targetData,
+    targetDate: targetDate,
+  });
+} else if (confirmConfig.type === "pullback") {
       // toast.success("Complaint Pulled Back Successfully");
       setConfirmConfig({ open: false, type: null });
     }
   };
 
-  const handleConfirmNo = () => {
+const handleConfirmNo = () => {
     setConfirmConfig({ open: false, type: null });
-    setRemark("");
+    setTargetData(""); // <-- setRemark ki jagah setTargetData
     setSelectedForwardTo("");
   };
 
@@ -905,24 +916,22 @@ const ViewAllComplaint = () => {
                 {/* --- FORWARDING LOGIC END --- */}
     
                 {/* Remark Field - HIDDEN IF ASSIGN OR PULLBACK */}
-                {confirmConfig.type !== "assign" &&
-                  confirmConfig.type !== "pullback" && (
-                    <>
-                      <div className="mb-5">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Remark <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                          value={remark}
-                          onChange={(e) => setRemark(e.target.value)}
-                          rows={4}
-                          placeholder="Enter your remark here..."
-                          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                        />
-                      </div>
-                    </>
-                  )}
-    
+             {confirmConfig.type === "forward" && (
+  <div className="mb-5">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Target Date <span className="text-red-500">*</span>
+    </label>
+
+    <input
+      type="date"
+      min={new Date().toISOString().split("T")[0]}
+      value={targetDate}
+      onChange={(e) => setTargetDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+)}
                 {/* Buttons */}
                 <div className="flex justify-end gap-3">
                   <button
@@ -939,28 +948,29 @@ const ViewAllComplaint = () => {
                       : "Cancel"}
                   </button>
     
-                  <button
-                    onClick={handleConfirmYes}
-                    disabled={
-                      markAsReceivedMutation.isPending ||
-                     forwardComplaintMutation.isPending ||
-                      (confirmConfig.type === "receive" && !remark.trim()) ||
-                      (confirmConfig.type === "forward" &&
-                        (!remark.trim() ||
-                          !selectedForwardTo ||
-                          isLoadingOptions ||
-                          isFetchingOptions))
-                    }
-                    className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-                  >
-                    {markAsReceivedMutation.isPending ||
-                   forwardComplaintMutation.isPending
-                      ? "Sending..."
-                      : confirmConfig.type === "assign" ||
-                        confirmConfig.type === "pullback"
-                      ? "Yes"
-                      : "Send"}
-                  </button>
+               <button
+  onClick={handleConfirmYes}
+  disabled={
+    markAsReceivedMutation.isPending ||
+    forwardComplaintMutation.isPending ||
+    (confirmConfig.type === "receive" && (!targetData || !targetData.trim())) ||
+    (confirmConfig.type === "forward" &&
+      (
+        !targetDate ||              // ✅ सिर्फ Date चेक करेगा
+        !selectedForwardTo ||       // ✅ सिर्फ Officer चेक करेगा
+        isLoadingOptions ||
+        isFetchingOptions
+      )
+    )
+  }
+  className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+>
+  {markAsReceivedMutation.isPending || forwardComplaintMutation.isPending
+    ? "Sending..."
+    : confirmConfig.type === "assign" || confirmConfig.type === "pullback"
+    ? "Yes"
+    : "Send"}
+</button>
                 </div>
               </div>
             </div>

@@ -46,6 +46,7 @@ const ScanLetter = () => {
   const [filteredComplainList, setFilteredComplainList] = useState([]);
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 1. Fetch Complaint IDs
   const getAllComplainsID = async () => {
@@ -109,54 +110,51 @@ const ScanLetter = () => {
   };
 
   // Submit Logic
-  const submitScaneData = async (e) => {
-    e.preventDefault();
-    setErrors({});
+ const submitScaneData = async (e) => {
+  e.preventDefault();
+  setErrors({});
+  setIsSubmitting(true); // 🔵 START LOADING
 
-    const payload = new FormData();
+  const payload = new FormData();
 
-    payload.append("complaint_id", formData.complaint_id);
-    payload.append("letter_type", formData.letter_type);
-    payload.append("subject", formData.subject);
-    payload.append("medium", formData.medium);
+  payload.append("complaint_id", formData.complaint_id);
+  payload.append("letter_type", formData.letter_type);
+  payload.append("subject", formData.subject);
+  payload.append("medium", formData.medium);
 
+  if (selectedFile) {
+    payload.append("file", selectedFile);
+  }
 
-    if (selectedFile) {
-      payload.append("file", selectedFile);
+  try {
+    const res = await api.post("/dispatch/add-dispatch", payload, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    toast.success("Letter uploaded successfully!");
+
+    queryClient.invalidateQueries(["all-dispatch-letters"]);
+
+    setFormData({
+      complaint_id: "",
+      letter_type: "",
+      subject: "",
+      medium: "",
+    });
+    setSelectedFile(null);
+    setIsModalOpen(false);
+  } catch (error) {
+    if (error.response && error.response.status === 422) {
+      setErrors(error.response.data.errors);
+    } else {
+      toast.error("Something went wrong. Please try again.");
     }
-
-    try {
-      const res = await api.post("/dispatch/add-dispatch", payload, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      toast.success("Letter uploaded successfully!");
-      console.log("Data Posted", res.data);
-
-      // Refresh the list after success
-      queryClient.invalidateQueries(["all-dispatch-letters"]);
-
-      // Reset Form
-      setFormData({
-        complaint_id: "",
-        letter_type: "",
-        subject: "",
-        medium: "",
-      });
-      setSelectedFile(null);
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error("Error submitting:", error);
-
-      if (error.response && error.response.status === 422) {
-        setErrors(error.response.data.errors);
-      } else {
-        toast.error("Something went wrong. Please try again.");
-      }
-    }
-  };
+  } finally {
+    setIsSubmitting(false); // 🔵 STOP LOADING (SUCCESS / ERROR BOTH)
+  }
+};
 
   const handleUploadAreaClick = () => {
     fileInputRef.current.click();
@@ -600,12 +598,23 @@ const makeFileUrl = (filePath) => {
               >
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="w-full md:w-auto px-4 py-2.5 text-sm font-medium text-white bg-blue-800 rounded-lg hover:bg-blue-900 transition-colors shadow-sm"
-              >
-                Upload & Attach
-              </button>
+             <button
+  type="submit"
+  disabled={isSubmitting}
+  className={`w-full md:w-auto px-4 py-2.5 text-sm font-medium text-white rounded-lg shadow-sm flex items-center justify-center gap-2
+    ${isSubmitting
+      ? "bg-blue-400 cursor-not-allowed"
+      : "bg-blue-800 hover:bg-blue-900 transition-colors"}
+  `}
+>
+  {isSubmitting ? (
+    <>
+      Uploading...
+    </>
+  ) : (
+    "Upload & Attach"
+  )}
+</button>
             </div>
           </form>
         </div>
