@@ -121,43 +121,46 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
   return (
     <div className="bg-gray-50 min-h-screen ">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-        <div className="w-full flex flex-col items-start justify-start text-left">
-          <h1 className="text-xl font-bold text-gray-900">Leave Files</h1>
-          <p className="text-sm text-gray-600">अवकाश फाइलें</p>
-        </div>
-       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-
-  {/* Search */}
-  <div className="relative w-full sm:w-80">
-    <FaSearch className="absolute left-3 top-3 text-gray-400" />
-<input
-  type="text"
-  placeholder="फाइल खोजे"
-  className="pl-10 py-1 kruti-input border border-gray-300 rounded-lg w-full
-             text-[14px]
-             placeholder:text-[15px] placeholder:text-gray-400
-             focus:outline-none focus:border-blue-500"
-  value={searchTerm}
-  onChange={(e) => {
-    setSearchTerm(e.target.value);
-    setCurrentPage(1);
-  }}
-/>
+     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+  
+  {/* Title */}
+  <div className="w-full flex flex-col items-start justify-start text-left">
+    <h1 className="text-xl font-bold text-gray-900">Leave Files</h1>
+    <p className="text-sm text-gray-600">अवकाश फाइलें</p>
   </div>
 
-  {/* Button */}
-  <button
-  onClick={()=>{
-    navigate("/employee/add-files")
-  }}
-    className="w-full sm:w-auto px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 whitespace-nowrap"
-  >
-    Add Leave Files
-  </button>
+  {/* Search + Button */}
+  <div className="w-full flex flex-col sm:flex-row sm:items-center gap-3">
 
+    {/* Search */}
+    <div className="relative w-full sm:w-80">
+      <FaSearch className="absolute left-3 top-2.5 text-gray-400 text-sm" />
+      <input
+        type="text"
+        placeholder="फाइल खोजे"
+        className="pl-9 py-1.5 kruti-input border border-gray-300 rounded-lg w-full
+                   text-[14px]
+                   placeholder:text-[14px] placeholder:text-gray-400
+                   focus:outline-none focus:border-blue-500"
+        value={searchTerm}
+        onChange={(e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1);
+        }}
+      />
+    </div>
+
+    {/* Button */}
+    <button
+      onClick={() => navigate("/employee/add-files")}
+      className="w-full sm:w-auto px-5 py-2 bg-blue-600 text-white
+                 rounded-lg hover:bg-blue-700 whitespace-nowrap"
+    >
+      Add Leave Files
+    </button>
+
+  </div>
 </div>
-      </div>
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
