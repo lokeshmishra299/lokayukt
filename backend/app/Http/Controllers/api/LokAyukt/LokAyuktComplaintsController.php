@@ -1309,6 +1309,7 @@ $complainDetails->actions = $actions;
                 if($cmp->save()){
                     $apcAction = new ComplaintAction();
                     $apcAction->complaint_id = $complainId;
+                     $apcAction->forward_by_lokayukt = $user;
                     $apcAction->status = 'Return';
                     $apcAction->remarks = $request->remarks;
                     $apcAction->save();
