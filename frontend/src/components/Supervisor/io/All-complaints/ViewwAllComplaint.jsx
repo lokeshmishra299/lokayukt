@@ -263,7 +263,7 @@ const ViewAllComplaint = () => {
     // --- PULL BACK API (Supervisor) ---
   const pullBackMutation = useMutation({
     mutationFn: async ({ complaintId }) => {
-      return api.post(`/supervisor/pull-back-by-ro-aro/${complaintId}`);
+      return api.post(`/supervisor/pull-back-by-io/${complaintId}`);
     },
     onSuccess: (res) => {
       toast.success("Complaint pulled back successfully");
@@ -319,7 +319,7 @@ const ViewAllComplaint = () => {
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-cio/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-io/${complaintId}`, {
           forward_to: forwardTo,
           // remark: remarkData,
             target_date: targetDate, 

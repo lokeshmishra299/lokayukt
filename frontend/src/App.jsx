@@ -631,6 +631,17 @@ import DspEmployViewFiles from './components/Dispatch/Employ/ViewFiles';
 
 
 
+// Employ Modules steno|assistant-clerk|computer-assistant |car-driver| jamadar|office|farrash|sweeper|gardener|cook|watchman|peon
+  import EmployLayout from "./components/Employ/Layout"
+  import EmployDashboard from "./components/Employ/Dashboard"
+  import EmployComplaints from "./components/Employ/Complaints"
+  import EmployAddFiles from "./components/Employ/AddFiles"
+  import EmployViewFiles from "./components/Employ/ViewFiles"
+  import EmployUserManagement from "./components/Employ/EditUserManagment"
+  // import EmployViewPersonalFile from "./components/Employ/"
+
+
+
 // TanStack 
 const queryClient = new QueryClient();
 
@@ -671,9 +682,29 @@ function App() {
       )}
 
 
-      {/* {role === 'emp ' && (
-       
-      )} */}
+ {(
+  role === 'emp' ||
+  role === 'jamadar' ||
+  role === 'office' ||
+  role === 'farrash' ||
+  role === 'sweeper' ||
+  role === 'gardener' ||
+  role === 'cook' ||
+  role === 'watchman' ||
+  role === 'peon' ||
+  role === 'steno' ||
+  role === 'assistant-clerk' ||
+  role === 'computer-assistant' ||
+  role === 'car-driver'
+) && (
+  <Route path="/employee" element={<EmployLayout />}>
+    <Route path="dashboard" element={<EmployDashboard />} />
+    <Route path="complaints" element={<EmployComplaints />} />
+    <Route path="add-files" element={<EmployAddFiles />} />
+    <Route path="view-files" element={<EmployViewFiles />} />
+    <Route path="user-management" element={<EmployUserManagement />} />
+  </Route>
+)}
       {/*  Operator Routes */}
       {role === 'operator' && (
         <>  
