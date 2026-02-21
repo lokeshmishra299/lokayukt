@@ -365,8 +365,8 @@ const ViewAllComplaint = () => {
 
       });
     }  else if (confirmConfig.type === "forward") {
-  if (!selectedForwardTo || !targetDate) {
-    toast.error("Please select officer and target date");
+  if (!selectedForwardTo) {
+    toast.error("Please select officer");
     return;
   }
       forwardComplaintMutation.mutate({
@@ -1020,7 +1020,6 @@ const ViewAllComplaint = () => {
     (confirmConfig.type === "receive" && !remark.trim()) ||
     (confirmConfig.type === "forward" &&
   (!selectedForwardTo ||
-   !targetDate ||
    isLoadingOptions ||
    isFetchingOptions))
   }

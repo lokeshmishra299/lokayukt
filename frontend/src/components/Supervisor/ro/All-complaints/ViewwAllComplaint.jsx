@@ -404,10 +404,9 @@ function takefile(){
         toast.success(data.message || "Forwarded successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
 
-            setTimeout(()=>{
+             setTimeout(()=>{
           navigate("/supervisor/all-complaints")
         }, 2000)
-        
         setRemark("");
         setThroughRC(false)
         setSelectedForwardTo("");
@@ -435,8 +434,8 @@ function takefile(){
         remarkData: remark,
       });
     } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !targetDate) {
-        toast.error("Please select forward to and enter a remark");
+      if (!selectedForwardTo ) {
+        toast.error("Please select forward");
         return;
       }
       forwardComplaintMutation.mutate({

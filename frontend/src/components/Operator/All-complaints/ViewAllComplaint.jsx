@@ -181,8 +181,8 @@
           remarkData: remark,
         });
       } else if (confirmConfig.type === "forward") {
-        if (!selectedForwardTo || !targetDate) {
-          toast.error("Please select forward to and enter a remark");
+        if (!selectedForwardTo ) {
+          toast.error("Please select forward");
           return;
         }
         forwardPhysicallyMutation.mutate({
@@ -846,7 +846,8 @@
  {confirmConfig.type === "forward" && (
   <div className="mb-5">
     <label className="block text-sm font-medium text-gray-700 mb-2">
-      Target Date <span className="text-red-500">*</span>
+      Target Date 
+      {/* <span className="text-red-500">*</span> */}
     </label>
     <input
       type="date"
@@ -873,7 +874,7 @@
                   {confirmConfig.type === "pullback" ? "No" : "Cancel"}
                 </button>
 
-                <button
+              <button
                   onClick={handleConfirmYes}
                   disabled={
                     markAsReceivedMutation.isPending ||
@@ -881,8 +882,7 @@
                     (confirmConfig.type === "forward" &&
                       (isLoadingOptions || isFetchingOptions)) ||
                     (confirmConfig.type === "receive" && !remark.trim()) ||
-                    (confirmConfig.type === "forward" &&
-                      (!selectedForwardTo || !targetDate))
+                    (confirmConfig.type === "forward" && !selectedForwardTo)
                   }
                   className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >

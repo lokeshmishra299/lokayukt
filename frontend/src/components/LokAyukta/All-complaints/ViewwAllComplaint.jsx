@@ -580,10 +580,7 @@ const releaseComplaintMutation = useMutation({
     toast.error("Please select officer to forward");
     return;
   }
-  if (!targetDate) {
-    toast.error("Please select target date");
-    return;
-  }
+  
 
   forwardComplaintMutation.mutate({
     complaintId: id,
@@ -1413,7 +1410,8 @@ const releaseComplaintMutation = useMutation({
 {confirmConfig.type === "forward" && (
   <div className="mb-5 mt-3">
     <label className="block text-sm font-medium text-gray-700 mb-2">
-      Target Date <span className="text-red-500">*</span>
+      Target Date 
+      {/* <span className="text-red-500">*</span> */}
     </label>
     <input
       type="date"
@@ -1451,8 +1449,7 @@ const releaseComplaintMutation = useMutation({
                   pullBackMutation.isPending ||
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
-                    (!selectedForwardTo  ||
-                      !targetDate ||
+                    (!selectedForwardTo ||
                       isLoadingOptions ||
                       isFetchingOptions))
                 }

@@ -1151,11 +1151,11 @@ const ViewAllComplaint = () => {
                 disabled={
                   markAsReceivedMutation.isPending ||
                   forwardComplaintMutation.isPending ||
-                  assignToSelfMutation.isPending || // ✅ Take File Loading
-                  pullBackMutation.isPending || // ✅ Pull Back Loading
+                  assignToSelfMutation.isPending || 
+                  pullBackMutation.isPending || 
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
-                    (!targetDate ||
+                    (
                       !selectedForwardTo ||
                       isLoadingOptions ||
                       isFetchingOptions))

@@ -1156,7 +1156,7 @@ const ViewAllComplaint = () => {
                   pullBackMutation.isPending || // ✅ Pull Back Loading
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
-                    (!targetDate ||
+                    (
                       !selectedForwardTo ||
                       isLoadingOptions ||
                       isFetchingOptions))

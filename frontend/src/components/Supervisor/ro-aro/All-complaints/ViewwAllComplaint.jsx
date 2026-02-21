@@ -434,8 +434,8 @@ function takefile(){
         remarkData: remark,
       });
     } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !targetDate) {
-        toast.error("Please select forward to and enter a remark");
+      if (!selectedForwardTo ) {
+        toast.error("Please select forward");
         return;
       }
       forwardComplaintMutation.mutate({

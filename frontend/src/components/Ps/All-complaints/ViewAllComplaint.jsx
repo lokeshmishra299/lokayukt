@@ -362,7 +362,7 @@ return flatList.filter(
           setTimeout(()=>{
           navigate("/ps/all-complaints")
         }, 2000)
-        
+
       // setRemark("");
       setTargetDate("");
       setSelectedForwardTo("");
@@ -387,10 +387,7 @@ return flatList.filter(
     toast.error("Please select officer");
     return;
   }
-  if (!targetDate) {
-    toast.error("Please select target date");
-    return;
-  }
+ 
 
   forwardComplaintMutation.mutate({
     complaintId: id,
@@ -1305,7 +1302,8 @@ return flatList.filter(
 {confirmConfig.type === "forward" && (
   <div className="mb-5">
     <label className="block text-sm font-medium text-gray-700 mb-2">
-      Target Date <span className="text-red-500">*</span>
+      Target Date 
+      <span className="text-red-500">*</span>
     </label>
     <input
       type="date"
@@ -1343,7 +1341,6 @@ return flatList.filter(
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
                     (!selectedForwardTo ||
-  !targetDate ||
   isLoadingOptions ||
   isFetchingOptions))
                 }

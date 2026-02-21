@@ -404,7 +404,7 @@ const ViewAllComplaint = () => {
          setTimeout(()=>{
           navigate("/supervisor/all-complaints")
         }, 2000)
-        
+
       setRemark("");
       setThroughRC(false);
       setSelectedForwardTo("");
@@ -1156,7 +1156,7 @@ const ViewAllComplaint = () => {
                   pullBackMutation.isPending || // ✅ Pull Back Loading
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
-                    (!targetDate ||
+                    (
                       !selectedForwardTo ||
                       isLoadingOptions ||
                       isFetchingOptions))

@@ -532,11 +532,7 @@ const ViewAllComplaint = () => {
         toast.error("Please select officer");
         return;
       }
-      if (!targetDate) {
-        toast.error("Please select target date");
-        return;
-      }
-
+     
       forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
@@ -1384,7 +1380,8 @@ const ViewAllComplaint = () => {
             {confirmConfig.type === "forward" && (
               <div className="mb-5">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Target Date <span className="text-red-500">*</span>
+                  Target Date 
+                  {/*  <span className="text-red-500">*</span> */}
                 </label>
                 <input
                   type="date"
@@ -1422,7 +1419,6 @@ const ViewAllComplaint = () => {
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
                     (!selectedForwardTo ||
-                      !targetDate ||
                       isLoadingOptions ||
                       isFetchingOptions))
                 }
