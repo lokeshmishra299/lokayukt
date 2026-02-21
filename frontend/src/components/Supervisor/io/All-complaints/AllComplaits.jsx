@@ -84,18 +84,18 @@ const AllComplaints = () => {
     }
   };
 
-  const sortComplaintsByDate = (complaints, order) => {
-    return [...complaints].sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
+  // const sortComplaintsByDate = (complaints, order) => {
+  //   return [...complaints].sort((a, b) => {
+  //     const dateA = new Date(a.created_at);
+  //     const dateB = new Date(b.created_at);
 
-      if (order === "desc") {
-        return dateB - dateA;
-      } else {
-        return dateA - dateB;
-      }
-    });
-  };
+  //     if (order === "desc") {
+  //       return dateB - dateA;
+  //     } else {
+  //       return dateA - dateB;
+  //     }
+  //   });
+  // };
 
   const getAllComplaints = async () => {
     const res = await api.get("/supervisor/all-complaints");
@@ -151,13 +151,13 @@ const AllComplaints = () => {
     queryFn: getComplaintTypes,
   });
 
-  useEffect(() => {
+useEffect(() => {
     if (complaintsData) {
       setAllComplaints(complaintsData);
-      const sorted = sortComplaintsByDate(complaintsData, sortOrder);
-      setFilteredComplaints(sorted);
+      // बिना सॉर्ट किए सीधा डेटा सेट करें
+      setFilteredComplaints(complaintsData); 
     }
-  }, [complaintsData, sortOrder]);
+  }, [complaintsData]); // sortOrder को हटा दिया
 
 //   useEffect(() => {
 //     if (allComplaints.length === 0) return;
@@ -298,20 +298,19 @@ useEffect(() => {
       });
     }
 
-    // सॉर्टिंग
-    const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(sorted);
-    // setCurrentPage(1);
-
-  }, [
-    searchQuery,
-    allComplaints,
-    selectedDistrict,
-    selectedStatus,
-    selectedFeeStatus,
-    selectedCaseType,
-    sortOrder
-  ]);
+   // सीधा सेट करें
+      setFilteredComplaints(filtered);
+      // setCurrentPage(1);
+  
+    }, [
+      searchQuery,
+      allComplaints,
+      selectedDistrict,
+      selectedStatus,
+      selectedFeeStatus,
+      selectedCaseType
+    ]); // sortOrder को हटा दिया
+    
 
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();

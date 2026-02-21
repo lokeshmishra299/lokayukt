@@ -84,18 +84,18 @@ const AllComplaints = () => {
     }
   };
 
-  const sortComplaintsByDate = (complaints, order) => {
-    return [...complaints].sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
+  // const sortComplaintsByDate = (complaints, order) => {
+  //   return [...complaints].sort((a, b) => {
+  //     const dateA = new Date(a.created_at);
+  //     const dateB = new Date(b.created_at);
 
-      if (order === "desc") {
-        return dateB - dateA;
-      } else {
-        return dateA - dateB;
-      }
-    });
-  };
+  //     if (order === "desc") {
+  //       return dateB - dateA;
+  //     } else {
+  //       return dateA - dateB;
+  //     }
+  //   });
+  // };
 
   const getAllComplaints = async () => {
     const res = await api.get("/supervisor/all-complaints");
@@ -154,10 +154,9 @@ const AllComplaints = () => {
   useEffect(() => {
     if (complaintsData) {
       setAllComplaints(complaintsData);
-      const sorted = sortComplaintsByDate(complaintsData, sortOrder);
-      setFilteredComplaints(sorted);
+      setFilteredComplaints(complaintsData); 
     }
-  }, [complaintsData, sortOrder]);
+  }, [complaintsData]);
 
 //   useEffect(() => {
 //     if (allComplaints.length === 0) return;
@@ -298,8 +297,8 @@ useEffect(() => {
     }
 
     // सॉर्टिंग
-    const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(sorted);
+    setFilteredComplaints(filtered);
+    // setFilteredComplaints(sorted);
     // setCurrentPage(1);
 
   }, [
@@ -309,7 +308,6 @@ useEffect(() => {
     selectedStatus,
     selectedFeeStatus,
     selectedCaseType,
-    sortOrder
   ]);
   
   const handleViewDetails = (e, complaintId) => {

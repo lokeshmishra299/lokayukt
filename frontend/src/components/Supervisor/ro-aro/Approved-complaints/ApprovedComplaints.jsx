@@ -145,13 +145,12 @@ const ApprovedComplaints = () => {
     queryFn: getComplaintTypes,
   });
 
-  useEffect(() => {
+ useEffect(() => {
     if (complaintsData) {
       setAllComplaints(complaintsData);
-      const sorted = sortComplaintsByDate(complaintsData, sortOrder);
-      setFilteredComplaints(sorted);
+      setFilteredComplaints(complaintsData); // बिना सॉर्ट के सीधा सेट करें
     }
-  }, [complaintsData, sortOrder]);
+  }, [complaintsData]); // sortOrder हटा दिया
 
 
   useEffect(() => {
@@ -223,19 +222,18 @@ const ApprovedComplaints = () => {
       }
   
       // सॉर्टिंग
-      const sorted = sortComplaintsByDate(filtered, sortOrder);
-      setFilteredComplaints(sorted);
-      // setCurrentPage(1);
-  
-    }, [
-      searchQuery,
-      allComplaints,
-      selectedDistrict,
-      selectedStatus,
-      selectedFeeStatus,
-      selectedCaseType,
-      sortOrder
-    ]);
+      // सीधा सेट करें
+    setFilteredComplaints(filtered);
+    // setCurrentPage(1);
+
+  }, [
+    searchQuery,
+    allComplaints,
+    selectedDistrict,
+    selectedStatus,
+    selectedFeeStatus,
+    selectedCaseType
+  ]); // sortOrder हटा दिया
 
 //   useEffect(() => {
 //     if (allComplaints.length === 0) return;
