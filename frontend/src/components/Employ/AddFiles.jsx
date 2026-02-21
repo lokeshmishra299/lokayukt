@@ -7,6 +7,7 @@ import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -28,6 +29,7 @@ const uploadApi = axios.create({
 });
 
 const AddFiles = () => {
+  const c = useNavigate()
   const [correspondenceType, setCorrespondenceType] = useState("Letter");
   const [title, setTitle] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -122,6 +124,10 @@ uploadedFiles.forEach((fileData, index) => {
       await uploadApi.post("/employee/upload-file", formData);
 
       toast.success("Uploaded document successfully!");
+
+      setTimeout(()=>{
+        navigate("/employee/view-files")
+      }, 2000)
       setUploadedFiles([]);
       setTitle(""); 
       setCorrespondenceType("Letter"); 
