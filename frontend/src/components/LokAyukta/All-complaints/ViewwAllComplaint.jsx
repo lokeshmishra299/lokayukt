@@ -440,6 +440,9 @@ const releaseComplaintMutation = useMutation({
       toast.success("Complaint pulled back successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       setConfirmConfig({ open: false, type: null });
+      setTimeout(()=>{
+        navigate("/lokayukt/all-complaints")
+      }, 2000)
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Pull back failed");
@@ -461,6 +464,10 @@ const releaseComplaintMutation = useMutation({
     onSuccess: (data) => {
       // setTimeout(()=>{
       toast.success("Return With Remarked Successfully");
+
+      setTimeout(()=>{
+         navigate("/lokayukt/all-complaints")
+      }, 2000)
 
       // }, 2000)
       setThroughRC(false);
@@ -489,6 +496,8 @@ const releaseComplaintMutation = useMutation({
     onSuccess: (data) => {
       toast.success("Dispose successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+      
       setRemark("");
       setConfirmConfig({ open: false, type: null });
     },
@@ -536,6 +545,10 @@ const releaseComplaintMutation = useMutation({
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
       // setRemark("");
+
+        setTimeout(()=>{
+         navigate("/lokayukt/all-complaints")
+      }, 2000)
           setTargetDate("");
       setThroughRC(false);
       setSelectedForwardTo("");
@@ -1385,11 +1398,12 @@ const releaseComplaintMutation = useMutation({
       Remark <span className="text-red-500">*</span>
     </label>
     <textarea
-    placeholder="Enter your remark here..."
+    // placeholder="Enter your remark here..."
+    placeholder="vkids rFkk fVIi.kh ;gk¡ fy[ksa"
       value={remark}
       onChange={(e) => setRemark(e.target.value)}
       rows={4}
-      className="w-full px-3 py-2 border border-gray-300 rounded
+      className="w-full kruti-input px-3 py-2 border border-gray-300 rounded
                  focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
     />
   </div>

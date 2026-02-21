@@ -6,6 +6,7 @@ import { toast, Toaster } from "react-hot-toast";
 
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useNavigate } from 'react-router-dom';
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
@@ -309,6 +310,8 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
 ComplaintPrintView.displayName = 'ComplaintPrintView';
 
 const Complaints = () => {
+
+  const navigate = useNavigate();
 
   
   const printRef = useRef(null);
@@ -947,6 +950,11 @@ const handleMainRespondent = (id) => {
     });
 
     toast.success('ड्राफ्ट सफलतापूर्वक सेव हो गया ✅');
+
+    setTimeout(()=>{
+      navigate("/operator/draft")
+    }, 2000)
+    
     setShowPreview(false);
     resetAll()
 
@@ -1097,6 +1105,12 @@ const handleMainRespondent = (id) => {
         position: "top-right",
         autoClose: 3000,
       });
+
+       setTimeout(()=>{
+      navigate("/operator/all-complaints")
+    }, 2000)
+
+      
       setShowPreview(false);
       handleReset();
 

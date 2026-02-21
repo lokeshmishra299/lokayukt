@@ -519,7 +519,10 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
       <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Draft</h2>
         <div className="flex items-center gap-2">
-          {Number(complaint?.approved_rejected_by_ro_aro) !== 1 && (
+          {
+
+            complaint?.assign_to_ro_aro ? 
+            Number(complaint?.approved_rejected_by_ro_aro) !== 1 && (
               <button
             className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
             onClick={() => {
@@ -530,10 +533,19 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
             Create Draft
           </button>
           )
+          :
+          <div>
+
+          </div>
 
           }
          
-        {Number(complaint?.approved_rejected_by_ro_aro) !== 1 && (
+        {
+          
+
+          complaint?.assign_to_ro_aro
+          ? 
+          Number(complaint?.approved_rejected_by_ro_aro) !== 1 && (
   <button
     onClick={handleAddDocuments}
     className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
@@ -541,7 +553,13 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
     <FaCloudUploadAlt className="w-4 h-4" />
     Add Draft
   </button>
-)}
+)
+:
+<div>
+  
+</div>
+
+}
          
         </div>
       </div>
@@ -830,12 +848,7 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
                 }`}
               >
 
-              <style>{`
-                  .public-DraftStyleDefault-block {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                  }
-                `}</style>
+            
                 
                 {/* <Editor
                   editorState={editorState}
@@ -864,6 +877,8 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
 
 
 <style>{`
+.kruti-input div[data-block="true"], 
+.kruti-input p,
 .public-DraftStyleDefault-block {
   margin: 0 !important;
   padding: 0 !important;
@@ -872,7 +887,7 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
 .kruti-input .public-DraftEditor-content {
   font-family: 'KrutiDev' !important;
   font-size: 20px !important;
-  line-height: 1.5 !important;
+  line-height: 1.1 !important; 
 }
 
 .kruti-input .public-DraftEditorPlaceholder-root {
@@ -892,7 +907,6 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
   font-family: 'KrutiDev' !important;
 }
 `}</style>
-
                 <Editor
 
                 
@@ -1037,13 +1051,21 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
             <div className="-ml-5 mt-2"> 
               
               <div
-                className="ml-6 draft-preview-content"
-                dangerouslySetInnerHTML={{
-                  __html: sentToPersonInfo
-                    ?.replace(/<li>/g, '<li style="font-family: KrutiDev; font-size:20px;">')
-                    .replace(/<p>/g, '<p style="font-family: KrutiDev; font-size:20px; margin:0;">'),
-                }}
-              />
+  className="ml-6 draft-preview-content"
+  dangerouslySetInnerHTML={{
+    __html: sentToPersonInfo
+      ?.replace(
+  /<li>/g,
+  '<li style="font-family: KrutiDev; font-size:20px; margin:0; padding:0; line-height:1.1;">'
+)
+.replace(
+  /<p>/g,
+  '<p style="font-family: KrutiDev; font-size:20px; margin:0; padding:0; line-height:1.1;">'
+)
+  }}
+/>
+
+
             </div>
 
 
@@ -1062,9 +1084,18 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
               className="rounded-md bg-white min-h-[200px] md:min-h-[260px] draft-preview-content"
               dangerouslySetInnerHTML={{
                 __html: note
-                  .replace(/<li>/g, '<li style="font-family: Arial, sans-serif;"><span style="font-family: KrutiDev; font-size:22px;">')
-                  .replace(/<\/li>/g, '</span></li>')
-                  .replace(/<p>/g, '<p style="font-family: KrutiDev; font-size:22px;">')
+                 .replace(
+  /<li>/g,
+  '<li style="font-family: Arial, sans-serif; margin:0; padding:0; line-height:1.1;"><span style="font-family: KrutiDev; font-size:22px; line-height:1.1;">'
+)
+.replace(
+  /<\/li>/g,
+  '</span></li>'
+)
+.replace(
+  /<p>/g,
+  '<p style="font-family: KrutiDev; font-size:22px; margin:0; padding:0; line-height:1.1;">'
+)
               }}
             />
 

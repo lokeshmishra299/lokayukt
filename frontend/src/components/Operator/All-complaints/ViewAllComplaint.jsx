@@ -151,6 +151,10 @@
       onSuccess: (data) => {
         toast.success(data.message || "Forwarded successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+        setTimeout(()=>{
+          navigate("/operator/all-complaints")
+        }, 2000)
         setRemark("");
         setSelectedForwardTo("");
         setConfirmConfig({ open: false, type: null });
@@ -827,8 +831,11 @@
       value={remark}
       onChange={(e) => setRemark(e.target.value)}
       rows={4}
-      placeholder="Enter remark here..."
-      className="w-full px-3 py-2 border border-gray-300 rounded 
+      // placeholder="Enter remark here..."
+      placeholder="vkids rFkk fVIi.kh ;gk¡ fy[ksa"
+      className="w-full
+      kruti-input
+       px-3 py-2 border border-gray-300 rounded 
                  focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
     />
   </div>
