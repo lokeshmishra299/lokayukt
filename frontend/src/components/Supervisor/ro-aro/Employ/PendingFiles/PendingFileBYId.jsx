@@ -198,16 +198,16 @@ const PendingFileBYId = () => {
 
         {/* Tab Content Area */}
         <div className="flex-1 p-4 md:p-6 overflow-y-auto">
-          {activeTab === "notings" && (
-             <div>
-              <Notes/>
-             </div>
-          )}
-          {activeTab === "movement" && (
-             <div>
-              <MovementHistory/>
-             </div>
-          )}
+         {activeTab === "notings" && fileData && (
+  <div>
+    <Notes complaint={fileData} />
+  </div>
+)}
+       {activeTab === "movement" && fileData && (
+  <div>
+    <MovementHistory complaint={fileData} />
+  </div>
+)}
         </div>
 
         {/* --- Send Button Section --- */}
