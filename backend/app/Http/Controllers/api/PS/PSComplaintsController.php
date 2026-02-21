@@ -111,35 +111,28 @@ if($roleParent === 'lok-ayukt'){
 // });
 $psId = auth()->id();
 
-$query->where(function ($mainQuery) use ($psId) {
+$query->where(function ($q) use ($psId) {
 
-    // ✅ 1. Fresh complaint (kisi ne forward nahi ki)
-    $mainQuery->whereNotExists(function ($q) {
-        $q->select(DB::raw(1))
-          ->from('complaint_actions as rep')
-          ->whereColumn('rep.complaint_id', 'complaints.id')
-          ->where(function ($q2) {
-              $q2->whereNotNull('rep.forward_by_ps')
-                 ->orWhere('rep.forward_by_lokayukt', '<>', 0);
-          });
+    $q->whereExists(function ($sub) use ($psId) {
+        $sub->select(DB::raw(1))
+            ->from('complaint_actions as rep')
+            ->whereColumn('rep.complaint_id', 'complaints.id')
+            ->where('rep.forward_to_ps', $psId);
     })
 
-    // ✅ 2. Current PS ko forward hui ho
-    ->orWhereExists(function ($q) use ($psId) {
-        $q->select(DB::raw(1))
-          ->from('complaint_actions as rep')
-          ->whereColumn('rep.complaint_id', 'complaints.id')
-          ->where('rep.forward_to_ps', $psId);
-    })
-
-    // ✅ 3. Lokayukt/RK level se new aayi ho
-    ->orWhere(function ($q) {
-        $q->where('complaints.approved_rejected_by_rk', 1)
-          ->where('complaints.approved_rejected_by_ps', 0);
+    ->orWhere(function ($inner) {
+        $inner->where('complaints.approved_rejected_by_rk', 1)
+              ->whereNull('complaints.approved_rejected_by_ps');
     });
 
-})->orderByDesc('complaints.id');
-    // $query->where('complaints.approved_rejected_by_rk', 1)
+})
+
+->whereNotExists(function ($sub) use ($psId) {
+    $sub->select(DB::raw(1))
+        ->from('complaint_actions as rep')
+        ->whereColumn('rep.complaint_id', 'complaints.id')
+        ->where('rep.forward_by_ps', $psId);
+});    // $query->where('complaints.approved_rejected_by_rk', 1)
     //       ->where('complaints.approved_rejected_by_lokayukt', 0);
     // //       ->orWhere(function ($q) {
     //       $q->whereNotNull('rep.forward_by_ps')
