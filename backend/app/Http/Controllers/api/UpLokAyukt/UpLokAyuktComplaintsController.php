@@ -616,6 +616,7 @@ $complainDetails->actions = $actions;
                 if($cmp->save()){
                     $apcAction = new ComplaintAction();
                     $apcAction->complaint_id = $complainId;
+                    $apcAction->forward_by_uplokayukt = $user;
                     $apcAction->status = 'Final Decision';
                     $apcAction->remarks = $request->remark;
                     $apcAction->save();

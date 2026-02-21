@@ -308,6 +308,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/forward-by-ds-js/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyds']);
         Route::post('/forward-by-da/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyRoAro']);
+        Route::post('/forward-by-ro/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyRo']);
         Route::post('/forward-by-sec/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySec']);
         Route::post('/forward-by-cio/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyCio']);
         Route::post('/forward-by-io/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyio']);
@@ -606,7 +607,8 @@ Route::middleware('auth:sanctum')->group(function(){
        
     });
 
-    Route::middleware('role:emp')->prefix('employee')->group(function () {
+    Route::middleware('role:steno|assistant-clerk|computer-assistant
+|car-driver|jamadar|orderly/jamadar|office|farrash|sweeper|gardener|cook|watchman|peon')->prefix('employee')->group(function () {
        
         Route::get('/all-files',[EmployeesController::class,'index']);
                 Route::get('/all-files/{id}',[EmployeesController::class,'fileDetails']);

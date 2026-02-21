@@ -74,7 +74,23 @@ class PSComplaintsController extends Controller
         'dd1.district_name as dist_new'
     );
 if($roleParent === 'lok-ayukt'){
-      $query->whereNotExists(function ($q) {
+    //   $query->whereNotExists(function ($q) {
+    //     $q->select(DB::raw(1))
+    //       ->from('complaint_actions as rep')
+    //       ->whereColumn('rep.complaint_id', 'complaints.id')
+    //       ->where(function ($q2) {
+    //           $q2->whereNotNull('rep.forward_by_ps')
+    //              ->orWhere('rep.forward_by_lokayukt', '<>', 0);
+    //       });
+    // });
+
+    $psId = auth()->id(); // current PS id
+
+$query->where('complaints.approved_rejected_by_ps','0')
+->where(function ($mainQuery) use ($psId) {
+
+    // ✅ Existing functionality
+    $mainQuery->whereNotExists(function ($q) {
         $q->select(DB::raw(1))
           ->from('complaint_actions as rep')
           ->whereColumn('rep.complaint_id', 'complaints.id')
@@ -82,7 +98,17 @@ if($roleParent === 'lok-ayukt'){
               $q2->whereNotNull('rep.forward_by_ps')
                  ->orWhere('rep.forward_by_lokayukt', '<>', 0);
           });
+    })
+
+    // ✅ OR → jo current PS ko assign ho wo bhi show
+    ->orWhereExists(function ($q) use ($psId) {
+        $q->select(DB::raw(1))
+          ->from('complaint_actions as rep')
+          ->whereColumn('rep.complaint_id', 'complaints.id')
+          ->where('rep.forward_to_ps', $psId);
     });
+
+});
     // $query->where('complaints.approved_rejected_by_rk', 1)
     //       ->where('complaints.approved_rejected_by_lokayukt', 0);
     // //       ->orWhere(function ($q) {
@@ -104,7 +130,7 @@ if($roleParent === 'lok-ayukt'){
           ->whereNotNull('rep.forward_to_sec')
           ->where('rep.forward_to_sec', $parentId);
 }
-$records = $query->get();
+$records = $query->orderBy('complaints.updated_at')->get();
 
 
      if ($roleParent === 'lok-ayukt') {
@@ -707,6 +733,8 @@ $complainDetails->actions = $actions;
                             if($roleFwd === "lok-ayukt" || $roleFwd === "up-lok-ayukt"){
                                     if($roleFwd === "lok-ayukt"){
                                     $apcAction->forward_to_lokayukt = $request->forward_to;
+                                    $cmp->approved_rejected_by_lokayukt = 0;
+                                    $cmp->save();
                                 }elseif($roleFwd === "up-lok-ayukt"){
                                     $apcAction->forward_to_uplokayukt = $request->forward_to;
                                 }
@@ -1111,7 +1139,8 @@ $complainDetails->actions = $actions;
              ->where(function ($q) use ($parentId, $roleParent,$userId) {
 
                  if ($roleParent === 'lok-ayukt') {
-                    $q->where('rep.forward_by_ps', $userId);
+                    $q->where('cm.approved_rejected_by_ps','1')
+                      ->where('rep.forward_by_ps', $userId);
                     //  $q->where('rep.forward_to_lokayukt', $parentId);      
                  } elseif ($roleParent === 'up-lok-ayukt') {
                     //  $q->where('rep.forward_to_uplokayukt', $parentId);

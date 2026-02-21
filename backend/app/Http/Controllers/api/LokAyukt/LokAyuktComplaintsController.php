@@ -48,15 +48,31 @@ class LokAyuktComplaintsController extends Controller
                       'resp.respondent_name as respondentName',
         );
 
-  $query->whereNotExists(function ($q) {
-        $q->select(DB::raw(1))
-          ->from('complaint_actions as rep')
-          ->whereColumn('rep.complaint_id', 'complaints.id')
-          ->where(function ($q2) {
-              $q2->whereNotNull('rep.forward_by_ps')
-                 ->orWhere('rep.forward_by_lokayukt', '<>', 0);
-          });
-    });
+//   $query->whereNotExists(function ($q) {
+//         $q->select(DB::raw(1))
+//           ->from('complaint_actions as rep')
+//           ->whereColumn('rep.complaint_id', 'complaints.id')
+//           ->where(function ($q2) {
+//               $q2->whereNotNull('rep.forward_by_ps')
+//                  ->orWhere('rep.forward_by_lokayukt', '<>', 0);
+//           });
+//     });
+$query->where('complaints.approved_rejected_by_lokayukt', 0)
+->whereExists(function ($q) {
+    $q->select(DB::raw(1))
+      ->from('complaint_actions as rep')
+      ->whereColumn('rep.complaint_id', 'complaints.id')
+
+      // latest action only
+      ->whereRaw('rep.id = (
+            SELECT MAX(id)
+            FROM complaint_actions
+            WHERE complaint_id = complaints.id
+      )')
+
+      // latest forward Lokayukt ko aya ho
+      ->where('rep.forward_to_lokayukt', '<>', 0);
+});
       
     //   ->where(function ($q) {
     //       $q->whereNull('rep.forward_by_ps')
@@ -504,6 +520,7 @@ $complainDetails->actions = $actions;
                 if($cmp->save()){
                     $apcAction = new ComplaintAction();
                     $apcAction->complaint_id = $complainId;
+                    $apcAction->forward_by_lokayukt = $user;
                     $apcAction->status = 'Final Decision';
                     $apcAction->remarks = $request->remark;
                     $apcAction->save();
@@ -1024,11 +1041,19 @@ $complainDetails->actions = $actions;
                 );
 
          $complainDetails->where('form_status', 1)
+    // ->where(function ($q) {
+    //     $q->where('approved_rejected_by_lokayukt', 1)
+    //       ->orWhereNotNull('rep.forward_to_ps')
+    //       ->orWhere('rep.forward_to_lokayukt','<>',0);
+    // });
+
     ->where(function ($q) {
-        $q->where('approved_rejected_by_lokayukt', 1)
-          ->orWhereNotNull('rep.forward_to_ps')
-          ->orWhere('rep.forward_to_lokayukt','<>',0);
-    });
+    $q->where('approved_rejected_by_lokayukt', 1)
+      ->orWhere(function ($q2) {
+          $q2->whereNotNull('rep.forward_to_ps')
+             ->where('rep.forward_to_lokayukt','<>',0);
+      });
+});
 
      
     //  $complainDetails->where('form_status', 1)
