@@ -791,7 +791,7 @@ $complainDetails->actions = $actions;
                 
      $complainDetails->where('form_status', 1)
       ->distinct('complaints.id')
-                  ->where('rep.forward_to_uplokayukt', $user)
+                  ->where('rep.forward_by_uplokayukt', $user)
                   ->where('approved_rejected_by_rk', 1)
                   ->where('approved_rejected_by_lokayukt', 1);
             // ->where('approved_rejected_by_rk', 1)

@@ -132,12 +132,13 @@ $query->where(function ($q) use ($psId) {
         ->from('complaint_actions as rep')
         ->whereColumn('rep.complaint_id', 'complaints.id')
         ->where('rep.forward_by_ps', $psId);
-});    // $query->where('complaints.approved_rejected_by_rk', 1)
+})    // $query->where('complaints.approved_rejected_by_rk', 1)
     //       ->where('complaints.approved_rejected_by_lokayukt', 0);
     // //       ->orWhere(function ($q) {
     //       $q->whereNotNull('rep.forward_by_ps')
     //         ->orWhere('rep.forward_by_lokayukt','<>',0);
     //   });
+    ->where('complaints.approved_rejected_by_lokayukt', '<>', 1);
 
 }elseif($roleParent === 'up-lok-ayukt'){
     // $query->where('complaints.approved_rejected_by_rk', 1)
