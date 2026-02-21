@@ -191,13 +191,19 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Documents</h2>
-        <button
+        {complaint.assign_to_ps ? 
+         <button
           onClick={handleAddDocuments}
           className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
         >
           <FaCloudUploadAlt className="w-4 h-4" />
           Add Documents
-        </button>
+        </button> :
+        <div>
+
+        </div>
+        }
+       
       </div>
 
       {/* Docs List */}

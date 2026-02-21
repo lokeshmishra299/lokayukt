@@ -198,16 +198,16 @@ const PendingFileBYId = () => {
 
         {/* Tab Content Area */}
         <div className="flex-1 p-4 md:p-6 overflow-y-auto">
-          {activeTab === "notings" && (
-             <div>
-              <Notes/>
-             </div>
-          )}
-          {activeTab === "movement" && (
-             <div>
-              <MovementHistory/>
-             </div>
-          )}
+         {activeTab === "notings" && fileData && (
+  <div>
+    <Notes complaint={fileData} />
+  </div>
+)}
+       {activeTab === "movement" && fileData && (
+  <div>
+    <MovementHistory complaint={fileData} />
+  </div>
+)}
         </div>
 
         {/* --- Send Button Section --- */}
@@ -260,10 +260,9 @@ const PendingFileBYId = () => {
                     const subroleLabel = item.subrole?.label;
 
                     return (
-                      <option key={item.id} value={item.id}>
-                        {roleLabel}
-                        {subroleLabel ? ` (${subroleLabel})` : ""}
-                      </option>
+                     <option key={item.id} value={item.id}>
+  {item.name} / ({item.role?.label})
+</option>
                     );
                   })}
                 </select>
