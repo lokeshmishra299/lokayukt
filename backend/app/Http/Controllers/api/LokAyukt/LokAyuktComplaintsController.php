@@ -57,23 +57,46 @@ class LokAyuktComplaintsController extends Controller
 //                  ->orWhere('rep.forward_by_lokayukt', '<>', 0);
 //           });
 //     });
-$query->where('complaints.approved_rejected_by_lokayukt', 0)
-->whereExists(function ($q) {
-    $q->select(DB::raw(1))
-      ->from('complaint_actions as rep')
-      ->whereColumn('rep.complaint_id', 'complaints.id')
+// $query->where('complaints.approved_rejected_by_lokayukt', 0)
+// ->whereExists(function ($q) {
+//     $q->select(DB::raw(1))
+//       ->from('complaint_actions as rep')
+//       ->whereColumn('rep.complaint_id', 'complaints.id')
 
-      // latest action only
-      ->whereRaw('rep.id = (
-            SELECT MAX(id)
-            FROM complaint_actions
-            WHERE complaint_id = complaints.id
-      )')
+//       // latest action only
+//       ->whereRaw('rep.id = (
+//             SELECT MAX(id)
+//             FROM complaint_actions
+//             WHERE complaint_id = complaints.id
+//       )')
 
-      // latest forward Lokayukt ko aya ho
-      ->where('rep.forward_to_lokayukt', '<>', 0);
+//       // latest forward Lokayukt ko aya ho
+//       ->where('rep.forward_to_lokayukt', '<>', 0);
+// });
+      $query->where('complaints.approved_rejected_by_lokayukt', 0)
+->where(function ($main) {
+
+    // ✅ Condition 1 → RK se approved new file
+    $main->where('complaints.approved_rejected_by_rk', 1)
+
+    // ✅ OR Condition 2 → Latest forward Lokayukt ko aya
+    ->orWhereExists(function ($q) {
+        $q->select(DB::raw(1))
+          ->from('complaint_actions as rep')
+          ->whereColumn('rep.complaint_id', 'complaints.id')
+
+          // latest action only
+          ->whereRaw('rep.id = (
+                SELECT MAX(id)
+                FROM complaint_actions
+                WHERE complaint_id = complaints.id
+          )')
+
+          // latest forward Lokayukt ko aya ho
+          ->where('rep.forward_to_lokayukt', '<>', 0);
+    });
+
 });
-      
     //   ->where(function ($q) {
     //       $q->whereNull('rep.forward_by_ps')
     //         ->orWhere('rep.forward_by_lokayukt', 0);
