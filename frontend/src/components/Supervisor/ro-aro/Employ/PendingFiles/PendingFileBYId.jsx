@@ -260,10 +260,9 @@ const PendingFileBYId = () => {
                     const subroleLabel = item.subrole?.label;
 
                     return (
-                      <option key={item.id} value={item.id}>
-                        {roleLabel}
-                        {subroleLabel ? ` (${subroleLabel})` : ""}
-                      </option>
+                     <option key={item.id} value={item.id}>
+  {item.name} / ({item.role?.label})
+</option>
                     );
                   })}
                 </select>
