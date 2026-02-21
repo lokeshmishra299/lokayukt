@@ -1,13 +1,14 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-// import { ToastContainer, toast } from "react-toastify";
 import { toast } from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCheckCircle } from "react-icons/fa";
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -15,16 +16,32 @@ const api = axios.create({
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
+
 const Fees = ({ complaint, onFeeApproved }) => {
   const { id } = useParams();
   const [erorrss, setErrorss] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
-    const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
+
+  // 1. Local state banayein taki UI turant update ho bina refresh kiye
+  const [isApproved, setIsApproved] = useState(
+    complaint?.fee_approved_by_lokayukt == 1
+  );
+  const [localRemark, setLocalRemark] = useState(complaint?.remark || "");
+
+  // Parent se data baad me aaye to local state ko sync karne ke liye
+  useEffect(() => {
+    setIsApproved(complaint?.fee_approved_by_lokayukt == 1);
+    setLocalRemark(complaint?.remark || "");
+  }, [complaint]);
+
   const [fessSubmitForm, setFessSubmitForm] = useState({
     fee_exempted: "2",
     remarks: "",
   });
+  
   const [selectedFeeOption, setSelectedFeeOption] = useState("partial");
+
   const handleFeeChange = (value) => {
     const feeMap = {
       full: "1",
@@ -37,6 +54,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
       fee_exempted: feeMap[value],
     }));
   };
+
   const handleApprove = async () => {
     try {
       setIsLoading(true); // Start loading
@@ -46,18 +64,24 @@ const Fees = ({ complaint, onFeeApproved }) => {
         fessSubmitForm
       );
       console.log("Fee Submitted:", res.data);
+      
       // Success Toast
       toast.success("Fee Verified Successfully!");
-      // Clear Remarks Field
-        queryClient.invalidateQueries({
+
+      // 2. State update karein taki UI turant badal jaye aur remark dikh jaye
+      setIsApproved(true);
+      setLocalRemark(fessSubmitForm.remarks); // Typed remark ko turant set karein
+
+      // React Query cache invalidate karein taki background me naya data aa jaye
+      queryClient.invalidateQueries({
         queryKey: ["complaint", id],
       });
-       
 
-      
-    if (onFeeApproved) {
-      onFeeApproved();
-    }
+      if (onFeeApproved) {
+        onFeeApproved();
+      }
+
+      // Clear Remarks Field
       setFessSubmitForm((prev) => ({
         ...prev,
         remarks: "",
@@ -66,41 +90,39 @@ const Fees = ({ complaint, onFeeApproved }) => {
       console.log("Error he", error);
       const errorData = error?.response?.data || null;
       setErrorss(errorData);
-      // Error Toast
-      if (errorData?.message) {
-        // toast.error(errorData.message);
-      } else {
-        // toast.error("Something went wrong while verifying fee.");
-      }
     } finally {
       setIsLoading(false); // Stop loading
     }
   };
+
   return (
     <>
-      {complaint.fee_approved_by_lokayukt == 1 ? (
+      {/* 3. isApproved condition ka use karein */}
+      {isApproved ? (
         <div className="w-full flex items-center gap-4 p-6 bg-green-50 border border-green-300 rounded-xl shadow-sm">
-  <FaCheckCircle className="text-green-600" size={28} />
+          <FaCheckCircle className="text-green-600" size={28} />
 
-  <div className="w-full">
-    <div className="flex justify-between items-start">
-      <p className="text-green-800 text-base font-semibold">
-        Fee Approved
-      </p>
+          <div className="w-full">
+            <div className="flex justify-between items-start">
+              <p className="text-green-800 text-base font-semibold">
+                Fee Approved
+              </p>
 
-      <p className="text-green-700 text-sm">
-       <span className="text-black  font-semibold">Remark:</span> <span className="kruti-input">{complaint?.remark || "ykxw ugha"}</span> 
-      </p>
-    </div>
+              <p className="text-green-700 text-sm">
+                <span className="text-black font-semibold">Remark:</span>{" "}
+                {/* 4. Yahan localRemark dikhayein */}
+                <span className="kruti-input">
+                  {localRemark || "ykxw ugha"}
+                </span>
+              </p>
+            </div>
 
-    {/* Description below */}
-    <p className="text-green-700 text-sm mt-1">
-      The fee has already been approved.
-    </p>
-  </div>
-</div>
-
-
+            {/* Description below */}
+            <p className="text-green-700 text-sm mt-1">
+              The fee has already been approved.
+            </p>
+          </div>
+        </div>
       ) : (
         <div className="w-full space-y-6">
           <div className="border rounded-xl bg-white shadow-sm overflow-hidden">
@@ -182,7 +204,6 @@ const Fees = ({ complaint, onFeeApproved }) => {
                     }))
                   }
                   rows={4}
-                  // placeholder="Enter comments…"
                   placeholder="dksfVZ ;gk¡ fy[ksa"
                   className="w-full kruti-input px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
                 />
@@ -205,21 +226,10 @@ const Fees = ({ complaint, onFeeApproved }) => {
               </div>
             </div>
           </div>
-          {/* Toast Container Configured exactly like Login.js */}
-          {/* <Toaster
-            position="top-right"
-  
-          /> */}
         </div>
       )}
     </>
   );
 };
+
 export default Fees;
-
-
-
-
-
-
-

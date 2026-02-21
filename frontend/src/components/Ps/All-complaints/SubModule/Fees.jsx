@@ -26,10 +26,12 @@ const Fees = ({ complaint, onFeeApproved }) => {
   const [isApproved, setIsApproved] = useState(
     complaint?.fee_approved_by_lokayukt == 1
   );
+  const [localRemark, setLocalRemark] = useState(complaint?.remark || "");
 
   // Parent se data baad me aaye to state sync karne ke liye
   useEffect(() => {
     setIsApproved(complaint?.fee_approved_by_lokayukt == 1);
+    setLocalRemark(complaint?.remark || "");
   }, [complaint]);
 
   const [fessSubmitForm, setFessSubmitForm] = useState({
@@ -66,6 +68,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
 
       // 2. State update karein taki UI turant badal jaye
       setIsApproved(true);
+      setLocalRemark(fessSubmitForm.remarks);
 
       // React Query Cache Invalidate
       queryClient.invalidateQueries({
@@ -102,7 +105,9 @@ const Fees = ({ complaint, onFeeApproved }) => {
                 Fee Approved
               </p>
               <p className="text-green-700 text-sm">
-                <span className="text-black font-semibold">Remark:</span> <span className="kruti-input">{complaint?.remark || "ykxw ugha"}</span> 
+                <span className="text-black font-semibold">Remark:</span>{" "}
+                {/* 4. Yahan localRemark render ho raha hai */}
+                <span className="kruti-input">{localRemark || "ykxw ugha"}</span> 
               </p>
             </div>
             <p className="text-green-700 text-sm mt-1">
