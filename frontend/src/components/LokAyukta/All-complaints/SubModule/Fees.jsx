@@ -89,7 +89,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
       </p>
 
       <p className="text-green-700 text-sm">
-       <span className="text-black  font-semibold">Remark:</span> <span className="kruti-input">{complaint?.remark || "N/A"}</span> 
+       <span className="text-black  font-semibold">Remark:</span> <span className="kruti-input">{complaint?.remark || "ykxw ugha"}</span> 
       </p>
     </div>
 
