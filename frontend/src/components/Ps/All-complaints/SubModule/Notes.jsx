@@ -377,7 +377,9 @@ const Notes = ({ complaint }) => {
         <p className="text-[16px] font-medium text-gray-800">
           Notes & Notings
         </p>
-        <button
+
+        {complaint.assign_to_ps ? 
+            <button
           className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
           // onClick={() => setOpen(true)}
           onClick={() => {
@@ -391,7 +393,12 @@ const Notes = ({ complaint }) => {
   >
         
           Add Note / Noting
-        </button>
+        </button> :
+        <div>
+          
+        </div>
+        }
+      
       </div>
 
       {/* 50:50 SPLIT CONTAINER */}
