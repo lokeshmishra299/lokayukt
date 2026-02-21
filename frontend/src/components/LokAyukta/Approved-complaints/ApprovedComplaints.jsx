@@ -717,7 +717,12 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                       <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
                         <div className="flex gap-1.5">
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
-                            New Case
+                               {complaint.case_type == 1 ?  "New Case" :
+                          complaint.case_type == 2 ? "Old Case"
+                          :
+                          "New Case"
+                           
+                            }
                           </span>
                           {/* {complaint.fee_exempted === 1 && ( */}
                           <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">

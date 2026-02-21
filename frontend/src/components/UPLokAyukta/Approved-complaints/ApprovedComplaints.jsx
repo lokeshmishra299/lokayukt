@@ -32,10 +32,12 @@ const AllComplaints = () => {
   const [filteredComplaints, setFilteredComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder, setSortOrder] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [complaintToApprove, setComplaintToApprove] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
+  const [selectedNature, setSelectedNature] = useState("");
+  
 
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -61,6 +63,22 @@ const itemsPerPage = 10;
   // };
 
 
+  // Sorting Function
+  function sortComplaintsByDate(complaints, order) {
+    if (!order) return complaints; // डिफ़ॉल्ट ऑर्डर
+
+    return [...complaints].sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+
+      if (order === "desc") {
+        return dateB - dateA; // Newest first
+      } else {
+        return dateA - dateB; // Oldest first
+      }
+    });
+  }
+
  const getAllComplaints = async () => {
   const res = await api.get("/uplokayukt/all-approved-complaints");
   return res.data; 
@@ -84,6 +102,7 @@ const itemsPerPage = 10;
     queryFn: getAllComplaints,
   });
 
+  
   
   const stats = {
   overdue: data?.older7DaysCount || 0,
@@ -265,12 +284,12 @@ useEffect(() => {
 //   ]);
 
 
-
 useEffect(() => {
     if (allComplaints.length === 0) return;
 
     let filtered = [...allComplaints];
 
+    // 1. Search Filter
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase().trim();
       const queryFromKruti = krutiToUnicode(searchQuery).toLowerCase().trim();
@@ -303,6 +322,7 @@ useEffect(() => {
       });
     }
 
+    // 2. District Filter
     if (selectedDistrict !== "") {
         filtered = filtered.filter((complaint) => {
           const dataDistrict = complaint.dist_new || complaint.district_name;
@@ -311,22 +331,40 @@ useEffect(() => {
         });
     }
 
+    // 3. Status Filter
     if (selectedStatus !== "") {
         filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
     }
 
+    // 4. Fee Status Filter
     if (selectedFeeStatus !== "") {
         filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
     }
 
-    if (selectedCaseType !== "") {
-        filtered = filtered.filter((complaint) => {
-            return complaint.category?.toLowerCase() === selectedCaseType.toLowerCase();
-        });
+    // 5. Nature Filter (Complaint / Assertion)
+    if (selectedNature !== "") {
+      filtered = filtered.filter((complaint) =>
+        String(complaint.category || "").toLowerCase().trim() === selectedNature.toLowerCase().trim()
+      );
     }
 
-    // const sorted = sortComplaintsByDate(filtered, sortOrder);
-    setFilteredComplaints(filtered);
+    // 6. Case Type Filter (New / Old / Today)
+    if (selectedCaseType === "new") {
+      filtered = filtered.filter((complaint) => complaint.case_type == 1);
+    }
+    if (selectedCaseType === "old") {
+      filtered = filtered.filter((complaint) => complaint.case_type == 2);
+    }
+    if (selectedCaseType === "today") {
+      const today = new Date().toDateString();
+      filtered = filtered.filter((complaint) => new Date(complaint.created_at).toDateString() === today);
+    }
+
+    // 7. Sorting Apply
+    const sorted = sortComplaintsByDate(filtered, sortOrder);
+    
+    // 8. Final Data Update
+    setFilteredComplaints(sorted); 
     setCurrentPage(1);
     
   }, [
@@ -335,10 +373,12 @@ useEffect(() => {
     selectedDistrict,
     selectedStatus,
     selectedFeeStatus,
-    selectedCaseType,
-    // sortOrder 
+    selectedNature,      // Nature added here
+    selectedCaseType,    // Case Type added here
+    sortOrder            // Sort Order added here
   ]);
-  
+
+
 const indexOfLastItem = currentPage * itemsPerPage;
 const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
@@ -571,15 +611,26 @@ function limitTo50Words(text) {
                   <option value="1">Paid</option>
                   <option value="3">Exempted</option>
                 </select>
-               <select
-  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
-  value={selectedCaseType}
-  onChange={(e) => setSelectedCaseType(e.target.value)}
->
-  <option value="">Case Type: All</option>
-  <option value="complaint">Complaint</option>
-  <option value="assertion">Assertion</option>
-</select>
+          <select
+                  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+                  value={selectedNature}
+                  onChange={(e) => setSelectedNature(e.target.value)}
+                >
+                  <option value="">Nature: All</option>
+                  <option value="complaint">Complaint</option>
+                  <option value="assertion">Assertion</option>
+                </select>
+
+                <select
+                  value={selectedCaseType}
+                  onChange={(e) => setSelectedCaseType(e.target.value)}
+                  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+                >
+                  <option value="">Case Type: All</option>
+                  <option value="new">New Case</option>
+                  <option value="old">Old Case</option>
+                  <option value="today">Today Case</option>
+                </select>
 
               </div>
               <div className="flex items-center gap-2">
@@ -588,7 +639,7 @@ function limitTo50Words(text) {
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={sortOrder}
                   onChange={handleSortChange}>
-                <option value="desc">Received Date </option> 
+                <option value="">Received Date </option> 
                 <option value="asc">Ascending Order</option> 
                 <option value="desc">Decending Order</option>
                  {/* <option value="desc">Newest First</option>
@@ -673,7 +724,12 @@ function limitTo50Words(text) {
                      <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
                         <div className="flex gap-1.5">
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
-                            New Case
+                             {complaint.case_type == 1 ?  "New Case" :
+                          complaint.case_type == 2 ? "Old Case"
+                          :
+                          "New Case"
+                           
+                            }
                           </span>
                           {/* {complaint.fee_exempted === 1 && ( */}
                           <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">

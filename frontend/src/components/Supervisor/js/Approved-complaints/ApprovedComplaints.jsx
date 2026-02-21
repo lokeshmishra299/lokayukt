@@ -29,10 +29,13 @@ const ApprovedComplaints = () => {
   const [filteredComplaints, setFilteredComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder, setSortOrder] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [complaintToApprove, setComplaintToApprove] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
+  const [selectedNature, setSelectedNature] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+    
 
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -84,18 +87,34 @@ const ApprovedComplaints = () => {
     }
   };
 
-  const sortComplaintsByDate = (complaints, order) => {
+  // const sortComplaintsByDate = (complaints, order) => {
+  //   return [...complaints].sort((a, b) => {
+  //     const dateA = new Date(a.created_at);
+  //     const dateB = new Date(b.created_at);
+
+  //     if (order === "desc") {
+  //       return dateB - dateA;
+  //     } else {
+  //       return dateA - dateB;
+  //     }
+  //   });
+  // };
+
+       function sortComplaintsByDate(complaints, order) {
+    if (!order) return complaints; // डिफ़ॉल्ट ऑर्डर
+
     return [...complaints].sort((a, b) => {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
 
       if (order === "desc") {
-        return dateB - dateA;
+        return dateB - dateA; // Newest first
       } else {
-        return dateA - dateB;
+        return dateA - dateB; // Oldest first
       }
     });
-  };
+  }
+
 
   const getAllComplaints = async () => {
     const res = await api.get("/supervisor/all-approved-complaints");
@@ -145,98 +164,112 @@ const ApprovedComplaints = () => {
     queryFn: getComplaintTypes,
   });
 
-  useEffect(() => {
+ useEffect(() => {
     if (complaintsData) {
       setAllComplaints(complaintsData);
-      const sorted = sortComplaintsByDate(complaintsData, sortOrder);
-      setFilteredComplaints(sorted);
+      // बिना सॉर्ट किए सीधा डेटा सेट करें
+      setFilteredComplaints(complaintsData); 
     }
-  }, [complaintsData, sortOrder]);
+  }, [complaintsData]);
 
 
 
-    useEffect(() => {
-        if (allComplaints.length === 0) return;
-    
-        let filtered = [...allComplaints];
-    
-        if (searchQuery.trim() !== "") {
-          const query = searchQuery.toLowerCase().trim(); // 1. जो आपने टाइप किया (Direct Search)
-          
-          // 2. अगर आपने "Kruti Code" (जैसे dqN gks) टाइप किया है, तो उसे हिंदी बनाओ
-          const queryFromKruti = krutiToUnicode(searchQuery).toLowerCase().trim();
-    
-          // 3. अगर आपने "Hindi" टाइप किया है, तो उसका Kruti Code बनाओ (Backup)
-          const queryToKruti = unicodeToKrutiDev(searchQuery).trim(); 
-    
-          filtered = filtered.filter((complaint) => {
-            
-            const match = (val) => {
-                if (!val) return false;
-                const strVal = String(val).toLowerCase(); // डेटा (जो अब हिंदी में है)
-                
-                return (
-                  strVal.includes(query) ||          // Direct Match
-                  strVal.includes(queryFromKruti) || // Kruti Input -> Matches Hindi Data
-                  strVal.includes(queryToKruti)      // Hindi Input -> Matches Old Kruti Data
-                );
-            };
-    
+useEffect(() => {
+    if (allComplaints.length === 0) return;
+
+    let filtered = [...allComplaints];
+
+    // 1. Search Filter (Hindi & Kruti Dev)
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase().trim();
+      const queryFromKruti = krutiToUnicode(searchQuery).toLowerCase().trim();
+      const queryToKruti = unicodeToKrutiDev(searchQuery).trim();
+
+      filtered = filtered.filter((complaint) => {
+        const match = (val) => {
+            if (!val) return false;
+            const strVal = String(val).toLowerCase();
+            const strValOriginal = String(val);
             return (
-              match(complaint.complainantName) ||      
-              match(complaint.respondentName) ||       
-              match(complaint.complain_no) ||          
-              match(complaint.name) ||                 
-              match(complaint.district_name) ||        
-              match(complaint.remark) ||               
-              match(complaint.description) ||
-              match(complaint.complaint_description) ||
-              match(complaint.email) ||
-              match(complaint.mobile)
+              strVal.includes(query) || 
+              strVal.includes(queryFromKruti) ||
+              strValOriginal.includes(queryToKruti)
             );
-          });
-        }
+        };
+
+        return (
+          match(complaint.complainantName) ||
+          match(complaint.respondentName) ||
+          match(complaint.complain_no) ||
+          match(complaint.name) ||
+          match(complaint.district_name) ||
+          match(complaint.remark) ||
+          match(complaint.description) ||
+          match(complaint.complaint_description) ||
+          match(complaint.email) ||
+          match(complaint.mobile)
+        );
+      });
+    }
+
+    // 2. District Filter
+    if (selectedDistrict !== "") {
+        filtered = filtered.filter((complaint) => {
+          const dataDistrict = complaint.dist_new || complaint.district_name;
+          if (!dataDistrict) return false;
+          return String(dataDistrict).toLowerCase().trim() === selectedDistrict.toLowerCase().trim();
+        });
+    }
+
+    // 3. Status Filter
+    if (selectedStatus !== "") {
+        filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
+    }
+
+    // 4. Fee Status Filter
+    if (selectedFeeStatus !== "") {
+        filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
+    }
+
+    // 5. Nature Filter (Complaint / Assertion)
+    if (selectedNature !== "") {
+      filtered = filtered.filter((complaint) =>
+        String(complaint.category || "").toLowerCase().trim() === selectedNature.toLowerCase().trim()
+      );
+    }
+
+    // 6. Case Type Filter (New / Old / Today)
+    if (selectedCaseType === "new") {
+      filtered = filtered.filter((complaint) => String(complaint.case_type) === "1");
+    }
+    if (selectedCaseType === "old") {
+      filtered = filtered.filter((complaint) => String(complaint.case_type) === "2");
+    }
+    if (selectedCaseType === "today") {
+      const today = new Date().toDateString();
+      filtered = filtered.filter((complaint) => {
+        if (!complaint.created_at) return false;
+        return new Date(complaint.created_at).toDateString() === today;
+      });
+    }
+
+    // 7. Sorting Apply करें
+    const sorted = sortComplaintsByDate(filtered, sortOrder);
     
-        // --- बाकी फिल्टर्स (District, Status आदि) को छेड़ें नहीं ---
+    // 8. Final Data Update
+    setFilteredComplaints(sorted); 
+    setCurrentPage(1);
     
-        if (selectedDistrict !== "") {
-          filtered = filtered.filter((complaint) => {
-            const dataDistrict = complaint.dist_new || complaint.district_name;
-            if (!dataDistrict) return false;
-            return String(dataDistrict).toLowerCase().trim() === selectedDistrict.toLowerCase().trim();
-          });
-        }
-    
-        if (selectedStatus !== "") {
-          filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
-        }
-    
-        if (selectedFeeStatus !== "") {
-          filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
-        }
-    
-        if (selectedCaseType !== "") {
-          filtered = filtered.filter((complaint) => {
-            const dataCategory = String(complaint.category || "").toLowerCase().trim();
-            const selectedValue = String(selectedCaseType).toLowerCase().trim();
-            return dataCategory === selectedValue;
-          });
-        }
-    
-        // सॉर्टिंग
-        const sorted = sortComplaintsByDate(filtered, sortOrder);
-        setFilteredComplaints(sorted);
-        // setCurrentPage(1);
-    
-      }, [
-        searchQuery,
-        allComplaints,
-        selectedDistrict,
-        selectedStatus,
-        selectedFeeStatus,
-        selectedCaseType,
-        sortOrder
-      ]);
+  }, [
+    searchQuery,
+    allComplaints,
+    selectedDistrict,
+    selectedStatus,
+    selectedFeeStatus,
+    selectedNature,      // <-- Nature 
+    selectedCaseType,    // <-- Case Type 
+    sortOrder            // <-- Sort Order 
+  ]);
       
 //   useEffect(() => {
 //     if (allComplaints.length === 0) return;
@@ -508,15 +541,27 @@ const ApprovedComplaints = () => {
                   <option value="1">Paid</option>
                   <option value="3">Exempted</option>
                 </select>
-               <select
-  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
-  value={selectedCaseType}
-  onChange={(e) => setSelectedCaseType(e.target.value)}
->
-  <option value="">Case Type: All</option>
-  <option value="complaint">Complaint</option>
-  <option value="assertion">Assertion</option>
-</select>
+        <select
+                  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+                  value={selectedNature}
+                  onChange={(e) => setSelectedNature(e.target.value)}
+                >
+                  <option value="">Nature: All</option>
+                  <option value="complaint">Complaint</option>
+                  <option value="assertion">Assertion</option>
+                </select>
+
+                <select
+                  value={selectedCaseType}
+                  onChange={(e) => setSelectedCaseType(e.target.value)}
+                  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+                >
+                  <option value="">Case Type: All</option>
+                  <option value="new">New Case</option>
+                  <option value="old">Old Case</option>
+                  <option value="today">Today Case</option>
+                </select>
+
 
               </div>
               <div className="flex items-center gap-2">
@@ -526,7 +571,7 @@ const ApprovedComplaints = () => {
                   value={sortOrder}
                   onChange={handleSortChange}
                 >
-                  <option value="desc">Received Date</option> 
+                  <option value="">Received Date</option> 
                   <option value="asc">Ascending Order</option> 
                   <option value="desc">Decending Order</option>
                 </select>
