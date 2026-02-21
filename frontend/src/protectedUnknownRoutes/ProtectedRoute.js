@@ -15,7 +15,6 @@ const ProtectedRoute = ({ allowedRoles, allowedSubroles }) => {
     );
   }
 
-  // STAGE 2: Kya user logged in hai?
   if (!user) {
     // Agar user null hai (token nahi hai), toh wapas Login page par bhej do
     return <Navigate to="/login" replace />;
