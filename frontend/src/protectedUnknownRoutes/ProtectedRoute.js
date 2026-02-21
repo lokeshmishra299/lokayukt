@@ -6,11 +6,10 @@ const ProtectedRoute = ({ allowedRoles, allowedSubroles }) => {
   // 1. Context API se user ki details aur loading state nikalenge
   const { user, loading } = useAuth();
 
-  // STAGE 1: Kya API se data aa raha hai? (Refresh hone par)
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20vh' }}>
-        <h2>Loading... Please wait...</h2> {/* Yahan aap koi Spinner bhi laga sakte hain */}
+        <h2>Loading... Please wait...</h2> 
       </div>
     );
   }
