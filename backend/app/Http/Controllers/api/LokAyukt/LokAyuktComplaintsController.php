@@ -143,6 +143,7 @@ class LokAyuktComplaintsController extends Controller
                 //     ->count();
                   $todayCount = DB::table('complaints')
                     ->where('in_draft', 0)
+                    ->where('approved_rejected_by_rk', 1)
                     ->whereDate('created_at', today())
                      ->distinct('complaints.id')
                     ->count();
