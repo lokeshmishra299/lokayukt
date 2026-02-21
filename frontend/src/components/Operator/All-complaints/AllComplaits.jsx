@@ -46,7 +46,7 @@ const AllComplaints = () => {
   const [filteredComplaints, setFilteredComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder, setSortOrder] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [complaintToApprove, setComplaintToApprove] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
@@ -71,7 +71,10 @@ const currentComplaints = filteredComplaints.slice(
 const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
 
-  const sortComplaintsByDate = (complaints, order) => {
+const sortComplaintsByDate = (complaints, order) => {
+    // If no order is selected, return data exactly as API sent it
+    if (!order) return complaints; 
+
     return [...complaints].sort((a, b) => {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
@@ -642,17 +645,18 @@ if (selectedCaseType === "today") {
                 <span className="text-gray-600 text-xs whitespace-nowrap">
                   Sort by:
                 </span>
+              <div className="flex items-center gap-2">
                 <select
+                  // className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs text-gray-600"
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={sortOrder}
                   onChange={handleSortChange}
                 >
-                  <option value="desc">Received Date </option>
-                  <option value="asc">Ascending Order</option>
-                  <option value="desc">Decending Order</option>
-                  {/* <option value="desc">Newest First</option>
-                  <option value="asc">Oldest First</option> */}
+                  <option value="">Received Date</option>
+                  <option value="desc">Ascending Order</option>
+                  <option value="asc">Decending Order</option>
                 </select>
+              </div>
               </div>
             </div>
           </div>
