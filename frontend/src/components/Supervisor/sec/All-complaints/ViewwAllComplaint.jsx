@@ -400,6 +400,11 @@ const ViewAllComplaint = () => {
     onSuccess: (data) => {
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+        setTimeout(()=>{
+          navigate("/supervisor/all-complaints")
+        }, 2000)
+        
       setRemark("");
       setThroughRC(false);
       setSelectedForwardTo("");

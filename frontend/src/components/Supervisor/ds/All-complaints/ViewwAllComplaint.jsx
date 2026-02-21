@@ -387,7 +387,7 @@ const ViewAllComplaint = () => {
   const forwardComplaintMutation = useMutation({
     mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
       const res = await api.post(
-        `/supervisor/forward-by-sec/${complaintId}`,
+        `/supervisor/forward-by-ds/${complaintId}`,
         {
           forward_to: forwardTo,
           // remark: remarkData,
@@ -400,6 +400,11 @@ const ViewAllComplaint = () => {
     onSuccess: (data) => {
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+         setTimeout(()=>{
+          navigate("/supervisor/all-complaints")
+        }, 2000)
+        
       setRemark("");
       setThroughRC(false);
       setSelectedForwardTo("");
