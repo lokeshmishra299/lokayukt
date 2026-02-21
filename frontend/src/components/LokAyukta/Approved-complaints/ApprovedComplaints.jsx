@@ -31,7 +31,7 @@ const ApprovedComplaints = () => {
   const [filteredComplaints, setFilteredComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrder, setSortOrder] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [complaintToApprove, setComplaintToApprove] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
@@ -40,6 +40,7 @@ const ApprovedComplaints = () => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
+  const [selectedNature, setSelectedNature] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
 const itemsPerPage = 10;
@@ -97,7 +98,9 @@ const itemsPerPage = 10;
     }
   };
 
-  const sortComplaintsByDate = (complaints, order) => {
+const sortComplaintsByDate = (complaints, order) => {
+    if (!order) return complaints; // <-- अगर कोई ऑर्डर सेलेक्ट नहीं है, तो डिफ़ॉल्ट डेटा भेजें
+
     return [...complaints].sort((a, b) => {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
@@ -360,19 +363,38 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
         filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
     }
 
-    if (selectedFeeStatus !== "") {
+   if (selectedFeeStatus !== "") {
         filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
     }
 
-   if (selectedCaseType !== "") {
-        filtered = filtered.filter((complaint) => {
-            return complaint.category?.toLowerCase() === selectedCaseType.toLowerCase();
-        });
+    // ✅ Nature filter (Complaint / Assertion)
+    if (selectedNature !== "") {
+      filtered = filtered.filter((complaint) =>
+        String(complaint.category || "")
+          .toLowerCase()
+          .trim() === selectedNature.toLowerCase().trim()
+      );
+    }
+
+    // ✅ Case Type filter (New / Old / Today)
+    if (selectedCaseType === "new") {
+      filtered = filtered.filter((complaint) => complaint.case_type == 1);
+    }
+
+    if (selectedCaseType === "old") {
+      filtered = filtered.filter((complaint) => complaint.case_type == 2);
+    }
+
+    if (selectedCaseType === "today") {
+      const today = new Date().toDateString();
+      filtered = filtered.filter(
+        (complaint) => new Date(complaint.created_at).toDateString() === today
+      );
     }
 
     const sorted = sortComplaintsByDate(filtered, sortOrder);
-   // जो डेटा फ़िल्टर होकर आया है, उसे बिना सॉर्ट किए सेट कर दें
-    setFilteredComplaints(filtered);
+    // अब यहाँ 'sorted' सेट करें, ताकि सॉर्टिंग काम करे
+    setFilteredComplaints(sorted);
     setCurrentPage(1);
     
   }, [
@@ -381,8 +403,9 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
     selectedDistrict,
     selectedStatus,
     selectedFeeStatus,
+    selectedNature,
     selectedCaseType,
-    // sortOrder 
+    sortOrder // <-- इसे वापस अनकमेंट करें
   ]);
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
@@ -580,15 +603,26 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                   <option value="1">Paid</option>
                   <option value="3">Exempted</option>
                 </select>
-               <select
-  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
-  value={selectedCaseType}
-  onChange={(e) => setSelectedCaseType(e.target.value)}
->
-  <option value="">Case Type: All</option>
-  <option value="complaint">Complaint</option>
-  <option value="assertion">Assertion</option>
-</select>
+ <select
+                  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+                  value={selectedNature}
+                  onChange={(e) => setSelectedNature(e.target.value)}
+                >
+                  <option value="">Nature: All</option>
+                  <option value="complaint">Complaint</option>
+                  <option value="assertion">Assertion</option>
+                </select>
+
+                <select
+                  value={selectedCaseType}
+                  onChange={(e) => setSelectedCaseType(e.target.value)}
+                  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+                >
+                  <option value="">Case Type: All</option>
+                  <option value="new">New Case</option>
+                  <option value="old">Old Case</option>
+                  <option value="today">Today Case</option>
+                </select>
 
               </div>
               <div className="flex items-center gap-2">
@@ -600,7 +634,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                   value={sortOrder}
                   onChange={handleSortChange}
                 >
-                  <option value="desc">Received Date</option>
+                  <option value="">Received Date</option>
                   <option value="asc">Ascending Order</option>
                   <option value="desc">Decending Order</option>
                 </select>
