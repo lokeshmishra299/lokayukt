@@ -543,7 +543,9 @@ const MovementHistory = ({ complaint }) => {
                 </p>
                 <p className="text-[13px] text-gray-600 mt-1">
                   <span className="font-semibold">Remark:</span>{" "}
-                  {item?.remarks || "NA"}
+                  {/* {item?.remarks || "NA"} */}
+                  <span className="kruti-input">{item?.remarks || "ykxw ugha"}</span>
+
                 </p>
               </div>
 

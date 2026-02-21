@@ -196,6 +196,7 @@
 // export default MovementHistory;
 
 
+
 // import React from "react";
 // import { FaArrowRight } from "react-icons/fa6";
 
@@ -519,7 +520,8 @@ const MovementHistory = ({ complaint }) => {
 
                 <p className="text-[13px] text-gray-600 mt-1 leading-snug">
                   <span className="font-semibold text-gray-700 mr-1">Remark:</span>
-                  {item?.remarks || "NA"}
+                  {/* {item?.remarks || "NA"} */}
+                                    <span className="kruti-input">{item?.remarks || "ykxw ugha"}</span>
                 </p>
               </div>
 
