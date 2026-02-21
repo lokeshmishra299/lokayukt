@@ -89,7 +89,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
       </p>
 
       <p className="text-green-700 text-sm">
-       <span className="text-black font-semibold">Remark:</span> <span className="">{complaint?.remark || "N/A"}</span> 
+       <span className="text-black  font-semibold">Remark:</span> <span className="kruti-input">{complaint?.remark || "N/A"}</span> 
       </p>
     </div>
 
@@ -182,8 +182,9 @@ const Fees = ({ complaint, onFeeApproved }) => {
                     }))
                   }
                   rows={4}
-                  placeholder="Enter comments…"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
+                  // placeholder="Enter comments…"
+                  placeholder="dksfVZ ;gk¡ fy[ksa"
+                  className="w-full kruti-input px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
                 />
                 {erorrss && erorrss.errors && erorrss.errors.remarks && (
                   <p className="text-red-600 text-sm">
