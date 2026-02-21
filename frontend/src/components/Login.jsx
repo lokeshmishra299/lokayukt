@@ -71,12 +71,37 @@ const Login = () => {
             window.open("/main-dashboard", "_self");
           }
 
-          else if (userRole === "emp"){
-            window.open("/employee/dashboard", "_self");
-            localStorage.setItem('subrole', response.data.data.user.subrole.name);
+          // else if (userRole === "emp"){
+          //   window.open("/employee/dashboard", "_self");
+          //   localStorage.setItem('subrole', response.data.data.user.subrole.name);
 
 
-          }
+          // }
+
+          else if (
+  [
+    "emp",
+    "jamadar",
+    "office",
+    "farrash",
+    "sweeper",
+    "gardener",
+    "cook",
+    "watchman",
+    "peon",
+    "steno",
+    "assistant-clerk",
+    "computer-assistant",
+    "orderly/jamadar",
+    "car-driver",
+  ].includes(userRole)
+) {
+  localStorage.setItem(
+    "subrole",
+    response.data.data.user.subrole?.name || ""
+  );
+  window.open("/employee/dashboard", "_self");
+}
 
           else if (userRole === "supervisor") {
             localStorage.setItem('subrole', response.data.data.user.subrole.name);

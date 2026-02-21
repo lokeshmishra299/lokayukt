@@ -26,10 +26,12 @@ const Fees = ({ complaint, onFeeApproved }) => {
   const [isApproved, setIsApproved] = useState(
     complaint?.fee_approved_by_lokayukt == 1
   );
+  const [localRemark, setLocalRemark] = useState(complaint?.remark || "");
 
   // Parent se data baad me aaye to state sync karne ke liye
   useEffect(() => {
     setIsApproved(complaint?.fee_approved_by_lokayukt == 1);
+    setLocalRemark(complaint?.remark || "");
   }, [complaint]);
 
   const [fessSubmitForm, setFessSubmitForm] = useState({
@@ -66,6 +68,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
 
       // 2. State update karein taki UI turant badal jaye
       setIsApproved(true);
+      setLocalRemark(fessSubmitForm.remarks);
 
       // React Query Cache Invalidate
       queryClient.invalidateQueries({
@@ -96,10 +99,17 @@ const Fees = ({ complaint, onFeeApproved }) => {
       {isApproved ? (
         <div className="w-full flex items-center gap-4 p-6 bg-green-50 border border-green-300 rounded-xl shadow-sm">
           <FaCheckCircle className="text-green-600" size={28} />
-          <div>
-            <p className="text-green-800 text-base font-semibold">
-              Fee Approved
-            </p>
+          <div className="w-full">
+            <div className="flex justify-between items-start">
+              <p className="text-green-800 text-base font-semibold">
+                Fee Approved
+              </p>
+              <p className="text-green-700 text-sm">
+                <span className="text-black font-semibold">Remark:</span>{" "}
+                {/* 4. Yahan localRemark render ho raha hai */}
+                <span className="kruti-input">{localRemark || "ykxw ugha"}</span> 
+              </p>
+            </div>
             <p className="text-green-700 text-sm mt-1">
               The fee has already been approved by the Lokayukt.
             </p>
@@ -186,8 +196,8 @@ const Fees = ({ complaint, onFeeApproved }) => {
                     }))
                   }
                   rows={4}
-                  placeholder="Enter comments…"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
+                  placeholder="dksfVZ ;gk¡ fy[ksa"
+                  className="w-full kruti-input px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
                 />
                 {erorrss && erorrss.errors && erorrss.errors.remarks && (
                   <p className="text-red-600 text-sm">

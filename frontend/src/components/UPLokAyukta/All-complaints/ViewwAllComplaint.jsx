@@ -391,6 +391,11 @@ const ViewAllComplaint = () => {
     onSuccess: (res) => {
       toast.success("Complaint pulled back successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+          setTimeout(()=>{
+         navigate("/uplokayukt/all-complaints")
+      }, 2000)
+
       setConfirmConfig({ open: false, type: null });
     },
     onError: (error) => {
@@ -432,6 +437,11 @@ const ViewAllComplaint = () => {
     onSuccess: (data) => {
       toast.success(data.message || "Marked as received successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+          setTimeout(()=>{
+         navigate("/uplokayukt/all-complaints")
+      }, 2000)
+
       setRemark("");
       setConfirmConfig({ open: false, type: null });
     },
@@ -482,6 +492,11 @@ const ViewAllComplaint = () => {
     onSuccess: (data) => {
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+        setTimeout(()=>{
+         navigate("/uplokayukt/all-complaints")
+      }, 2000)
+      
       setRemark("");
       setTargetDate("");
       setSelectedForwardTo("");
@@ -1355,10 +1370,11 @@ const ViewAllComplaint = () => {
                 </label>
                 <textarea
                   value={remark}
-                  placeholder="Enter your remark here…"
+                  // placeholder="Enter your remark here…"
+                  placeholder="vkids rFkk fVIi.kh ;gk¡ fy[ksa"
                   onChange={(e) => setRemark(e.target.value)}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded
+                  className="w-full kruti-input px-3 py-2 border border-gray-300 rounded
                  focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 />
               </div>

@@ -695,6 +695,7 @@ function App() {
   role === 'steno' ||
   role === 'assistant-clerk' ||
   role === 'computer-assistant' ||
+  role === 'orderly/jamadar' ||
   role === 'car-driver'
 ) && (
   <Route path="/employee" element={<EmployLayout />}>

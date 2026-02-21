@@ -788,7 +788,7 @@ useEffect(() => {
                   <option value="">Select option</option>
                   {uploadList.map((item) => (
                     <option key={item.id} value={item.id}>
-                      {item.name}
+                       { item.name } / ({item.role?.label})
                     </option>
                   ))}
                 </select>
