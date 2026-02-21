@@ -98,10 +98,15 @@ const Fees = ({ complaint, onFeeApproved }) => {
       {isApproved ? (
         <div className="w-full flex items-center gap-4 p-6 bg-green-50 border border-green-300 rounded-xl shadow-sm">
           <FaCheckCircle className="text-green-600" size={28} />
-          <div>
-            <p className="text-green-800 text-base font-semibold">
-              Fee Approved
-            </p>
+          <div className="w-full">
+            <div className="flex justify-between items-start">
+              <p className="text-green-800 text-base font-semibold">
+                Fee Approved
+              </p>
+              <p className="text-green-700 text-sm">
+                <span className="text-black font-semibold">Remark:</span> <span className="kruti-input">{complaint?.remark || "N/A"}</span> 
+              </p>
+            </div>
             <p className="text-green-700 text-sm mt-1">
               The fee has already been approved.
             </p>
@@ -188,8 +193,8 @@ const Fees = ({ complaint, onFeeApproved }) => {
                     }))
                   }
                   rows={4}
-                  placeholder="Enter comments…"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
+                  placeholder="dksfVZ ;gk¡ fy[ksa"
+                  className="w-full kruti-input px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
                 />
                 {erorrss && erorrss.errors && erorrss.errors.remarks && (
                   <p className="text-red-600 text-sm">
