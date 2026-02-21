@@ -84,12 +84,36 @@ if($roleParent === 'lok-ayukt'){
     //       });
     // });
 
-    $psId = auth()->id(); // current PS id
+//     $psId = auth()->id(); // current PS id
 
-$query->where('complaints.approved_rejected_by_ps','0')
-->where(function ($mainQuery) use ($psId) {
+// $query->where('complaints.approved_rejected_by_ps','0')
+// ->where(function ($mainQuery) use ($psId) {
 
-    // ✅ Existing functionality
+//     // ✅ Existing functionality
+//     $mainQuery->whereNotExists(function ($q) {
+//         $q->select(DB::raw(1))
+//           ->from('complaint_actions as rep')
+//           ->whereColumn('rep.complaint_id', 'complaints.id')
+//           ->where(function ($q2) {
+//               $q2->whereNotNull('rep.forward_by_ps')
+//                  ->orWhere('rep.forward_by_lokayukt', '<>', 0);
+//           });
+//     })
+
+//     // ✅ OR → jo current PS ko assign ho wo bhi show
+//     ->orWhereExists(function ($q) use ($psId) {
+//         $q->select(DB::raw(1))
+//           ->from('complaint_actions as rep')
+//           ->whereColumn('rep.complaint_id', 'complaints.id')
+//           ->where('rep.forward_to_ps', $psId);
+//     });
+
+// });
+$psId = auth()->id();
+
+$query->where(function ($mainQuery) use ($psId) {
+
+    // ✅ 1. Fresh complaint (kisi ne forward nahi ki)
     $mainQuery->whereNotExists(function ($q) {
         $q->select(DB::raw(1))
           ->from('complaint_actions as rep')
@@ -100,15 +124,21 @@ $query->where('complaints.approved_rejected_by_ps','0')
           });
     })
 
-    // ✅ OR → jo current PS ko assign ho wo bhi show
+    // ✅ 2. Current PS ko forward hui ho
     ->orWhereExists(function ($q) use ($psId) {
         $q->select(DB::raw(1))
           ->from('complaint_actions as rep')
           ->whereColumn('rep.complaint_id', 'complaints.id')
           ->where('rep.forward_to_ps', $psId);
+    })
+
+    // ✅ 3. Lokayukt/RK level se new aayi ho
+    ->orWhere(function ($q) {
+        $q->where('complaints.approved_rejected_by_rk', 1)
+          ->where('complaints.approved_rejected_by_ps', 0);
     });
 
-});
+})->orderByDesc('complaints.id');
     // $query->where('complaints.approved_rejected_by_rk', 1)
     //       ->where('complaints.approved_rejected_by_lokayukt', 0);
     // //       ->orWhere(function ($q) {
