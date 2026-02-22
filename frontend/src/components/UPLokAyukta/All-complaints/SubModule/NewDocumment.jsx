@@ -3,11 +3,8 @@ import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt } from "react-ic
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-// import { toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
 import Pagination from "../../../Pagination";
-
-
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -30,13 +27,13 @@ const Documents = ({ complaint }) => {
   const [newDoc, setNewDoc] = useState({
     title: "",
     type: "Letter", // Default to first option
-    file: null,
+    files: [], // ✅ Changed 'file' to 'files' for multiple upload
   });
 
   // Backend Errors State
   const [errors, setErrors] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-const docsPerPage = 5;
+  const docsPerPage = 5;
 
   const handleAddDocuments = () => {
     setErrors({});
@@ -64,28 +61,25 @@ const docsPerPage = 5;
   } = useQuery({
     queryKey: ["documents", complaint?.id],
     queryFn: async () => {
-      const res = await api.get(`/ps/get-document/${complaint.id}`);
+      const res = await api.get(`/uplokayukt/get-document/${complaint.id}`);
       return res.data.status ? res.data.data : [];
     },
     enabled: !!complaint?.id,
   });
 
   useEffect(() => {
-  setCurrentPage(1);
-}, [complaint?.id]);
+    setCurrentPage(1);
+  }, [complaint?.id]);
 
-
-const indexOfLastDoc = currentPage * docsPerPage;
-const indexOfFirstDoc = indexOfLastDoc - docsPerPage;
-
-const currentDocuments = documents.slice(indexOfFirstDoc, indexOfLastDoc);
-const totalPages = Math.ceil(documents.length / docsPerPage);
-
+  const indexOfLastDoc = currentPage * docsPerPage;
+  const indexOfFirstDoc = indexOfLastDoc - docsPerPage;
+  const currentDocuments = documents.slice(indexOfFirstDoc, indexOfLastDoc);
+  const totalPages = Math.ceil(documents.length / docsPerPage);
 
   const handleViewPdf = async (filename) => {
     try {
       setLoadingDoc(filename);
-      const res = await api.get(`/ps/get-file-preview/${complaint.id}`);
+      const res = await api.get(`/uplokayukt/get-file-preview/${complaint.id}`);
       if (res.data.status && res.data.data.length > 0) {
         const match = res.data.data.find((p) => p.includes(filename));
         if (match) {
@@ -94,34 +88,31 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
         }
       }
     } catch (err) {
-      // alert("PDF nahi khul paya");
+      console.error("PDF Preview Error", err);
     } finally {
       setLoadingDoc(null);
     }
   };
 
   useEffect(() => {
-  if (currentPage > totalPages) {
-    setCurrentPage(totalPages || 1);
-  }
-}, [totalPages]);
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages || 1);
+    }
+  }, [totalPages]);
 
-  // -- Handle File Selection --
+  // -- Handle File Selection (For Multiple Files) --
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setNewDoc({ ...newDoc, file: e.target.files[0] });
-      // Clear file error locally when user selects file
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      setNewDoc({ ...newDoc, files: selectedFiles });
+      
       if (errors.file) setErrors({ ...errors, file: null });
     }
   };
 
   // -- Handle Form Submit --
   const handleSubmitDocument = async () => {
-    // 1. Reset Errors
     setErrors({});
-
-    // 2. CHECK REMOVED: Maine wo code hata diya jo empty fields ko rok raha tha.
-    // Ab request seedha backend pe jayegi chahe fields khali hon.
 
     if (!complaint?.id) {
       toast.error("Complaint ID missing");
@@ -132,29 +123,32 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
     try {
       const formData = new FormData();
       
-      // Agar file null hai toh bhi backend bhej rahe hain taaki backend error de
-      if(newDoc.file) {
-          formData.append("file", newDoc.file);
+      // ✅ एरे की हर फाइल को लूप लगाकर formData में डालें
+      if (newDoc.files && newDoc.files.length > 0) {
+        newDoc.files.forEach((fileItem, index) => {
+          formData.append(`file[${index}]`, fileItem);
+        });
+      } else {
+        formData.append("file", ""); // बैकएंड एरर के लिए खाली भेजें
       }
-      formData.append("type", newDoc.type || ""); // Empty string agar khali ho
+
+      formData.append("type", newDoc.type || "");
       formData.append("title", newDoc.title || ""); 
       formData.append("complain_id", complaint.id);
 
-      await api.post("/ps/upload-document", formData, {
+      await api.post("/uplokayukt/upload-document", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       toast.success("Document uploaded successfully!");
       setopenAddDocuments(false);
-      setNewDoc({ title: "", type: "Letter", file: null });
+      setNewDoc({ title: "", type: "Letter", files: [] }); // Reset State
       setErrors({});
       refetch();
     } catch (error) {
       console.error("Upload failed", error);
       
-      // -- Backend Errors Capture --
       if (error.response && error.response.data && error.response.data.errors) {
-        // Backend se aaye errors ko state me set kar rahe hain
         setErrors(error.response.data.errors);
       } else {
         const msg = error.response?.data?.message || "Failed to upload document.";
@@ -184,6 +178,7 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
   return (
     <div className="">
       {/* <Toaster position="top-right" /> */}
+      
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Documents</h2>
@@ -240,13 +235,16 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
           ))
         )}
       </div>
-          <Pagination
-  currentPage={currentPage}
-  totalPages={totalPages}
-  onPageChange={setCurrentPage}
-  totalItems={documents.length}
-  itemsPerPage={docsPerPage}
-/>
+      
+      {documents.length > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          totalItems={documents.length}
+          itemsPerPage={docsPerPage}
+        />
+      )}
 
       {/* Add Document Modal */}
       {openAddDocuments && (
@@ -267,7 +265,8 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
 
             {/* Modal Body */}
             <div className="p-6 space-y-5">
-              {/* Document Title */}
+              
+              {/* ✅ Document Title Input */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Document Title <span className="text-red-500">*</span>
@@ -284,13 +283,12 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
                     errors.title ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                   }`}
                 />
-                {/* --- BACKEND ERROR FOR TITLE --- */}
                 {errors.title && (
                   <p className="text-xs text-red-500 mt-1">{errors.title}</p>
                 )}
               </div>
 
-              {/* Document Type */}
+              {/* ✅ Document Type Dropdown */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Correspondence Type <span className="text-red-500">*</span>
@@ -310,16 +308,15 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
                   <option value="RTI Reply">RTI Reply</option>
                   <option value="Counter Order">Counter Order</option>
                 </select>
-                {/* --- BACKEND ERROR FOR TYPE --- */}
                 {errors.type && (
                   <p className="text-xs text-red-500 mt-1">{errors.type}</p>
                 )}
               </div>
 
-              {/* File Upload Area */}
+              {/* ✅ File Upload Area (Multiple) */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
-                  Upload File <span className="text-red-500">*</span>
+                  Upload File(s) <span className="text-red-500">*</span>
                 </label>
                 <div 
                   className={`relative border-2 border-dashed rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group ${
@@ -328,35 +325,38 @@ const totalPages = Math.ceil(documents.length / docsPerPage);
                 >
                   <input
                     type="file"
+                    multiple // ✅ Enabled multiple selection
                     onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     accept=".pdf,.jpg,.jpeg,.png"
                   />
                   <div className="flex flex-col items-center justify-center gap-2">
-                    {newDoc.file ? (
+                    {newDoc.files && newDoc.files.length > 0 ? (
                       <>
                         <FaFileAlt className="w-8 h-8 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
-                          {newDoc.file.name}
+                        <span className="text-sm font-medium text-gray-900">
+                          {newDoc.files.length} file(s) selected
                         </span>
-                        <span className="text-xs text-gray-500">
-                          {(newDoc.file.size / 1024 / 1024).toFixed(2)} MB
-                        </span>
+                        {/* List of selected files */}
+                        <div className="mt-2 text-xs text-gray-500 max-h-24 overflow-y-auto w-full px-2">
+                          {newDoc.files.map((f, i) => (
+                            <div key={i} className="truncate">{f.name}</div>
+                          ))}
+                        </div>
                       </>
                     ) : (
                       <>
                         <FaCloudUploadAlt className={`w-8 h-8 transition-colors ${errors.file ? "text-red-400" : "text-gray-400 group-hover:text-blue-500"}`} />
                         <span className={`text-sm ${errors.file ? "text-red-500" : "text-gray-500"}`}>
-                          Click to browse or drag file here
+                          Click to browse or drag files here
                         </span>
                         <span className="text-xs text-gray-400">
-                          PDF, JPG, PNG (Max 5MB)
+                          PDF, JPG, PNG (You can select multiple files)
                         </span>
                       </>
                     )}
                   </div>
                 </div>
-                {/* --- BACKEND ERROR FOR FILE --- */}
                 {errors.file && (
                   <p className="text-xs text-red-500 mt-1">{errors.file}</p>
                 )}
