@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { FaSearch, FaSpinner, FaEye } from "react-icons/fa";
+import { FaSearch, FaSpinner } from "react-icons/fa";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+// Pagination Component Import (Ensure path is correct according to your folder structure)
+import Pagination from "../Pagination"; 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -40,6 +42,12 @@ const Reporting = () => {
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // API se aane wala per_page
+
   const { data: districtsList, isLoading: loadingDistricts } = useQuery({
     queryKey: ["districts-list"],
     queryFn: async () => {
@@ -56,7 +64,8 @@ const Reporting = () => {
     }
   });
 
-  const handleSearch = async () => {
+  // Search logic me page param dynamically handle ho raha hai
+  const handleSearch = async (page = 1) => {
     setIsLoading(true);
     
     try {
@@ -70,7 +79,8 @@ const Reporting = () => {
         enroll_from: enrollmentFromDate,
         enroll_to: enrollmentToDate,     
         complaint_date: complaintDate,
-        nature: nature
+        nature: nature,
+        page: page // Request me page number bhejna
       };
 
       const response = await api.get("/operator/search-by-field", {
@@ -78,19 +88,29 @@ const Reporting = () => {
       });
 
       if (response.data.status === true || response.data.status === "success") {
-        const fetchedData = response.data.data?.data || [];
+        const paginationData = response.data.data; // Yeh apka paginated object hai
+        const fetchedData = paginationData?.data || []; // Asli array of objects
+        
         setResults(fetchedData);
         
-        if (fetchedData.length === 0) {
+        // Backend se aaye pagination data ko state me set karein
+        setCurrentPage(paginationData?.current_page || 1);
+        setTotalPages(paginationData?.last_page || 1);
+        setTotalItems(paginationData?.total || 0);
+        setItemsPerPage(paginationData?.per_page || 10);
+        
+        if (fetchedData.length === 0 && page === 1) {
           toast.success("No records found for this search.");
         }
       } else {
-        setResults(Array.isArray(response.data) ? response.data : []);
+        setResults([]);
+        setTotalItems(0);
       }
     } catch (error) {
       console.error("Search Error:", error);
       toast.error("Failed to fetch search results");
       setResults([]);
+      setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
@@ -119,6 +139,7 @@ const Reporting = () => {
           Reporting & Search
         </h2>
         
+        {/* --- Filters Section --- */}
         <div className="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end w-full">
 
@@ -243,8 +264,9 @@ const Reporting = () => {
             </div>
 
             <div>
+              {/* Naya Search hamesha Page 1 se shuru hoga */}
               <button
-                onClick={handleSearch}
+                onClick={() => handleSearch(1)}
                 disabled={isLoading}
                 className={`w-full flex items-center justify-center gap-2 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors h-[38px] ${
                   isLoading
@@ -260,6 +282,7 @@ const Reporting = () => {
           </div>
         </div>
 
+        {/* --- Table Section --- */}
         <div className="overflow-x-auto rounded-md border border-gray-200">
           <table className="min-w-full text-sm text-left text-gray-600">
             <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
@@ -272,68 +295,66 @@ const Reporting = () => {
                 <th className="px-6 py-3 border-b">District</th>
                 <th className="px-6 py-3 border-b">Department</th>
                 <th className="px-6 py-3 border-b">Nature</th>
-                {/* <th className="px-6 py-3 border-b">Action</th> */}
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-200 bg-white">
               {isLoading ? (
                 <tr>
-                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
                    Searching records...
                   </td>
                 </tr>
               ) : results.length > 0 ? (
-                results.map((item, index) => (
-                  <tr key={item.id || index} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4">{index + 1}</td>
-                    
-                    <td 
-                      className="px-6 py-4 font-medium text-blue-600 cursor-pointer hover:underline whitespace-nowrap" 
-                      onClick={() => handleViewComplaint(item.id)}
-                    >
-                      {item.COMP_NO || "N/A"} {item.YEAR1 ? `/ ${item.YEAR1}` : ""}
-                    </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {formatDate(item.ENROLL_DT)}
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {formatDate(item.COMP_DT)}
-                    </td>
-
-                    <td className="px-6 py-4 font-medium text-gray-800">
-                      <span className="kruti-input text-lg">{item.COMP_NM || "N/A"}</span>
-                    </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                      {item.DISTT || "N/A"}
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                      {item.DEPTT || "N/A"}
-                    </td>
-                    
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-                        {item.NATURE == 1 ? "Complaint" : item.NATURE == 2 ? "Assertion" : item.NATURE || "N/A"}
-                      </span>
-                    </td>
-                    
-                    {/* <td className="px-6 py-4">
-                      <button
+                results.map((item, index) => {
+                  // Serial number dynamically calculate hoga (Page 2 pe 11 se shuru hoga)
+                  const serialNumber = (currentPage - 1) * itemsPerPage + index + 1;
+                  
+                  return (
+                    <tr key={item.id || index} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">{serialNumber}</td>
+                      
+                      <td 
+                        className="px-6 py-4 font-medium text-blue-600 cursor-pointer hover:underline whitespace-nowrap" 
                         onClick={() => handleViewComplaint(item.id)}
-                        className="flex items-center gap-1 px-3 py-1.5 text-xs text-blue-700 border border-blue-300 rounded hover:bg-blue-50 transition"
                       >
-                        <FaEye className="w-3 h-3" /> View
-                      </button>
-                    </td> */}
-                  </tr>
-                ))
+                        {item.COMP_NO || "N/A"} {item.YEAR1 ? `/ ${item.YEAR1}` : ""}
+                      </td>
+                      
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {formatDate(item.ENROLL_DT)}
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {formatDate(item.COMP_DT)}
+                      </td>
+
+                      {/* Yaha Kruti Dev ki class lagayi gayi hai */}
+                      <td className="px-6 py-4 font-medium text-gray-800">
+                        <span className="kruti-input text-[17px]">{item.COMP_NM || "N/A"}</span>
+                      </td>
+                      
+                      {/* District pe Kruti Dev ki class */}
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                        <span className=" text-[17px]">{item.DISTT || "N/A"}</span>
+                      </td>
+
+                      {/* Department pe Kruti Dev ki class */}
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                        <span className=" text-[17px]">{item.DEPTT || "N/A"}</span>
+                      </td>
+                      
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                          {item.NATURE == 1 ? "Complaint" : item.NATURE == 2 ? "Assertion" : item.NATURE || "N/A"}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })
               ) : (
                 <tr>
-                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
                     No records found. Please enter details and click Search.
                   </td>
                 </tr>
@@ -341,6 +362,19 @@ const Reporting = () => {
             </tbody>
           </table>
         </div>
+
+        {/* --- Server-Side Pagination Component --- */}
+        {results.length > 0 && totalPages > 1 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => handleSearch(page)} // Yaha click karne pe API wapas page number leke call hogi
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage} // API ke mutabiq dynamic items per page
+            />
+          </div>
+        )}
 
       </div>
     </div>
