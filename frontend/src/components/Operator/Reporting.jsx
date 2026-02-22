@@ -291,13 +291,15 @@ const Reporting = () => {
                 <th className="px-6 py-3 border-b">District</th>
                 <th className="px-6 py-3 border-b">Department</th>
                 <th className="px-6 py-3 border-b">Nature</th>
+                <th className="px-6 py-3 border-b">Address1</th>
+                <th className="px-6 py-3 border-b">Address2</th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-200 bg-white">
               {isLoading ? (
                 <tr>
-                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan="11" className="px-4 py-8 text-center text-gray-500">
                    Searching records...
                   </td>
                 </tr>
@@ -349,12 +351,20 @@ const Reporting = () => {
                           {item.NATURE == 1 ? "Complaint" : item.NATURE == 2 ? "Assertion" : item.NATURE || "N/A"}
                         </span>
                       </td>
+
+                        <td className="px-6 py-4 font-medium text-gray-800">
+                        <span className="kruti-input text-[17px]">{item.ADD1 || "N/A"}</span>
+                      </td>
+
+                        <td className="px-6 py-4 font-medium text-gray-800">
+                        <span className="kruti-input text-[17px]">{item.ADD2 || "N/A"}</span>
+                      </td>
                     </tr>
                   )
                 })
               ) : (
                 <tr>
-                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan="11" className="px-4 py-8 text-center text-gray-500">
                     No records found. Please enter details and click Search.
                   </td>
                 </tr>
