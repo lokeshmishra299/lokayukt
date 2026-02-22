@@ -133,7 +133,7 @@ const Reporting = () => {
 
             {/* Complaint / File No */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Complaint / File No</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">File No</label>
               <input
                 type="text"
                 placeholder="शिकायत, फ़ाइल संख्या"
@@ -152,10 +152,12 @@ const Reporting = () => {
               <label className="block text-xs font-medium text-gray-600 mb-1">Complaint </label>
               <input
                 type="text"
-                placeholder="f'kdk;r, izfriknd"
+                placeholder="f'kdk;r,"
                 value={corrResp}
                 onChange={(e) => setCorrResp(e.target.value)}
-                className="w-full px-3 py-2 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                // className="w-full px-3 py-2 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                // className="w-full px-3 py-1.5 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-1 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
