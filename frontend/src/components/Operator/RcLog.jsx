@@ -492,9 +492,18 @@ const RcLog = () => {
                     {/* ✅ यहाँ UPDATE और VIEW दोनों बटन दिए गए हैं */}
                     <td className="px-4 py-2 flex items-center gap-2">
                       <button
-                        onClick={() => {
+                      onClick={() => {
                           setRecordToUpdate(item);
-                          setRcUpdateDateTime(""); // नया ओपन करते समय इनपुट रीसेट करें
+                          
+                          // ✅ अगर rc_update की वैल्यू मौजूद है, तो उसे इनपुट के फॉर्मेट (T लगाकर) में सेट करें
+                          if (item.rc_update) {
+                            // "2026-02-22 14:19:00" को "2026-02-22T14:19" में बदलें
+                            const formattedForInput = item.rc_update.replace(" ", "T").substring(0, 16);
+                            setRcUpdateDateTime(formattedForInput);
+                          } else {
+                            setRcUpdateDateTime(""); // अगर नहीं है, तो खाली रखें
+                          }
+                          
                           setShowUpdateModal(true);
                         }}
                         className="flex items-center gap-1 text-xs px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition"
@@ -559,7 +568,7 @@ const RcLog = () => {
                            {getMovementTitle(action)}
                         </td>
                         <td className="border px-4 py-2 text-gray-600 italic">
-                          {action.remarks || "No remarks"}
+                          <span className="kruti-input">{action.remarks || "ykxw ugha"}</span>
                         </td>
                         <td className="border px-4 py-2 whitespace-nowrap">
                           {formatDate(action.created_at)}
