@@ -34,10 +34,9 @@ const Reporting = () => {
   const [district, setDistrict] = useState("");
   const [department, setDepartment] = useState("");
   
-  // ✅ From/To changed to Date, added Enrollment/Complaint Date & Nature
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-  const [enrollmentDate, setEnrollmentDate] = useState("");
+  // ✅ Updated Date Fields
+  const [enrollmentFromDate, setEnrollmentFromDate] = useState("");
+  const [enrollmentToDate, setEnrollmentToDate] = useState("");
   const [complaintDate, setComplaintDate] = useState("");
   const [nature, setNature] = useState("");
 
@@ -68,7 +67,7 @@ const Reporting = () => {
     setIsLoading(true);
     
     try {
-      // ✅ Now sending all parameters including the new dates and nature
+      // ✅ Now sending all parameters including the updated dates and nature
       const queryParams = {
         comp_file: compFile,
         comp_resp: corrResp,
@@ -76,9 +75,8 @@ const Reporting = () => {
         year: year,
         district: district,
         department: department,
-        from: fromDate,
-        to: toDate,
-        enrollment_date: enrollmentDate,
+        enroll_from: enrollmentFromDate, // Mapping Enrollment From
+        enroll_to: enrollmentToDate,     // Mapping Enrollment To
         complaint_date: complaintDate,
         nature: nature
       };
@@ -135,7 +133,7 @@ const Reporting = () => {
 
             {/* Complaint / File No */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Complaint / File No</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">File No</label>
               <input
                 type="text"
                 placeholder="शिकायत, फ़ाइल संख्या"
@@ -151,13 +149,15 @@ const Reporting = () => {
 
             {/* Corr / Response */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Corr / Response</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Complaint </label>
               <input
                 type="text"
-                placeholder="f'kdk;r, izfriknd"
+                placeholder="f'kdk;r,"
                 value={corrResp}
                 onChange={(e) => setCorrResp(e.target.value)}
-                className="w-full px-3 py-2 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                // className="w-full px-3 py-2 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                // className="w-full px-3 py-1.5 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-1 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -191,35 +191,24 @@ const Reporting = () => {
               </select>
             </div>
 
-            {/* ✅ From (Date) */}
+            {/* ✅ Enrollment From Date */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">From Date</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Enrollment From Date</label>
               <input
                 type="date"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
+                value={enrollmentFromDate}
+                onChange={(e) => setEnrollmentFromDate(e.target.value)}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
 
-            {/* ✅ To (Date) */}
+            {/* ✅ Enrollment To Date */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">To Date</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Enrollment To Date</label>
               <input
                 type="date"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              />
-            </div>
-
-            {/* ✅ Enrollment Date */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Enrollment Date</label>
-              <input
-                type="date"
-                value={enrollmentDate}
-                onChange={(e) => setEnrollmentDate(e.target.value)}
+                value={enrollmentToDate}
+                onChange={(e) => setEnrollmentToDate(e.target.value)}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
@@ -249,7 +238,16 @@ const Reporting = () => {
               </select>
             </div>
 
-          
+            {/* Date */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Date</label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white"
+              />
+            </div>
 
             {/* Year */}
             <div>
