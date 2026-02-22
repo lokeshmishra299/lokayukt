@@ -225,6 +225,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/all-draft',[OperatorComplaintsController::class,'allDraft']);
         Route::get('/all-pending-complaints',[OperatorComplaintsController::class,'allComplainspending']);
         Route::get('/all-approved-complaints',[OperatorComplaintsController::class,'allComplainsapproved']);
+       
+        Route::post('/update-rc/{id}',[OperatorComplaintsController::class,'updateRCLogDateTime']);
         // Route::post('/all-rejected-complaints',[OperatorComplaintsController::class,'allComplainsDashboardRejected']);
         Route::get('/view-complaint/{id}',[OperatorReportController::class,'viewComplaint']);
         Route::get('/view-draft/{id}',[OperatorReportController::class,'viewDraft']);

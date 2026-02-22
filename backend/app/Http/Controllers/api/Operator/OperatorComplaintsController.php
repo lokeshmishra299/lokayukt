@@ -2489,8 +2489,8 @@ class OperatorComplaintsController extends Controller
         $join->on('cm.id', '=', 'ca.complaint_id')
              ->where('ca.sent_through_rk', 1);
     })
-    ->select('cm.id','cm.complain_no')
-    ->groupBy('cm.id','cm.complain_no')
+    ->select('cm.id','cm.complain_no','cm.rc_update')
+    ->groupBy('cm.id','cm.complain_no','cm.rc_update')
     ->orderBy('cm.id', 'DESC')
     ->get();
 
@@ -2585,4 +2585,28 @@ $complaints = $complaints->filter(function ($complaint) {
             'data' => $roles
         ]);
     }
+
+    // public function updateRCLogDateTime(){
+
+    // }
+
+     public function updateRCLogDateTime(Request $request, $id)
+    {
+        $complaint = Complaint::find($id);
+        if (!$complaint) {
+            return response()->json([
+                'status' => false,
+                'message' => 'complaint not found'
+            ], 404);
+        }
+        // $user->status = "1" ? "0" : "1";
+        $complaint->rc_update = $request->rc_update;
+        $complaint->save();
+        return response()->json([
+            'status' => true,
+            'message' => 'Updated successfully',
+            'data' => $complaint
+        ]);
+    }
+
 }
