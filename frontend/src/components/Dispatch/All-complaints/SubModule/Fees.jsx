@@ -1,11 +1,13 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCheckCircle } from "react-icons/fa";
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
+
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -13,15 +15,30 @@ const api = axios.create({
     ...(token && { Authorization: `Bearer ${token}` }),
   },
 });
+
 const Fees = ({ complaint, onFeeApproved }) => {
   const { id } = useParams();
   const [erorrss, setErrorss] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // Added loading state
+
+  // 1. Local state add kiya gaya hai jisse UI bina refresh ke update ho sake
+  const [isApproved, setIsApproved] = useState(
+    complaint?.fee_approved_by_dispatch == 1
+  );
+  const [localRemark, setLocalRemark] = useState(complaint?.remark || "");
+
+  // Parent se data baad me aaye to state sync karne ke liye
+  useEffect(() => {
+    setIsApproved(complaint?.fee_approved_by_dispatch == 1);
+    setLocalRemark(complaint?.remark || "");
+  }, [complaint]);
+
   const [fessSubmitForm, setFessSubmitForm] = useState({
     fee_exempted: "2",
     remarks: "",
   });
   const [selectedFeeOption, setSelectedFeeOption] = useState("partial");
+
   const handleFeeChange = (value) => {
     const feeMap = {
       full: "1",
@@ -34,6 +51,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
       fee_exempted: feeMap[value],
     }));
   };
+
   const handleApprove = async () => {
     try {
       setIsLoading(true); // Start loading
@@ -45,12 +63,16 @@ const Fees = ({ complaint, onFeeApproved }) => {
       console.log("Fee Submitted:", res.data);
       // Success Toast
       toast.success("Fee Verified Successfully!");
-      // Clear Remarks Field
-
       
-    if (onFeeApproved) {
-      onFeeApproved();
-    }
+      // 2. State update karein taki UI turant badal jaye
+      setIsApproved(true);
+      setLocalRemark(fessSubmitForm.remarks);
+
+      if (onFeeApproved) {
+        onFeeApproved();
+      }
+      
+      // Clear Remarks Field
       setFessSubmitForm((prev) => ({
         ...prev,
         remarks: "",
@@ -69,15 +91,24 @@ const Fees = ({ complaint, onFeeApproved }) => {
       setIsLoading(false); // Stop loading
     }
   };
+
   return (
     <>
-      {complaint.fee_approved_by_dispatch == 1 ? (
+      {/* 3. isApproved state ka use kiya gaya hai condition check ke liye */}
+      {isApproved ? (
         <div className="w-full flex items-center gap-4 p-6 bg-green-50 border border-green-300 rounded-xl shadow-sm">
           <FaCheckCircle className="text-green-600" size={28} />
-          <div>
-            <p className="text-green-800 text-base font-semibold">
-              Fee Approved
-            </p>
+          <div className="w-full">
+            <div className="flex justify-between items-start">
+              <p className="text-green-800 text-base font-semibold">
+                Fee Approved
+              </p>
+              <p className="text-green-700 text-sm">
+                <span className="text-black font-semibold">Remark:</span>{" "}
+                {/* 4. Yahan localRemark aur Kruti Dev class add ki gayi hai */}
+                <span className="kruti-input">{localRemark || "ykxw ugha"}</span>
+              </p>
+            </div>
             <p className="text-green-700 text-sm mt-1">
               The fee has already been approved by the Lokayukt.
             </p>
@@ -155,6 +186,7 @@ const Fees = ({ complaint, onFeeApproved }) => {
                 <label className="text-gray-700 text-sm font-medium">
                   Remarks / Comments
                 </label>
+                {/* 5. Textarea me kruti-input class aur naya placeholder add kiya gaya hai */}
                 <textarea
                   value={fessSubmitForm.remarks}
                   onChange={(e) =>
@@ -164,8 +196,8 @@ const Fees = ({ complaint, onFeeApproved }) => {
                     }))
                   }
                   rows={4}
-                  placeholder="Enter comments…"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
+                  placeholder="dksfVZ ;gk¡ fy[ksa"
+                  className="w-full kruti-input px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm text-gray-700 resize-none"
                 />
                 {erorrss && erorrss.errors && erorrss.errors.remarks && (
                   <p className="text-red-600 text-sm">
@@ -204,11 +236,5 @@ const Fees = ({ complaint, onFeeApproved }) => {
     </>
   );
 };
+
 export default Fees;
-
-
-
-
-
-
-

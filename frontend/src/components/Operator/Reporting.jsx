@@ -5,7 +5,6 @@ import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-// Axios Setup
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const api = axios.create({
@@ -26,7 +25,6 @@ api.interceptors.request.use((config) => {
 const Reporting = () => {
   const navigate = useNavigate();
 
-  // --- Input States ---
   const [compFile, setCompFile] = useState(""); 
   const [corrResp, setCorrResp] = useState(""); 
   const [date, setDate] = useState("");
@@ -34,17 +32,14 @@ const Reporting = () => {
   const [district, setDistrict] = useState("");
   const [department, setDepartment] = useState("");
   
-  // ✅ Updated Date Fields
   const [enrollmentFromDate, setEnrollmentFromDate] = useState("");
   const [enrollmentToDate, setEnrollmentToDate] = useState("");
   const [complaintDate, setComplaintDate] = useState("");
   const [nature, setNature] = useState("");
 
-  // --- Data & Loading States ---
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // ✅ Fetch Districts from API
   const { data: districtsList, isLoading: loadingDistricts } = useQuery({
     queryKey: ["districts-list"],
     queryFn: async () => {
@@ -53,7 +48,6 @@ const Reporting = () => {
     }
   });
 
-  // ✅ Fetch Departments from API
   const { data: departmentsList, isLoading: loadingDepartments } = useQuery({
     queryKey: ["departments-list"],
     queryFn: async () => {
@@ -62,12 +56,10 @@ const Reporting = () => {
     }
   });
 
-  // --- API Call Function (GET) ---
   const handleSearch = async () => {
     setIsLoading(true);
     
     try {
-      // ✅ Now sending all parameters including the updated dates and nature
       const queryParams = {
         comp_file: compFile,
         comp_resp: corrResp,
@@ -75,8 +67,8 @@ const Reporting = () => {
         year: year,
         district: district,
         department: department,
-        enroll_from: enrollmentFromDate, // Mapping Enrollment From
-        enroll_to: enrollmentToDate,     // Mapping Enrollment To
+        enroll_from: enrollmentFromDate,
+        enroll_to: enrollmentToDate,     
         complaint_date: complaintDate,
         nature: nature
       };
@@ -86,8 +78,10 @@ const Reporting = () => {
       });
 
       if (response.data.status === true || response.data.status === "success") {
-        setResults(response.data.data || []);
-        if (response.data.data?.length === 0) {
+        const fetchedData = response.data.data?.data || [];
+        setResults(fetchedData);
+        
+        if (fetchedData.length === 0) {
           toast.success("No records found for this search.");
         }
       } else {
@@ -102,13 +96,11 @@ const Reporting = () => {
     }
   };
 
-  // View Handler
   const handleViewComplaint = (complaintId) => {
     if (!complaintId) return;
     navigate(`/lokayukt/all-complaints/view/${complaintId}`);
   };
 
-  // Date Formatter Helper
   const formatDate = (dateString) => {
     if (!dateString) return "NA";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -127,11 +119,9 @@ const Reporting = () => {
           Reporting & Search
         </h2>
         
-        {/* ✅ Header & Search Filters */}
         <div className="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end w-full">
 
-            {/* Complaint / File No */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">File No</label>
               <input
@@ -147,7 +137,6 @@ const Reporting = () => {
               />
             </div>
 
-            {/* Corr / Response */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Complaint </label>
               <input
@@ -155,13 +144,10 @@ const Reporting = () => {
                 placeholder="f'kdk;r,"
                 value={corrResp}
                 onChange={(e) => setCorrResp(e.target.value)}
-                // className="w-full px-3 py-2 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                // className="w-full px-3 py-1.5 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 className="w-full px-3 py-1 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
-            {/* District Dropdown */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">District</label>
               <select
@@ -176,7 +162,6 @@ const Reporting = () => {
               </select>
             </div>
 
-            {/* Department Dropdown */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Department</label>
               <select
@@ -191,7 +176,6 @@ const Reporting = () => {
               </select>
             </div>
 
-            {/* ✅ Enrollment From Date */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Enrollment From Date</label>
               <input
@@ -202,7 +186,6 @@ const Reporting = () => {
               />
             </div>
 
-            {/* ✅ Enrollment To Date */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Enrollment To Date</label>
               <input
@@ -213,7 +196,6 @@ const Reporting = () => {
               />
             </div>
 
-            {/* ✅ Complaint Date */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Complaint Date</label>
               <input
@@ -224,7 +206,6 @@ const Reporting = () => {
               />
             </div>
 
-            {/* ✅ Nature Dropdown */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Nature</label>
               <select
@@ -238,7 +219,6 @@ const Reporting = () => {
               </select>
             </div>
 
-            {/* Date */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Date</label>
               <input
@@ -249,7 +229,6 @@ const Reporting = () => {
               />
             </div>
 
-            {/* Year */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
               <input
@@ -263,7 +242,6 @@ const Reporting = () => {
               />
             </div>
 
-            {/* Search Button */}
             <div>
               <button
                 onClick={handleSearch}
@@ -282,20 +260,19 @@ const Reporting = () => {
           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto rounded-md border border-gray-200">
           <table className="min-w-full text-sm text-left text-gray-600">
             <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
               <tr>
                 <th className="px-6 py-3 border-b">S.No</th>
-                <th className="px-6 py-3 border-b">Complaint No.</th>
-                <th className="px-6 py-3 border-b whitespace-nowrap">Enrollment Date</th>
+                <th className="px-6 py-3 border-b">Comp. No / Year</th>
+                <th className="px-6 py-3 border-b whitespace-nowrap">Enroll Date</th>
+                <th className="px-6 py-3 border-b whitespace-nowrap">Comp. Date</th>
+                <th className="px-6 py-3 border-b">Complainant</th>
                 <th className="px-6 py-3 border-b">District</th>
                 <th className="px-6 py-3 border-b">Department</th>
-                <th className="px-6 py-3 border-b">From</th>
-                <th className="px-6 py-3 border-b">To</th>
-                <th className="px-6 py-3 border-b">Status</th>
-                <th className="px-6 py-3 border-b">Action</th>
+                <th className="px-6 py-3 border-b">Nature</th>
+                {/* <th className="px-6 py-3 border-b">Action</th> */}
               </tr>
             </thead>
 
@@ -303,7 +280,7 @@ const Reporting = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
-                    <FaSpinner className="animate-spin inline mr-2 text-blue-600" /> Searching records...
+                   Searching records...
                   </td>
                 </tr>
               ) : results.length > 0 ? (
@@ -311,55 +288,47 @@ const Reporting = () => {
                   <tr key={item.id || index} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">{index + 1}</td>
                     
-                    <td className="px-6 py-4 font-medium text-blue-600 cursor-pointer hover:underline whitespace-nowrap" onClick={() => handleViewComplaint(item.id)}>
-                      {item.complain_no || "N/A"}
+                    <td 
+                      className="px-6 py-4 font-medium text-blue-600 cursor-pointer hover:underline whitespace-nowrap" 
+                      onClick={() => handleViewComplaint(item.id)}
+                    >
+                      {item.COMP_NO || "N/A"} {item.YEAR1 ? `/ ${item.YEAR1}` : ""}
                     </td>
                     
-                    {/* Enrollment Date Render */}
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {formatDate(item.registration_date || item.created_at || item.date)}
-                    </td>
-                    
-                    {/* District */}
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                      {item.district_name || item.district || "N/A"}
+                      {formatDate(item.ENROLL_DT)}
                     </td>
 
-                    {/* Department */}
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                      {item.department_name || item.department || "N/A"}
-                    </td>
-                    
-                    {/* From */}
-                    <td className="px-6 py-4 font-medium text-gray-800 whitespace-nowrap">
-                      {item.from_name || item.forward_by_name || item.sender_name || "N/A"}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {formatDate(item.COMP_DT)}
                     </td>
 
-                    {/* To */}
-                    <td className="px-6 py-4 font-medium text-gray-800 whitespace-nowrap">
-                      {item.to_name || item.forward_to_name || item.receiver_name || "N/A"}
+                    <td className="px-6 py-4 font-medium text-gray-800">
+                      <span className="kruti-input text-lg">{item.COMP_NM || "N/A"}</span>
                     </td>
                     
-                    {/* Status */}
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                      {item.DISTT || "N/A"}
+                    </td>
+
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                      {item.DEPTT || "N/A"}
+                    </td>
+                    
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' :
-                        item.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                        'bg-blue-100 text-blue-800'
-                      }`}>
-                        {item.status || "In Motion"}
+                      <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                        {item.NATURE == 1 ? "Complaint" : item.NATURE == 2 ? "Assertion" : item.NATURE || "N/A"}
                       </span>
                     </td>
                     
-                    {/* Action */}
-                    <td className="px-6 py-4">
+                    {/* <td className="px-6 py-4">
                       <button
                         onClick={() => handleViewComplaint(item.id)}
                         className="flex items-center gap-1 px-3 py-1.5 text-xs text-blue-700 border border-blue-300 rounded hover:bg-blue-50 transition"
                       >
                         <FaEye className="w-3 h-3" /> View
                       </button>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               ) : (

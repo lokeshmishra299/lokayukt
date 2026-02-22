@@ -31,6 +31,13 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
     return location.pathname.startsWith(fullPath);
   };
 
+  const isFilesActive = () => {
+  return (
+    location.pathname.startsWith("/employee/view-files") ||
+    location.pathname.startsWith("/employee/add-files")
+  );
+};
+
   const handleLinkClick = () => {
     if (isMobile && isMobileMenuOpen) toggleMobileMenu();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -149,7 +156,25 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
             {(!isCollapsed || isMobile) && "User Management"}
           </Link> */}
           {/* User Management */}
-          <Link
+
+
+
+           <Link
+            to="/employee/view-files"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+             ${isFilesActive()
+  ? "bg-blue-600 text-white shadow-md"
+  : "text-gray-700 hover:bg-gray-200"
+}
+              ${isCollapsed && !isMobile ? "justify-center" : ""}
+            `}
+          >
+            <RiFileSearchLine />
+            {(!isCollapsed || isMobile) && "View Files"}
+          </Link>
+          
+          {/* <Link
             to="/employee/add-files"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
@@ -162,23 +187,10 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <FaFileSignature />
             {(!isCollapsed || isMobile) && "Add Files"}
-          </Link>
+          </Link> */}
 
 
-           <Link
-            to="/employee/view-files"
-            onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/view-files")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <RiFileSearchLine />
-            {(!isCollapsed || isMobile) && "View Files"}
-          </Link>
+          
 
           {/* Master Data */}
           {/* <Link

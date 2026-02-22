@@ -256,7 +256,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 
 // Main Dashboard Component
-const Dashboard = ({ userRole = "ps" }) => {
+const Dashboard = ({ userRole = "operator" }) => {
 
   const navigate = useNavigate()
   //  API State Management + Date Picker State
@@ -278,7 +278,7 @@ const Dashboard = ({ userRole = "ps" }) => {
   const fetchWeeklyData = async () => {
     try {
       console.log('Fetching weekly graph data...');
-      const response = await api.get('/dispatch/getWeeklyGraph');
+      const response = await api.get('/operator/getWeeklyGraph');
       console.log('Weekly API Response:', response.data);
       
       if (response.data && response.data.labels) {
@@ -315,14 +315,14 @@ const Dashboard = ({ userRole = "ps" }) => {
   const fetchDashboardData = async (monthParam) => {
     try {
       // 1. Dashboard Stats API
-      const dashResponse = await api.get(`/dispatch/dashboard/${monthParam}`);
+      const dashResponse = await api.get(`/operator/dashboard/${monthParam}`);
       if (dashResponse.data.status) {
         setDashboardData(dashResponse.data.dataDashboard);
       }
 
 
       // 2. Monthly Complaint API
-      const monthlyResponse = await api.get('/dispatch/montly-complaint');
+      const monthlyResponse = await api.get('/operator/montly-complaint');
       if (monthlyResponse.data) {
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const monthlyTrends = months.map((month, index) => ({
@@ -336,7 +336,7 @@ const Dashboard = ({ userRole = "ps" }) => {
 
 
       // 3. Status Distribution API
-      const statusResponse = await api.get('/dispatch/status-distribution');
+      const statusResponse = await api.get('/operator/status-distribution');
       if (statusResponse.data && statusResponse.data.data) {
         const statusInfo = statusResponse.data.data;
         const statusDistribution = [
@@ -366,7 +366,7 @@ const Dashboard = ({ userRole = "ps" }) => {
 
 
       // 4. Department-wise API
-      const deptResponse = await api.get('/dispatch/department-wise-complaint');
+      const deptResponse = await api.get('/operator/department-wise-complaint');
       if (deptResponse.data.status) {
         const deptData = Object.entries(deptResponse.data.data).map(([department, complaints]) => ({
           department,
@@ -378,7 +378,7 @@ const Dashboard = ({ userRole = "ps" }) => {
 
 
       // 5. District-wise API
-      const districtResponse = await api.get('/dispatch/district-wise-company-type');
+      const districtResponse = await api.get('/operator/district-wise-company-type');
       if (districtResponse.data) {
         const { district, total, allegations, grievances } = districtResponse.data;
         const districtFormatted = district.map((districtName, index) => ({
@@ -497,7 +497,7 @@ const handleDateChange = (date) => {
     }
     .custom-datepicker-wrapper .react-datepicker__month-wrapper {
       display: grid;
-      grid-tpslate-columns: repeat(3, 1fr);
+      grid-toperatorlate-columns: repeat(3, 1fr);
       gap: 0.25rem;
     }
     .custom-datepicker-wrapper .react-datepicker__month-text {
@@ -622,7 +622,7 @@ const handleDateChange = (date) => {
         {/* Total Complaints */}
         <div
         onClick={()=>{
-          // navigate("/ps/all-complaints ")
+          // navigate("/operator/all-complaints ")
         }}
          className="p-5 rounded-2xl shadow-md border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -660,7 +660,7 @@ const handleDateChange = (date) => {
         {/* Approved */}
         <div 
           onClick={()=>{
-          // navigate("/ps/approved-complaints")
+          // navigate("/operator/approved-complaints")
         }}
         className="p-5 rounded-2xl shadow-md border border-green-200 bg-green-50 hover:bg-green-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -696,7 +696,7 @@ const handleDateChange = (date) => {
         {/* Pending */}
         <div
         //   onClick={()=>{
-        //   navigate("/ps/pending-complaints")
+        //   navigate("/operator/pending-complaints")
         // }}
          className="p-5 rounded-2xl shadow-md border border-yellow-200 bg-yellow-50 hover:bg-yellow-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
@@ -715,7 +715,7 @@ const handleDateChange = (date) => {
         {/* Avg. Processing */}
         <div
         //   onClick={()=>{
-        //   navigate("/ps/pending-complaints")
+        //   navigate("/operator/pending-complaints")
         // }}
          className="p-5 rounded-2xl shadow-md border border-teal-200 bg-teal-50 hover:bg-teal-100 transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer">
           <div className="flex justify-between items-start">
