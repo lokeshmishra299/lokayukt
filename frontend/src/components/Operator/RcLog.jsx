@@ -22,6 +22,11 @@ const RcLog = () => {
   const [openViewPopup, setOpenViewPopup] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedLog, setSelectedLog] = useState(null);
+  const [recordToUpdate, setRecordToUpdate] = useState(null); 
+  
+  // ✅ डेट और टाइम स्टोर करने के लिए नया State
+  const [rcUpdateDateTime, setRcUpdateDateTime] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -38,14 +43,15 @@ const RcLog = () => {
   // --- UPDATE MUTATION ---
   const updateRcMutation = useMutation({
     mutationFn: async (payload) => {
-      // ⚠️ अपना सही बैकएंड API URL यहाँ डालें
-      const res = await api.post(`/operator/update-rc/${selectedLog?.id}`, payload);
+      const res = await api.post(`/operator/update-rc/${recordToUpdate?.id}`, payload);
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data.message || "Record Updated Successfully!");
       setShowUpdateModal(false);
-      refetch(); // डेटा ताज़ा करें
+      setRecordToUpdate(null);
+      setRcUpdateDateTime(""); // ✅ सबमिट होने के बाद इनपुट क्लियर करें
+      refetch(); 
     },
     onError: (error) => {
       toast.error(error?.response?.data?.message || "Failed to update record");
@@ -53,14 +59,14 @@ const RcLog = () => {
   });
 
   const handleUpdateRecord = () => {
-    // Current Date Time Generate (YYYY-MM-DD HH:mm:ss format)
-    const now = new Date();
-    const formattedDateTime = now.getFullYear() + '-' + 
-      String(now.getMonth() + 1).padStart(2, '0') + '-' + 
-      String(now.getDate()).padStart(2, '0') + ' ' + 
-      String(now.getHours()).padStart(2, '0') + ':' + 
-      String(now.getMinutes()).padStart(2, '0') + ':' + 
-      String(now.getSeconds()).padStart(2, '0');
+    if (!rcUpdateDateTime) {
+      toast.error("Please select Date and Time");
+      return;
+    }
+
+    // HTML datetime-local "YYYY-MM-DDTHH:mm" फॉर्मेट में डेटा देता है
+    // बैकएंड के लिए हम इसे "YYYY-MM-DD HH:mm:ss" में बदल रहे हैं
+    const formattedDateTime = rcUpdateDateTime.replace("T", " ") + ":00";
 
     const payload = {
       rc_update: formattedDateTime
@@ -195,8 +201,11 @@ const RcLog = () => {
 
     /* ================= PS ================= */
     if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_lokayukt) { return `${ps} → Record Section (RC) → Hon’ble ${toLok}`; }
+    if (item.forward_by_ps && item.forward_to_lokayukt) { return `${ps} → Hon’ble ${toLok}`; }
     if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_uplokayukt) { return `${ps} → Record Section (RC) → Hon’ble ${toUpLok}`; }
+    if (item.forward_by_ps && item.forward_to_uplokayukt) { return `${ps} → Hon’ble ${toUpLok}`; }
     if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_sec) { return `${ps} → Record Section (RC) → ${toSec}`; }
+    if (item.forward_by_ps && item.forward_to_sec) { return `${ps} → ${toSec}`; }
     if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_ps) { return `${ps} → Record Section (RC) → ${ps}`; }
     if (item.forward_by_ps && item.forward_to_ps) { return `${ps} → ${ps}`; }
     if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${ps} → Record Section (RC) → ${toCio}`; }
@@ -480,7 +489,18 @@ const RcLog = () => {
                     <td className="px-4 py-2 text-gray-600">
                       {formatDate(item.last_action?.created_at)}
                     </td>
-                    <td className="px-4 py-2">
+                    {/* ✅ यहाँ UPDATE और VIEW दोनों बटन दिए गए हैं */}
+                    <td className="px-4 py-2 flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setRecordToUpdate(item);
+                          setRcUpdateDateTime(""); // नया ओपन करते समय इनपुट रीसेट करें
+                          setShowUpdateModal(true);
+                        }}
+                        className="flex items-center gap-1 text-xs px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                      >
+                        Update
+                      </button>
                       <button
                         onClick={() => handleViewOpenPopup(item)}
                         className="flex items-center gap-1 text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
@@ -555,14 +575,8 @@ const RcLog = () => {
                 </table>
               </div>
 
-              {/* View Modal Footer - Added UPDATE Button */}
-              <div className="flex justify-between items-center border-t px-4 py-3 bg-gray-50 rounded-b-lg">
-                <button
-                  onClick={() => setShowUpdateModal(true)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 font-medium transition shadow-sm"
-                >
-                  Update Record
-                </button>
+              {/* View Modal Footer */}
+              <div className="flex justify-end gap-2 border-t px-4 py-3 bg-gray-50 rounded-b-lg">
                 <button
                   onClick={handleClosePopup}
                   className="px-4 py-2 bg-gray-200 rounded text-sm hover:bg-gray-300 font-medium transition"
@@ -574,18 +588,31 @@ const RcLog = () => {
           </div>
         )}
 
-        {/* --- UPDATE CONFIRMATION MODAL --- */}
+        {/* --- UPDATE CONFIRMATION MODAL WITH DATETIME INPUT --- */}
         {showUpdateModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">Confirm Update</h3>
-              <p className="text-sm text-gray-600 mb-6">
-                Are you sure you want to update this record with the current date and time?
-              </p>
+              <h3 className="text-lg font-bold text-gray-800 mb-4">Update Record</h3>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Date & Time <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  value={rcUpdateDateTime}
+                  onChange={(e) => setRcUpdateDateTime(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
               
               <div className="flex justify-end gap-3">
                 <button
-                  onClick={() => setShowUpdateModal(false)}
+                  onClick={() => {
+                    setShowUpdateModal(false);
+                    setRecordToUpdate(null);
+                    setRcUpdateDateTime("");
+                  }}
                   disabled={updateRcMutation.isPending}
                   className="px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
                 >
@@ -593,11 +620,11 @@ const RcLog = () => {
                 </button>
                 <button
                   onClick={handleUpdateRecord}
-                  disabled={updateRcMutation.isPending}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 shadow-sm"
+                  disabled={updateRcMutation.isPending || !rcUpdateDateTime}
+                  className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded hover:bg-green-700 flex items-center gap-2 disabled:opacity-50 shadow-sm"
                 >
                   {updateRcMutation.isPending && <FaSpinner className="animate-spin" />}
-                  {updateRcMutation.isPending ? "Updating..." : "Yes, Update"}
+                  {updateRcMutation.isPending ? "Updating..." : "Update"}
                 </button>
               </div>
             </div>
