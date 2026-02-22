@@ -151,7 +151,7 @@ const Reporting = () => {
 
             {/* Corr / Response */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Corr / Response</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Complaint / Respondent</label>
               <input
                 type="text"
                 placeholder="f'kdk;r, izfriknd"
