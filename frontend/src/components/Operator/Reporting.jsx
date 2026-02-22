@@ -31,12 +31,15 @@ const Reporting = () => {
   const [corrResp, setCorrResp] = useState(""); 
   const [date, setDate] = useState("");
   const [year, setYear] = useState("");
-  
-  // ✅ New States for District, Department, From, To
   const [district, setDistrict] = useState("");
   const [department, setDepartment] = useState("");
-  const [fromSender, setFromSender] = useState("");
-  const [toReceiver, setToReceiver] = useState("");
+  
+  // ✅ From/To changed to Date, added Enrollment/Complaint Date & Nature
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [enrollmentDate, setEnrollmentDate] = useState("");
+  const [complaintDate, setComplaintDate] = useState("");
+  const [nature, setNature] = useState("");
 
   // --- Data & Loading States ---
   const [results, setResults] = useState([]);
@@ -65,7 +68,7 @@ const Reporting = () => {
     setIsLoading(true);
     
     try {
-      // ✅ Now sending all 8 parameters to backend
+      // ✅ Now sending all parameters including the new dates and nature
       const queryParams = {
         comp_file: compFile,
         comp_resp: corrResp,
@@ -73,8 +76,11 @@ const Reporting = () => {
         year: year,
         district: district,
         department: department,
-        from: fromSender,
-        to: toReceiver
+        from: fromDate,
+        to: toDate,
+        enrollment_date: enrollmentDate,
+        complaint_date: complaintDate,
+        nature: nature
       };
 
       const response = await api.get("/operator/search-by-field", {
@@ -123,7 +129,7 @@ const Reporting = () => {
           Reporting & Search
         </h2>
         
-        {/* ✅ Header & Search Filters (Updated Grid) */}
+        {/* ✅ Header & Search Filters */}
         <div className="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 items-end w-full">
 
@@ -145,7 +151,7 @@ const Reporting = () => {
 
             {/* Corr / Response */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Corr / Response </label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Corr / Response</label>
               <input
                 type="text"
                 placeholder="f'kdk;r, izfriknd"
@@ -185,40 +191,65 @@ const Reporting = () => {
               </select>
             </div>
 
-            {/* From (Sender) */}
+            {/* ✅ From (Date) */}
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">From</label>
-              <input
-                type="text"
-                placeholder="Sender Name..."
-                value={fromSender}
-                onChange={(e) => setFromSender(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* To (Receiver) */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">To</label>
-              <input
-                type="text"
-                placeholder="Receiver Name..."
-                value={toReceiver}
-                onChange={(e) => setToReceiver(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Date */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Date</label>
+              <label className="block text-xs font-medium text-gray-600 mb-1">From Date</label>
               <input
                 type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
+
+            {/* ✅ To (Date) */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">To Date</label>
+              <input
+                type="date"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+            </div>
+
+            {/* ✅ Enrollment Date */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Enrollment Date</label>
+              <input
+                type="date"
+                value={enrollmentDate}
+                onChange={(e) => setEnrollmentDate(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+            </div>
+
+            {/* ✅ Complaint Date */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Complaint Date</label>
+              <input
+                type="date"
+                value={complaintDate}
+                onChange={(e) => setComplaintDate(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              />
+            </div>
+
+            {/* ✅ Nature Dropdown */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Nature</label>
+              <select
+                value={nature}
+                onChange={(e) => setNature(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              >
+                <option value="">Select Nature</option>
+                <option value="1">Complaint</option>
+                <option value="2">Assertion</option>
+              </select>
+            </div>
+
+          
 
             {/* Year */}
             <div>
@@ -286,7 +317,7 @@ const Reporting = () => {
                       {item.complain_no || "N/A"}
                     </td>
                     
-                    {/* Enrollment Date */}
+                    {/* Enrollment Date Render */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       {formatDate(item.registration_date || item.created_at || item.date)}
                     </td>
