@@ -311,7 +311,7 @@ const Notes = ({ complaint }) => {
     const docId = selectedDocObj ? selectedDocObj.id : "";
 
     const payload = {
-      complaint_id: complaint.id,
+      employee_file_id: complaint.id,
       description: note,
       d_id: docId,
       range_from: pageRanges[0].from,
@@ -319,7 +319,7 @@ const Notes = ({ complaint }) => {
     };
 
     try {
-      const res = await api.post("/supervisor/add-notes", payload);
+      const res = await api.post("/supervisor/add-notes-employee", payload);
 
       if (res.data.status) {
         toast.success("Note Added Successfully!");
