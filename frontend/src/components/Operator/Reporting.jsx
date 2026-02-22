@@ -8,20 +8,14 @@ import { useQuery } from "@tanstack/react-query";
 import Pagination from "../Pagination"; 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
+const token = localStorage.getItem("access_token");
 
 const api = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
   },
-});
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
 });
 
 const Reporting = () => {
@@ -288,7 +282,9 @@ const Reporting = () => {
             <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
               <tr>
                 <th className="px-6 py-3 border-b">S.No</th>
-                <th className="px-6 py-3 border-b">Comp. No / Year</th>
+                {/* 1. Comp. No aur Year ke liye alag th banaye gaye */}
+                <th className="px-6 py-3 border-b">Comp. No</th>
+                <th className="px-6 py-3 border-b">Year</th>
                 <th className="px-6 py-3 border-b whitespace-nowrap">Enroll Date</th>
                 <th className="px-6 py-3 border-b whitespace-nowrap">Comp. Date</th>
                 <th className="px-6 py-3 border-b">Complainant</th>
@@ -301,7 +297,7 @@ const Reporting = () => {
             <tbody className="divide-y divide-gray-200 bg-white">
               {isLoading ? (
                 <tr>
-                  <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
                    Searching records...
                   </td>
                 </tr>
@@ -314,11 +310,17 @@ const Reporting = () => {
                     <tr key={item.id || index} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">{serialNumber}</td>
                       
+                      {/* 2. Comp. No. ka alag column banaya */}
                       <td 
                         className="px-6 py-4 font-medium text-blue-600 cursor-pointer hover:underline whitespace-nowrap" 
                         onClick={() => handleViewComplaint(item.id)}
                       >
-                        {item.COMP_NO || "N/A"} {item.YEAR1 ? `/ ${item.YEAR1}` : ""}
+                        {item.COMP_NO || "N/A"}
+                      </td>
+
+                      {/* 3. Year ka alag column banaya */}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {item.YEAR1 || "N/A"}
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -334,12 +336,10 @@ const Reporting = () => {
                         <span className="kruti-input text-[17px]">{item.COMP_NM || "N/A"}</span>
                       </td>
                       
-                      {/* District pe Kruti Dev ki class */}
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800">
                         <span className=" text-[17px]">{item.DISTT || "N/A"}</span>
                       </td>
 
-                      {/* Department pe Kruti Dev ki class */}
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800">
                         <span className=" text-[17px]">{item.DEPTT || "N/A"}</span>
                       </td>
@@ -354,7 +354,7 @@ const Reporting = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan="8" className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
                     No records found. Please enter details and click Search.
                   </td>
                 </tr>
