@@ -6,6 +6,7 @@ import { FiUpload } from "react-icons/fi";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
+import Pagination from "../../../Pagination";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -32,6 +33,8 @@ const Documents = ({ complaint }) => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   // --- NEW STATE FOR FETCHING DOCUMENTS ---
   const [documents, setDocuments] = useState([]);
@@ -39,15 +42,25 @@ const Documents = ({ complaint }) => {
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
   const [loadingDocId, setLoadingDocId] = useState(null);
 
+  const indexOfLastDoc = currentPage * itemsPerPage;
+  const indexOfFirstDoc = indexOfLastDoc - itemsPerPage;
+
+  const currentDocuments = documents.slice(
+    indexOfFirstDoc,
+    indexOfLastDoc
+  );
+
+  const totalPages = Math.ceil(documents.length / itemsPerPage);
+
   // --- 1. FETCH DOCUMENTS API (Operator List) ---
   const fetchDocuments = async () => {
     if (!complaint?.id) return;
     setIsLoadingDocs(true);
     try {
-      // List fetch karne ke liye operator wali api
       const res = await api.get(`/operator/get-document/${complaint.id}`);
       if (res.data.status) {
         setDocuments(res.data.data);
+        setCurrentPage(1);
       }
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -77,7 +90,6 @@ const Documents = ({ complaint }) => {
   const handleViewPdf = async (filename) => {
     try {
       setLoadingDocId(filename); 
-      // ✅ UPDATED: View ke liye 'operator' wali API use ki hai
       const res = await api.get(`/operator/get-file-preview/${complaint.id}`);
       
       if (res.data.status && res.data.data.length > 0) {
@@ -162,7 +174,6 @@ const Documents = ({ complaint }) => {
       formData.append("title", title);
       formData.append("complain_id", complaint.id);
 
-      // Upload ke liye operator wali api
       await uploadApi.post("/operator/upload-document", formData);
 
       toast.success("Uploaded document successfully!");
@@ -171,21 +182,19 @@ const Documents = ({ complaint }) => {
       fetchDocuments();
     } catch (error) {
       const res = error.response?.data;
-     if (res?.errors) {
-  const newErrors = { ...res.errors };
+      if (res?.errors) {
+        const newErrors = { ...res.errors };
 
-  // 👇 backend file.0 → frontend file
-  if (res.errors["file.0"]) {
-    newErrors.file = res.errors["file.0"];
-  }
+        if (res.errors["file.0"]) {
+          newErrors.file = res.errors["file.0"];
+        }
 
-  setFieldErrors(newErrors);
+        setFieldErrors(newErrors);
 
-  if (newErrors.file) {
-    toast.error(newErrors.file[0]);
-  }
-}
- else if (res?.message) {
+        if (newErrors.file) {
+          toast.error(newErrors.file[0]);
+        }
+      } else if (res?.message) {
         toast.error(res.message);
       } else {
         toast.error("Failed to upload documents. Please try again.");
@@ -207,20 +216,21 @@ const Documents = ({ complaint }) => {
             <div className="text-center py-4 text-gray-500">Loading documents...</div>
           ) : documents.length > 0 ? (
             <div className="grid gap-3">
-              {documents.map((doc, index) => (
+              {currentDocuments.map((doc, index) => (
                 <div 
                   key={doc.id || index} 
-                  className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+                  // Mobile view me flex-col, aur badi screen pe flex-row
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-center gap-3 overflow-hidden">
-                    <div className="bg-red-50 p-2 rounded-lg">
+                  <div className="flex items-center gap-3 overflow-hidden w-full sm:w-auto">
+                    <div className="bg-red-50 p-2 rounded-lg flex-shrink-0">
                       <FaFilePdf className="text-red-500 text-xl" />
                     </div>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-gray-800 truncate">
                         {doc.title || doc.file || "Untitled Document"}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 truncate">
                         {doc.type} • {new Date(doc.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -229,7 +239,8 @@ const Documents = ({ complaint }) => {
                   <button
                     onClick={() => handleViewPdf(doc.file)}
                     disabled={loadingDocId === doc.file}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-70"
+                    // Mobile pe button full width (w-full) hoga, aur center align hoga
+                    className="flex items-center justify-center gap-2 px-4 py-2 sm:px-3 sm:py-1.5 text-sm sm:text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-70 w-full sm:w-auto flex-shrink-0 mt-1 sm:mt-0"
                   >
                     {loadingDocId === doc.file ? (
                       <FaSpinner className="animate-spin" />
@@ -242,19 +253,31 @@ const Documents = ({ complaint }) => {
               ))}
             </div>
           ) : (
-            <div className="p-6 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center text-gray-500">
+            <div className="p-6 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center text-gray-500 text-sm">
               No documents found for this file.
             </div>
           )}
         </div>
 
+        {documents.length > itemsPerPage && (
+          <div className="overflow-x-auto">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalItems={documents.length}
+              itemsPerPage={itemsPerPage}
+            />
+          </div>
+        )}
+
         {/* --- UPLOAD BOX --- */}
         <div className="p-4 sm:p-5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
-          <h2 className="text-[17px] sm:text-[18px] text-blue-900 font-semibold mb-3">
+          <h2 className="text-[16px] sm:text-[18px] text-blue-900 font-semibold mb-2">
             Attach New Incoming Correspondence
           </h2>
 
-          <p className="text-sm text-blue-800 mb-3">
+          <p className="text-xs sm:text-sm text-blue-800 mb-4">
             Attach letters, reminders, RTI replies received after file movement.
           </p>
 
@@ -271,7 +294,7 @@ const Documents = ({ complaint }) => {
                   setFieldErrors((prev) => ({ ...prev, title: undefined }));
                 }}
                 placeholder="Add Title"
-                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 ${
                   fieldErrors.title ? "border-red-500" : "border-gray-300"
                 }`}
               />
@@ -290,7 +313,7 @@ const Documents = ({ complaint }) => {
                   setCorrespondenceType(e.target.value);
                   setFieldErrors((prev) => ({ ...prev, type: undefined }));
                 }}
-                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-300 ${
+                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 ${
                   fieldErrors.type ? "border-red-500" : "border-gray-300"
                 }`}
               >
@@ -308,17 +331,17 @@ const Documents = ({ complaint }) => {
           <div className="mb-1">
             <label
               htmlFor="pdfUpload"
-              className={`cursor-pointer w-full border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-gray-100 transition ${
+              className={`cursor-pointer w-full border-2 border-dashed rounded-xl p-5 sm:p-6 flex flex-col items-center justify-center text-center hover:bg-blue-100/50 transition ${
                 fieldErrors.file
                   ? "border-red-500 bg-red-50"
-                  : "border-gray-300"
+                  : "border-gray-300 bg-white"
               }`}
             >
-              <FaArrowUpLong className="text-3xl text-gray-500 mb-2" />
-              <p className="font-medium text-gray-700">
+              <FaArrowUpLong className="text-2xl sm:text-3xl text-gray-400 mb-2" />
+              <p className="font-medium text-gray-700 text-sm sm:text-base">
                 Click to upload PDF(s)
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 mt-1">
                 Only .pdf files are allowed
               </p>
 
@@ -332,44 +355,45 @@ const Documents = ({ complaint }) => {
               />
             </label>
             {fieldErrors.file && (
-  <p className="mt-1 text-xs text-red-600">
-    {fieldErrors.file[0]}
-  </p>
-)}
+              <p className="mt-1 text-xs text-red-600 text-center">
+                {fieldErrors.file[0]}
+              </p>
+            )}
           </div>
         </div>
 
         {/* Uploaded File List (Preview before upload) */}
         {uploadedFiles.length > 0 && (
           <div className="p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-sm">
-            <h3 className="text-[16px] sm:text-[17px] font-semibold mb-4">
-              Selected Documents ({uploadedFiles.length}) - 
-              {/* <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span> */}
+            <h3 className="text-[15px] sm:text-[16px] font-semibold mb-3 sm:mb-4 text-gray-800">
+              Selected Documents ({uploadedFiles.length})
             </h3>
 
             <div className="space-y-3">
               {uploadedFiles.map((file) => (
                 <div
                   key={file.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition"
+                  className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition"
                 >
-                  <div className="flex items-center gap-4 flex-1">
-                    <FaFilePdf className="text-red-600 text-2xl flex-shrink-0" />
+                  <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                    <FaFilePdf className="text-red-600 text-xl sm:text-2xl flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-800 truncate">
+                      <p className="font-medium text-sm sm:text-base text-gray-800 truncate">
                         {file.name}
                       </p>
-                      <div className="flex flex-wrap gap-2 text-xs text-gray-600 mt-1">
+                      <div className="flex flex-wrap gap-2 text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">
                         <span>{file.size} KB</span>
+                        <span className="hidden sm:inline">•</span>
                         <span>{file.uploadDate}</span>
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={() => handleRemoveFile(file.id)}
-                    className="self-end sm:self-center p-2 text-red-600 hover:bg-red-100 rounded-full transition"
+                    className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors flex-shrink-0"
+                    aria-label="Remove file"
                   >
-                    <FaTimes size={18} />
+                    <FaTimes size={16} />
                   </button>
                 </div>
               ))}
@@ -377,11 +401,11 @@ const Documents = ({ complaint }) => {
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row justify-end">
+        <div className="flex flex-col sm:flex-row justify-end pt-2">
           <button
             onClick={uploadDocument}
             disabled={isUploading}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-sm transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
+            className="px-5 py-3 sm:py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed w-full sm:w-auto font-medium"
           >
             <FiUpload className="text-lg" />
             {isUploading ? "Uploading..." : "Upload Document"}
@@ -391,24 +415,30 @@ const Documents = ({ complaint }) => {
 
       <Toaster position="top-right" />
 
-      {/* PDF View Modal */}
+      {/* PDF View Modal - Better mobile handling */}
       {pdfViewUrl && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl">
-            <div className="flex items-center justify-between p-4 border-b bg-gray-50 rounded-t-lg">
-              <h3 className="text-lg font-semibold text-gray-800">Document Viewer</h3>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-xl w-full max-w-5xl h-[95vh] sm:h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-gray-50">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 truncate pr-4">
+                Document Viewer
+              </h3>
               <button
                 onClick={() => setPdfViewUrl(null)}
-                className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-600"
+                className="p-1.5 sm:p-2 bg-gray-200 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors text-gray-600 flex-shrink-0"
               >
-                <FaTimes className="w-5 h-5" />
+                <FaTimes className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
-            <iframe
-              src={`${pdfViewUrl}#zoom=page-width`}
-              className="w-full h-full border-0 bg-gray-100"
-              title="PDF Viewer"
-            />
+            
+            <div className="flex-1 w-full bg-gray-100 overflow-hidden relative">
+              {/* PDF Iframe */}
+              <iframe
+                src={`${pdfViewUrl}#zoom=page-width`}
+                className="absolute inset-0 w-full h-full border-0"
+                title="PDF Viewer"
+              />
+            </div>
           </div>
         </div>
       )}

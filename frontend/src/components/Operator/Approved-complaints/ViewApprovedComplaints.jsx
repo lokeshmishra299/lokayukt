@@ -54,7 +54,8 @@
     const [targetDate, setTargetDate] = useState("");
 
 
-    const {data: complaintData,isLoading,isError,error,} = useQuery({
+    // const {data: complaintData,isLoading,isError,error,} = useQuery({
+    const { data: complaintData, isLoading, isError, error, refetch } = useQuery({
       queryKey: ["complaint-details", id],
       queryFn: async () => {
         const res = await api.get(`/operator/view-complaint/${id}`);
@@ -109,6 +110,7 @@
       onSuccess: (data) => {
         toast.success("Marked as received successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+        refetch();
         setRemark("");
         setConfirmConfig({ open: false, type: null });
       },
@@ -132,6 +134,7 @@
       onSuccess: (data) => {
         toast.success(data.message || "Forwarded successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+        refetch();
         setRemark("");
         setSelectedForwardTo("");
         setConfirmConfig({ open: false, type: null });

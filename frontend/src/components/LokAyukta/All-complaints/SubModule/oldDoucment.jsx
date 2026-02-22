@@ -3,8 +3,10 @@ import { FaEye, FaTimes, FaSpinner, FaCloudUploadAlt, FaFileAlt } from "react-ic
 import { BsFileEarmarkPdf } from "react-icons/bs";
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { toast, Toaster } from "react-hot-toast";
-import Pagination from "../../../Pagination";
+// import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
+import Pagination from "../../../Pagination"
+
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -21,20 +23,19 @@ const Documents = ({ complaint }) => {
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
+  const [docPage, setDocPage] = useState(1);
+const itemsPerPage = 10;
 
   // -- Add Document State --
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newDoc, setNewDoc] = useState({
     title: "",
     type: "Letter", // Default to first option
-    files: [], // ✅ Changed to 'files' array for multiple upload
+    file: null,
   });
 
   // Backend Errors State
   const [errors, setErrors] = useState({});
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const docsPerPage = 5;
 
   const handleAddDocuments = () => {
     setErrors({});
@@ -62,27 +63,27 @@ const Documents = ({ complaint }) => {
   } = useQuery({
     queryKey: ["documents", complaint?.id],
     queryFn: async () => {
-      const res = await api.get(`/ps/get-document/${complaint.id}`);
+      const res = await api.get(`/lokayukt/get-document/${complaint.id}`);
       return res.data.status ? res.data.data : [];
     },
     enabled: !!complaint?.id,
   });
 
+  
   useEffect(() => {
-    setCurrentPage(1);
-  }, [complaint?.id]);
+  setDocPage(1);
+}, [documents]);
 
-  // ✅ PAGINATION LOGIC
-  const indexOfLastDoc = currentPage * docsPerPage;
-  const indexOfFirstDoc = indexOfLastDoc - docsPerPage;
+  const lastIndex = docPage * itemsPerPage;
+const firstIndex = lastIndex - itemsPerPage;
+const currentDocs = documents.slice(firstIndex, lastIndex);
+const totalPages = Math.ceil(documents.length / itemsPerPage);
 
-  const currentDocuments = documents.slice(indexOfFirstDoc, indexOfLastDoc);
-  const totalPages = Math.ceil(documents.length / docsPerPage);
 
   const handleViewPdf = async (filename) => {
     try {
       setLoadingDoc(filename);
-      const res = await api.get(`/ps/get-file-preview/${complaint.id}`);
+      const res = await api.get(`/lokayukt/get-file-preview/${complaint.id}`);
       if (res.data.status && res.data.data.length > 0) {
         const match = res.data.data.find((p) => p.includes(filename));
         if (match) {
@@ -91,25 +92,16 @@ const Documents = ({ complaint }) => {
         }
       }
     } catch (err) {
-      console.error("PDF preview error", err);
+      // alert("PDF nahi khul paya");
     } finally {
       setLoadingDoc(null);
     }
   };
 
-  useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(totalPages || 1);
-    }
-  }, [totalPages]);
-
-  // -- Handle File Selection (For Multiple Files) --
+  // -- Handle File Selection --
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      // ✅ Convert FileList to Array and set to state
-      const selectedFiles = Array.from(e.target.files);
-      setNewDoc({ ...newDoc, files: selectedFiles });
-      
+    if (e.target.files && e.target.files[0]) {
+      setNewDoc({ ...newDoc, file: e.target.files[0] });
       // Clear file error locally when user selects file
       if (errors.file) setErrors({ ...errors, file: null });
     }
@@ -117,7 +109,11 @@ const Documents = ({ complaint }) => {
 
   // -- Handle Form Submit --
   const handleSubmitDocument = async () => {
+    // 1. Reset Errors
     setErrors({});
+
+    // 2. CHECK REMOVED: Maine wo code hata diya jo empty fields ko rok raha tha.
+    // Ab request seedha backend pe jayegi chahe fields khali hon.
 
     if (!complaint?.id) {
       toast.error("Complaint ID missing");
@@ -128,32 +124,29 @@ const Documents = ({ complaint }) => {
     try {
       const formData = new FormData();
       
-      // ✅ Append multiple files to formData as an array
-      if (newDoc.files && newDoc.files.length > 0) {
-        newDoc.files.forEach((fileItem, index) => {
-          formData.append(`file[${index}]`, fileItem);
-        });
-      } else {
-        formData.append("file", ""); // Send empty to trigger backend validation
+      // Agar file null hai toh bhi backend bhej rahe hain taaki backend error de
+      if(newDoc.file) {
+          formData.append("file", newDoc.file);
       }
-
-      formData.append("type", newDoc.type || ""); 
+      formData.append("type", newDoc.type || ""); // Empty string agar khali ho
       formData.append("title", newDoc.title || ""); 
       formData.append("complain_id", complaint.id);
 
-      await api.post("/ps/upload-document", formData, {
+      await api.post("/lokayukt/upload-document", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       toast.success("Document uploaded successfully!");
       setopenAddDocuments(false);
-      setNewDoc({ title: "", type: "Letter", files: [] }); // ✅ Reset state
+      setNewDoc({ title: "", type: "Letter", file: null });
       setErrors({});
       refetch();
     } catch (error) {
       console.error("Upload failed", error);
       
+      // -- Backend Errors Capture --
       if (error.response && error.response.data && error.response.data.errors) {
+        // Backend se aaye errors ko state me set kar rahe hain
         setErrors(error.response.data.errors);
       } else {
         const msg = error.response?.data?.message || "Failed to upload document.";
@@ -182,20 +175,17 @@ const Documents = ({ complaint }) => {
 
   return (
     <div className="">
-      <Toaster position="top-right" />
+      {/* <Toaster position="top-right"  /> */}
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Documents</h2>
-        {complaint.assign_to_ps ? 
-         <button
+        <button
           onClick={handleAddDocuments}
           className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
         >
           <FaCloudUploadAlt className="w-4 h-4" />
           Add Documents
-        </button> :
-        <div></div>
-        }
+        </button>
       </div>
 
       {/* Docs List */}
@@ -205,7 +195,7 @@ const Documents = ({ complaint }) => {
             No documents available
           </div>
         ) : (
-          currentDocuments.map((doc) => (
+          currentDocs.map((doc) => (
             <div
               key={doc.id}
               className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
@@ -239,17 +229,22 @@ const Documents = ({ complaint }) => {
                 </button>
               </div>
             </div>
+
+            
           ))
         )}
       </div>
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-        totalItems={documents.length}
-        itemsPerPage={docsPerPage}
-      />
+      {documents.length > itemsPerPage && (
+  <Pagination
+    currentPage={docPage}
+    totalPages={totalPages}
+    onPageChange={setDocPage}
+    totalItems={documents.length}
+    itemsPerPage={itemsPerPage}
+  />
+)}
+
 
       {/* Add Document Modal */}
       {openAddDocuments && (
@@ -287,6 +282,7 @@ const Documents = ({ complaint }) => {
                     errors.title ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                   }`}
                 />
+                {/* --- BACKEND ERROR FOR TITLE --- */}
                 {errors.title && (
                   <p className="text-xs text-red-500 mt-1">{errors.title}</p>
                 )}
@@ -312,15 +308,16 @@ const Documents = ({ complaint }) => {
                   <option value="RTI Reply">RTI Reply</option>
                   <option value="Counter Order">Counter Order</option>
                 </select>
+                {/* --- BACKEND ERROR FOR TYPE --- */}
                 {errors.type && (
                   <p className="text-xs text-red-500 mt-1">{errors.type}</p>
                 )}
               </div>
 
-              {/* File Upload Area (Multiple) */}
+              {/* File Upload Area */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
-                  Upload File(s) <span className="text-red-500">*</span>
+                  Upload File <span className="text-red-500">*</span>
                 </label>
                 <div 
                   className={`relative border-2 border-dashed rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group ${
@@ -329,38 +326,35 @@ const Documents = ({ complaint }) => {
                 >
                   <input
                     type="file"
-                    multiple // ✅ Enabled Multiple Selection
                     onChange={handleFileChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     accept=".pdf,.jpg,.jpeg,.png"
                   />
                   <div className="flex flex-col items-center justify-center gap-2">
-                    {newDoc.files && newDoc.files.length > 0 ? (
+                    {newDoc.file ? (
                       <>
                         <FaFileAlt className="w-8 h-8 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-900">
-                          {newDoc.files.length} file(s) selected
+                        <span className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+                          {newDoc.file.name}
                         </span>
-                        {/* List of selected files */}
-                        <div className="mt-2 text-xs text-gray-500 max-h-24 overflow-y-auto w-full px-2">
-                          {newDoc.files.map((f, i) => (
-                            <div key={i} className="truncate">{f.name}</div>
-                          ))}
-                        </div>
+                        <span className="text-xs text-gray-500">
+                          {(newDoc.file.size / 1024 / 1024).toFixed(2)} MB
+                        </span>
                       </>
                     ) : (
                       <>
                         <FaCloudUploadAlt className={`w-8 h-8 transition-colors ${errors.file ? "text-red-400" : "text-gray-400 group-hover:text-blue-500"}`} />
                         <span className={`text-sm ${errors.file ? "text-red-500" : "text-gray-500"}`}>
-                          Click to browse or drag files here
+                          Click to browse or drag file here
                         </span>
                         <span className="text-xs text-gray-400">
-                          PDF, JPG, PNG (You can select multiple files)
+                          PDF, JPG, PNG (Max 5MB)
                         </span>
                       </>
                     )}
                   </div>
                 </div>
+                {/* --- BACKEND ERROR FOR FILE --- */}
                 {errors.file && (
                   <p className="text-xs text-red-500 mt-1">{errors.file}</p>
                 )}

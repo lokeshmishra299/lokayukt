@@ -192,6 +192,7 @@ const ViewAllComplaint = () => {
      const [showModal, setShowModal] = useState(false);
      const [Rejectedloading,setRejectedloading] = useState(false)
      const [targetDate, setTargetDate] = useState("");
+     const [fieldErrors, setFieldErrors] = useState({});
 
   
 
@@ -301,8 +302,14 @@ return flatList.filter(
         }, 2000)
       setConfirmConfig({ open: false, type: null });
     },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to pull back");
+  onError: (error) => {
+      const resData = error?.response?.data;
+      // ✅ अगर बैकएंड से validation 'errors' ऑब्जेक्ट आता है:
+      if (resData && resData.errors) {
+        setFieldErrors(resData.errors);
+      } else {
+        toast.error(resData?.message || "Failed to forward");
+      }
     },
   });
 
@@ -345,12 +352,12 @@ return flatList.filter(
     },
   });
 
-  const forwardComplaintMutation = useMutation({
+ const forwardComplaintMutation = useMutation({
     mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
       const res = await api.post(`/ps/forward-complain-by-ps/${complaintId}`, {
         forward_to: forwardTo,
         // remark: remarkData,
-          target_date: targetDate,
+        target_date: targetDate,
         sent_through_rk: sent_through_rk ? 1 : 0,
       });
       return res.data;
@@ -359,17 +366,28 @@ return flatList.filter(
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
 
-          setTimeout(()=>{
-          navigate("/ps/all-complaints")
-        }, 2000)
+      setTimeout(()=>{
+        navigate("/ps/all-complaints")
+      }, 2000)
 
-      // setRemark("");
       setTargetDate("");
       setSelectedForwardTo("");
       setConfirmConfig({ open: false, type: null });
+      setFieldErrors({}); // ✅ Success पर भी एरर क्लियर करें
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to forward");
+      // 🎯 यहाँ हम बैकएंड के हर तरह के एरर फॉर्मेट को हैंडल कर रहे हैं
+      const resData = error?.response?.data;
+      
+      if (resData?.errors) {
+        // अगर validation error है (जैसे target_date)
+        setFieldErrors(resData.errors);
+        toast.error("Please fill required fields."); // एक जनरल टोस्ट भी दिखाएं
+      } else if (resData?.message) {
+        toast.error(resData.message);
+      } else {
+        toast.error("Failed to forward");
+      }
     },
   });
 
@@ -458,6 +476,7 @@ return flatList.filter(
     setRemark("");
       setTargetDate("");
     setSelectedForwardTo("");
+    setFieldErrors({});
   };
 
   const getStatusColor = (status) => {
@@ -1303,16 +1322,33 @@ return flatList.filter(
   <div className="mb-5">
     <label className="block text-sm font-medium text-gray-700 mb-2">
       Target Date 
-      <span className="text-red-500">*</span>
+      {/* <span className="text-red-500">*</span> */}
     </label>
     <input
       type="date"
       min={new Date().toISOString().split("T")[0]}
       value={targetDate}
-      onChange={(e) => setTargetDate(e.target.value)}
-      className="w-full px-3 py-2 border border-gray-300 rounded
-                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      onChange={(e) => {
+        setTargetDate(e.target.value);
+        // ✅ जैसे ही यूज़र कुछ टाइप करे, एरर हटा दें
+        if (fieldErrors?.target_date) {
+          setFieldErrors((prev) => ({ ...prev, target_date: null }));
+        }
+      }}
+      className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${
+        fieldErrors?.target_date 
+          ? "border-red-500 focus:ring-red-400 bg-red-50" 
+          : "border-gray-300 focus:ring-blue-500"
+      }`}
     />
+    
+    {/* 🎯 यहाँ लाल रंग में एरर मैसेज दिखेगा */}
+    {fieldErrors?.target_date && (
+      <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
+       
+        {fieldErrors.target_date[0]}
+      </p>
+    )}
   </div>
 )}
 
@@ -1338,6 +1374,8 @@ return flatList.filter(
                 disabled={
                   returnWithRemarksMutation.isPending ||
                   forwardComplaintMutation.isPending ||
+                  assignToSelfMutation.isPending || 
+                  pullBackMutation.isPending ||
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
                     (!selectedForwardTo ||

@@ -393,7 +393,7 @@ useEffect(() => {
   //   }
   // };
 
-  const exportToExcel = async (data, fileName) => {
+ const exportToExcel = async (data, fileName) => {
     if (!data || data.length === 0) {
       alert("No data to export");
       return;
@@ -404,6 +404,21 @@ useEffect(() => {
 
     try {
       const ws = XLSX.utils.json_to_sheet(data);
+
+      // ✅ Excel में कॉलम के बीच स्पेसिंग (Column Width) सेट करने का लॉजिक
+      const cols = Object.keys(data[0]).map((key) => {
+        // उस कॉलम में सबसे लंबे शब्द (या हेडर) की लंबाई निकालें
+        const maxLength = Math.max(
+          ...data.map((row) => (row[key] ? row[key].toString().length : 0)),
+          key.length
+        );
+        // उसमें 5 कैरेक्टर का अतिरिक्त "पैडिंग/स्पेस" जोड़ें (अधिकतम चौड़ाई 50 सेट करें)
+        return { wch: Math.min(maxLength + 5, 50) };
+      });
+
+      // वर्कशीट में कॉलम की चौड़ाई अप्लाई करें
+      ws["!cols"] = cols;
+
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
       XLSX.writeFile(wb, `${fileName}.xlsx`);
@@ -414,7 +429,7 @@ useEffect(() => {
     }
   };
 
-  const exportToPDF = async (data, fileName) => {
+ const exportToPDF = async (data, fileName) => {
     if (!data || data.length === 0) {
       alert("No data to export");
       return;
@@ -424,42 +439,55 @@ useEffect(() => {
     await new Promise((resolve) => setTimeout(resolve, 300));
 
     try {
-      let html = `<h2 style="text-align:center; font-family: sans-serif;">${fileName}</h2>
-        <table border="1" cellpadding="5" cellspacing="0" style="border-collapse:collapse; width:100%; font-size:10px; font-family: sans-serif;">
-          <thead style="background-color:#f0f0f0;">
-            <tr>`;
+      // ✅ CSS में Padding, word-wrap और overflow-wrap ऐड किया गया है ताकि टेक्स्ट बाहर न जाए
+      let html = `
+        <div style="padding: 10px;">
+          <h2 style="text-align:center; font-family: sans-serif; margin-bottom: 15px; color: #333;">${fileName}</h2>
+          <table style="border-collapse:collapse; width:100%; font-size:11px; font-family: sans-serif; table-layout: auto;">
+            <thead style="background-color:#f0f0f0;">
+              <tr>`;
 
       const keys = Object.keys(data[0]);
       keys.forEach((key) => {
-        html += `<th style="padding:5px; text-align:left;">${key}</th>`;
+        // ✅ Headers के लिए CSS
+        html += `<th style="border: 1px solid #ddd; padding:8px; text-align:left; word-wrap: break-word;">${key}</th>`;
       });
 
       html += `</tr></thead><tbody>`;
 
       data.forEach((row) => {
-        html += `<tr>`;
+        html += `<tr style="page-break-inside: avoid;">`; // ✅ पंक्ति को बीच से कटने से रोकने के लिए
         keys.forEach((key) => {
-          html += `<td style="padding:5px;">${row[key]}</td>`;
+          // ✅ Data के लिए CSS (word-break ताकि लंबा टेक्स्ट अगली लाइन में आ जाए)
+          html += `<td style="border: 1px solid #ddd; padding:8px; word-wrap: break-word; overflow-wrap: break-word; max-width: 150px;">${row[key]}</td>`;
         });
         html += `</tr>`;
       });
 
-      html += `</tbody></table>`;
+      html += `</tbody></table>
+        </div>`;
 
       const element = document.createElement("div");
       element.innerHTML = html;
 
+      // ✅ PDF Options को अपडेट किया गया है
       const opt = {
-        margin: 10,
+        margin: [15, 10, 15, 10], // [Top, Left, Bottom, Right] में मार्जिन (Padding)
         filename: `${fileName}.pdf`,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true,
+          letterRendering: true 
+        },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }, // ✅ पेज ब्रेक सही करने के लिए
         jsPDF: { unit: "mm", format: "a4", orientation: "landscape" },
       };
 
       await html2pdf().set(opt).from(element).save();
     } catch (error) {
       console.error("PDF export failed", error);
+      toast.error("Failed to generate PDF");
     } finally {
       setExportingPdf(false);
     }
@@ -740,9 +768,9 @@ useEffect(() => {
               </div>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4">
+            {/* <p className="text-sm text-gray-500 mb-4">
               {filteredEnrollmentData.length} case(s) found
-            </p>
+            </p> */}
             <div className="overflow-x-auto -mx-4 md:mx-0">
               <div className="inline-block min-w-full align-middle">
                 <table className="min-w-full text-sm text-left text-gray-500">

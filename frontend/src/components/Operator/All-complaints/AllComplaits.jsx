@@ -876,7 +876,7 @@ if (selectedCaseType === "today") {
                     Confirm Approval
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500">
-                    Are you sure you want to approve this complaint?
+                    Are you sure you want to forward this complaint?
                   </p>
                   {complaintToApprove && (
                     <p className="text-xs text-gray-600 mt-1">
