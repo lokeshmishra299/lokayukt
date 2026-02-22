@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\ComplaintNotes;
 use App\Models\ComplainDocuments;
 use App\Models\Drafts;
+use App\Models\EmployeeComplainNotes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -2478,6 +2479,65 @@ $complainDetails->actions = $actions;
         if(isset($request->complaint_id)){    
                 $compDoc = new ComplaintNotes();
                 $compDoc->complaint_id = $request->complaint_id;
+                $compDoc->added_by = $added_by;
+                // $compDoc->type = $request->type;
+                // $compDoc->title = $request->title;
+                $compDoc->description = $request->description;
+                $compDoc->forward_by = $added_by;
+                $compDoc->forward_to = $request->forward_to;
+                $compDoc->d_id = $request->d_id;
+                $compDoc->range_from = $request->range_from;
+                $compDoc->range_two = $request->range_two;
+                $compDoc->save();
+              
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Document Added successfully.',
+                    'data' => $compDoc
+                ], 201);
+        }
+
+    }
+
+
+    public function addNotesEmployee(Request $request)
+    {
+       
+        // $user = $request->user()->id;
+        $added_by = Auth::user()->id;
+    
+        $validation = Validator::make($request->all(), [
+            
+            'employee_file_id' => 'required|numeric',
+            // 'type' => 'required|string',
+            // 'title' => 'required|string',
+            'description' => 'required|string',
+            // 'd_id' => 'required',
+            // 'forward_by' => 'required',
+            // 'forward_to' => 'required',
+            // 'range_from' => 'required',
+            // 'range_two' => 'required',
+            
+        ], [
+            'employee_file_id.required' => 'Complaint Id is required.',
+            // 'type.required' => 'Complaint description is required.',
+            // 'title.required' => 'Letter Subject is Required',
+            'description.required' => 'Description is Required',
+            // 'd_id.required' => 'Document is Required',
+            'range_from.required' => 'Range From is Required',
+            'range_two.required' => 'Range too is Required',
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+
+        if(isset($request->employee_file_id)){    
+                $compDoc = new EmployeeComplainNotes();
+                $compDoc->employee_file_id = $request->employee_file_id;
                 $compDoc->added_by = $added_by;
                 // $compDoc->type = $request->type;
                 // $compDoc->title = $request->title;

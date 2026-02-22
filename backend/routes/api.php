@@ -280,7 +280,11 @@ Route::middleware('auth:sanctum')->group(function(){
         
         Route::get('/get-roles-supervisors', [CommonController::class, 'getRolesSupervisors']);
         Route::get('/personal-file-list',[EmployeesController::class,'personalFileList']);
+
         Route::get('/personal-file-list/{id}',[EmployeesController::class,'personalFileListById']);
+
+        Route::post('/add-notes-employee',[SupervisorComplaintsController::class,'addNotesEmployee']);
+
 
         Route::post('/personal-file-send',[EmployeesController::class, 'sendPersonalFile']);
 

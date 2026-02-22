@@ -76,20 +76,39 @@ class AuthMiddleware
         abort(403, 'Unauthorized access.');
     } */
 
-        public function handle(Request $request, Closure $next, ...$roles): Response
+       public function handle(Request $request, Closure $next, ...$params): Response
 {
     if (!Auth::check()) {
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 
-    $userRole = strtolower(Auth::user()->role->name ?? '');
+    $user = Auth::user();
+    $userRole = strtolower($user->role->name ?? '');
+    $userSubRole = strtolower($user->subrole->name ?? '');
 
-    $roles = array_map(function ($role) {
-        return strtolower(trim($role));
-    }, explode('|', implode('|', $roles)));
+    foreach ($params as $param) {
 
-    if (in_array($userRole, $roles)) {
-        return $next($request);
+        // Split role and subroles
+        $parts = explode(':', $param);
+
+        $roleName = strtolower(trim($parts[0]));
+
+        // If role does not match, skip
+        if ($userRole !== $roleName) {
+            continue;
+        }
+
+        // If no subrole defined in route → allow
+        if (!isset($parts[1])) {
+            return $next($request);
+        }
+
+        // Check subroles
+        $allowedSubroles = array_map('trim', explode('|', strtolower($parts[1])));
+
+        if (in_array($userSubRole, $allowedSubroles)) {
+            return $next($request);
+        }
     }
 
     abort(403, 'Unauthorized access.');
