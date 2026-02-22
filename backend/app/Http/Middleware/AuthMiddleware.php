@@ -15,7 +15,7 @@ class AuthMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$params): Response
+    /*public function handle(Request $request, Closure $next, ...$params): Response
     { 
      
         // if (!Auth::check()) {
@@ -74,5 +74,24 @@ class AuthMiddleware
         }
 
         abort(403, 'Unauthorized access.');
+    } */
+
+        public function handle(Request $request, Closure $next, ...$roles): Response
+{
+    if (!Auth::check()) {
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
+
+    $userRole = strtolower(Auth::user()->role->name ?? '');
+
+    $roles = array_map(function ($role) {
+        return strtolower(trim($role));
+    }, explode('|', implode('|', $roles)));
+
+    if (in_array($userRole, $roles)) {
+        return $next($request);
+    }
+
+    abort(403, 'Unauthorized access.');
+}
 }

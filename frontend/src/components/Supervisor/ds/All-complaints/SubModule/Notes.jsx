@@ -422,10 +422,26 @@ const Notes = ({ complaint }) => {
                     </p>
                   </div>
 
+                  <style>{`
+                    .fetched-note-content p, 
+                    .fetched-note-content div {
+                       margin-top: 0 !important;
+                       margin-bottom: 2px !important; /* हल्का सा गैप ताकि लाइनें बिल्कुल न चिपकें */
+                       line-height: 1.1 !important;   /* लाइन की ऊंचाई एकदम कम कर दी */
+                    }
+                    .fetched-note-content ol, 
+                    .fetched-note-content ul {
+                       margin-top: 0 !important;
+                       margin-bottom: 2px !important;
+                       padding-left: 20px !important;
+                    }
+                  `}</style>
+
                   <div
-                    className="mt-2 kruti-input whitespace-pre-wrap text-sm text-gray-700 overflow-x-auto"
+                    className="mt-2 fetched-note-content kruti-input text-sm text-gray-700 overflow-x-auto"
                     dangerouslySetInnerHTML={{ __html: item.description }}
                   />
+
 
                   {(referencedTitle || (item.range_from && item.range_two)) && (
                     <div className="mt-3 pt-2 border-t border-gray-200 text-xs text-gray-500">
@@ -547,7 +563,7 @@ const Notes = ({ complaint }) => {
   .kruti-input .public-DraftEditor-content {
     font-family: 'KrutiDev' !important;
     font-size: 20px !important;
-    line-height: 1.5 !important;
+    line-height: 1.1 !important;
   }
 
   /* 3. Placeholder - Force English Font */
@@ -735,9 +751,9 @@ const Notes = ({ complaint }) => {
   className="rounded-md kruti-input bg-white px-2 py-2 md:px-5 md:py-4 min-h-[200px] draft-preview-content"
   dangerouslySetInnerHTML={{
     __html: note
-      .replace(/<li>/g, '<li style="font-family: Arial, sans-serif !important;"><span style="font-family: \'KrutiDev\' !important; font-size: 22px;">')
-      .replace(/<\/li>/g, '</span></li>')
-      .replace(/<p>/g, '<p style="font-family: \'KrutiDev\' !important; font-size: 22px;">')
+          .replace(/<li>/g, '<li style="font-family: Arial, sans-serif !important; margin-bottom: 0px !important; line-height: 1.0 !important;"><span style="font-family: \'KrutiDev\' !important; font-size: 22px;">')
+    .replace(/<\/li>/g, '</span></li>')
+    .replace(/<p>/g, '<p style="font-family: \'KrutiDev\' !important; font-size: 22px; margin-top: 0px !important; margin-bottom: 2px !important; line-height: 1.0 !important;">')
   }}
 />
 

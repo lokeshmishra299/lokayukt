@@ -29,7 +29,7 @@ const uploadApi = axios.create({
 });
 
 const AddFiles = () => {
-  const c = useNavigate()
+  const navigate = useNavigate();
   const [correspondenceType, setCorrespondenceType] = useState("Letter");
   const [title, setTitle] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -153,14 +153,28 @@ uploadedFiles.forEach((fileData, index) => {
     <>
       {/* <div className="space-y-6 w-full h-screen"> */}
       <div className="space-y-6 w-full min-h-screen pb-10">
-        <div className="flex items-start gap-3">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Add Leave Files</h1>
-            <p className="text-sm sm:text-base text-gray-600 break-words">
-              छुट्टी फाइल जोड़ें
-            </p>
-          </div>
-        </div>
+      <div className="flex items-start justify-between gap-3">
+  
+  {/* Left side (Title) */}
+  <div>
+    <h1 className="text-xl font-bold text-gray-900">Add Leave Files</h1>
+    <p className="text-sm sm:text-base text-gray-600 break-words">
+      छुट्टी फाइल जोड़ें
+    </p>
+  </div>
+
+  {/* Right side (Back Button) */}
+ 
+
+
+    <button
+            onClick={() => navigate(-1)}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+               ← Back
+          </button>
+
+</div>
 
         <div className="p-4 sm:p-5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
           
