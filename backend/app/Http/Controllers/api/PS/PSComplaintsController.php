@@ -512,9 +512,11 @@ $complainDetails->actions = $actions;
    }
 
    public function getSubROleUsers(){
-     
+         $userParent = Auth::user()->parent_user_id;
+        //   return response()->json($userParent);
         $users = User::with('subrole')
          ->whereNotNull('sub_role_id')
+        //  ->where('parent_user_id',$userParent)
         ->get();
         $users = $users->map(function ($item) {
         if($item->subrole){
@@ -679,6 +681,11 @@ $complainDetails->actions = $actions;
         //    dd($request->all());
         // $user = Auth::user()->id;
         // dd($usersubrole);
+         $parentId = null;
+        $parentId = Auth::user()->parent_user_id;
+        // dd($parentId);
+        $userParentData = User::with('role')->where('id',$parentId)->get();
+        $roleParent = $userParentData[0]->role->name;
 
         $userRole = User::with('role')->where('id',$request->forward_to)->get();
 
@@ -739,7 +746,10 @@ $complainDetails->actions = $actions;
                 // $remark.= $request->remarks;
                 // $remark.='\n';
                 // $cmp->remark = $remark;
-                
+                    if($roleParent ==="up-lok-ayukt"){
+                         $cmp->assign_to_ps = null;           
+                    }
+
                     if($cmp->save()){
 
                          $apcAction = new ComplaintAction();
@@ -751,8 +761,7 @@ $complainDetails->actions = $actions;
                                 $apcAction->sent_through_rk = 1;
                             }
 
-                             
-
+                         
                         
                             if($roleFwd === "lok-ayukt" || $roleFwd === "up-lok-ayukt"){
                                     if($roleFwd === "lok-ayukt"){

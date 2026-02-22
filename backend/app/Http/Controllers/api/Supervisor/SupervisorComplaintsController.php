@@ -1663,7 +1663,7 @@ $complainDetails->actions = $actions;
         $validation = Validator::make($request->all(), [
             // 'forward_by_ds_js' => 'required|exists:users,id',
             'forward_to' => 'required|exists:users,id',
-            'remark' => 'required',
+            // 'remark' => 'required',
          
           
         ], [
@@ -1671,7 +1671,7 @@ $complainDetails->actions = $actions;
             // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
             'forward_to.required' => 'Forward to user is required.',
             'forward_to.exists' => 'Forward to user does not exist.',
-            'remark.required' => 'Remark is required.',
+            // 'remark.required' => 'Remark is required.',
            
         ]);
 
@@ -1693,6 +1693,7 @@ $complainDetails->actions = $actions;
 
                if($cmp){
                 $cmp->approved_rejected_by_sec= 1;
+                
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Deputy Secretary / Joint Secretary';
                 // $remark.='\n';
@@ -1744,6 +1745,7 @@ $complainDetails->actions = $actions;
                         $apcAction = new ComplaintAction();
                         $apcAction->complaint_id = $complainId;
                         $apcAction->forward_by_sec = $userId;
+                         $apcAction->target_date = $request->target_date;
                         // $apcAction->approved_rejected_by_ro_aro = $userId;
 
                         if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','dispatch'])) {
