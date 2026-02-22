@@ -4,7 +4,6 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-// Pagination Component Import (Ensure path is correct according to your folder structure)
 import Pagination from "../Pagination"; 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -40,7 +39,8 @@ const Reporting = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // API se aane wala per_page
+  // API se aane wala per_page
+  const [itemsPerPage, setItemsPerPage] = useState(10); 
 
   const { data: districtsList, isLoading: loadingDistricts } = useQuery({
     queryKey: ["districts-list"],
@@ -58,7 +58,6 @@ const Reporting = () => {
     }
   });
 
-  // Search logic me page param dynamically handle ho raha hai
   const handleSearch = async (page = 1) => {
     setIsLoading(true);
     
@@ -74,7 +73,8 @@ const Reporting = () => {
         enroll_to: enrollmentToDate,     
         complaint_date: complaintDate,
         nature: nature,
-        page: page // Request me page number bhejna
+        // pagination requst me
+        page: page 
       };
 
       const response = await api.get("/operator/search-by-field", {
@@ -82,8 +82,9 @@ const Reporting = () => {
       });
 
       if (response.data.status === true || response.data.status === "success") {
-        const paginationData = response.data.data; // Yeh apka paginated object hai
-        const fetchedData = paginationData?.data || []; // Asli array of objects
+        // Yeh apka paginated object hai
+        const paginationData = response.data.data; 
+        const fetchedData = paginationData?.data || []; 
         
         setResults(fetchedData);
         
@@ -282,7 +283,6 @@ const Reporting = () => {
             <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
               <tr>
                 <th className="px-6 py-3 border-b">S.No</th>
-                {/* 1. Comp. No aur Year ke liye alag th banaye gaye */}
                 <th className="px-6 py-3 border-b">Comp. No</th>
                 <th className="px-6 py-3 border-b">Year</th>
                 <th className="px-6 py-3 border-b whitespace-nowrap">Enroll Date</th>
@@ -305,14 +305,12 @@ const Reporting = () => {
                 </tr>
               ) : results.length > 0 ? (
                 results.map((item, index) => {
-                  // Serial number dynamically calculate hoga (Page 2 pe 11 se shuru hoga)
                   const serialNumber = (currentPage - 1) * itemsPerPage + index + 1;
                   
                   return (
                     <tr key={item.id || index} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">{serialNumber}</td>
                       
-                      {/* 2. Comp. No. ka alag column banaya */}
                       <td 
                         className="px-6 py-4 font-medium text-blue-600 cursor-pointer hover:underline whitespace-nowrap" 
                         onClick={() => handleViewComplaint(item.id)}
@@ -320,7 +318,6 @@ const Reporting = () => {
                         {item.COMP_NO || "N/A"}
                       </td>
 
-                      {/* 3. Year ka alag column banaya */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         {item.YEAR1 || "N/A"}
                       </td>
@@ -333,7 +330,6 @@ const Reporting = () => {
                         {formatDate(item.COMP_DT)}
                       </td>
 
-                      {/* Yaha Kruti Dev ki class lagayi gayi hai */}
                       <td className="px-6 py-4 font-medium text-gray-800">
                         <span className="kruti-input text-[17px]">{item.COMP_NM || "N/A"}</span>
                       </td>
@@ -373,15 +369,16 @@ const Reporting = () => {
           </table>
         </div>
 
-        {/* --- Server-Side Pagination Component --- */}
         {results.length > 0 && totalPages > 1 && (
           <div className="mt-4">
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              onPageChange={(page) => handleSearch(page)} // Yaha click karne pe API wapas page number leke call hogi
+              // Yaha click karne pe API wapas page number leke call hogi
+              onPageChange={(page) => handleSearch(page)} 
               totalItems={totalItems}
-              itemsPerPage={itemsPerPage} // API ke mutabiq dynamic items per page
+              // API ke mutabiq dynamic items per page
+              itemsPerPage={itemsPerPage} 
             />
           </div>
         )}
