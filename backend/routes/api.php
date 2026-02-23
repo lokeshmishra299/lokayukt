@@ -613,8 +613,7 @@ Route::middleware('auth:sanctum')->group(function(){
        
     });
 
-    Route::middleware('role:steno|assistant-clerk|computer-assistant
-|car-driver|jamadar|orderly/jamadar|office|farrash|sweeper|gardener|cook|watchman|peon')->prefix('employee')->group(function () {
+    Route::middleware('role:steno|peon')->prefix('employee')->group(function () {
        
         Route::get('/all-files',[EmployeesController::class,'index']);
                 Route::get('/all-files/{id}',[EmployeesController::class,'fileDetails']);

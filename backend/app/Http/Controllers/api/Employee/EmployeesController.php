@@ -208,16 +208,16 @@ class EmployeesController extends Controller
         ]);
     }
 
-    public function personalFileList()
-    {
+   public function personalFileList()
+{
+    $user = auth()->id();
 
-        $user = Auth()->id();
-        // dd($user);
-        $employeFile = EmployeeUploadFiles::where('permission_user_id', $user)->get();
-        // dd($employeFile);
-        return ApiResponse::generateResponse('success', 'Employee personal file fetch successfully', $employeFile, 200);
-    }
+    $employeFile = EmployeeUploadFiles::where('permission_user_id', $user)
+                    ->where('added_by', '!=', $user)  
+                    ->get();
 
+    return ApiResponse::generateResponse('success', 'Employee personal file fetch successfully', $employeFile, 200);
+}
    public function personalFileListById($id)
 {
     $userId = auth()->id();

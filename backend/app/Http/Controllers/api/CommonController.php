@@ -1193,7 +1193,7 @@ class CommonController extends Controller
     ]);
 
     $file = EmployeeUploadFiles::find($request->file_id);
-    $fromUserId = Auth::id(); // Admin granting permission
+    $fromUserId = Auth::id();
     $toUserId = $request->user_id;
 
     // Update file permission
@@ -1201,31 +1201,69 @@ class CommonController extends Controller
     $file->permission_user_by_admin = $fromUserId;
     $file->user_id = $fromUserId;
     $file->save();
-     // Fetch recipient user
+
+    // Get role & subrole
     $toUser = User::with(['role','subrole'])->find($toUserId);
+    $roleFwd    = strtolower($toUser->role->name ?? '');
+    $subroleFwd = strtolower($toUser->subrole->name ?? '');
 
-    // Determine role/subrole for tracking
-    $roleName = strtolower($toUser->role->name ?? '');
-    $subRoleName = strtolower($toUser->subrole->name ?? '');
-    $forwardKey = $subRoleName ?: $roleName ?: null;
+    $apcAction = new ComplainActionPersonalFile();
+    $apcAction->file_id     = $file->id;
+    $apcAction->subject     = $file->title ?? null;
+    $apcAction->remarks     = 'Permission granted by admin';
+    $apcAction->action_date = now();
+    $apcAction->type         = 1;
+    $apcAction->status       = 'Verified';
+    $apcAction->forward_by_admin = $fromUserId;
 
-    // Create history / tracking entry
-    if ($forwardKey) {
-        ComplainActionPersonalFile::create([
-            'file_id'        => $file->id,
-            'subject'        => $file->title ?? null,
-            'remarks'        => 'Permission granted by admin',
-            'action_date'    => now(),
-            'type'           => 1, // You can define: 1 = Permission Grant
-            'status'         => 'Verified', // Or 'Created' depending on your flow
-            "forward_to_ro_aro" => $toUserId,
-            "forward_by_admin" => $fromUserId,
-        ]);
+    if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt', 'dispatch'])) {
+
+        if ($roleFwd == 'lok-ayukt') {
+            $apcAction->forward_to_lokayukt = $toUserId;
+        } elseif ($roleFwd == 'dispatch') {
+            $apcAction->forward_to_dispatch = $toUserId;
+        } else {
+            $apcAction->forward_to_uplokayukt = $toUserId;
+        }
+
+    } elseif ($roleFwd == 'supervisor' && $subroleFwd) {
+
+        switch ($subroleFwd) {
+            case 'ds':
+                $apcAction->forward_to_ds = $toUserId;
+                break;
+
+            case 'js':
+                $apcAction->forward_to_js = $toUserId;
+                break;
+
+            case 'us':
+                $apcAction->forward_to_us = $toUserId;
+                break;
+
+            case 'sec':
+                $apcAction->forward_to_sec = $toUserId;
+                break;
+
+            case 'cio-io':
+                $apcAction->forward_to_cio_io = $toUserId;
+                break;
+
+            case 'ro-aro':
+                $apcAction->forward_to_ro_aro = $toUserId;
+                break;
+
+            case 'io':
+                $apcAction->forward_to_io = $toUserId;
+                break;
+        }
     }
+
+    $apcAction->save();
 
     return ApiResponse::generateResponse(
         'success',
-        'Permission granted successfully and tracked',
+        'Permission granted & tracked successfully',
         $file,
         200
     );
