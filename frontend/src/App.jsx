@@ -62,6 +62,15 @@ import OperatorEmployUserManagement from './components/Operator/Employ/UserManag
 import OperatorEmployAddFiles from './components/Operator/Employ/AddFiles';
 import OperatorEmployViewFiles from './components/Operator/Employ/ViewFiles';
 import OperatorEmployViewPersonalFile from './components/Operator/Employ/ViewPersonalFiles';
+
+
+
+import OperatorViewPersonalFiles from './components/Operator/Employ/PersonalFiles/ViewPersonalFiles';
+import OperatorAddPersonalFiles from "./components/Operator/Employ/PersonalFiles//AddpersonalFiles"
+import OperatorPersonalFileById from './components/Operator/Employ/PersonalFiles/PersonalFileById';
+
+import OperatorPendingFiles from './components/Operator/Employ/PendingFiles/PendingFiles';
+import OperatorPendingFileBYId from './components/Operator/Employ/PendingFiles/PendingFileBYId';
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
 // import EmployEditUserManagment from './components/Employ/EditUserManagment';
@@ -717,6 +726,16 @@ import PsEmployComplaints from './components/Ps/Employ/Complaints';
 import PsEmployUserManagement from './components/Ps/Employ/UserManagement';
 import PsEmployAddFiles from './components/Ps/Employ/AddFiles';
 import PsEmployViewFiles from './components/Ps/Employ/ViewFiles';
+
+
+
+
+  import PsViewPersonalFiles from './components/Ps/Employ/PersonalFiles/ViewPersonalFiles';
+import PsAddPersonalFiles from "./components/Ps/Employ/PersonalFiles//AddpersonalFiles"
+import PsPersonalFileById from './components/Ps/Employ/PersonalFiles/PersonalFileById';
+
+import PsPendingFiles from './components/Ps/Employ/PendingFiles/PendingFiles';
+import PsPendingFileBYId from './components/Ps/Employ/PendingFiles/PendingFileBYId';
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
 // import EmployEditUserManagment from './components/Employ/EditUserManagment';
@@ -824,6 +843,15 @@ import DspEmployViewFiles from './components/Dispatch/Employ/ViewFiles';
   import EmployAddFiles from "./components/Employ/AddFiles"
   import EmployViewFiles from "./components/Employ/ViewFiles"
   import EmployUserManagement from "./components/Employ/EditUserManagment"
+
+
+
+  import EmployViewPersonalFiles from './components/Employ/PersonalFiles/ViewPersonalFiles';
+import EmployAddPersonalFiles from "./components/Employ/PersonalFiles//AddpersonalFiles"
+import EmployPersonalFileById from './components/Employ/PersonalFiles/PersonalFileById';
+
+import EmployPendingFiles from './components/Employ/PendingFiles/PendingFiles';
+import EmployPendingFileBYId from './components/Employ/PendingFiles/PendingFileBYId';
   // import EmployViewPersonalFile from "./components/Employ/"
 
 
@@ -890,6 +918,15 @@ function App() {
     <Route path="add-files" element={<EmployAddFiles />} />
     <Route path="view-files" element={<EmployViewFiles />} />
     <Route path="user-management" element={<EmployUserManagement />} />
+
+
+
+    
+                <Route path="view-personal-files" element={<EmployViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<EmployAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<EmployPersonalFileById />} />
+          <Route path="view-pending-files" element={<EmployPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<EmployPendingFileBYId />} />
   </Route>
 )}
       {/*  Operator Routes */}
@@ -904,6 +941,15 @@ function App() {
           <Route path="view-files" element={<OperatorEmployViewFiles />} />
           <Route path="user-management" element={<OperatorEmployUserManagement />} />
           <Route path="view-personal-files" element={<OperatorEmployViewPersonalFile />} />
+
+
+
+
+                <Route path="view-personal-files" element={<OperatorViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<OperatorAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<OperatorPersonalFileById />} />
+          <Route path="view-pending-files" element={<OperatorPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<OperatorPendingFileBYId />} />
        
         </Route>
           <Route path="main-dashboard" element={<OperatorEmployUserDashboard />} />
@@ -1579,6 +1625,14 @@ function App() {
           <Route path="add-files" element={<PsEmployAddFiles />} />
           <Route path="view-files" element={<PsEmployViewFiles />} />
           <Route path="user-management" element={<PsEmployUserManagement />} />
+
+
+
+                  <Route path="view-personal-files" element={<PsViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<PsAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<PsPersonalFileById />} />
+          <Route path="view-pending-files" element={<PsPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<PsPendingFileBYId />} />
        
         </Route>
            <Route path="main-dashboard" element={<EmployeeUserDashboard />} />
