@@ -176,6 +176,105 @@ import RoAroPendingFileBYId from './components/Supervisor/ro-aro/Employ/PendingF
 
 
 
+// So
+//----------
+
+import SupervisorLayoutso from './components/Supervisor/so/Layout';
+import SupervisorDashboardso from './components/Supervisor/so/Dashboard';
+import SupervisorComplaintsso from './components/Supervisor/so/Complaints';
+import SupervisorProgressRegisterso from './components/Supervisor/so/ProgressRegister';
+import SupervisorSearchReportsso from './components/Supervisor/so/SearchReports';
+import SupervisorViewComplaintsso from './components/Supervisor/so/ViewComplaints';
+import SupervisorPendingComplaintsso from './components/Supervisor/so/Pending-complaints/PendingComplaints';
+import SupervisorEditPendingComplaintsso from './components/Supervisor/so/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintsso from './components/Supervisor/so/Pending-complaints/ViewPendingComplaints';
+
+
+import SupervisorApprovedComplaintsso from './components/Supervisor/so/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintso from './components/Supervisor/so/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintso from './components/Supervisor/so/Approved-complaints/EditApprovedComplaints';
+
+import SupervisorAllComplaitsso from './components/Supervisor/so/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintso from './components/Supervisor/so/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintsso from './components/Supervisor/so/All-complaints/EditAllComplaints';
+
+
+import EmployUserDashboardso from "./components/Supervisor/so/EmployUserDashboard"
+
+
+// Employ
+import SoEmployLayout from './components/Supervisor/so/Employ/Layout';
+import SoEmployDashboard from './components/Supervisor/so/Employ/Dashboard';
+import SoEmployComplaints from './components/Supervisor/so/Employ/Complaints';
+
+import SoEmployUserManagement from './components/Supervisor/so/Employ/UserManagement';
+import SoEmployAddFiles from './components/Supervisor/so/Employ/ViewLeaveFiels/AddFiles';
+import SoEmployViewFiles from './components/Supervisor/so/Employ/ViewLeaveFiels/ViewFiles';
+import SoViewFielsById from './components/Supervisor/so/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import SoViewPersonalFiles from './components/Supervisor/so/Employ/PersonalFiles/ViewPersonalFiles';
+import SoAddPersonalFiles from "./components/Supervisor/so/Employ/PersonalFiles//AddpersonalFiles"
+import SoPersonalFileById from './components/Supervisor/so/Employ/PersonalFiles/PersonalFileById';
+
+import SoPendingFiles from './components/Supervisor/so/Employ/PendingFiles/PendingFiles';
+import SoPendingFileBYId from './components/Supervisor/so/Employ/PendingFiles/PendingFileBYId';
+
+
+
+
+
+// PRO
+//----------
+
+import SupervisorLayoutpro from './components/Supervisor/pro/Layout';
+import SupervisorDashboardpro from './components/Supervisor/pro/Dashboard';
+import SupervisorComplaintspro from './components/Supervisor/pro/Complaints';
+import SupervisorProgressRegisterpro from './components/Supervisor/pro/ProgressRegister';
+import SupervisorSearchReportspro from './components/Supervisor/pro/SearchReports';
+import SupervisorViewComplaintspro from './components/Supervisor/pro/ViewComplaints';
+import SupervisorPendingComplaintspro from './components/Supervisor/pro/Pending-complaints/PendingComplaints';
+import SupervisorEditPendingComplaintspro from './components/Supervisor/pro/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintspro from './components/Supervisor/pro/Pending-complaints/ViewPendingComplaints';
+
+
+import SupervisorApprovedComplaintspro from './components/Supervisor/pro/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintpro from './components/Supervisor/pro/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintpro from './components/Supervisor/pro/Approved-complaints/EditApprovedComplaints';
+
+import SupervisorAllComplaitspro from './components/Supervisor/pro/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintpro from './components/Supervisor/pro/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintspro from './components/Supervisor/pro/All-complaints/EditAllComplaints';
+
+
+import EmployUserDashboardpro from "./components/Supervisor/pro/EmployUserDashboard"
+
+
+// Employ
+import ProEmployLayout from './components/Supervisor/pro/Employ/Layout';
+import ProEmployDashboard from './components/Supervisor/pro/Employ/Dashboard';
+import ProEmployComplaints from './components/Supervisor/pro/Employ/Complaints';
+
+import ProEmployUserManagement from './components/Supervisor/pro/Employ/UserManagement';
+import ProEmployAddFiles from './components/Supervisor/pro/Employ/ViewLeaveFiels/AddFiles';
+import ProEmployViewFiles from './components/Supervisor/pro/Employ/ViewLeaveFiels/ViewFiles';
+import ProViewFielsById from './components/Supervisor/pro/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import ProViewPersonalFiles from './components/Supervisor/pro/Employ/PersonalFiles/ViewPersonalFiles';
+import ProAddPersonalFiles from "./components/Supervisor/pro/Employ/PersonalFiles//AddpersonalFiles"
+import ProPersonalFileById from './components/Supervisor/pro/Employ/PersonalFiles/PersonalFileById';
+
+import ProPendingFiles from './components/Supervisor/pro/Employ/PendingFiles/PendingFiles';
+import ProPendingFileBYId from './components/Supervisor/pro/Employ/PendingFiles/PendingFileBYId';
+
+
+
+
+
+
+
+
 // DS
 
 import SupervisorLayoutds from './components/Supervisor/ds/Layout';
@@ -618,6 +717,40 @@ import PsEmployComplaints from './components/Ps/Employ/Complaints';
 import PsEmployUserManagement from './components/Ps/Employ/UserManagement';
 import PsEmployAddFiles from './components/Ps/Employ/AddFiles';
 import PsEmployViewFiles from './components/Ps/Employ/ViewFiles';
+// import EmployMasterData from './components/Employ/MasterData';
+// import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// import EmployViewComplaints from './components/Employ/ViewComplaints';
+// import EmployEditComplaint from './components/Employ/EditComplaint';
+// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
+
+
+// Aps
+
+
+// APS Route
+import ApsLayout from "./components/Aps/Layout";
+import ApsDashboard from "./components/Aps/Dashboard";
+import ApsComplaints from './components/Aps/Complaints';
+import ApsAllComplaints from './components/Aps/All-complaints/AllComplaits';
+import ApsViewAllComplaint from './components/Aps/All-complaints/ViewAllComplaint';
+import ApsPendingComplaints from './components/Aps/Pending-complaints/PendingComplaints';
+import ApsViewPendingComplaint from './components/Aps/Pending-complaints/ViewPendingComplaint';
+import ApsApprovedComplaints from './components/Aps/Approved-complaints/ApprovedComplaints';
+import ApsViewApprovedComplaints from './components/Aps/Approved-complaints/ViewApprovedComplaints';
+import ApsScaneLetter from './components/LokAyukta/ScaneLetter';
+import ApsEmployeeUserDashboard from './components/Aps/EmployUserDashboard';
+
+// Employ
+import ApsEmployLayout from './components/Aps/Employ/Layout';
+import ApsEmployDashboard from './components/Aps/Employ/Dashboard';
+import ApsEmployComplaints from './components/Aps/Employ/Complaints';
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
+import ApsEmployUserManagement from './components/Aps/Employ/UserManagement';
+import ApsEmployAddFiles from './components/Aps/Employ/AddFiles';
+import ApsEmployViewFiles from './components/Aps/Employ/ViewFiles';
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
 // import EmployEditUserManagment from './components/Employ/EditUserManagment';
@@ -1075,6 +1208,102 @@ function App() {
 
 
 
+
+         {role === 'supervisor' && subrole === 'so' && (
+          <>
+
+            <Route path="/employee" element={<SoEmployLayout />}>
+          <Route path="dashboard" element={<SoEmployDashboard />} />
+          <Route path="complaints" element={<SoEmployComplaints />} />
+          <Route path="add-files" element={<SoEmployAddFiles />} />
+          <Route path="view-files" element={<SoEmployViewFiles />} />
+          <Route path="user-management" element={<SoEmployUserManagement />} />
+          <Route path="view-files/:id" element={<SoViewFielsById />} />
+          <Route path="view-personal-files" element={<SoViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<SoAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<SoPersonalFileById />} />
+          <Route path="view-pending-files" element={<SoPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<SoPendingFileBYId />} />
+
+
+
+       
+        </Route>
+
+          <Route path="main-dashboard" element={<EmployUserDashboardso />} />
+
+
+        <Route path="/supervisor" element={<SupervisorLayoutso />}>
+          <Route path="dashboard" element={<SupervisorDashboardso  />} />
+          <Route path="complaints" element={<SupervisorComplaintsso />} />
+          <Route path="progress-register" element={<SupervisorProgressRegisterso />} />
+          <Route path="search-reports" element={<SupervisorSearchReportsso />} />
+          <Route path="search-reports/view/:id" element={<SupervisorViewComplaintsso />} />
+
+          <Route path="all-complaints" element={<SupervisorAllComplaitsso />} />
+          <Route path="all-complaints/view/:id" element={<SupervisorViewAllComplaintso />} />
+          <Route path="all-complaints/edit/:id" element={<SupervisorEditComplaintsso />} />
+
+          <Route path="pending-complaints" element={<SupervisorPendingComplaintsso />} />
+          <Route path="pending-complaints/view/:id" element={<SupervisorViewPendingComplaintsso />} />
+          <Route path="pending-complaints/edit/:id" element={<SupervisorEditPendingComplaintsso />} />
+
+          <Route path="approved-complaints" element={<SupervisorApprovedComplaintsso />} />   
+          <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintso/>} />
+          <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintso />} /> 
+        </Route>
+          </>
+      )}
+
+
+          {role === 'supervisor' && subrole === 'pro' && (
+          <>
+
+            <Route path="/employee" element={<ProEmployLayout />}>
+          <Route path="dashboard" element={<ProEmployDashboard />} />
+          <Route path="complaints" element={<ProEmployComplaints />} />
+          <Route path="add-files" element={<ProEmployAddFiles />} />
+          <Route path="view-files" element={<ProEmployViewFiles />} />
+          <Route path="user-management" element={<ProEmployUserManagement />} />
+          <Route path="view-files/:id" element={<ProViewFielsById />} />
+          <Route path="view-personal-files" element={<ProViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<ProAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<ProPersonalFileById />} />
+          <Route path="view-pending-files" element={<ProPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<ProPendingFileBYId />} />
+
+
+
+       
+        </Route>
+
+          <Route path="main-dashboard" element={<EmployUserDashboardpro />} />
+
+
+        <Route path="/supervisor" element={<SupervisorLayoutpro />}>
+          <Route path="dashboard" element={<SupervisorDashboardpro  />} />
+          <Route path="complaints" element={<SupervisorComplaintspro />} />
+          <Route path="progress-register" element={<SupervisorProgressRegisterpro />} />
+          <Route path="search-reports" element={<SupervisorSearchReportspro />} />
+          <Route path="search-reports/view/:id" element={<SupervisorViewComplaintspro />} />
+
+          <Route path="all-complaints" element={<SupervisorAllComplaitspro />} />
+          <Route path="all-complaints/view/:id" element={<SupervisorViewAllComplaintpro />} />
+          <Route path="all-complaints/edit/:id" element={<SupervisorEditComplaintspro />} />
+
+          <Route path="pending-complaints" element={<SupervisorPendingComplaintspro />} />
+          <Route path="pending-complaints/view/:id" element={<SupervisorViewPendingComplaintspro />} />
+          <Route path="pending-complaints/edit/:id" element={<SupervisorEditPendingComplaintspro />} />
+
+          <Route path="approved-complaints" element={<SupervisorApprovedComplaintspro />} />   
+          <Route path="approved-complaints/view/:id" element={<SupervisorViewApprovedComplaintpro/>} />
+          <Route path="approved-complaints/edit/:id" element={<SupervisorEditApprovedComplaintpro />} /> 
+        </Route>
+          </>
+      )}
+
+
+
           {/** ARO */}
          {role === 'supervisor' && subrole === 'ro' && (
           <>
@@ -1373,6 +1602,51 @@ function App() {
 
           <Route path="approved-complaints" element={<ApprovedComplaints />} />   
           <Route path="approved-complaints/view/:id" element={<ViewApprovedComplaints/>} />
+    
+
+
+              
+                    {/* <Route path="master-data" element={<PsMasterData />} />
+                    <Route path="reporting" element={<PsReporting />} /> */}
+         
+        </Route>
+        </>
+      )}
+
+
+       {role === 'aps' && (
+        <>
+
+
+         <Route path="/employee" element={<ApsEmployLayout />}>
+          <Route path="dashboard" element={<ApsEmployDashboard />} />
+          <Route path="complaints" element={<ApsEmployComplaints />} />
+          <Route path="add-files" element={<ApsEmployAddFiles />} />
+          <Route path="view-files" element={<ApsEmployViewFiles />} />
+          <Route path="user-management" element={<ApsEmployUserManagement />} />
+       
+        </Route>
+           <Route path="main-dashboard" element={<ApsEmployeeUserDashboard />} />
+        <Route path="/aps" element={<ApsLayout />}>
+
+       
+
+           <Route path="dashboard" element={<ApsDashboard/>} />
+          <Route path="complaints" element={<ApsComplaints />} />
+          {/* <Route path="progress-register" element={<pro />} />
+          <Route path="search-reports" element={<PsSearchReports />} />
+          <Route path="search-reports/view/:id" element={<PsViewComplait />} /> */}
+
+          <Route path="all-complaints" element={<ApsAllComplaints />} />
+          <Route path="all-complaints/view/:id" element={<ApsViewAllComplaint />} />
+        
+
+          <Route path="pending-complaints" element={<ApsPendingComplaints />} />
+          <Route path="pending-complaints/view/:id" element={<ApsViewPendingComplaint />} />
+          
+
+          <Route path="approved-complaints" element={<ApsApprovedComplaints />} />   
+          <Route path="approved-complaints/view/:id" element={<ApsViewApprovedComplaints/>} />
     
 
 
