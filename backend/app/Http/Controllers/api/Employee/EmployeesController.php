@@ -70,8 +70,9 @@ class EmployeesController extends Controller
     public function uploadFiles(Request $request)
     {
         $added_by = Auth::user()->id;
+        $parentId = Auth::user()->parent_user_id ?? null;
 
-        // Validation for multiple files
+
         $validation = Validator::make($request->all(), [
 
             // 'complain_id' => 'required|numeric',
@@ -113,6 +114,7 @@ class EmployeesController extends Controller
 
                 $compDoc = new EmployeeUploadFiles();
                 $compDoc->added_by   = $added_by;
+                 $compDoc->parent_id  = $parentId; 
                 $compDoc->type       = "Letter";
                 $compDoc->title      = $request->title;
                 $compDoc->file       = $fileName;
