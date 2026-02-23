@@ -8,6 +8,7 @@ import {
 import toast from 'react-hot-toast';
 import Pagination from '../Pagination';
 import { FaPaperPlane } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -23,6 +24,7 @@ const api = axios.create({
 
 
 const AllLeaveFiles = () => {
+  const navigate = useNavigate()
   const queryClient = useQueryClient(); 
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -297,14 +299,11 @@ const AllLeaveFiles = () => {
                       <td className="px-6 py-4">
 <button
   onClick={() => {
-    setSelectedFileId(row.id);   
-    setopenSendPoup(true);
+    navigate(`${row.id}`);
   }}
-  className="inline-flex items-center gap-2 px-4 py-2 
-             bg-green-600 text-white text-sm font-medium
-             rounded-md shadow hover:bg-green-700"
+  className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
 >
-  Send
+  Permissions
 </button>
 
 </td>
@@ -418,7 +417,7 @@ const AllLeaveFiles = () => {
   <option value="">Select Authority</option>
 
   {roleSubrole?.map((item) => {
-    const roleLabel = item.role?.label;
+    const roleLabel = item?.name;
     const subroleLabel = item.subrole?.label;
 
     return (

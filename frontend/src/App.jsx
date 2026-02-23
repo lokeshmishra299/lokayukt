@@ -890,6 +890,7 @@ function App() {
           <Route path="employment-management/edit/:id" element={<AdminEditEmploymentManagement />} />
           <Route path="all-leaves-files" element={<AdminAllLeaveFiels />} />
           <Route path="all-personal-file" element={<AdminAllPersonalFile />} />
+          <Route path="all-personal-file/:id" element={<AdminAllPersonalFile />} />
 
 
         </Route>
