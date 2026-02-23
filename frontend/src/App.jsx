@@ -22,7 +22,10 @@ import AdminEmploymentManagement from './components/Admin/EmploymentManagement';
 import AdminAddEmploymentManagement from './components/Admin/AddEmploymentManagement';
 import AdminEditEmploymentManagement from './components/Admin/EditEmploymentManagement';
 import AdminAllLeaveFiels from './components/Admin/AllLeaveFiels';
-import AdminAllPersonalFile from './components/Admin/AllPersonalFile';
+import AdminAllPersonalFile from './components/Admin/PersonalFiles/AllPersonalFile';
+import AdminViewPersonalFile from './components/Admin/PersonalFiles/ViewPersonalFile';
+import AdminAddPersonalFile from './components/Admin/PersonalFiles/AddPersonalFiles';
+import AdminAllPermission from './components/Admin/PersonalFiles/AllPermission';
 
 
 
@@ -890,6 +893,9 @@ function App() {
           <Route path="employment-management/edit/:id" element={<AdminEditEmploymentManagement />} />
           <Route path="all-leaves-files" element={<AdminAllLeaveFiels />} />
           <Route path="all-personal-file" element={<AdminAllPersonalFile />} />
+          <Route path="all-personal-file/:id" element={<AdminViewPersonalFile />} />
+          <Route path="add-personal-file" element={<AdminAddPersonalFile />} />
+          <Route path="all-personal-file/permissions/:id" element={<AdminAllPermission />} />
 
 
         </Route>

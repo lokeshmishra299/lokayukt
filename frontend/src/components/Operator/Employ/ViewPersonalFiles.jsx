@@ -121,7 +121,7 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <div className="w-full flex flex-col items-start justify-start text-left">
-          <h1 className="text-xl font-bold text-gray-900">Leave Files</h1>
+          <h1 className="text-xl font-bold text-gray-900">Personal Files</h1>
           <p className="text-sm text-gray-600">अवकाश फाइलें</p>
         </div>
         <div className="mt-4 md:mt-0 relative w-full md:w-auto">
