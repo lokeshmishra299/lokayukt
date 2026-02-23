@@ -439,14 +439,14 @@ const UserManagement = () => {
               >
                 Roles & Permissions
               </button>
-              <button
+              {/* <button
                 onClick={() => setActiveTab('audit')}
                 className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 py-1.5 text-sm font-medium transition-all flex-1 ${
                   activeTab === 'audit' ? "bg-white text-black shadow-sm" : "hover:text-gray-700"
                 }`}
               >
                 Audit Log
-              </button>
+              </button> */}
             </div>
 
             {/* Tab Content */}
