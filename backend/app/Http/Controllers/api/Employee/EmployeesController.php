@@ -177,8 +177,8 @@ class EmployeesController extends Controller
             'action_date'  => now(),
             'type'         => 1,
             'status'       => 'Verified',
-            'forward_to_rk' => $added_by,  
-            'forward_by_rk' => $added_by
+            'forward_to_admin' => $added_by,  
+            'forward_by_ro_aro' => $added_by
         ]);
 
         $uploadedFiles[] = $file;

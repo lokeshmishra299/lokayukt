@@ -598,7 +598,7 @@ const Notes = ({ complaint }) => {
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description[0]}</p>}
 
               <div className="flex flex-col md:flex-row gap-4 mt-6">
-                <div className="flex-1">
+                {/* <div className="flex-1">
                   <label className="block text-sm font-medium mb-2">Reference by Document</label>
                   <select
                     className={`w-full border rounded-md p-2 ${errors.d_id ? "border-red-500" : "border-gray-300"}`}
@@ -611,9 +611,9 @@ const Notes = ({ complaint }) => {
                     ))}
                   </select>
                   {errors.d_id && <p className="text-red-500 text-xs mt-1">{errors.d_id[0]}</p>}
-                </div>
+                </div> */}
 
-                <div className="w-full md:w-auto">
+                {/* <div className="w-full md:w-auto">
                   <label className="block text-sm font-medium mb-2">Pages</label>
                   <div className="flex gap-2">
                     <input
@@ -632,7 +632,7 @@ const Notes = ({ complaint }) => {
                     />
                   </div>
                   {(errors.range_from || errors.range_two) && <p className="text-red-500 text-xs mt-1">Required</p>}
-                </div>
+                </div> */}
               </div>
 
               <div className="flex justify-end mt-6 gap-3 border-t pt-4">

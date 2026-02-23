@@ -171,6 +171,7 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</th>
               </tr>
             </thead>
@@ -191,6 +192,11 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
                     </td>
                     <td className="px-6 kruti-input py-4 text-sm text-gray-600">{file.type}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{file.created_at}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">{file.status == 2 ? "Accepted" :
+                    file.status == 3 ? "Rejected"
+                    :
+                    "N/A"
+                    }</td>
                     <td className="px-6 py-4 text-right">
                         <button 
          onClick={() => {

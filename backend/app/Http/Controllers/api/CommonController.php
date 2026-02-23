@@ -1219,7 +1219,7 @@ class CommonController extends Controller
             'type'           => 1, // You can define: 1 = Permission Grant
             'status'         => 'Verified', // Or 'Created' depending on your flow
             "forward_to_ro_aro" => $toUserId,
-            "forward_by_rk" => $fromUserId,
+            "forward_by_admin" => $fromUserId,
         ]);
     }
 
