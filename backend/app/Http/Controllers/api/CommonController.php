@@ -15,6 +15,7 @@ use App\Models\Category;
 use App\Models\SubRole;
 use App\Models\Topics;
 use App\Models\Budget;
+use App\Models\ComplainActionPersonalFile;
 use App\Models\EmployeeFiles;
 use App\Models\EmployeeUploadFiles;
 use App\Models\User;
@@ -1184,7 +1185,7 @@ class CommonController extends Controller
         ]);
     }
 
-   public function accessFilePermission(Request $request)
+  public function accessFilePermission(Request $request)
 {
     $request->validate([
         'file_id' => 'required|exists:employee_files,id',
@@ -1192,15 +1193,39 @@ class CommonController extends Controller
     ]);
 
     $file = EmployeeUploadFiles::find($request->file_id);
+    $fromUserId = Auth::id(); // Admin granting permission
+    $toUserId = $request->user_id;
 
-    $file->permission_user_id = $request->user_id;
-    $file->permission_user_by_admin = $request->user_id;
-    $file->user_id=Auth()->id();
+    // Update file permission
+    $file->permission_user_id = $toUserId;
+    $file->permission_user_by_admin = $fromUserId;
+    $file->user_id = $fromUserId;
     $file->save();
+     // Fetch recipient user
+    $toUser = User::with(['role','subrole'])->find($toUserId);
+
+    // Determine role/subrole for tracking
+    $roleName = strtolower($toUser->role->name ?? '');
+    $subRoleName = strtolower($toUser->subrole->name ?? '');
+    $forwardKey = $subRoleName ?: $roleName ?: null;
+
+    // Create history / tracking entry
+    if ($forwardKey) {
+        ComplainActionPersonalFile::create([
+            'file_id'        => $file->id,
+            'subject'        => $file->title ?? null,
+            'remarks'        => 'Permission granted by admin',
+            'action_date'    => now(),
+            'type'           => 1, // You can define: 1 = Permission Grant
+            'status'         => 'Verified', // Or 'Created' depending on your flow
+            "forward_to_ro_aro" => $toUserId,
+            "forward_by_rk" => $fromUserId,
+        ]);
+    }
 
     return ApiResponse::generateResponse(
         'success',
-        'Permission granted successfully',
+        'Permission granted successfully and tracked',
         $file,
         200
     );

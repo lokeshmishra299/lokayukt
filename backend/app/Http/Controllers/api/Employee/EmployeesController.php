@@ -136,73 +136,60 @@ class EmployeesController extends Controller
 
 
     public function uploadPrivateFiles(Request $request)
-    {
-        $added_by = Auth::user()->id;
+{
+    $user = Auth::user();
+    $added_by = $user->id;
 
-        // Validation for multiple files
-        $validation = Validator::make($request->all(), [
+    $validation = Validator::make($request->all(), [
+        'title'  => 'required|string',
+        'type'   => 'required|string',
+        'file'   => 'required|array',
+        'file.*' => 'file|mimes:jpg,jpeg,png,pdf|max:2048',
+    ]);
 
-            // 'complain_id' => 'required|numeric',
-            'title'       => 'required|string',
-            'type'        => 'required|string',
-
-            // Multiple file validation
-            'file'        => 'required|array',
-            'file.*'      => 'file|mimes:jpg,jpeg,png,pdf|max:2048',
-
-        ], [
-
-            // 'complain_id.required' => 'Complaint Id is required.',
-            'title.required'       => 'Letter Subject is Required.',
-            'type.required'        => 'Complaint description is required.',
-            'file.required'        => 'At least one file is required.',
-            'file.array'           => 'Invalid file format.',
-            'file.*.mimes'         => 'Only JPG, PNG and PDF files are allowed.',
-            'file.*.max'           => 'Each file must be less than 2MB.',
-
-        ]);
-
-        if ($validation->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validation->errors()
-            ], 422);
-        }
-
-        if ($request->hasFile('file')) {
-
-            $uploadedFiles = [];
-
-            foreach ($request->file('file') as $uploadedFile) {
-
-                $fileName = 'doc_' . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
-
-                $filePath = $uploadedFile->storeAs('employeeFiles', $fileName, 'public');
-
-                $compDoc = new EmployeeUploadFiles();
-                $compDoc->added_by   = $added_by;
-                $compDoc->type       = "Personal File";
-                $compDoc->title      = $request->title;
-                $compDoc->file       = $fileName;
-
-                $compDoc->save();
-
-                $uploadedFiles[] = $compDoc;
-            }
-
-            return response()->json([
-                'status'  => true,
-                'message' => 'Files uploaded successfully.',
-                'data'    => $uploadedFiles
-            ], 201);
-        }
-
+    if ($validation->fails()) {
         return response()->json([
             'status' => false,
-            'message' => 'No files found.'
-        ], 400);
+            'errors' => $validation->errors()
+        ], 422);
     }
 
+    $uploadedFiles = [];
+
+    foreach ($request->file('file') as $uploadedFile) {
+
+        $fileName = 'doc_' . uniqid() . '.' . $uploadedFile->getClientOriginalExtension();
+        $uploadedFile->storeAs('employeeFiles', $fileName, 'public');
+
+        $file = EmployeeUploadFiles::create([
+            'added_by' => $added_by,
+            'type'     => "Personal File",
+            'title'    => $request->title,
+            'file'     => $fileName,
+            'permission_user_id' => $added_by,
+            'is_forward' => 0
+        ]);
+
+        ComplainActionPersonalFile::create([
+            'file_id'      => $file->id,
+            'subject'      => $request->title,
+            'remarks'      => 'File Uploaded',
+            'action_date'  => now(),
+            'type'         => 1,
+            'status'       => 'Verified',
+            'forward_to_rk' => $added_by,  
+            'forward_by_rk' => $added_by
+        ]);
+
+        $uploadedFiles[] = $file;
+    }
+
+    return response()->json([
+        'status'  => true,
+        'message' => 'Files uploaded successfully with tracking.',
+        'data'    => $uploadedFiles
+    ], 201);
+}
 
     public function getFilePreview($id)
     {
