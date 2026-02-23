@@ -152,7 +152,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
             <RiFileSearchLine />
             {(!isCollapsed || isMobile) && "Leave Files"}
           </Link>
-
+{/* 
           <Link
             to="/employee/view-personal-files"
             onClick={handleLinkClick}
@@ -166,10 +166,10 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <TbFileSearch />
             {(!isCollapsed || isMobile) && "Personal Files"}
-          </Link>
+          </Link> */}
 
 
-          {/* <Link
+          <Link
             to="/employee/view-pending-files"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
@@ -182,7 +182,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <MdOutlinePendingActions />
             {(!isCollapsed || isMobile) && "Pending Files"}
-          </Link> */}
+          </Link>
 
         </nav>
       </aside>

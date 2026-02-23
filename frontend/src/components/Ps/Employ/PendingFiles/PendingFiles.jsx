@@ -85,40 +85,38 @@ const ViewPersonalFiles = () => {
   return (
     <div className="bg-gray-50 min-h-screen ">
       
-      {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        
-        {/* Title */}
-        <div className="w-full flex items-center gap-3">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Pending Personal Files</h1>
-            <p className="text-sm text-gray-600">लंबित व्यक्तिगत फाइलें</p>
-          </div>
-        </div>
-
-        {/* Search + Button */}
-        <div className="w-full flex flex-col sm:flex-row sm:items-center gap-3">
-
-          {/* Search */}
-          <div className="relative w-full sm:w-80">
-            <FaSearch className="absolute left-3 top-2.5 text-gray-400 text-sm" />
-            <input
-              type="text"
-              placeholder="फाइल खोजे"
-              className="pl-9 py-1.5 kruti-input border border-gray-300 rounded-lg w-full
-                         text-[14px]
-                         placeholder:text-[14px] placeholder:text-gray-400
-                         focus:outline-none focus:border-blue-500"
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1);
-              }}
-            />
-          </div>
-
-        </div>
-      </div>
+         
+         {/* Title */}
+         <div className="w-full md:w-auto flex items-center gap-3">
+           <div>
+             <h1 className="text-xl font-bold text-gray-900">Pending Personal Files</h1>
+             <p className="text-sm text-gray-600">लंबित व्यक्तिगत फाइलें</p>
+           </div>
+         </div>
+   
+         {/* Search */}
+         <div className="w-full md:w-auto flex flex-col sm:flex-row items-center justify-end gap-3">
+   
+           <div className="relative w-full sm:w-64 md:w-80">
+             <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+             <input
+               type="text"
+               placeholder="फाइल खोजे"
+               className="pl-9 py-2 kruti-input border border-gray-300 rounded-lg w-full
+                          text-[14px] placeholder:text-[14px] placeholder:text-gray-400
+                          focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+               value={searchTerm}
+               onChange={(e) => {
+                 setSearchTerm(e.target.value);
+                 setCurrentPage(1);
+               }}
+             />
+           </div>
+   
+         </div>
+       </div>
+   
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-100">

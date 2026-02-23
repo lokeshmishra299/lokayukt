@@ -63,7 +63,7 @@ const ViewFielsById = () => {
         <div className="p-4 md:p-6 border-b">
           <div className="flex justify-between items-start mb-3">
             <h2 className="text-xl font-semibold text-gray-800">
-              File No. {fileData?.id} (<span className="text-blue-600 uppercase">{fileData?.title}</span>)
+              File No. {fileData?.id} 
             </h2>
             <div className="flex gap-2">
               <span className="px-3 py-1 rounded bg-blue-100 text-blue-800 border-blue-200">
@@ -154,14 +154,14 @@ const ViewFielsById = () => {
         {/* Tab Content Area */}
         <div className="flex-1 p-4 md:p-6 overflow-y-auto">
           {activeTab === "notings" && (
-             <div>
-              <Notes/>
-             </div>
-          )}
-          {activeTab === "movement" && (
-             <div>
-              <MovementHistory/>
-             </div>
+          <div>
+    <Notes complaint={fileData} />
+  </div>
+)}
+       {activeTab === "movement" && fileData && (
+  <div>
+    <MovementHistory complaint={fileData} />
+  </div>
           )}
         </div>
 
