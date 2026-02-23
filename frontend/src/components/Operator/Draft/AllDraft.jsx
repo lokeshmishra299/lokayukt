@@ -6,14 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import { IoMdTime } from "react-icons/io";
+import { useMemo } from "react";
 import Pagination from "../../Pagination";
+import { krutiToUnicode } from "../../../components/utils/krutiToUnicode";
+import { unicodeToKrutiDev } from "../../../components/utils/unicodeToKruti";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const token = localStorage.getItem("access_token");
-
-import { krutiToUnicode } from "../../../components/utils/krutiToUnicode";
-import { unicodeToKrutiDev } from "../../../components/utils/unicodeToKruti";
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -29,22 +29,33 @@ const AllDraft = () => {
 
   const [allComplaints, setAllComplaints] = useState([]);
   const [filteredComplaints, setFilteredComplaints] = useState([]);
-  const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState("desc");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [complaintToApprove, setComplaintToApprove] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
 
+  const [selectedNature, setSelectedNature] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedFeeStatus, setSelectedFeeStatus] = useState("");
   const [selectedCaseType, setSelectedCaseType] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-const itemsPerPage = 10;
+  const itemsPerPage = 10;
+
+  // Pagination Variables
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentComplaints = filteredComplaints.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+  const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
   const sortComplaintsByDate = (complaints, order) => {
+    if (!order) return complaints;
+
     return [...complaints].sort((a, b) => {
       const dateA = new Date(a.created_at);
       const dateB = new Date(b.created_at);
@@ -82,26 +93,6 @@ const itemsPerPage = 10;
     queryFn: getDistrict,
   });
 
-  const getComplaintTypes = async () => {
-    const res = await api.get("/operator/complainstype");
-    return res.data.data;
-  };
-
-  const { data: complaintTypesData, isLoading: typesLoading } = useQuery({
-    queryKey: ["complaint-types"],
-    queryFn: getComplaintTypes,
-  });
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
-const currentComplaints = filteredComplaints.slice(
-  indexOfFirstItem,
-  indexOfLastItem
-);
-
-const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
-
   useEffect(() => {
     if (data?.data && Array.isArray(data.data)) {
       setAllComplaints(data.data);
@@ -111,148 +102,106 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
     }
   }, [data, sortOrder]);
 
-  // useEffect(() => {
-  //   if (allComplaints.length === 0) return;
+  // ✅ Search & Filters Logic
+  useEffect(() => {
+    if (allComplaints.length === 0) return;
 
-  //   let filtered = [...allComplaints];
+    let filtered = [...allComplaints];
 
-  //   if (searchQuery.trim() !== "") {
-  //     const query = searchQuery.toLowerCase();
-  //     filtered = filtered.filter((complaint) => {
-  //       return (
-  //         complaint.complain_no?.toLowerCase().includes(query) ||
-  //         complaint.name?.toLowerCase().includes(query) ||
-  //         complaint.district_name?.toLowerCase().includes(query) ||
-  //         complaint.remark?.toLowerCase().includes(query) ||
-  //         complaint.description?.toLowerCase().includes(query) ||
-  //         complaint.email?.toLowerCase().includes(query) ||
-  //         complaint.mobile?.includes(query)
-  //       );
-  //     });
-  //   }
+    // 1. Search Logic
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase().trim();
+      const queryFromKruti = krutiToUnicode(searchQuery).toLowerCase().trim();
+      const queryToKruti = unicodeToKrutiDev(searchQuery).trim();
 
-  //   if (selectedDistrict !== "") {
-  //     filtered = filtered.filter((complaint) => {
-  //       return (
-  //         complaint.district_name?.toLowerCase() ===
-  //         selectedDistrict.toLowerCase()
-  //       );
-  //     });
-  //   }
-
-  //   if (selectedStatus !== "") {
-  //     filtered = filtered.filter((complaint) => {
-  //       return complaint.status === selectedStatus;
-  //     });
-  //   }
-
-  //   if (selectedFeeStatus !== "") {
-  //     filtered = filtered.filter((complaint) => {
-  //       return complaint.fee_exempted?.toString() === selectedFeeStatus;
-  //     });
-  //   }
-
-  //   if (selectedCaseType !== "") {
-  //     filtered = filtered.filter((complaint) => {
-  //       return complaint.complaint_type_id === parseInt(selectedCaseType);
-  //     });
-  //   }
-
-  //   const sorted = sortComplaintsByDate(filtered, sortOrder);
-  //   setFilteredComplaints(sorted);
-  //   setCurrentPage(1);
-  // }, [
-  //   searchQuery,
-  //   allComplaints,
-  //   selectedDistrict,
-  //   selectedStatus,
-  //   selectedFeeStatus,
-  //   selectedCaseType,
-  // ]);
-
-
-    useEffect(() => {
-      if (allComplaints.length === 0) return;
-  
-      let filtered = [...allComplaints];
-  
-      if (searchQuery.trim() !== "") {
-        const query = searchQuery.toLowerCase().trim(); // 1. जो आपने टाइप किया (Direct Search)
-        
-        // 2. अगर आपने "Kruti Code" (जैसे dqN gks) टाइप किया है, तो उसे हिंदी बनाओ
-        const queryFromKruti = krutiToUnicode(searchQuery).toLowerCase().trim();
-  
-        // 3. अगर आपने "Hindi" टाइप किया है, तो उसका Kruti Code बनाओ (Backup)
-        const queryToKruti = unicodeToKrutiDev(searchQuery).trim(); 
-  
-        filtered = filtered.filter((complaint) => {
-          
-          const match = (val) => {
-              if (!val) return false;
-              const strVal = String(val).toLowerCase(); // डेटा (जो अब हिंदी में है)
-              
-              return (
-                strVal.includes(query) ||          // Direct Match
-                strVal.includes(queryFromKruti) || // Kruti Input -> Matches Hindi Data
-                strVal.includes(queryToKruti)      // Hindi Input -> Matches Old Kruti Data
-              );
-          };
-  
+      filtered = filtered.filter((complaint) => {
+        const match = (val) => {
+          if (!val) return false;
+          const strVal = String(val).toLowerCase();
           return (
-            match(complaint.complainantName) ||      
-            match(complaint.respondentName) ||       
-            match(complaint.complain_no) ||          
-            match(complaint.name) ||                 
-            match(complaint.district_name) ||        
-            match(complaint.remark) ||               
-            match(complaint.description) ||
-            match(complaint.complaint_description) ||
-            match(complaint.email) ||
-            match(complaint.mobile)
+            strVal.includes(query) ||
+            strVal.includes(queryFromKruti) ||
+            strVal.includes(queryToKruti)
           );
-        });
-      }
-  
-      // --- बाकी फिल्टर्स (District, Status आदि) को छेड़ें नहीं ---
-  
-      if (selectedDistrict !== "") {
-        filtered = filtered.filter((complaint) => {
-          const dataDistrict = complaint.dist_new || complaint.district_name;
-          if (!dataDistrict) return false;
-          return String(dataDistrict).toLowerCase().trim() === selectedDistrict.toLowerCase().trim();
-        });
-      }
-  
-      if (selectedStatus !== "") {
-        filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
-      }
-  
-      if (selectedFeeStatus !== "") {
-        filtered = filtered.filter((complaint) => complaint.fee_exempted?.toString() === selectedFeeStatus);
-      }
-  
-      if (selectedCaseType !== "") {
-        filtered = filtered.filter((complaint) => {
-          const dataCategory = String(complaint.category || "").toLowerCase().trim();
-          const selectedValue = String(selectedCaseType).toLowerCase().trim();
-          return dataCategory === selectedValue;
-        });
-      }
-  
-      // सॉर्टिंग
-      const sorted = sortComplaintsByDate(filtered, sortOrder);
-      setFilteredComplaints(sorted);
-      setCurrentPage(1);
-  
-    }, [
-      searchQuery,
-      allComplaints,
-      selectedDistrict,
-      selectedStatus,
-      selectedFeeStatus,
-      selectedCaseType,
-      sortOrder
-    ]);
+        };
+
+        return (
+          match(complaint.complainantName) ||
+          match(complaint.respondentName) ||
+          match(complaint.complain_no) ||
+          match(complaint.name) ||
+          match(complaint.district_name) ||
+          match(complaint.remark) ||
+          match(complaint.description) ||
+          match(complaint.complaint_description) ||
+          match(complaint.email) ||
+          match(complaint.mobile)
+        );
+      });
+    }
+
+    // 2. District Filter
+    if (selectedDistrict !== "") {
+      filtered = filtered.filter((complaint) => {
+        const dataDistrict = complaint.dist_new || complaint.district_name;
+        if (!dataDistrict) return false;
+        return String(dataDistrict).toLowerCase().trim() === selectedDistrict.toLowerCase().trim();
+      });
+    }
+
+    // 3. Status Filter
+    if (selectedStatus !== "") {
+      filtered = filtered.filter((complaint) => complaint.status === selectedStatus);
+    }
+
+    // 4. Fee Status Filter (Handles integers properly)
+    if (selectedFeeStatus !== "") {
+      filtered = filtered.filter((complaint) => {
+        let currentFee = complaint.fee_exempted;
+        // Agar fee status invalid hai, toh default 0 (Pending) maan lenge
+        if (currentFee !== 1 && currentFee !== 2 && currentFee !== 3) {
+          currentFee = 0;
+        }
+        return String(currentFee) === selectedFeeStatus;
+      });
+    }
+
+    // 5. Nature Filter (Handles 'category' field)
+    if (selectedNature !== "") {
+      filtered = filtered.filter((complaint) => {
+        const dataNature = String(complaint.category || complaint.nature || "").toLowerCase().trim();
+        const selectedValue = String(selectedNature).toLowerCase().trim();
+        return dataNature === selectedValue;
+      });
+    }
+
+    // 6. Case Type Filter ('1' = New, '2' = Old, 'today' = Created Today)
+    if (selectedCaseType !== "") {
+      filtered = filtered.filter((complaint) => {
+        if (selectedCaseType === "today") {
+          const today = new Date().toDateString();
+          const createdDate = new Date(complaint.created_at).toDateString();
+          return createdDate === today;
+        } else {
+          return String(complaint.case_type) === selectedCaseType;
+        }
+      });
+    }
+
+    const sorted = sortComplaintsByDate(filtered, sortOrder);
+    setFilteredComplaints(sorted);
+    setCurrentPage(1);
+
+  }, [
+    searchQuery,
+    allComplaints,
+    selectedDistrict,
+    selectedStatus,
+    selectedFeeStatus,
+    selectedNature,
+    selectedCaseType,
+    sortOrder
+  ]);
 
   const handleViewDetails = (e, complaintId) => {
     e.stopPropagation();
@@ -272,40 +221,29 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
   const handleConfirmApproval = async () => {
     if (!complaintToApprove) return;
-
     setIsApproving(true);
-
     try {
       const response = await api.post(
-        `/operator/approved-by-ro/${complaintToApprove.id}`,
+        `/operator/approved-by-ro/${complaintToApprove.id}`
       );
-
       if (response.data.success || response.status === 200) {
-        toast.success("Send To Lokayukt Successfully!", {
+        toast.success("Send To Inbox Successfully!", {
           position: "top-right",
           autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
         });
-
         const updateData = (prevData) =>
           prevData.map((complaint) =>
             complaint.id === complaintToApprove.id
               ? { ...complaint, approved_rejected_by_lokayukt: 1 }
-              : complaint,
+              : complaint
           );
-
         setAllComplaints(updateData);
         setFilteredComplaints(updateData);
-
         refetch();
       } else {
         toast.error("Failed to approve complaint");
       }
     } catch (error) {
-      console.error("Approval Error:", error);
       toast.error("Failed to approve complaint");
     } finally {
       setIsApproving(false);
@@ -323,40 +261,20 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
     return complaint.approved_rejected_by_rk === 1;
   };
 
-  const getStatistics = () => {
-    const overdueCount = allComplaints.filter(
-      (c) => c.status === "overdue",
-    ).length;
-    const receivedToday = allComplaints.filter((c) => {
-      const today = new Date().toDateString();
-      const complaintDate = new Date(c.created_at).toDateString();
-      return today === complaintDate;
-    }).length;
-
-    return {
-      total: allComplaints.length,
-      overdue: overdueCount,
-      receivedToday: receivedToday,
-    };
-  };
-
   const getDaysDifference = (date) => {
     const created = new Date(date);
     const today = new Date();
-
     const diffTime = today - created;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
     return diffDays;
   };
 
   function limitTo50Words(text) {
+    if (!text) return "";
     const words = text.trim().split(/\s+/);
-
     if (words.length <= 30) {
       return text;
     }
-
     return words.slice(0, 30).join(" ") + " ...";
   }
 
@@ -398,21 +316,13 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
             <div className="relative mb-3">
               <IoSearchOutline className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              {/* <input
+              <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                className="kruti-input w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:!font-sans placeholder:!text-gray-500 placeholder:!text-sm placeholder:!tracking-normal"
                 placeholder="Search by file no., complainant, subject..."
-              /> */}
-
-                         <input
-  type="text"
-  value={searchQuery}
-  onChange={(e) => setSearchQuery(e.target.value)}
-  className="kruti-input w-full border border-gray-300 rounded-md pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:!font-sans placeholder:!text-gray-500 placeholder:!text-sm placeholder:!tracking-normal"
-  placeholder="Search by file no., complainant, subject..."
-/>
+              />
             </div>
 
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 text-xs">
@@ -427,9 +337,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                   <option value="Disposed Accepted">Disposed Accepted</option>
                   <option value="Resolved">Resolved</option>
                   <option value="Rejected">Rejected</option>
-                  <option value="Under Investigation">
-                    Under Investigation
-                  </option>
+                  <option value="Under Investigation">Under Investigation</option>
                   <option value="Pending">Pending</option>
                 </select>
 
@@ -440,11 +348,14 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                   onChange={(e) => setSelectedDistrict(e.target.value)}
                 >
                   <option value="">District: All</option>
-                  {districtData?.map((item) => (
-                    <option key={item.id} value={item.district_name}>
-                      {item.district_name}
-                    </option>
-                  ))}
+                  {districtData?.map((item) => {
+                    const districtName = item.dist_new || item.district_name || item.name || "";
+                    return (
+                      <option key={item.id} value={districtName}>
+                        {districtName}
+                      </option>
+                    );
+                  })}
                 </select>
 
                 <select
@@ -460,17 +371,24 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                 </select>
 
                 <select
-                  className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
-                  disabled={typesLoading}
+                  value={selectedNature}
+                  onChange={(e) => setSelectedNature(e.target.value)}
+                  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
+                >
+                  <option value="">Nature: All</option>
+                  <option value="complaint">Complaint</option>
+                  <option value="assertion">Assertion</option>
+                </select>
+
+                <select
                   value={selectedCaseType}
                   onChange={(e) => setSelectedCaseType(e.target.value)}
+                  className="border border-gray-300 px-2 py-1 rounded-md text-xs"
                 >
                   <option value="">Case Type: All</option>
-                  {complaintTypesData?.map((type) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  ))}
+                  <option value="1">New Case</option>
+                  <option value="2">Old Case</option>
+                  <option value="today">Today Case</option>
                 </select>
               </div>
 
@@ -483,11 +401,9 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                   value={sortOrder}
                   onChange={handleSortChange}
                 >
-                  <option value="desc">Received Date </option>
+                  <option value="desc">Received Date</option>
                   <option value="asc">Ascending Order</option>
                   <option value="desc">Decending Order</option>
-                  {/* <option value="desc">Newest First</option>
-                  <option value="asc">Oldest First</option> */}
                 </select>
               </div>
             </div>
@@ -498,7 +414,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">Loading...</h1>
               </div>
-            ) : filteredComplaints?.length == 0 ? (
+            ) : filteredComplaints?.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <h1 className="text-gray-600">No Data Found.</h1>
               </div>
@@ -506,8 +422,9 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
               <div className="flex items-center justify-center h-full">
                 <p className="text-red-500 text-sm">Error: {error.message}</p>
               </div>
-            ) : filteredComplaints.length > 0 ? (
+            ) : (
               <div className="divide-y divide-gray-200">
+                {/* ✅ IMPORTANT: Using currentComplaints here ensures Pagination works */}
                 {currentComplaints.map((complaint) => (
                   <div
                     key={complaint.id}
@@ -518,19 +435,12 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                         <p className="text-sm font-semibold text-gray-900 mb-1">
                           File No. {complaint.complain_no}
                         </p>
-                        {/* <p className="text-xs text-gray-700 mb-1">
-                          Description:{" "}
-                          {limitTo50Words(complaint.complaint_description) ||
-                            "No description available"}
-                        </p> */}
-
                         <p className="text-xs text-gray-700 mb-1">
-                         <span className="text-[15px]">Description: </span>
+                          <span className="text-[15px]">Description: </span>
                           <span className="kruti-input">
-                               {limitTo50Words(complaint.complaint_description) ||
-                            "No description available"}
+                            {limitTo50Words(complaint.complaint_description) ||
+                              "No description available"}
                           </span>
-                         
                         </p>
                         <div className="text-[11px] text-gray-600 mb-1">
                           <span className="text-gray-500">Cause Date :</span>
@@ -551,7 +461,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                               day: "numeric",
                               month: "short",
                               year: "numeric",
-                            },
+                            }
                           )}{" "}
                           • Last action:{" "}
                           {new Date(complaint.updated_at).toLocaleDateString(
@@ -560,7 +470,7 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                               day: "numeric",
                               month: "short",
                               year: "numeric",
-                            },
+                            }
                           )}
                         </div>
                       </div>
@@ -568,23 +478,27 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                       <div className="flex flex-col items-start sm:items-end gap-2 flex-shrink-0 w-full sm:w-auto">
                         <div className="flex gap-1.5">
                           <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[11px] font-medium whitespace-nowrap">
-                            New Case
+                            {complaint.case_type == 1 ?  "New Case" :
+                          complaint.case_type == 2 ? "Old Case"
+                          :
+                          "New Case"
+                           
+                            }
                           </span>
-                          {/* {complaint.fee_exempted === 1 && ( */}
+                          
+                          {/* ✅ YOUR REQUIRED COMPLEX CONDITION ADDED HERE */}
                           <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[11px] font-medium whitespace-nowrap">
                             {complaint.approved_rejected_by_rk === 0 &&
                             complaint.approved_rejected_by_lokayukt === 0
                               ? "Record Section"
                               : complaint.approved_rejected_by_rk === 1 &&
-                                  complaint.approved_rejected_by_lokayukt != 1
-                                ? "With Lokayukta"
-                                : complaint.approved_rejected_by_rk === 1 &&
-                                    complaint.approved_rejected_by_lokayukt ===
-                                      1
-                                  ? "  With UpLokayukta"
-                                  : "Record Section"}
+                                complaint.approved_rejected_by_lokayukt != 1
+                              ? "With Lokayukta"
+                              : complaint.approved_rejected_by_rk === 1 &&
+                                complaint.approved_rejected_by_lokayukt === 1
+                              ? "  With UpLokayukta"
+                              : "Record Section"}
                           </span>
-                          {/* )} */}
                         </div>
 
                         <div className="flex gap-1.5">
@@ -594,25 +508,25 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
 
                           <span
                             className={`
-    px-2 py-0.5 rounded text-[11px] font-medium
-    ${
-      complaint.fee_exempted === 0
-        ? "bg-green-50 text-blue-600"
-        : complaint.fee_exempted === 1
-          ? "bg-orange-50 text-orange-600"
-          : complaint.fee_exempted === 2
-            ? "bg-blue-50 text-orange-400"
-            : ""
-    }
-  `}
+                              px-2 py-0.5 rounded text-[11px] font-medium
+                              ${
+                                complaint.fee_exempted === 3
+                                  ? "bg-green-50 text-blue-600"
+                                  : complaint.fee_exempted === 1
+                                  ? "bg-orange-50 text-orange-600"
+                                  : complaint.fee_exempted === 2
+                                  ? "bg-blue-50 text-orange-400"
+                                  : "bg-red-50 text-red-600"
+                              }
+                            `}
                           >
                             {complaint.fee_exempted === 3
                               ? "Exempted"
                               : complaint.fee_exempted === 1
-                                ? "Paid"
-                                : complaint.fee_exempted === 2
-                                  ? "Partial"
-                                  : "Pending"}
+                              ? "Paid"
+                              : complaint.fee_exempted === 2
+                              ? "Partial"
+                              : "Pending"}
                           </span>
                         </div>
 
@@ -653,30 +567,18 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                   </div>
                 ))}
               </div>
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <p className="text-gray-500 text-sm">
-                  {searchQuery ||
-                  selectedDistrict ||
-                  selectedStatus ||
-                  selectedFeeStatus ||
-                  selectedCaseType
-                    ? "No results found"
-                    : ""}
-                </p>
-              </div>
             )}
           </div>
         </div>
       </div>
-      <Pagination
-  currentPage={currentPage}
-  totalPages={totalPages}
-  onPageChange={setCurrentPage}
-  totalItems={filteredComplaints.length}
-  itemsPerPage={itemsPerPage}
-/>
 
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={filteredComplaints.length}
+        itemsPerPage={itemsPerPage}
+      />
 
       {isConfirmModalOpen && (
         <div className="fixed inset-0 z-50 overflow-auto bg-black/50 flex justify-center items-center p-4">
@@ -705,13 +607,8 @@ const totalPages = Math.ceil(filteredComplaints.length / itemsPerPage);
                     Confirm
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-500">
-                    Are you sure you want to the file in Inbox?
+                    Are you sure you want to send the file to Inbox?
                   </p>
-                  {/* {complaintToApprove && (
-                    <p className="text-xs text-gray-600 mt-1">
-                      File No: {complaintToApprove.complain_no}
-                    </p> */}
-                  {/* )} */}
                 </div>
               </div>
               <div className="flex gap-3">

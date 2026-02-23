@@ -149,12 +149,22 @@ import EmployUserDashboardroaro from "./components/./Supervisor/ro-aro/EmployUse
 import RoAroEmployLayout from './components/Supervisor/ro-aro/Employ/Layout';
 import RoAroEmployDashboard from './components/Supervisor/ro-aro/Employ/Dashboard';
 import RoAroEmployComplaints from './components/Supervisor/ro-aro/Employ/Complaints';
-// import EmployProgressRegister from './components/Employ/ProgressRegister';
-// import EmploySearchReports from './components/Employ/SearchReports';
+
 import RoAroEmployUserManagement from './components/Supervisor/ro-aro/Employ/UserManagement';
 import RoAroEmployAddFiles from './components/Supervisor/ro-aro/Employ/ViewLeaveFiels/AddFiles';
 import RoAroEmployViewFiles from './components/Supervisor/ro-aro/Employ/ViewLeaveFiels/ViewFiles';
 import RoAroViewFielsById from './components/Supervisor/ro-aro/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import RoAroViewPersonalFiles from './components/Supervisor/ro-aro/Employ/PersonalFiles/ViewPersonalFiles';
+import RoAroAddPersonalFiles from "./components/Supervisor/ro-aro/Employ/PersonalFiles//AddpersonalFiles"
+import RoAroPersonalFileById from './components/Supervisor/ro-aro/Employ/PersonalFiles/PersonalFileById';
+
+import RoAroPendingFiles from './components/Supervisor/ro-aro/Employ/PendingFiles/PendingFiles';
+import RoAroPendingFileBYId from './components/Supervisor/ro-aro/Employ/PendingFiles/PendingFileBYId';
+
+// import EmployProgressRegister from './components/Employ/ProgressRegister';
+// import EmploySearchReports from './components/Employ/SearchReports';
 
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
@@ -162,12 +172,6 @@ import RoAroViewFielsById from './components/Supervisor/ro-aro/Employ/ViewLeaveF
 // import EmployViewComplaints from './components/Employ/ViewComplaints';
 // import EmployEditComplaint from './components/Employ/EditComplaint';
 // import EmployFileAdministrator from './components/Employ/FileAdministrator';
-import RoAroViewPersonalFiles from './components/Supervisor/ro-aro/Employ/PersonalFiles/ViewPersonalFiles';
-import RoAroAddPersonalFiles from "./components/Supervisor/ro-aro/Employ/PersonalFiles//AddpersonalFiles"
-import RoAroPersonalFileById from './components/Supervisor/ro-aro/Employ/PersonalFiles/PersonalFileById';
-
-import RoAroPendingFiles from './components/Supervisor/ro-aro/Employ/PendingFiles/PendingFiles';
-import RoAroPendingFileBYId from './components/Supervisor/ro-aro/Employ/PendingFiles/PendingFileBYId';
 
 
 
@@ -200,17 +204,19 @@ import EmployUserDashboardds from "./components/./Supervisor/ds/EmployUserDashbo
 import DsEmployLayout from './components/Supervisor/ds/Employ/Layout';
 import DsEmployDashboard from './components/Supervisor/ds/Employ/Dashboard';
 import DsEmployComplaints from './components/Supervisor/ds/Employ/Complaints';
-// import EmployProgressRegister from './components/Employ/ProgressRegister';
-// import EmploySearchReports from './components/Employ/SearchReports';
+
 import DsEmployUserManagement from './components/Supervisor/ds/Employ/UserManagement';
-import DsEmployAddFiles from './components/Supervisor/ds/Employ/AddFiles';
-import DsEmployViewFiles from './components/Supervisor/ds/Employ/ViewFiles';
-// import EmployMasterData from './components/Employ/MasterData';
-// import EmployAddUserManagement from './components/Employ/AddUserManagement';
-// import EmployEditUserManagment from './components/Employ/EditUserManagment';
-// import EmployViewComplaints from './components/Employ/ViewComplaints';
-// import EmployEditComplaint from './components/Employ/EditComplaint';
-// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+import DsEmployAddFiles from './components/Supervisor/ds/Employ/ViewLeaveFiels/AddFiles';
+import DsEmployViewFiles from './components/Supervisor/ds/Employ/ViewLeaveFiels/ViewFiles';
+import DsViewFielsById from './components/Supervisor/ds/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import DsViewPersonalFiles from './components/Supervisor/ds/Employ/PersonalFiles/ViewPersonalFiles';
+import DsAddPersonalFiles from "./components/Supervisor/ds/Employ/PersonalFiles//AddpersonalFiles"
+import DsPersonalFileById from './components/Supervisor/ds/Employ/PersonalFiles/PersonalFileById';
+
+import DsPendingFiles from './components/Supervisor/ds/Employ/PendingFiles/PendingFiles';
+import DsPendingFileBYId from './components/Supervisor/ds/Employ/PendingFiles/PendingFileBYId';
 
 // JS
 
@@ -240,17 +246,19 @@ import EmployUserDashboardjs from "./components/./Supervisor/js/EmployUserDashbo
 import JsEmployLayout from './components/Supervisor/js/Employ/Layout';
 import JsEmployDashboard from './components/Supervisor/js/Employ/Dashboard';
 import JsEmployComplaints from './components/Supervisor/js/Employ/Complaints';
-// import EmployProgressRegister from './components/Employ/ProgressRegister';
-// import EmploySearchReports from './components/Employ/SearchReports';
+
 import JsEmployUserManagement from './components/Supervisor/js/Employ/UserManagement';
-import JsEmployAddFiles from './components/Supervisor/js/Employ/AddFiles';
-import JsEmployViewFiles from './components/Supervisor/js/Employ/ViewFiles';
-// import EmployMasterData from './components/Employ/MasterData';
-// import EmployAddUserManagement from './components/Employ/AddUserManagement';
-// import EmployEditUserManagment from './components/Employ/EditUserManagment';
-// import EmployViewComplaints from './components/Employ/ViewComplaints';
-// import EmployEditComplaint from './components/Employ/EditComplaint';
-// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+import JsEmployAddFiles from './components/Supervisor/js/Employ/ViewLeaveFiels/AddFiles';
+import JsEmployViewFiles from './components/Supervisor/js/Employ/ViewLeaveFiels/ViewFiles';
+import JsViewFielsById from './components/Supervisor/js/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import JsViewPersonalFiles from './components/Supervisor/js/Employ/PersonalFiles/ViewPersonalFiles';
+import JsAddPersonalFiles from "./components/Supervisor/js/Employ/PersonalFiles//AddpersonalFiles"
+import JsPersonalFileById from './components/Supervisor/js/Employ/PersonalFiles/PersonalFileById';
+
+import JsPendingFiles from './components/Supervisor/js/Employ/PendingFiles/PendingFiles';
+import JsPendingFileBYId from './components/Supervisor/js/Employ/PendingFiles/PendingFileBYId';
 
 // US
 
@@ -279,17 +287,19 @@ import EmployUserDashboardus from "./components/./Supervisor/us/EmployUserDashbo
 import UsEmployLayout from './components/Supervisor/us/Employ/Layout';
 import UsEmployDashboard from './components/Supervisor/us/Employ/Dashboard';
 import UsEmployComplaints from './components/Supervisor/us/Employ/Complaints';
-// import EmployProgressRegister from './components/Employ/ProgressRegister';
-// import EmploySearchReports from './components/Employ/SearchReports';
+
 import UsEmployUserManagement from './components/Supervisor/us/Employ/UserManagement';
-import UsEmployAddFiles from './components/Supervisor/us/Employ/AddFiles';
-import UsEmployViewFiles from './components/Supervisor/us/Employ/ViewFiles';
-// import EmployMasterData from './components/Employ/MasterData';
-// import EmployAddUserManagement from './components/Employ/AddUserManagement';
-// import EmployEditUserManagment from './components/Employ/EditUserManagment';
-// import EmployViewComplaints from './components/Employ/ViewComplaints';
-// import EmployEditComplaint from './components/Employ/EditComplaint';
-// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+import UsEmployAddFiles from './components/Supervisor/us/Employ/ViewLeaveFiels/AddFiles';
+import UsEmployViewFiles from './components/Supervisor/us/Employ/ViewLeaveFiels/ViewFiles';
+import UsViewFielsById from './components/Supervisor/us/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import UsViewPersonalFiles from './components/Supervisor/us/Employ/PersonalFiles/ViewPersonalFiles';
+import UsAddPersonalFiles from "./components/Supervisor/us/Employ/PersonalFiles//AddpersonalFiles"
+import UsPersonalFileById from './components/Supervisor/us/Employ/PersonalFiles/PersonalFileById';
+
+import UsPendingFiles from './components/Supervisor/us/Employ/PendingFiles/PendingFiles';
+import UsPendingFileBYId from './components/Supervisor/us/Employ/PendingFiles/PendingFileBYId';
 
 
 // ARO
@@ -317,15 +327,28 @@ import SupervisorEditComplaintsaro from './components/Supervisor/ro/All-complain
 import EmployUserDashboardaro from "./components/./Supervisor/ro/EmployUserDashboard"
 
 
+
 // Employ
 import AroEmployLayout from './components/Supervisor/ro/Employ/Layout';
 import AroEmployDashboard from './components/Supervisor/ro/Employ/Dashboard';
 import AroEmployComplaints from './components/Supervisor/ro/Employ/Complaints';
+
+import AroEmployUserManagement from './components/Supervisor/ro/Employ/UserManagement';
+import AroEmployAddFiles from './components/Supervisor/ro/Employ/ViewLeaveFiels/AddFiles';
+import AroEmployViewFiles from './components/Supervisor/ro/Employ/ViewLeaveFiels/ViewFiles';
+import AroViewFielsById from './components/Supervisor/ro/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import AroViewPersonalFiles from './components/Supervisor/ro/Employ/PersonalFiles/ViewPersonalFiles';
+import AroAddPersonalFiles from "./components/Supervisor/ro/Employ/PersonalFiles//AddpersonalFiles"
+import AroPersonalFileById from './components/Supervisor/ro/Employ/PersonalFiles/PersonalFileById';
+
+import AroPendingFiles from './components/Supervisor/ro/Employ/PendingFiles/PendingFiles';
+import AroPendingFileBYId from './components/Supervisor/ro/Employ/PendingFiles/PendingFileBYId';
+
 // import EmployProgressRegister from './components/Employ/ProgressRegister';
 // import EmploySearchReports from './components/Employ/SearchReports';
-import AroEmployUserManagement from './components/Supervisor/ro/Employ/UserManagement';
-import AroEmployAddFiles from './components/Supervisor/ro/Employ/AddFiles';
-import AroEmployViewFiles from './components/Supervisor/ro/Employ/ViewFiles';
+
 // import EmployMasterData from './components/Employ/MasterData';
 // import EmployAddUserManagement from './components/Employ/AddUserManagement';
 // import EmployEditUserManagment from './components/Employ/EditUserManagment';
@@ -361,21 +384,42 @@ import SupervisorEditComplaintssec from './components/Supervisor/sec/All-complai
 import EmployUserDashboardsec from "./components/Supervisor/sec/EmployUserDashboard"
 
 
+// // Employ
+// import SecEmployLayout from './components/Supervisor/sec/Employ/Layout';
+// import SecEmployDashboard from './components/Supervisor/sec/Employ/Dashboard';
+// import SecEmployComplaints from './components/Supervisor/sec/Employ/Complaints';
+// // import EmployProgressRegister from './components/Employ/ProgressRegister';
+// // import EmploySearchReports from './components/Employ/SearchReports';
+// import SecEmployUserManagement from './components/Supervisor/sec/Employ/UserManagement';
+// import SecEmployAddFiles from './components/Supervisor/sec/Employ/AddFiles';
+// import SecEmployViewFiles from './components/Supervisor/sec/Employ/ViewFiles';
+// // import EmployMasterData from './components/Employ/MasterData';
+// // import EmployAddUserManagement from './components/Employ/AddUserManagement';
+// // import EmployEditUserManagment from './components/Employ/EditUserManagment';
+// // import EmployViewComplaints from './components/Employ/ViewComplaints';
+// // import EmployEditComplaint from './components/Employ/EditComplaint';
+// // import EmployFileAdministrator from './components/Employ/FileAdministrator';
+
+
 // Employ
 import SecEmployLayout from './components/Supervisor/sec/Employ/Layout';
 import SecEmployDashboard from './components/Supervisor/sec/Employ/Dashboard';
 import SecEmployComplaints from './components/Supervisor/sec/Employ/Complaints';
-// import EmployProgressRegister from './components/Employ/ProgressRegister';
-// import EmploySearchReports from './components/Employ/SearchReports';
+
 import SecEmployUserManagement from './components/Supervisor/sec/Employ/UserManagement';
-import SecEmployAddFiles from './components/Supervisor/sec/Employ/AddFiles';
-import SecEmployViewFiles from './components/Supervisor/sec/Employ/ViewFiles';
-// import EmployMasterData from './components/Employ/MasterData';
-// import EmployAddUserManagement from './components/Employ/AddUserManagement';
-// import EmployEditUserManagment from './components/Employ/EditUserManagment';
-// import EmployViewComplaints from './components/Employ/ViewComplaints';
-// import EmployEditComplaint from './components/Employ/EditComplaint';
-// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+import SecEmployAddFiles from './components/Supervisor/sec/Employ/ViewLeaveFiels/AddFiles';
+import SecEmployViewFiles from './components/Supervisor/sec/Employ/ViewLeaveFiels/ViewFiles';
+import SecViewFielsById from './components/Supervisor/sec/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import SecViewPersonalFiles from './components/Supervisor/sec/Employ/PersonalFiles/ViewPersonalFiles';
+import SecAddPersonalFiles from "./components/Supervisor/sec/Employ/PersonalFiles//AddpersonalFiles"
+import SecPersonalFileById from './components/Supervisor/sec/Employ/PersonalFiles/PersonalFileById';
+
+import SecPendingFiles from './components/Supervisor/sec/Employ/PendingFiles/PendingFiles';
+import SecPendingFileBYId from './components/Supervisor/sec/Employ/PendingFiles/PendingFileBYId';
+
+
 
 
 // Supervisor 
@@ -401,62 +445,71 @@ import SupervisorEditComplaintscio from './components/Supervisor/cio-io/All-comp
 
 import EmployUserDashboardcio from "./components/./Supervisor/cio-io/EmployUserDashboard"
 
+
 // Employ
 import CioEmployLayout from './components/Supervisor/cio-io/Employ/Layout';
 import CioEmployDashboard from './components/Supervisor/cio-io/Employ/Dashboard';
 import CioEmployComplaints from './components/Supervisor/cio-io/Employ/Complaints';
-// import EmployProgressRegister from './components/Employ/ProgressRegister';
-// import EmploySearchReports from './components/Employ/SearchReports';
+
 import CioEmployUserManagement from './components/Supervisor/cio-io/Employ/UserManagement';
-import CioEmployAddFiles from './components/Supervisor/cio-io/Employ/AddFiles';
-import CioEmployViewFiles from './components/Supervisor/cio-io/Employ/ViewFiles';
-// import EmployMasterData from './components/Employ/MasterData';
-// import EmployAddUserManagement from './components/Employ/AddUserManagement';
-// import EmployEditUserManagment from './components/Employ/EditUserManagment';
-// import EmployViewComplaints from './components/Employ/ViewComplaints';
-// import EmployEditComplaint from './components/Employ/EditComplaint';
-// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+import CioEmployAddFiles from './components/Supervisor/cio-io/Employ/ViewLeaveFiels/AddFiles';
+import CioEmployViewFiles from './components/Supervisor/cio-io/Employ/ViewLeaveFiels/ViewFiles';
+import CioViewFielsById from './components/Supervisor/cio-io/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import CioViewPersonalFiles from './components/Supervisor/cio-io/Employ/PersonalFiles/ViewPersonalFiles';
+import CioAddPersonalFiles from "./components/Supervisor/cio-io/Employ/PersonalFiles//AddpersonalFiles"
+import CioPersonalFileById from './components/Supervisor/cio-io/Employ/PersonalFiles/PersonalFileById';
+
+import CioPendingFiles from './components/Supervisor/cio-io/Employ/PendingFiles/PendingFiles';
+import CioPendingFileBYId from './components/Supervisor/cio-io/Employ/PendingFiles/PendingFileBYId';
+
 
 
 
 // Supervisor 
 // SubRole -> io
-import SupervisorLayoutio from './components/Supervisor/io/Layout';
-import SupervisorDashboardio from './components/Supervisor/io/Dashboard';
-import SupervisorComplaintsio from './components/Supervisor/io/Complaints';
-import SupervisorProgressRegisterio from './components/Supervisor/io/ProgressRegister';
-import SupervisorSearchReportsio from './components/Supervisor/io/SearchReports';
-import SupervisorViewComplaintsio from './components/Supervisor/io/ViewComplaints';
+import SupervisorLayoutio from './components/Supervisor/ioo/Layout';
+import SupervisorDashboardio from './components/Supervisor/ioo/Dashboard';
+import SupervisorComplaintsio from './components/Supervisor/ioo/Complaints';
+import SupervisorProgressRegisterio from './components/Supervisor/ioo/ProgressRegister';
+import SupervisorSearchReportsio from './components/Supervisor/ioo/SearchReports';
+import SupervisorViewComplaintsio from './components/Supervisor/ioo/ViewComplaints';
 // import SupervisorPendingComplaintsio from './components/Supervisors/io-io/Pending-complaints/PendingComplaints';
-import SupervisorEditPendingComplaintsio from './components/Supervisor/io/Pending-complaints/EditPendingComplaints';
-import SupervisorViewPendingComplaintsio from './components/Supervisor/io/Pending-complaints/ViewPendingComplaints';
+import SupervisorEditPendingComplaintsio from './components/Supervisor/ioo/Pending-complaints/EditPendingComplaints';
+import SupervisorViewPendingComplaintsio from './components/Supervisor/ioo/Pending-complaints/ViewPendingComplaints';
 // import SupervisorViewPendingComplaintsio from './components/Supervisor/io-io/Pending-complaints/ViewPendingComplaints';
 
-import SupervisorApprovedComplaintsio from './components/Supervisor/io/Approved-complaints/ApprovedComplaints';
-import SupervisorViewApprovedComplaintsio from './components/Supervisor/io/Approved-complaints/ViewApprovedComplaints';
-import SupervisorEditApprovedComplaintsio from './components/Supervisor/io/Approved-complaints/EditApprovedComplaints';
+import SupervisorApprovedComplaintsio from './components/Supervisor/ioo/Approved-complaints/ApprovedComplaints';
+import SupervisorViewApprovedComplaintsio from './components/Supervisor/ioo/Approved-complaints/ViewApprovedComplaints';
+import SupervisorEditApprovedComplaintsio from './components/Supervisor/ioo/Approved-complaints/EditApprovedComplaints';
 
-import SupervisorAllComplaitsio from './components/Supervisor/io/All-complaints/AllComplaits';
-import SupervisorViewAllComplaintio from './components/Supervisor/io/All-complaints/ViewwAllComplaint';
-import SupervisorEditComplaintsio from './components/Supervisor/io/All-complaints/EditAllComplaints';
+import SupervisorAllComplaitsio from './components/Supervisor/ioo/All-complaints/AllComplaits';
+import SupervisorViewAllComplaintio from './components/Supervisor/ioo/All-complaints/ViewwAllComplaint';
+import SupervisorEditComplaintsio from './components/Supervisor/ioo/All-complaints/EditAllComplaints';
 
-import EmployUserDashboardio from "./components/./Supervisor/io/EmployUserDashboard"
+import EmployUserDashboardio from "./components/./Supervisor/ioo/EmployUserDashboard"
+
+
 
 // Employ
-import ioEmployLayout from './components/Supervisor/io/Employ/Layout';
-import ioEmployDashboard from './components/Supervisor/io/Employ/Dashboard';
-import ioEmployComplaints from './components/Supervisor/io/Employ/Complaints';
-// import EmployProgressRegister from './components/Employ/ProgressRegister';
-// import EmploySearchReports from './components/Employ/SearchReports';
-import ioEmployUserManagement from './components/Supervisor/io/Employ/UserManagement';
-import ioEmployAddFiles from './components/Supervisor/io/Employ/AddFiles';
-import ioEmployViewFiles from './components/Supervisor/io/Employ/ViewFiles';
-// import EmployMasterData from './components/Employ/MasterData';
-// import EmployAddUserManagement from './components/Employ/AddUserManagement';
-// import EmployEditUserManagment from './components/Employ/EditUserManagment';
-// import EmployViewComplaints from './components/Employ/ViewComplaints';
-// import EmployEditComplaint from './components/Employ/EditComplaint';
-// import EmployFileAdministrator from './components/Employ/FileAdministrator';
+import IoEmployLayout from './components/Supervisor/ioo/Employ/Layout';
+import IoEmployDashboard from './components/Supervisor/ioo/Employ/Dashboard';
+import IoEmployComplaints from './components/Supervisor/ioo/Employ/Complaints';
+
+import IoEmployUserManagement from './components/Supervisor/ioo/Employ/UserManagement';
+import IoEmployAddFiles from './components/Supervisor/ioo/Employ/ViewLeaveFiels/AddFiles';
+import IoEmployViewFiles from './components/Supervisor/ioo/Employ/ViewLeaveFiels/ViewFiles';
+import IoViewFielsById from './components/Supervisor/ioo/Employ/ViewLeaveFiels/ViewFielsById';
+
+
+import IoViewPersonalFiles from './components/Supervisor/ioo/Employ/PersonalFiles/ViewPersonalFiles';
+import IoAddPersonalFiles from "./components/Supervisor/ioo/Employ/PersonalFiles//AddpersonalFiles"
+import IoPersonalFileById from './components/Supervisor/ioo/Employ/PersonalFiles/PersonalFileById';
+
+import IoPendingFiles from './components/Supervisor/ioo/Employ/PendingFiles/PendingFiles';
+import IoPendingFileBYId from './components/Supervisor/ioo/Employ/PendingFiles/PendingFileBYId';
+
 
 
 
@@ -807,12 +860,22 @@ function App() {
 
         <>
 
-              <Route path="/employee" element={<DsEmployLayout />}>
+                 <Route path="/employee" element={<DsEmployLayout />}>
           <Route path="dashboard" element={<DsEmployDashboard />} />
           <Route path="complaints" element={<DsEmployComplaints />} />
           <Route path="add-files" element={<DsEmployAddFiles />} />
           <Route path="view-files" element={<DsEmployViewFiles />} />
           <Route path="user-management" element={<DsEmployUserManagement />} />
+
+
+
+            <Route path="view-files/:id" element={<DsViewFielsById />} />
+
+            <Route path="view-personal-files" element={<DsViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<DsAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<DsPersonalFileById />} />
+          <Route path="view-pending-files" element={<DsPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<DsPendingFileBYId />} />
        
         </Route>
           <Route path="main-dashboard" element={<EmployUserDashboardds />} />
@@ -846,12 +909,22 @@ function App() {
         <>
 
         
-              <Route path="/employee" element={<JsEmployLayout />}>
+               <Route path="/employee" element={<JsEmployLayout />}>
           <Route path="dashboard" element={<JsEmployDashboard />} />
           <Route path="complaints" element={<JsEmployComplaints />} />
           <Route path="add-files" element={<JsEmployAddFiles />} />
           <Route path="view-files" element={<JsEmployViewFiles />} />
           <Route path="user-management" element={<JsEmployUserManagement />} />
+
+
+
+            <Route path="view-files/:id" element={<JsViewFielsById />} />
+
+            <Route path="view-personal-files" element={<JsViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<JsAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<JsPersonalFileById />} />
+          <Route path="view-pending-files" element={<JsPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<JsPendingFileBYId />} />
        
         </Route>
           <Route path="main-dashboard" element={<EmployUserDashboardjs />} />
@@ -885,12 +958,22 @@ function App() {
         <>
 
         
-              <Route path="/employee" element={<UsEmployLayout />}>
+             <Route path="/employee" element={<UsEmployLayout />}>
           <Route path="dashboard" element={<UsEmployDashboard />} />
           <Route path="complaints" element={<UsEmployComplaints />} />
           <Route path="add-files" element={<UsEmployAddFiles />} />
           <Route path="view-files" element={<UsEmployViewFiles />} />
           <Route path="user-management" element={<UsEmployUserManagement />} />
+
+
+
+            <Route path="view-files/:id" element={<UsViewFielsById />} />
+
+            <Route path="view-personal-files" element={<UsViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<UsAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<UsPersonalFileById />} />
+          <Route path="view-pending-files" element={<UsPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<UsPendingFileBYId />} />
        
         </Route>
 
@@ -952,8 +1035,8 @@ function App() {
           <Route path="complaints" element={<RoAroEmployComplaints />} />
           <Route path="add-files" element={<RoAroEmployAddFiles />} />
           <Route path="view-files" element={<RoAroEmployViewFiles />} />
-          <Route path="view-files/:id" element={<RoAroViewFielsById />} />
           <Route path="user-management" element={<RoAroEmployUserManagement />} />
+          <Route path="view-files/:id" element={<RoAroViewFielsById />} />
           <Route path="view-personal-files" element={<RoAroViewPersonalFiles />} />
           <Route path="add-personal-files" element={<RoAroAddPersonalFiles />} />
           <Route path="view-personal-files/:id" element={<RoAroPersonalFileById />} />
@@ -1004,6 +1087,15 @@ function App() {
           <Route path="add-files" element={<AroEmployAddFiles />} />
           <Route path="view-files" element={<AroEmployViewFiles />} />
           <Route path="user-management" element={<AroEmployUserManagement />} />
+
+
+            <Route path="view-files/:id" element={<AroViewFielsById />} />
+            <Route path="view-personal-files" element={<AroViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<AroAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<AroPersonalFileById />} />
+          <Route path="view-pending-files" element={<AroPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<AroPendingFileBYId />} />
+
           
        
         </Route>
@@ -1047,6 +1139,16 @@ function App() {
           <Route path="add-files" element={<SecEmployAddFiles />} />
           <Route path="view-files" element={<SecEmployViewFiles />} />
           <Route path="user-management" element={<SecEmployUserManagement />} />
+
+
+
+            <Route path="view-files/:id" element={<SecViewFielsById />} />
+
+            <Route path="view-personal-files" element={<SecViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<SecAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<SecPersonalFileById />} />
+          <Route path="view-pending-files" element={<SecPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<SecPendingFileBYId />} />
        
         </Route>
           <Route path="main-dashboard" element={<EmployUserDashboardsec />} />
@@ -1089,6 +1191,15 @@ function App() {
           <Route path="add-files" element={<CioEmployAddFiles />} />
           <Route path="view-files" element={<CioEmployViewFiles />} />
           <Route path="user-management" element={<CioEmployUserManagement />} />
+
+
+            <Route path="view-files/:id" element={<CioViewFielsById />} />
+
+            <Route path="view-personal-files" element={<CioViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<CioAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<CioPersonalFileById />} />
+          <Route path="view-pending-files" element={<CioPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<CioPendingFileBYId />} />
        
         </Route>
 
@@ -1125,12 +1236,22 @@ function App() {
 
 
       
-          <Route path="/employee" element={<ioEmployLayout />}>
-          <Route path="dashboard" element={<ioEmployDashboard />} />
-          <Route path="complaints" element={<ioEmployComplaints />} />
-          <Route path="add-files" element={<ioEmployAddFiles />} />
-          <Route path="view-files" element={<ioEmployViewFiles />} />
-          <Route path="user-management" element={<ioEmployUserManagement />} />
+
+            <Route path="/employee" element={<IoEmployLayout />}>
+          <Route path="dashboard" element={<IoEmployDashboard />} />
+          <Route path="complaints" element={<IoEmployComplaints />} />
+          <Route path="add-files" element={<IoEmployAddFiles />} />
+          <Route path="view-files" element={<IoEmployViewFiles />} />
+          <Route path="user-management" element={<IoEmployUserManagement />} />
+
+
+            <Route path="view-files/:id" element={<IoViewFielsById />} />
+
+            <Route path="view-personal-files" element={<IoViewPersonalFiles />} />
+          <Route path="add-personal-files" element={<IoAddPersonalFiles />} />
+          <Route path="view-personal-files/:id" element={<IoPersonalFileById />} />
+          <Route path="view-pending-files" element={<IoPendingFiles />} />
+          <Route path="view-pending-files/:id" element={<IoPendingFileBYId />} />
        
         </Route>
 

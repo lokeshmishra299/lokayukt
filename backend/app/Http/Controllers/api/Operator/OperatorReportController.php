@@ -1069,44 +1069,97 @@ $records = DB::table('complaints')
             ]);
     }
 
-    public function search(Request $request)
+//     public function search(Request $request)
+// {
+//     // $search = $request->search;
+
+//     $query = Complaint::query();
+
+//     if ($request->COMP_NO) {
+//         $query->where('COMP_NO', $request->COMP_NO);
+//     }
+
+//     if ($request->YEAR) {
+//         $query->where('YEAR', $request->YEAR);
+//     }
+
+//     if ($request->COMP_DT) {
+//         $query->whereDate('COMP_DT', $request->COMP_DT);
+//     }
+
+//     if ($request->COMP_NM) {
+//         $query->where('COMP_NM', 'like', '%'.$request->COMP_NM.'%');
+//     }
+
+//     if ($request->DISTT) {
+//         $query->where('DISTT', $request->DISTT);
+//     }
+
+//     if ($request->NATURE) {
+//         $query->where('NATURE', $request->NATURE);
+//     }
+
+//     if ($request->LETT_NO) {
+//         $query->where('LETT_NO', 'like', '%'.$request->LETT_NO.'%');
+//     }
+
+//     $data = $query->paginate(10);
+
+
+// }
+
+public function search(Request $request)
 {
-    // $search = $request->search;
+    $query = DB::table('old_complaints_data');
 
-    $query = Complaint::query();
-
-    if ($request->COMP_NO) {
-        $query->where('COMP_NO', $request->COMP_NO);
+    if ($request->comp_file) {
+        $query->where('COMP_NO', $request->comp_file);
     }
 
-    if ($request->YEAR) {
-        $query->where('YEAR', $request->YEAR);
+    if ($request->comp_resp) {
+        $query->where('COMP_NM', 'like', '%'.$request->comp_resp.'%');
     }
 
-    if ($request->COMP_DT) {
-        $query->whereDate('COMP_DT', $request->COMP_DT);
+    if ($request->date) {
+        $query->whereDate('COMP_DT', $request->date);
     }
 
-    if ($request->COMP_NM) {
-        $query->where('COMP_NM', 'like', '%'.$request->COMP_NM.'%');
+    if ($request->year) {
+        $query->where('YEAR1', $request->year);
     }
 
-    if ($request->DISTT) {
-        $query->where('DISTT', $request->DISTT);
+    if ($request->district) {
+        $query->where('district', $request->district);
     }
 
-    if ($request->NATURE) {
-        $query->where('NATURE', $request->NATURE);
+    if ($request->department) {
+        $query->where('department', $request->department);
     }
 
-    if ($request->LETT_NO) {
-        $query->where('LETT_NO', 'like', '%'.$request->LETT_NO.'%');
+    // date range filter (from - to)
+    if ($request->from && $request->to) {
+        $query->whereBetween('ENROLL_DT', [$request->from, $request->to]);
+    }
+
+    // if ($request->enrollment_date) {
+    //     $query->whereDate('enrollment_date', $request->enrollment_date);
+    // }
+
+    if ($request->complaint_date) {
+        $query->whereDate('complaint_date', $request->complaint_date);
+    }
+
+    if ($request->nature) {
+        $query->where('nature', $request->nature);
     }
 
     $data = $query->paginate(10);
 
-
+     return response()->json([
+                'status' => true,
+                'message' => 'Records Fetch successfully',
+                'data' =>  $data,
+            ]);
 }
-
 
 }

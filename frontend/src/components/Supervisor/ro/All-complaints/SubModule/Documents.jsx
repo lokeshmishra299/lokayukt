@@ -24,12 +24,12 @@ const Documents = ({ complaint }) => {
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
 
-  // -- Add Document State --
+  // -- Add Document State (Reverted to Single File) --
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newDoc, setNewDoc] = useState({
     title: "",
     type: "Letter", // Default to first option
-    files: [], // ✅ Changed to 'files' array for multiple upload
+    file: null, // ✅ Changed back to single 'file'
   });
 
   // Backend Errors State
@@ -94,12 +94,11 @@ const Documents = ({ complaint }) => {
     }
   };
 
-  // -- Handle File Selection (For Multiple Files) --
+  // -- Handle File Selection (Single File) --
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files.length > 0) {
-      // ✅ Convert FileList to Array and set to state
-      const selectedFiles = Array.from(e.target.files);
-      setNewDoc({ ...newDoc, files: selectedFiles });
+    if (e.target.files && e.target.files[0]) {
+      // ✅ Set single file
+      setNewDoc({ ...newDoc, file: e.target.files[0] });
       
       // Clear file error locally when user selects file
       if (errors.file) setErrors({ ...errors, file: null });
@@ -119,13 +118,11 @@ const Documents = ({ complaint }) => {
     try {
       const formData = new FormData();
       
-      // ✅ Append multiple files to formData as an array
-      if (newDoc.files && newDoc.files.length > 0) {
-        newDoc.files.forEach((fileItem, index) => {
-          formData.append(`file[${index}]`, fileItem);
-        });
+      // ✅ Append single file normally (Not as an array)
+      if (newDoc.file) {
+        formData.append("file", newDoc.file);
       } else {
-        formData.append("file", ""); // Send empty to trigger backend validation
+        formData.append("file", ""); // Send empty to trigger backend validation if required
       }
 
       formData.append("type", newDoc.type || ""); 
@@ -138,7 +135,7 @@ const Documents = ({ complaint }) => {
 
       toast.success("Document uploaded successfully!");
       setopenAddDocuments(false);
-      setNewDoc({ title: "", type: "Letter", files: [] }); // ✅ Reset state
+      setNewDoc({ title: "", type: "Letter", file: null }); // ✅ Reset state
       setErrors({});
       refetch();
     } catch (error) {
@@ -266,7 +263,7 @@ const Documents = ({ complaint }) => {
             {/* Modal Body */}
             <div className="p-6 space-y-5">
               
-              {/* ✅ Document Title Input */}
+              {/* Document Title Input */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Document Title <span className="text-red-500">*</span>
@@ -288,7 +285,7 @@ const Documents = ({ complaint }) => {
                 )}
               </div>
 
-              {/* ✅ Document Type Dropdown */}
+              {/* Document Type Dropdown */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
                   Correspondence Type <span className="text-red-500">*</span>
@@ -313,10 +310,10 @@ const Documents = ({ complaint }) => {
                 )}
               </div>
 
-              {/* ✅ File Upload Area (Multiple) */}
+              {/* ✅ File Upload Area (Single) */}
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">
-                  Upload File(s) <span className="text-red-500">*</span>
+                  Upload File <span className="text-red-500">*</span>
                 </label>
                 <div 
                   className={`relative border-2 border-dashed rounded-lg p-6 hover:bg-gray-50 transition-colors text-center cursor-pointer group ${
@@ -325,33 +322,29 @@ const Documents = ({ complaint }) => {
                 >
                   <input
                     type="file"
-                    multiple // ✅ Multiple Selection Enabled
                     onChange={handleFileChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    accept=".pdf,.jpg,.jpeg,.png"
+                    accept=".pdf,.jpg,.jpeg,.png" // ✅ Removed 'multiple'
                   />
                   <div className="flex flex-col items-center justify-center gap-2">
-                    {newDoc.files && newDoc.files.length > 0 ? (
+                    {newDoc.file ? (
                       <>
                         <FaFileAlt className="w-8 h-8 text-blue-500" />
-                        <span className="text-sm font-medium text-gray-900">
-                          {newDoc.files.length} file(s) selected
+                        <span className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+                          {newDoc.file.name}
                         </span>
-                        {/* List of selected files */}
-                        <div className="mt-2 text-xs text-gray-500 max-h-24 overflow-y-auto w-full px-2">
-                          {newDoc.files.map((f, i) => (
-                            <div key={i} className="truncate">{f.name}</div>
-                          ))}
-                        </div>
+                        <span className="text-xs text-gray-500">
+                          {(newDoc.file.size / 1024 / 1024).toFixed(2)} MB
+                        </span>
                       </>
                     ) : (
                       <>
                         <FaCloudUploadAlt className={`w-8 h-8 transition-colors ${errors.file ? "text-red-400" : "text-gray-400 group-hover:text-blue-500"}`} />
                         <span className={`text-sm ${errors.file ? "text-red-500" : "text-gray-500"}`}>
-                          Click to browse or drag files here
+                          Click to browse or drag file here
                         </span>
                         <span className="text-xs text-gray-400">
-                          PDF, JPG, PNG (You can select multiple files)
+                          PDF, JPG, PNG (Max 5MB)
                         </span>
                       </>
                     )}
