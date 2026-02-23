@@ -1166,6 +1166,20 @@ class CommonController extends Controller
         return ApiResponse::generateResponse('success','Leaves fetch successfully',$cat);
     }
 
+    public function fetchLeavesPersonalDetailsById($id)
+{
+    $cat = EmployeeUploadFiles::with('user:id,name')
+            ->where('type', 'Personal File')
+            ->where('id', $id)
+            ->first();
+
+    if (!$cat) {
+        return ApiResponse::generateResponse('error', 'Record not found', null);
+    }
+
+    return ApiResponse::generateResponse('success', 'Leaves fetch successfully', $cat);
+}
+
         public function approveRejectedEmployee(Request $request, $id)
     {
         $user = EmployeeUploadFiles::find($id);
@@ -1278,5 +1292,7 @@ class CommonController extends Controller
 
     return ApiResponse::generateResponse('success','User data fetch succesfully',$user,201);
     }
+
+    
 
 }
