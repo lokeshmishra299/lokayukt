@@ -844,7 +844,7 @@ $complainDetails->actions = $actions;
         $validation = Validator::make($request->all(), [
             // 'forward_by_ds_js' => 'required|exists:users,id',
             'forward_to' => 'required|exists:users,id',
-            'remark' => 'required',
+            // 'remark' => 'required',
          
           
         ], [
@@ -852,7 +852,7 @@ $complainDetails->actions = $actions;
             // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
             'forward_to.required' => 'Forward to user is required.',
             'forward_to.exists' => 'Forward to user does not exist.',
-            'remark.required' => 'Remark is required.',
+            // 'remark.required' => 'Remark is required.',
            
         ]);
 
@@ -883,8 +883,8 @@ $complainDetails->actions = $actions;
                 
                     if($cmp->save()){
 
-                         $apcAction = new ComplaintAction();
-                        //     $apcAction->complaint_id = $complainId;
+                        //  $apcAction = new ComplaintAction();
+                            // $apcAction->target_date = $request->target_date;
                         //     $apcAction->forward_by_lokayukt = $userId;
 
                              
@@ -925,6 +925,7 @@ $complainDetails->actions = $actions;
                         $apcAction = new ComplaintAction();
                         $apcAction->complaint_id = $complainId;
                         $apcAction->forward_by_lokayukt = $userId;
+                        $apcAction->target_date = $request->target_date;
 
                         if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt'])) {
 
@@ -963,7 +964,7 @@ $complainDetails->actions = $actions;
 
                         $apcAction->status = 'Forwarded';
                         $apcAction->type = '1';
-                        $apcAction->remarks = $request->remark;
+                        // $apcAction->remarks = $request->remark;
                         $apcAction->save();
                         $cmp->save();
 
