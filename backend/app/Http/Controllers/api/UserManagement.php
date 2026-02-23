@@ -101,7 +101,7 @@ class UserManagement extends Controller
             'department_id'   => $request->department,
             'user_name'    => $userName,
             'password1'    => $request->password,
-            'password'     => bcrypt('password123'),
+            'password'     => bcrypt($request->password),
             'user_type'     => 'user',
         ]);
 
