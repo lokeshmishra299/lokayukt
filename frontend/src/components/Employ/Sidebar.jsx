@@ -150,7 +150,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
             `}
           >
             <RiFileSearchLine />
-            {(!isCollapsed || isMobile) && "Files"}
+            {(!isCollapsed || isMobile) && "Leave Files"}
           </Link>
 
           <Link
