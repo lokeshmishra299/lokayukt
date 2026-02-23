@@ -19,22 +19,20 @@ const api = axios.create({
   },
 });
 
-const PendingFileBYId = () => {
+const ViewPersonalFile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("notings");
 
-  // Send Modal States
   const [openSendPoup, setopenSendPoup] = useState(false);
   const [selectedAuthority, setSelectedAuthority] = useState("");
   const [formErrors, setFormErrors] = useState({});
 
-  // 1. Fetch File Details
   const { data: response, isLoading } = useQuery({
     queryKey: ["personal-file-list", id],
     queryFn: async () => {
-      const res = await api.get(`/ps/personal-file-list/${id}`);
+      const res = await api.get(`/admin/get-leave-personal-details/${id}`);
       return res.data;
     },
     enabled: !!id
@@ -42,19 +40,17 @@ const PendingFileBYId = () => {
 
   const fileData = response?.data;
 
-  // 2. Fetch Roles (Authority) for Dropdown
-  const { data: roleSubrole, isLoading: isRolesLoading } = useQuery({
-    queryKey: ["get-roles-supervisors"],
-    queryFn: async () => {
-      const res = await api.get("/ps/get-roles-supervisors");
-      return res.data.data;
-    }
-  });
+//   const { data: roleSubrole, isLoading: isRolesLoading } = useQuery({
+//     queryKey: ["get-roles-supervisors"],
+//     queryFn: async () => {
+//       const res = await api.get("/admin/get-roles-supervisors");
+//       return res.data.data;
+//     }
+//   });
 
-  // 3. Send File Mutation (POST)
   const sendPermissionMutation = useMutation({
     mutationFn: async ({ file_id, to_user_id }) => {
-      const res = await api.post("/operator/personal-file-send", {
+      const res = await api.post("/admin/personal-file-send", {
         file_id,
         to_user_id,
       });
@@ -78,22 +74,17 @@ const PendingFileBYId = () => {
     },
   });
 
-  // URL Generator (Fix for /storage/employeeFiles path)
   const getFileUrl = (fileName) => {
     if (!fileName) return "";
     
-    // BASE_URL se '/api' hata kar root domain nikalo
     const root = BASE_URL.replace(/\/api\/?$/, ""); 
 
-    // Path setup: Agar file me pehle se slash nahi hai to laga do
     let cleanPath = fileName.startsWith("/") ? fileName : `/${fileName}`;
 
-    // Agar path me "/storage" nahi hai, to usko "/storage/employeeFiles" ke andar append kar do
     if (!cleanPath.includes("/storage/")) {
         cleanPath = `/storage/employeeFiles${cleanPath}`;
     }
 
-    // Combine: http://127.0.0.1:8000/storage/employeeFiles/doc_123.pdf
     return `${root}${cleanPath}`;
   };
 
@@ -122,7 +113,6 @@ const PendingFileBYId = () => {
             </div>
           </div>
 
-          {/* Main Info Grid */}
           <div className="space-y-3 mb-6 mt-4">
             <div>
               <h3 className="text-gray-900 text-[14px] font-bold mb-2">फ़ाइल का विवरण</h3>
@@ -143,7 +133,6 @@ const PendingFileBYId = () => {
             </div>
           </div>
 
-          {/* --- PDF FILE DISPLAY AREA (Sabse Upar) --- */}
           <div className="mt-4 border rounded-lg overflow-hidden bg-gray-100">
             <div className="bg-gray-200 px-4 py-2 flex justify-between items-center border-b">
               <span className="text-sm font-bold flex items-center gap-2">
@@ -174,7 +163,6 @@ const PendingFileBYId = () => {
           </div>
         </div>
 
-        {/* --- Tab Navigation (Niche) --- */}
         <div className="hidden md:flex border-b px-6 mt-2">
           <div className="flex gap-6 overflow-x-auto">
             {["notings", "movement", "documents"].map((tab) => (
@@ -210,15 +198,14 @@ const PendingFileBYId = () => {
 )}
         </div>
 
-        {/* --- Send Button Section --- */}
-        <div className="p-4 md:p-6 border-t bg-gray-50 flex justify-end">
+        {/* <div className="p-4 md:p-6 border-t bg-gray-50 flex justify-end">
             <button
               onClick={() => setopenSendPoup(true)}
               className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-green-700 transition"
             >
                 Send File
             </button>
-        </div>
+        </div> */}
 
       </div>
 
@@ -245,7 +232,7 @@ const PendingFileBYId = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Select Authority
                 </label>
-
+{/* 
                 <select
                   value={selectedAuthority}
                   onChange={(e) => setSelectedAuthority(e.target.value)}
@@ -265,13 +252,13 @@ const PendingFileBYId = () => {
 </option>
                     );
                   })}
-                </select>
-
+                </select> */}
+{/* 
                 {formErrors?.to_user_id && (
                   <p className="mt-1 text-sm text-red-600">
                     {formErrors.to_user_id[0]}
                   </p>
-                )}
+                )} */}
               </div>
             </div>
 
@@ -326,4 +313,4 @@ const PendingFileBYId = () => {
   );
 };
 
-export default PendingFileBYId;
+export default ViewPersonalFile;
