@@ -253,7 +253,7 @@ const AllLeaveFiles = () => {
             <thead className="bg-gray-100 border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">S.No</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Upload Date</th>
@@ -286,7 +286,7 @@ const AllLeaveFiles = () => {
                           <FaUser size={12} />
                         </div>
                         <span className="text-sm font-semibold text-gray-800 capitalize">
-                          {row.user?.name || "Unknown"}
+                          {row.user?.name || "N/A"}
                         </span>
                       </div>
                     </td>
@@ -295,14 +295,14 @@ const AllLeaveFiles = () => {
                       <div className="flex items-center gap-3">
                         {getFileIcon(row.file)}
                         <div>
-                            <p className="text-sm kruti-input font-medium text-gray-900">{row.title || "Untitled"}</p>
+                            <p className="text-sm kruti-input font-medium text-gray-900">{row?.title || "N/A"}</p>
                         </div>
                       </div>
                     </td>
                     
                     <td className="px-6 py-4">
                         <span className="px-2 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full border border-blue-100">
-                            {row.type}
+                            {row?.type || "N/A"}
                         </span>
                     </td>
                     
