@@ -149,6 +149,7 @@ class EmployeesController extends Controller
         'type'   => 'required|string',
         'file'   => 'required|array',
         'file.*' => 'file|mimes:jpg,jpeg,png,pdf|max:2048',
+        'person_user_id'=>'required|numeric'
     ]);
 
     if ($validation->fails()) {
@@ -171,7 +172,8 @@ class EmployeesController extends Controller
             'title'    => $request->title,
             'file'     => $fileName,
             'permission_user_id' => $added_by,
-            'is_forward' => 0
+            'is_forward' => 0,
+            'person_user_id'=>$request->person_user_id
         ]);
 
         ComplainActionPersonalFile::create([
