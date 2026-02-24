@@ -116,7 +116,7 @@ const AddpersonalFiles = () => {
 
     // ✅ Validate User Selection
     if (!selectedUser) {
-        setFieldErrors((prev) => ({ ...prev, user_id: ["Please select an authority"] }));
+        setFieldErrors((prev) => ({ ...prev, person_user_id: ["Please select an authority"] }));
         return;
     }
 
@@ -136,7 +136,7 @@ const AddpersonalFiles = () => {
 
       formData.append("type", correspondenceType);
       formData.append("title", title);
-      formData.append("user_id", selectedUser); // ✅ Sending selected user ID
+      formData.append("person_user_id", selectedUser); // ✅ Sending selected user ID
       
       await uploadApi.post("/admin/upload-private-file", formData);
 
@@ -232,11 +232,11 @@ const AddpersonalFiles = () => {
                 value={selectedUser}
                 onChange={(e) => {
                   setSelectedUser(e.target.value);
-                  setFieldErrors((prev) => ({ ...prev, user_id: undefined }));
+                  setFieldErrors((prev) => ({ ...prev, person_user_id: undefined }));
                 }}
                 className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 text-sm
                   focus:outline-none focus:ring-2 focus:ring-blue-300
-                  ${fieldErrors.user_id ? "border-red-500" : "border-gray-300"}`}
+                  ${fieldErrors.person_user_id ? "border-red-500" : "border-gray-300"}`}
               >
                 <option value="">Select Authority</option>
                 {roleSubrole?.map((item) => {
@@ -250,8 +250,8 @@ const AddpersonalFiles = () => {
                 })}
               </select>
 
-              {fieldErrors.user_id && (
-                <p className="mt-1 text-xs text-red-600">{fieldErrors.user_id[0]}</p>
+              {fieldErrors.person_user_id && (
+                <p className="mt-1 text-xs text-red-600">{fieldErrors.person_user_id[0]}</p>
               )}
             </div>
 
