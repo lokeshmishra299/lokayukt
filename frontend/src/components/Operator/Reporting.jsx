@@ -187,7 +187,7 @@ const Reporting = () => {
               >
                 <option value="">All Districts</option>
                 {!loadingDistricts && districtsList?.map((d) => (
-                  <option key={d.id} value={d.district_name}>{d.district_name}</option>
+                  <option key={d.id} value={d.district_name}><span className="kruti-input">{d.district_name}</span></option>
                 ))}
               </select>
             </div>
@@ -201,7 +201,7 @@ const Reporting = () => {
               >
                 <option value="">All Departments</option>
                 {!loadingDepartments && departmentsList?.map((d) => (
-                  <option key={d.id} value={d.name}>{d.name}</option>
+                  <option key={d.id} value={d.name}><span className="kruti-input">{d.name}</span></option>
                 ))}
               </select>
             </div>
