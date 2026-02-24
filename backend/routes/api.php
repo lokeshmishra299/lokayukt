@@ -51,10 +51,26 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-sub-roles/{roleId}', [CommonController::class, 'getSubroles']);
         Route::get('/get-leave-details', [CommonController::class, 'fetchLeavesDetails']);
         Route::get('/get-leave-personal-details', [CommonController::class, 'fetchLeavesPersonalDetails']);
+        
+        //23-02
+        Route::get('/get-leave-personal-details/{id}', [CommonController::class, 'fetchLeavesPersonalDetailsById']);
+
 
         Route::get('/get-roles-supervisor', [CommonController::class, 'getRolesSupervisors']);
 
         Route::post('/access-files-permission',[CommonController::class,'accessFilePermission']);
+
+
+        //PRIVATE FILES 23-02-2026
+
+        Route::post('/upload-private-file',[EmployeesController::class,'uploadPrivateFiles']);
+
+       Route::get('/private-file-permission/{id}',[EmployeesController::class,'privateFilesPermissionById']);
+
+        Route::get('/get-file-preview/{id}',[EmployeesController::class,'getFilePreview']); 
+
+        Route::post('/file/give-permission', [EmployeesController::class,'giveFilePermission']);
+        
 
 
 
@@ -615,9 +631,7 @@ Route::middleware('auth:sanctum')->group(function(){
        
     });
 
-    Route::middleware('role:steno|assistant-clerk|computer-assistant
-|car-driver|jamadar|orderly/jamadar|office|farrash|sweeper|gardener|cook|watchman|peon')->prefix('employee')->group(function () {
-       
+    Route::middleware('role:steno,assistant-clerk,computer-assistant,car-driver,jamadar,orderly/jamadar,office,farrash,sweeper,gardener,cook,watchman,peon')->prefix('employee')->group(function () {
         Route::get('/all-files',[EmployeesController::class,'index']);
                 Route::get('/all-files/{id}',[EmployeesController::class,'fileDetails']);
 

@@ -13,10 +13,28 @@ import {
 import { IoFileTray } from "react-icons/io5";
 import { FaFileSignature } from "react-icons/fa6";
 import { RiFileSearchLine } from "react-icons/ri";
+import { TbFileSearch } from "react-icons/tb";
+import { MdOutlinePendingActions } from "react-icons/md";
 
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
+
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
+
+  const isFilesActive = (path) => {
+    return location.pathname.startsWith("/employee/view-files") ||
+           location.pathname.startsWith("/employee/add-files");
+  };
+
+  const isFilesActivee = (path) => {
+    return location.pathname.startsWith("/employee/view-personal-files") ||
+           location.pathname.startsWith("/employee/add-personal-files");
+  };
+
+  const isFilesActiveee = (path) => {
+    return location.pathname.startsWith("/employee/view-pending-files") 
+          //  location.pathname.startsWith("/employee/add-pending-files");
+  };
 
   useEffect(() => {
     const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
@@ -30,13 +48,6 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
     if (href === "/dashboard") return location.pathname === fullPath;
     return location.pathname.startsWith(fullPath);
   };
-
-  const isFilesActive = () => {
-  return (
-    location.pathname.startsWith("/employee/view-files") ||
-    location.pathname.startsWith("/employee/add-files")
-  );
-};
 
   const handleLinkClick = () => {
     if (isMobile && isMobileMenuOpen) toggleMobileMenu();
@@ -96,134 +107,82 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           {/* <Link
             to="/admin/complaints"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/complaints")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <FaFileAlt />
-            {(!isCollapsed || isMobile) && "Complaints"}
+            ...
           </Link> */}
 
           {/* Progress Register */}
           {/* <Link
             to="/admin/progress-register"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/progress-register")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <FaChartBar />
-            {(!isCollapsed || isMobile) && "Progress Register"}
+            ...
           </Link> */}
 
           {/* Search & Reports */}
           {/* <Link
             to="/admin/search-reports"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/search-reports")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <FaSearch />
-            {(!isCollapsed || isMobile) && "Search & Reports"}
+            ...
           </Link> */}
 
           {/* User Management */}
           {/* <Link
             to="/employee/user-management"
             onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/user-management")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <FaUsers />
-            {(!isCollapsed || isMobile) && "User Management"}
+            ...
           </Link> */}
-          {/* User Management */}
 
+          {/* Add Files */}
+          {/* <Link
+            to="/employee/add-files"
+            onClick={handleLinkClick}
+            ...
+          </Link> */}
 
-
-           <Link
+          <Link
             to="/employee/view-files"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-             ${isFilesActive()
-  ? "bg-blue-600 text-white shadow-md"
-  : "text-gray-700 hover:bg-gray-200"
-}
+              ${isFilesActive()
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-700 hover:bg-gray-200"
+              }
               ${isCollapsed && !isMobile ? "justify-center" : ""}
             `}
           >
             <RiFileSearchLine />
-            {(!isCollapsed || isMobile) && "View Files"}
+            {(!isCollapsed || isMobile) && "Leave Files"}
           </Link>
-          
-          {/* <Link
-            to="/employee/add-files"
+{/* 
+          <Link
+            to="/employee/view-personal-files"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/add-files")
+              ${isFilesActivee()
                 ? "bg-blue-600 text-white shadow-md"
                 : "text-gray-700 hover:bg-gray-200"
               }
               ${isCollapsed && !isMobile ? "justify-center" : ""}
             `}
           >
-            <FaFileSignature />
-            {(!isCollapsed || isMobile) && "Add Files"}
+            <TbFileSearch />
+            {(!isCollapsed || isMobile) && "Personal Files"}
           </Link> */}
 
 
-          
-
-          {/* Master Data */}
-          {/* <Link
-            to="/admin/master-data"
+          <Link
+            to="/employee/view-pending-files"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/master-data")
+              ${isFilesActiveee()
                 ? "bg-blue-600 text-white shadow-md"
                 : "text-gray-700 hover:bg-gray-200"
               }
               ${isCollapsed && !isMobile ? "justify-center" : ""}
             `}
           >
-            <FaDatabase />
-            {(!isCollapsed || isMobile) && "Master Data"}
-          </Link> */}
-
-
-           {/* File Administrator */}
-          {/* <Link
-            to="/admin/file-administrator"
-            onClick={handleLinkClick}
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-              ${isActive("/file-administrator")
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-700 hover:bg-gray-200"
-              }
-              ${isCollapsed && !isMobile ? "justify-center" : ""}
-            `}
-          >
-            <IoFileTray />
-            {(!isCollapsed || isMobile) && "File Administrator"}
-          </Link> */}
+            <MdOutlinePendingActions />
+            {(!isCollapsed || isMobile) && "Pending Files"}
+          </Link>
 
         </nav>
       </aside>

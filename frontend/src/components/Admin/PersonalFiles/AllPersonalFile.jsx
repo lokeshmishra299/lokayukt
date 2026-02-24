@@ -6,8 +6,9 @@ import {
   FaEye, FaSearch, FaSpinner, FaTimes, FaUser
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
-import Pagination from '../Pagination';
+import Pagination from '../../Pagination';
 import { FaPaperPlane } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -23,6 +24,7 @@ const api = axios.create({
 
 
 const AllLeaveFiles = () => {
+  const navigate = useNavigate()
   const queryClient = useQueryClient(); 
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -208,28 +210,41 @@ const AllLeaveFiles = () => {
     <div className="bg-gray-50 min-h-screen ">
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <div className="w-full flex items-center gap-3">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">All Personal File</h1>
-            <p className="text-sm text-gray-600">समस्त व्यक्तिगत फाइलें</p>
-          </div>
-        </div>
+  <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+  {/* Left title */}
+  <div className="w-full flex items-center gap-3">
+    <div>
+      <h1 className="text-xl font-bold text-gray-900">All Personal File</h1>
+      <p className="text-sm text-gray-600">समस्त व्यक्तिगत फाइलें</p>
+    </div>
+  </div>
 
-        {/* Search */}
-        <div className="relative w-full md:w-auto">
-          <input
-            type="text"
-            placeholder="Qkby [kkstsa"
-            className="pl-10 kruti-input pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-64 focus:outline-none focus:border-blue-500"
+  {/* Right: Search + Add Button */}
+  <div className="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+    
+    {/* Search */}
+    <div className="relative w-full sm:w-64">
+      <input
+        type="text"
+        placeholder="Qkby [kkstsa"
+        className="pl-10 kruti-input pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:border-blue-500"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <FaSearch className="absolute left-3 top-3 text-gray-400" />
+    </div>
 
-            // className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full md:w-72 focus:outline-none focus:border-blue-500"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <FaSearch className="absolute left-3 top-3 text-gray-400" />
-        </div>
-      </div>
+    {/* Add Personal File Button */}
+    <button
+            onClick={() => navigate("/admin/add-personal-file")}
+            className="w-full sm:w-auto px-5 py-2 bg-blue-600 text-white
+                       rounded-lg hover:bg-blue-700 whitespace-nowrap"
+          >
+            Add Personal Files
+          </button>
+
+  </div>
+</div>
 
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-100">
@@ -238,7 +253,7 @@ const AllLeaveFiles = () => {
             <thead className="bg-gray-100 border-b">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">S.No</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Upload Date</th>
@@ -271,7 +286,7 @@ const AllLeaveFiles = () => {
                           <FaUser size={12} />
                         </div>
                         <span className="text-sm font-semibold text-gray-800 capitalize">
-                          {row.user?.name || "Unknown"}
+                          {row.user_name?.name || "N/A"}
                         </span>
                       </div>
                     </td>
@@ -280,14 +295,14 @@ const AllLeaveFiles = () => {
                       <div className="flex items-center gap-3">
                         {getFileIcon(row.file)}
                         <div>
-                            <p className="text-sm kruti-input font-medium text-gray-900">{row.title || "Untitled"}</p>
+                            <p className="text-sm kruti-input font-medium text-gray-900">{row?.title || "N/A"}</p>
                         </div>
                       </div>
                     </td>
                     
                     <td className="px-6 py-4">
                         <span className="px-2 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full border border-blue-100">
-                            {row.type}
+                            {row?.type || "N/A"}
                         </span>
                     </td>
                     
@@ -297,14 +312,11 @@ const AllLeaveFiles = () => {
                       <td className="px-6 py-4">
 <button
   onClick={() => {
-    setSelectedFileId(row.id);   
-    setopenSendPoup(true);
+    navigate(`permissions/${row.id}`);
   }}
-  className="inline-flex items-center gap-2 px-4 py-2 
-             bg-green-600 text-white text-sm font-medium
-             rounded-md shadow hover:bg-green-700"
+  className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
 >
-  Send
+  Permissions
 </button>
 
 </td>
@@ -313,18 +325,14 @@ const AllLeaveFiles = () => {
 
                     
                     <td className="px-6 py-4 text-right">
-                        <button 
-                            onClick={() => handleViewFile(row.id)}
-                            disabled={loadingDocId === row.id}
-                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded transition shadow-sm border 
-                                ${loadingDocId === row.id 
-                                    ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
-                                    : 'bg-white text-blue-600 hover:text-blue-800 border-blue-200 hover:bg-blue-50'
-                                }`}
-                        >
-                          {loadingDocId === row.id ? <FaSpinner className="animate-spin" /> : <FaEye />}
-                          View
-                        </button>
+                      <button
+  onClick={() => navigate(`/admin/all-personal-file/${row.id}`)}
+  className="inline-flex items-center gap-2 px-3 py-1.5 rounded transition shadow-sm border 
+             bg-white text-blue-600 hover:text-blue-800 border-blue-200 hover:bg-blue-50"
+>
+  <FaEye />
+  View
+</button>
                     </td>
                   </tr>
                 )})
@@ -333,13 +341,8 @@ const AllLeaveFiles = () => {
               )}
             </tbody>
           </table>
-        </div>
-      </div>
 
-      {/* Pagination */}
-      {filteredFiles.length > 0 && (
-        <div className="mt-4">
-            <Pagination
+           <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={setCurrentPage}
@@ -347,7 +350,20 @@ const AllLeaveFiles = () => {
               itemsPerPage={itemsPerPage}
             />
         </div>
-      )}
+      </div>
+
+      {/* Pagination */}
+      {/* {filteredFiles.length > 0 && (
+      
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalItems={filteredFiles.length}
+              itemsPerPage={itemsPerPage}
+            />
+
+      )} */}
 
       {/* --- MODAL --- */}
       {viewUrl && (
@@ -418,7 +434,7 @@ const AllLeaveFiles = () => {
   <option value="">Select Authority</option>
 
   {roleSubrole?.map((item) => {
-    const roleLabel = item.role?.label;
+    const roleLabel = item?.name;
     const subroleLabel = item.subrole?.label;
 
     return (

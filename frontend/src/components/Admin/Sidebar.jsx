@@ -21,6 +21,13 @@ import { FaClipboardUser } from "react-icons/fa6";
 const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
   const location = useLocation();
   const [isMobile, setIsMobile] = useState(false);
+
+  const isPersonalFileActive = () => {
+  return (
+    location.pathname.startsWith("/admin/all-personal-file") ||
+    location.pathname.startsWith("/admin/add-personal-file")
+  );
+};
   
   // State for Employee Dropdown
   const [isEmployeeMenuOpen, setIsEmployeeMenuOpen] = useState(false);
@@ -154,10 +161,10 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
                   to="/admin/all-personal-file"
                   onClick={handleLinkClick}
                   className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
-                    ${isActive("/all-personal-file")
-                      ? "text-blue-600 bg-blue-50"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                    }
+                   ${isPersonalFileActive()
+  ? "text-blue-600 bg-blue-50"
+  : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+}
                   `}
                 >
                   <span className="text-xs">

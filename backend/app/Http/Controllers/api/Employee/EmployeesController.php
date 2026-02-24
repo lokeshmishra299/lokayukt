@@ -5,11 +5,13 @@ namespace App\Http\Controllers\api\Employee;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\ComplainActionPersonalFile;
+use App\Models\EmployeeFilePermission;
 use Illuminate\Http\Request;
 use App\Models\EmployeeFiles;
 use App\Models\EmployeeUploadFiles;
 use App\Models\User;
 use Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
@@ -68,8 +70,9 @@ class EmployeesController extends Controller
     public function uploadFiles(Request $request)
     {
         $added_by = Auth::user()->id;
+        $parentId = Auth::user()->parent_user_id ?? null;
 
-        // Validation for multiple files
+
         $validation = Validator::make($request->all(), [
 
             // 'complain_id' => 'required|numeric',
@@ -111,6 +114,7 @@ class EmployeesController extends Controller
 
                 $compDoc = new EmployeeUploadFiles();
                 $compDoc->added_by   = $added_by;
+                 $compDoc->parent_id  = $parentId; 
                 $compDoc->type       = "Letter";
                 $compDoc->title      = $request->title;
                 $compDoc->file       = $fileName;
@@ -145,6 +149,7 @@ class EmployeesController extends Controller
         'type'   => 'required|string',
         'file'   => 'required|array',
         'file.*' => 'file|mimes:jpg,jpeg,png,pdf|max:2048',
+        'person_user_id'=>'required|numeric'
     ]);
 
     if ($validation->fails()) {
@@ -167,7 +172,8 @@ class EmployeesController extends Controller
             'title'    => $request->title,
             'file'     => $fileName,
             'permission_user_id' => $added_by,
-            'is_forward' => 0
+            'is_forward' => 0,
+            'person_user_id'=>$request->person_user_id
         ]);
 
         ComplainActionPersonalFile::create([
@@ -177,8 +183,7 @@ class EmployeesController extends Controller
             'action_date'  => now(),
             'type'         => 1,
             'status'       => 'Verified',
-            'forward_to_admin' => $added_by,  
-            'forward_by_ro_aro' => $added_by
+            'uploaded_by_admin' => $added_by
         ]);
 
         $uploadedFiles[] = $file;
@@ -190,6 +195,34 @@ class EmployeesController extends Controller
         'data'    => $uploadedFiles
     ], 201);
 }
+
+
+
+public function privateFilesPermissionById($id)
+{
+
+    $users = User::where('users.role_id', 3) 
+        ->leftJoin('employee_file_permissions as p', function($join) use ($id){
+            $join->on('users.id', '=', 'p.user_id')
+                 ->where('p.file_id', $id);
+        })
+        ->select(
+            'users.id',
+            'users.name',
+            'users.role_id',
+            DB::raw('IFNULL(p.can_view,0) as can_view'),
+            DB::raw('IFNULL(p.can_edit,0) as can_edit')
+        )
+        ->get();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'File permission list fetched successfully',
+        'data' => $users
+    ]);
+}
+
+
 
     public function getFilePreview($id)
     {
@@ -208,25 +241,73 @@ class EmployeesController extends Controller
         ]);
     }
 
-    public function personalFileList()
-    {
 
-        $user = Auth()->id();
-        // dd($user);
-        $employeFile = EmployeeUploadFiles::where('permission_user_id', $user)->get();
-        // dd($employeFile);
-        return ApiResponse::generateResponse('success', 'Employee personal file fetch successfully', $employeFile, 200);
+
+    public function giveFilePermission(Request $request)
+{
+    $request->validate([
+        'file_id' => 'required|integer|exists:employee_files,id',
+        'permissions' => 'required|array',
+        'permissions.*.user_id' => 'required|integer|exists:users,id',
+        'permissions.*.view' => 'required|boolean',
+        'permissions.*.edit' => 'required|boolean',
+    ]);
+
+    $adminId = Auth::id();
+
+    foreach($request->permissions as $perm){
+
+        EmployeeFilePermission::updateOrCreate(
+            [
+                'file_id' => $request->file_id,
+                'user_id' => $perm['user_id']
+            ],
+            [
+                'can_view' => $perm['view'],
+                'can_edit' => $perm['edit'],
+                'given_by' => $adminId
+            ]
+        );
     }
 
-   public function personalFileListById($id)
+    return response()->json([
+        'status' => true,
+        'message' => 'Permissions assigned successfully'
+    ]);
+}
+
+ public function personalFileList()
 {
     $userId = auth()->id();
-    // dd($userId);
+
+    $files = EmployeeUploadFiles::whereHas('permissions', function($q) use ($userId){
+            $q->where('user_id', $userId)
+              ->where('can_view', 1);
+        })
+        ->get();
+
+    return ApiResponse::generateResponse(
+        'success',
+        'Employee personal files fetched successfully',
+        $files,
+        200
+    );
+}
+  public function personalFileListById($id)
+{
+    $userId = auth()->id();
+
     $file = EmployeeUploadFiles::where('id', $id)
         ->where(function($q) use ($userId) {
-            $q->where('permission_user_id', $userId)
-              ->orWhere('added_by', $userId);
+            $q->where('added_by', $userId)
+              ->orWhereHas('permissions', function($p) use ($userId){
+                    $p->where('user_id', $userId)
+                      ->where('can_view', 1);
+              });
         })
+        ->with(['permissions' => function($q) use ($userId){
+            $q->where('user_id', $userId);
+        }])
         ->first();
 
     if (!$file) {
@@ -238,6 +319,22 @@ class EmployeesController extends Controller
         );
     }
 
+    // Default permissions
+    $canView = 0;
+    $canEdit = 0;
+
+    if ($file->added_by == $userId) {
+        // Admin uploader full rights
+        $canView = 1;
+        $canEdit = 1;
+    } elseif ($file->permissions->first()) {
+        $canView = $file->permissions->first()->can_view;
+        $canEdit = $file->permissions->first()->can_edit;
+    }
+
+    $file->can_view = $canView;
+    $file->can_edit = $canEdit;
+
     return ApiResponse::generateResponse(
         'success',
         'Employee personal file details fetched successfully',
@@ -245,7 +342,6 @@ class EmployeesController extends Controller
         200
     );
 }
-
 
     public function sendPersonalFile(Request $request)
     {

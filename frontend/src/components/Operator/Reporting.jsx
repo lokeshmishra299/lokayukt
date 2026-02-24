@@ -142,7 +142,7 @@ const Reporting = () => {
               <label className="block text-xs font-medium text-gray-600 mb-1">File No</label>
               <input
                 type="text"
-                placeholder="शिकायत, फ़ाइल संख्या"
+                placeholder="शिकायतें, फ़ाइल संख्या"
                 value={compFile}
                 onChange={(e) => {
                   const filtered = e.target.value.replace(/[^0-9/-]/g, "");
@@ -153,15 +153,29 @@ const Reporting = () => {
               />
             </div>
 
+
+              <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
+              <input
+                type="number"
+                placeholder="YYYY"
+                min="1990"
+                max="2099"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Complaint </label>
-              <input
-                type="text"
-                placeholder="f'kdk;r,"
-                value={corrResp}
-                onChange={(e) => setCorrResp(e.target.value)}
-                className="w-full px-3 py-1 kruti-input text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+            <input
+  type="text"
+  placeholder="शिकायतें"
+  value={corrResp}
+  onChange={(e) => setCorrResp(e.target.value)}
+  className="w-full px-3 py-1 kruti-input text-lg placeholder:text-sm placeholder:font-sans border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
             </div>
 
             <div>
@@ -173,7 +187,7 @@ const Reporting = () => {
               >
                 <option value="">All Districts</option>
                 {!loadingDistricts && districtsList?.map((d) => (
-                  <option key={d.id} value={d.district_name}>{d.district_name}</option>
+                  <option key={d.id} value={d.district_name}><span className="kruti-input">{d.district_name}</span></option>
                 ))}
               </select>
             </div>
@@ -187,7 +201,7 @@ const Reporting = () => {
               >
                 <option value="">All Departments</option>
                 {!loadingDepartments && departmentsList?.map((d) => (
-                  <option key={d.id} value={d.name}>{d.name}</option>
+                  <option key={d.id} value={d.name}><span className="kruti-input">{d.name}</span></option>
                 ))}
               </select>
             </div>
@@ -244,7 +258,7 @@ const Reporting = () => {
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white"
               />
             </div>
-
+{/* 
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
               <input
@@ -256,7 +270,7 @@ const Reporting = () => {
                 onChange={(e) => setYear(e.target.value)}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-            </div>
+            </div> */}
 
             <div>
               {/* Naya Search hamesha Page 1 se shuru hoga */}
@@ -291,8 +305,8 @@ const Reporting = () => {
                 <th className="px-6 py-3 border-b">District</th>
                 <th className="px-6 py-3 border-b">Department</th>
                 <th className="px-6 py-3 border-b">Nature</th>
-                <th className="px-6 py-3 border-b">Address1</th>
-                <th className="px-6 py-3 border-b">Address2</th>
+                <th className="px-6 py-3 border-b">Address</th>
+                {/* <th className="px-6 py-3 border-b">Address2</th> */}
               </tr>
             </thead>
 
@@ -335,11 +349,11 @@ const Reporting = () => {
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                        <span className=" text-[17px]">{item.DISTT || "N/A"}</span>
+                        <span className=" text-[17px] kruti-input">{item.DISTT || "N/A"}</span>
                       </td>
 
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                        <span className=" text-[17px]">{item.DEPTT || "N/A"}</span>
+                        <span className=" text-[17px] kruti-input">{item.DEPTT || "N/A"}</span>
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -352,9 +366,7 @@ const Reporting = () => {
                         <span className="kruti-input text-[17px]">{item.ADD1 || "N/A"}</span>
                       </td>
 
-                        <td className="px-6 py-4 font-medium text-gray-800">
-                        <span className="kruti-input text-[17px]">{item.ADD2 || "N/A"}</span>
-                      </td>
+                     
                     </tr>
                   )
                 })
