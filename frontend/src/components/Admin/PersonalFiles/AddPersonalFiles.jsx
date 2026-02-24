@@ -8,8 +8,7 @@ import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-  import { IoMdArrowBack } from "react-icons/io";
-
+import { IoMdArrowBack } from "react-icons/io";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
@@ -31,26 +30,37 @@ const uploadApi = axios.create({
 });
 
 const AddpersonalFiles = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [correspondenceType, setCorrespondenceType] = useState("Letter");
   const [title, setTitle] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  
+  // ✅ New state for selected user/authority
+  const [selectedUser, setSelectedUser] = useState("");
 
+  // All Files Type API
+  const AllFiles = async () => {
+    const res = await api.get("/admin/filetypes");
+    return res.data.data;
+  };
 
-  // All Files
-
- const AllFiles = async () => {
-  const res = await api.get("/admin/filetypes");
-  console.log("All Files", res.data.data); 
-  return res.data.data;
-};
-
-  const {data: allFilesData} = useQuery({
+  const { data: allFilesData } = useQuery({
     queryKey: ["filetypes"],
     queryFn: AllFiles
-  })
+  });
+
+  // ✅ Fetch Supervisor Roles API
+  const getRoleSubrole = async () => {
+    const res = await api.get("/admin/get-roles-supervisor");
+    return res.data.data;
+  };
+
+  const { data: roleSubrole } = useQuery({
+    queryKey: ["get-roles-supervisor"],
+    queryFn: getRoleSubrole
+  });
 
   const handleFileUpload = (e) => {
     setFieldErrors((prev) => ({ ...prev, file: undefined }));
@@ -99,9 +109,14 @@ const AddpersonalFiles = () => {
   const uploadDocument = async () => {
     setFieldErrors({});
 
-
     if (!title.trim()) {
         setFieldErrors((prev) => ({ ...prev, title: ["Title is required"] }));
+        return;
+    }
+
+    // ✅ Validate User Selection
+    if (!selectedUser) {
+        setFieldErrors((prev) => ({ ...prev, user_id: ["Please select an authority"] }));
         return;
     }
 
@@ -115,25 +130,26 @@ const AddpersonalFiles = () => {
     try {
       const formData = new FormData();
 
-uploadedFiles.forEach((fileData, index) => {
-  formData.append(`file[${index}]`, fileData.file);
-});
+      uploadedFiles.forEach((fileData, index) => {
+        formData.append(`file[${index}]`, fileData.file);
+      });
 
       formData.append("type", correspondenceType);
       formData.append("title", title);
+      formData.append("user_id", selectedUser); // ✅ Sending selected user ID
       
-    
       await uploadApi.post("/admin/upload-private-file", formData);
 
       toast.success("Uploaded Personal document successfully!");
 
-      setTimeout(()=>{
-        navigate("/admin/all-personal-file")
-      }, 2000)
+      setTimeout(() => {
+        navigate("/admin/all-personal-file");
+      }, 2000);
 
       setUploadedFiles([]);
       setTitle(""); 
       setCorrespondenceType("Letter"); 
+      setSelectedUser(""); // Reset user selection
     } catch (error) {
       const res = error.response?.data;
 
@@ -154,86 +170,108 @@ uploadedFiles.forEach((fileData, index) => {
 
   return (
     <>
-      {/* <div className="space-y-6 w-full h-screen"> */}
-      <div className="space-y-6 w-full min-h-screen pb-10">
-     <div className="flex items-start justify-between w-full gap-3">
-  <div>
-    <h1 className="text-xl font-bold text-gray-900">Add Personal Files</h1>
-    <p className="text-sm text-gray-600">
-      व्यक्तिगत फाइल जोड़ें
-    </p>
-  </div>
+      <div className="space-y-6 w-full min-h-screen pb-10 ">
+        <div className="flex items-start justify-between w-full gap-3">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Add Personal Files</h1>
+            <p className="text-sm text-gray-600">
+              व्यक्तिगत फाइल जोड़ें
+            </p>
+          </div>
 
-  <div>
-    {/* मैंने बटन में थोड़ी स्टाइलिंग भी डाल दी है ताकि अच्छा दिखे */}
-    <button
-                        onClick={() => navigate(-1)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
-                      >
-                        <IoMdArrowBack className="w-4 h-4" /> Back
-                      </button>
-  </div>
-</div>
+          <div>
+            <button
+              onClick={() => navigate(-1)}
+              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+            >
+              <IoMdArrowBack className="w-4 h-4" /> Back
+            </button>
+          </div>
+        </div>
 
         <div className="p-4 sm:p-5 bg-blue-50 border border-blue-200 rounded-xl shadow-sm">
           
-
+          {/* ✅ Form Grid updated back to 2 columns */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             
-          <div className="relative">
-  <label className="block text-sm font-medium text-gray-700 mb-1">
-    Topic <span className="text-red-500">*</span>
-  </label>
+            <div className="relative">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Topic <span className="text-red-500">*</span>
+              </label>
 
-  
- {!title && (
-  <span className="absolute left-3 top-[32px] text-gray-400 text-base pointer-events-none kruti-input">
-    fo"k; tksM+s
-  </span>
-)}
+              {!title && (
+                <span className="absolute left-3 top-[32px] text-gray-400 text-base pointer-events-none kruti-input">
+                  fo"k; tksM+s
+                </span>
+              )}
 
-  <input
-    type="text"
-    value={title}
-    onChange={(e) => {
-      setTitle(e.target.value);
-      setFieldErrors((prev) => ({ ...prev, title: undefined }));
-    }}
-    className={`border kruti-input px-3 py-2 text-base rounded-lg w-full bg-white text-gray-700
-      focus:outline-none focus:ring-2 focus:ring-blue-300
-      ${
-        fieldErrors.title ? "border-red-500" : "border-gray-300"
-      }`}
-  />
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setFieldErrors((prev) => ({ ...prev, title: undefined }));
+                }}
+                className={`border kruti-input px-3 py-2 text-base rounded-lg w-full bg-white text-gray-700
+                  focus:outline-none focus:ring-2 focus:ring-blue-300
+                  ${fieldErrors.title ? "border-red-500" : "border-gray-300"}`}
+              />
 
-  {fieldErrors.title && (
-    <p className="mt-1 text-xs text-red-600">
-      {fieldErrors.title[0]}
-    </p>
-  )}
-</div>
-
+              {fieldErrors.title && (
+                <p className="mt-1 text-xs text-red-600">
+                  {fieldErrors.title[0]}
+                </p>
+              )}
+            </div>
             
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                FIle Types  <span className="text-red-500">*</span>
+                Select Authority <span className="text-red-500">*</span>
               </label>
-           <select
-  value={correspondenceType}
-  onChange={(e) => {
-    setCorrespondenceType(e.target.value);
-    setFieldErrors((prev) => ({ ...prev, type: undefined }));
-  }}
-  className={`border  px-3 py-2 rounded-lg w-full bg-white text-gray-700
-    focus:outline-none focus:ring-2 focus:ring-blue-300
-    ${fieldErrors.type ? "border-red-500" : "border-gray-300"}`}
->
-  {/* <option value="">Select File Type</option> */}
-<option className="text-[12px]" value="">फ़ाइल प्रकार चुनें</option>
+              <select
+                value={selectedUser}
+                onChange={(e) => {
+                  setSelectedUser(e.target.value);
+                  setFieldErrors((prev) => ({ ...prev, user_id: undefined }));
+                }}
+                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700 text-sm
+                  focus:outline-none focus:ring-2 focus:ring-blue-300
+                  ${fieldErrors.user_id ? "border-red-500" : "border-gray-300"}`}
+              >
+                <option value="">Select Authority</option>
+                {roleSubrole?.map((item) => {
+                  const roleLabel = item?.name;
+                  const subroleLabel = item.subrole?.label;
+                  return (
+                    <option key={item.id} value={item.id}>
+                      {roleLabel} {subroleLabel ? ` (${subroleLabel})` : ""}
+                    </option>
+                  );
+                })}
+              </select>
 
-{/* Static option */}
-<option className="text-[12px]" value="personal_file">व्यक्तिगत</option>
-</select>
+              {fieldErrors.user_id && (
+                <p className="mt-1 text-xs text-red-600">{fieldErrors.user_id[0]}</p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                File Types <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={correspondenceType}
+                onChange={(e) => {
+                  setCorrespondenceType(e.target.value);
+                  setFieldErrors((prev) => ({ ...prev, type: undefined }));
+                }}
+                className={`border px-3 py-2 rounded-lg w-full bg-white text-gray-700
+                  focus:outline-none focus:ring-2 focus:ring-blue-300
+                  ${fieldErrors.type ? "border-red-500" : "border-gray-300"}`}
+              >
+                <option className="text-[12px]" value="">फ़ाइल प्रकार चुनें</option>
+                <option className="text-[12px]" value="personal_file">व्यक्तिगत</option>
+              </select>
 
               {fieldErrors.type && (
                 <p className="mt-1 text-xs text-red-600">{fieldErrors.type[0]}</p>
@@ -280,12 +318,9 @@ uploadedFiles.forEach((fileData, index) => {
           <div className="p-4 sm:p-5 bg-white border border-gray-200 rounded-xl shadow-sm">
             <h3 className="text-[16px] sm:text-[17px] font-semibold mb-4">
               Selected Documents ({uploadedFiles.length}) 
-              {/* <span className="text-blue-600"> {title ? `${correspondenceType}: ${title}` : correspondenceType}</span> */}
             </h3>
 
-            {/* <div className="space-y-3"> */}
             <div className="space-y-3 max-h-[350px] overflow-y-auto pr-2">
-
               {uploadedFiles.map((file) => (
                 <div
                   key={file.id}
@@ -326,7 +361,7 @@ uploadedFiles.forEach((fileData, index) => {
         </div>
       </div>
 
-      <Toaster position="top-right"  />
+      <Toaster position="top-right" />
     </>
   );
 };
