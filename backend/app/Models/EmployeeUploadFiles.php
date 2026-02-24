@@ -14,6 +14,10 @@ class EmployeeUploadFiles extends Model
         return $this->belongsTo(User::class,'added_by','id');
     }
 
+    public function userName() {
+        return $this->belongsTo(User::class,'person_user_id','id');
+    }
+
     public function permissions()
 {
     return $this->hasMany(EmployeeFilePermission::class, 'file_id');
