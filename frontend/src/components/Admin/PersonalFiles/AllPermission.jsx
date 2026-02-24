@@ -1,9 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-  import { IoMdArrowBack } from "react-icons/io";
+import { IoMdArrowBack } from "react-icons/io";
+import Pagination from "../../Pagination"; 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -17,34 +18,58 @@ const api = axios.create({
 });
 
 const AllPermission = () => {
-  // ✅ यहाँ 'Id' की जगह 'id' कर दिया है क्योंकि आपके Route में ':id' है
   const { id } = useParams(); 
   const navigate = useNavigate(); 
-
-  const currentFileId = id; 
+  const queryClient = useQueryClient();
 
   const [permissions, setPermissions] = useState({});
   const [isSaving, setIsSaving] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const getSubroleRole = async () => {
     const res = await api.get("/admin/get-roles-supervisor");
     return res.data.data; 
   };
 
-  const { data: users, isLoading, isError } = useQuery({
+  const { data: users, isLoading: usersLoading, isError: usersError } = useQuery({
     queryKey: ["roles-supervisor"], 
     queryFn: getSubroleRole
+  });
+
+  const getSavedPermissions = async () => {
+    const res = await api.get(`/admin/private-file-permission/${id}`);
+    return res.data.data; 
+  };
+
+  const { data: savedPerms, isLoading: permsLoading } = useQuery({
+    queryKey: ["private-file-permission", id], 
+    queryFn: getSavedPermissions,
+    enabled: !!id
   });
 
   useEffect(() => {
     if (users && Array.isArray(users)) {
       const initialPerms = {};
+      
       users.forEach(user => {
-        initialPerms[user.id] = { view: false, edit: false, all: false };
+        const savedUserPerm = savedPerms?.find(p => p.id === user.id);
+        
+        const hasView = savedUserPerm ? savedUserPerm.can_view === 1 : false;
+        const hasEdit = savedUserPerm ? savedUserPerm.can_edit === 1 : false;
+        const hasAll = hasView && hasEdit;
+        
+        initialPerms[user.id] = { 
+          view: hasView, 
+          edit: hasEdit, 
+          all: hasAll 
+        };
       });
+      
       setPermissions(initialPerms);
     }
-  }, [users]);
+  }, [users, savedPerms]);
 
   const handleCheckboxChange = (userId, type, checked) => {
     setPermissions(prev => {
@@ -79,29 +104,44 @@ const AllPermission = () => {
   };
 
   const handleSave = async () => {
-    const payloadPermissions = Object.entries(permissions)
-      .filter(([userId, perms]) => perms.view || perms.edit)
-      .map(([userId, perms]) => ({
-        user_id: parseInt(userId),
-        view: perms.view,
-        edit: perms.edit
-      }));
+    const hasAtLeastOneSelection = Object.values(permissions).some(
+      (perms) => perms.view || perms.edit
+    );
 
-    if (payloadPermissions.length === 0) {
-      toast.error("Please assign permissions to at least one user.");
+    if (!hasAtLeastOneSelection) {
+      toast.error("Please select at least one permission to allow.");
       return;
     }
 
+    const payloadPermissions = Object.entries(permissions).map(([userId, perms]) => ({
+      user_id: parseInt(userId),
+      view: perms.view,
+      edit: perms.edit
+    }));
+
     const payload = {
-      file_id: parseInt(id), // ✅ यहाँ भी 'id' इस्तेमाल किया है
+      file_id: parseInt(id),
       permissions: payloadPermissions
     };
 
     try {
       setIsSaving(true);
-      const response = await api.post("/admin/file/give-permission", payload);
-      console.log("Response:", response.data);
+      await api.post("/admin/file/give-permission", payload);
+      
+      await queryClient.invalidateQueries({
+        queryKey: ["private-file-permission", id],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["roles-supervisor"],
+      });
+      
       toast.success("Permissions saved successfully!");
+      
+      setTimeout(()=>{
+        navigate("/admin/all-personal-file")
+      }, 2000)
+      
     } catch (error) {
       console.error("Save error:", error);
       toast.error("Failed to save permissions.");
@@ -110,33 +150,37 @@ const AllPermission = () => {
     }
   };
 
-  if (isLoading) return <div className="p-6 text-gray-600">Loading users...</div>;
-  if (isError) return <div className="p-6 text-red-500">Error loading users data.</div>;
+  const safeUsers = users || [];
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentUsers = safeUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(safeUsers.length / itemsPerPage);
+
+  if (usersLoading || permsLoading) return <div className="p-6 text-gray-600 text-center">Loading...</div>;
+  if (usersError) return <div className="p-6 text-red-500">Error loading users data.</div>;
 
   return (
-    <div className="bg-gray-50 min-h-screen ">
+    <div className="bg-gray-50 min-h-screen w-full ">
       <Toaster position="top-right" />
       
-      <div className="max-w-6xl mx-auto ">
+      <div className="w-full">
         
-        {/* Header Section with BACK Button on Right */}
-        <div className="flex justify-between items-start ">
+        <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Give Permissions</h2>
             <p className="text-sm text-gray-500 mt-1">Assign view and edit access to users.</p>
           </div>
           <div>
             <button
-                                  onClick={() => navigate(-1)}
-                                  className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
-                                >
-                                  <IoMdArrowBack className="w-4 h-4" /> Back
-                                </button>
+              onClick={() => navigate(-1)}
+              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-1"
+            >
+              <IoMdArrowBack className="w-4 h-4" /> Back
+            </button>
           </div>
         </div>
 
-        {/* Table Section */}
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto bg-white rounded-t-xl shadow-sm border border-gray-200">
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50">
               <tr className="border-b border-gray-200">
@@ -147,7 +191,7 @@ const AllPermission = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {users?.map(user => {
+              {currentUsers.map(user => {
                 const userName = user.name || "Unknown";
                 const subroleName = user.subrole?.label || user.subrole?.name || "No subrole";
                 const initial = userName.charAt(0).toUpperCase();
@@ -196,8 +240,7 @@ const AllPermission = () => {
           </table>
         </div>
 
-        {/* Bottom Footer Section with Save & Cancel Buttons on Right */}
-        <div className="flex justify-end items-center gap-3 px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
+        <div className="flex justify-end items-center gap-3 px-6 py-4 bg-gray-50 border-x border-b border-gray-200 rounded-b-xl shadow-sm">
           <button 
             onClick={() => navigate(-1)} 
             className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
@@ -212,6 +255,18 @@ const AllPermission = () => {
             {isSaving ? 'Allowing...' : 'Allow Permissions'}
           </button>
         </div>
+
+        {safeUsers.length > 0 && (
+          <div className="mt-4 mb-8">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              totalItems={safeUsers.length}
+              itemsPerPage={itemsPerPage}
+            />
+          </div>
+        )}
 
       </div>
     </div>

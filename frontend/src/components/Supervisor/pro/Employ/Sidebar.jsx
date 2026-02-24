@@ -150,10 +150,10 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
             `}
           >
             <RiFileSearchLine />
-            {(!isCollapsed || isMobile) && "Files"}
+            {(!isCollapsed || isMobile) && "Leave Files"}
           </Link>
 
-          <Link
+          {/* <Link
             to="/employee/view-personal-files"
             onClick={handleLinkClick}
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
@@ -166,7 +166,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           >
             <TbFileSearch />
             {(!isCollapsed || isMobile) && "Personal Files"}
-          </Link>
+          </Link> */}
 
 
           <Link

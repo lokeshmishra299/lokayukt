@@ -122,27 +122,26 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
   return (
     <div className="bg-gray-50 min-h-screen ">
       {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
       
       {/* Title */}
-      <div className="w-full flex flex-col items-start justify-start text-left">
+      <div className="w-full md:w-auto flex flex-col text-left">
         <h1 className="text-xl font-bold text-gray-900">Leave Files</h1>
         <p className="text-sm text-gray-600">अवकाश फाइलें</p>
       </div>
     
       {/* Search + Button */}
-      <div className="w-full flex flex-col sm:flex-row sm:items-center gap-3">
+      <div className="w-full md:w-auto flex flex-col sm:flex-row items-center justify-end gap-3">
     
         {/* Search */}
-        <div className="relative w-full sm:w-80">
-          <FaSearch className="absolute left-3 top-2.5 text-gray-400 text-sm" />
+        <div className="relative w-full sm:w-64 md:w-80">
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
           <input
             type="text"
             placeholder="फाइल खोजे"
-            className="pl-9 py-1.5 kruti-input border border-gray-300 rounded-lg w-full
-                       text-[14px]
-                       placeholder:text-[14px] placeholder:text-gray-400
-                       focus:outline-none focus:border-blue-500"
+            className="pl-9 py-2 kruti-input border border-gray-300 rounded-lg w-full
+                       text-[14px] placeholder:text-[14px] placeholder:text-gray-400
+                       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -154,8 +153,8 @@ const totalPages = Math.ceil(filteredFiles.length / itemsPerPage);
         {/* Button */}
         <button
           onClick={() => navigate("/employee/add-files")}
-          className="w-full sm:w-auto px-5 py-2 bg-blue-600 text-white
-                     rounded-lg hover:bg-blue-700 whitespace-nowrap"
+          className="w-full sm:w-auto px-5 py-2 bg-blue-600 text-white font-medium
+                     rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
         >
           Add Leave Files
         </button>
