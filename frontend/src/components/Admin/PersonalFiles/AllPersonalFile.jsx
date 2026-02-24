@@ -286,7 +286,7 @@ const AllLeaveFiles = () => {
                           <FaUser size={12} />
                         </div>
                         <span className="text-sm font-semibold text-gray-800 capitalize">
-                          {row.user?.name || "N/A"}
+                          {row.user_name?.name || "N/A"}
                         </span>
                       </div>
                     </td>
