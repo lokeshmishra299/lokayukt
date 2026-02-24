@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IoMdArrowBack } from "react-icons/io";
-import Pagination from "../../Pagination"; // Make sure path is correct
+import Pagination from "../../Pagination";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -18,65 +18,59 @@ const api = axios.create({
 });
 
 const AllPermission = () => {
-  const { id } = useParams(); 
-  const navigate = useNavigate(); 
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [permissions, setPermissions] = useState({});
   const [isSaving, setIsSaving] = useState(false);
 
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // ✅ API 1: Get All Users with their Name and Subrole
   const getSubroleRole = async () => {
     const res = await api.get("/admin/get-roles-supervisor");
-    return res.data.data; 
+    return res.data.data;
   };
 
   const { data: users, isLoading: usersLoading, isError: usersError } = useQuery({
-    queryKey: ["roles-supervisor"], 
+    queryKey: ["roles-supervisor"],
     queryFn: getSubroleRole
   });
 
-  // ✅ API 2: Get Saved Permissions for Checkboxes (1 or 0)
   const getSavedPermissions = async () => {
     const res = await api.get(`/admin/private-file-permission/${id}`);
-    return res.data.data; // array with can_view, can_edit
+    return res.data.data;
   };
 
   const { data: savedPerms, isLoading: permsLoading } = useQuery({
-    queryKey: ["private-file-permission", id], 
+    queryKey: ["private-file-permission", id],
     queryFn: getSavedPermissions,
     enabled: !!id
   });
 
-  // ✅ Combine Both APIs: Set Checkboxes dynamically
   useEffect(() => {
     if (users && Array.isArray(users)) {
       const initialPerms = {};
-      
+
       users.forEach(user => {
-        // Find if this user has any saved permissions in the 2nd API
         const savedUserPerm = savedPerms?.find(p => p.id === user.id);
-        
-        // Agar 1 hai to true, nahi to false
+
         const hasView = savedUserPerm ? savedUserPerm.can_view === 1 : false;
         const hasEdit = savedUserPerm ? savedUserPerm.can_edit === 1 : false;
         const hasAll = hasView && hasEdit;
-        
-        initialPerms[user.id] = { 
-          view: hasView, 
-          edit: hasEdit, 
-          all: hasAll 
+
+        initialPerms[user.id] = {
+          view: hasView,
+          edit: hasEdit,
+          all: hasAll
         };
       });
-      
+
       setPermissions(initialPerms);
     }
   }, [users, savedPerms]);
 
-  // Checkbox logic
   const handleCheckboxChange = (userId, type, checked) => {
     setPermissions(prev => {
       const current = { ...prev[userId] };
@@ -109,20 +103,21 @@ const AllPermission = () => {
     });
   };
 
-  // Save Permissions
   const handleSave = async () => {
-    const payloadPermissions = Object.entries(permissions)
-      .filter(([userId, perms]) => perms.view || perms.edit)
-      .map(([userId, perms]) => ({
-        user_id: parseInt(userId),
-        view: perms.view,
-        edit: perms.edit
-      }));
+    const hasAtLeastOneSelection = Object.values(permissions).some(
+      (perms) => perms.view || perms.edit
+    );
 
-    if (payloadPermissions.length === 0) {
-      toast.error("Please assign permissions to at least one user.");
+    if (!hasAtLeastOneSelection) {
+      toast.error("Please select at least one permission to allow.");
       return;
     }
+
+    const payloadPermissions = Object.entries(permissions).map(([userId, perms]) => ({
+      user_id: parseInt(userId),
+      view: perms.view,
+      edit: perms.edit
+    }));
 
     const payload = {
       file_id: parseInt(id),
@@ -131,17 +126,29 @@ const AllPermission = () => {
 
     try {
       setIsSaving(true);
-      const response = await api.post("/admin/file/give-permission", payload);
+      await api.post("/admin/file/give-permission", payload);
+
+      await queryClient.invalidateQueries({
+        queryKey: ["private-file-permission", id],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["roles-supervisor"],
+      });
+
       toast.success("Permissions saved successfully!");
+
+      setTimeout(() => {
+        navigate("/admin/all-personal-file");
+      }, 2000);
+
     } catch (error) {
-      console.error("Save error:", error);
       toast.error("Failed to save permissions.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Pagination Logic
   const safeUsers = users || [];
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -154,11 +161,10 @@ const AllPermission = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
       <Toaster position="top-right" />
-      
+
       <div className="max-w-6xl mx-auto">
-        
-        {/* Header Section with BACK Button on Right */}
-        <div className="flex justify-between items-start mb-4 mt-4">
+
+        <div className="flex justify-between items-start mb-4 ">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Give Permissions</h2>
             <p className="text-sm text-gray-500 mt-1">Assign view and edit access to users.</p>
@@ -173,7 +179,6 @@ const AllPermission = () => {
           </div>
         </div>
 
-        {/* Table Section */}
         <div className="overflow-x-auto bg-white rounded-t-xl shadow-sm border border-gray-200">
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50">
@@ -185,7 +190,6 @@ const AllPermission = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {/* Loop through Paginated Users */}
               {currentUsers.map(user => {
                 const userName = user.name || "Unknown";
                 const subroleName = user.subrole?.label || user.subrole?.name || "No subrole";
@@ -205,24 +209,24 @@ const AllPermission = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center align-middle">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                         checked={permissions[user.id]?.view || false}
                         onChange={(e) => handleCheckboxChange(user.id, 'view', e.target.checked)}
                       />
                     </td>
                     <td className="px-6 py-4 text-center align-middle">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                         checked={permissions[user.id]?.edit || false}
                         onChange={(e) => handleCheckboxChange(user.id, 'edit', e.target.checked)}
                       />
                     </td>
                     <td className="px-6 py-4 text-center align-middle">
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                         checked={permissions[user.id]?.all || false}
                         onChange={(e) => handleCheckboxChange(user.id, 'all', e.target.checked)}
@@ -235,16 +239,15 @@ const AllPermission = () => {
           </table>
         </div>
 
-        {/* Bottom Footer Section with Save & Cancel Buttons on Right */}
         <div className="flex justify-end items-center gap-3 px-6 py-4 bg-gray-50 border-x border-b border-gray-200 rounded-b-xl shadow-sm">
-          <button 
-            onClick={() => navigate(-1)} 
+          <button
+            onClick={() => navigate(-1)}
             className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
           >
             Cancel
           </button>
-          <button 
-            onClick={handleSave} 
+          <button
+            onClick={handleSave}
             disabled={isSaving}
             className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition shadow-sm"
           >
@@ -252,7 +255,6 @@ const AllPermission = () => {
           </button>
         </div>
 
-        {/* Pagination Component */}
         {safeUsers.length > 0 && (
           <div className="mt-4 mb-8">
             <Pagination
