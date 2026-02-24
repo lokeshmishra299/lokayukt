@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { IoMdArrowBack } from "react-icons/io";
-import Pagination from "../../Pagination";
+import Pagination from "../../Pagination"; 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -18,8 +18,8 @@ const api = axios.create({
 });
 
 const AllPermission = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+  const { id } = useParams(); 
+  const navigate = useNavigate(); 
   const queryClient = useQueryClient();
 
   const [permissions, setPermissions] = useState({});
@@ -30,21 +30,21 @@ const AllPermission = () => {
 
   const getSubroleRole = async () => {
     const res = await api.get("/admin/get-roles-supervisor");
-    return res.data.data;
+    return res.data.data; 
   };
 
   const { data: users, isLoading: usersLoading, isError: usersError } = useQuery({
-    queryKey: ["roles-supervisor"],
+    queryKey: ["roles-supervisor"], 
     queryFn: getSubroleRole
   });
 
   const getSavedPermissions = async () => {
     const res = await api.get(`/admin/private-file-permission/${id}`);
-    return res.data.data;
+    return res.data.data; 
   };
 
   const { data: savedPerms, isLoading: permsLoading } = useQuery({
-    queryKey: ["private-file-permission", id],
+    queryKey: ["private-file-permission", id], 
     queryFn: getSavedPermissions,
     enabled: !!id
   });
@@ -52,21 +52,21 @@ const AllPermission = () => {
   useEffect(() => {
     if (users && Array.isArray(users)) {
       const initialPerms = {};
-
+      
       users.forEach(user => {
         const savedUserPerm = savedPerms?.find(p => p.id === user.id);
-
+        
         const hasView = savedUserPerm ? savedUserPerm.can_view === 1 : false;
         const hasEdit = savedUserPerm ? savedUserPerm.can_edit === 1 : false;
         const hasAll = hasView && hasEdit;
-
-        initialPerms[user.id] = {
-          view: hasView,
-          edit: hasEdit,
-          all: hasAll
+        
+        initialPerms[user.id] = { 
+          view: hasView, 
+          edit: hasEdit, 
+          all: hasAll 
         };
       });
-
+      
       setPermissions(initialPerms);
     }
   }, [users, savedPerms]);
@@ -127,7 +127,7 @@ const AllPermission = () => {
     try {
       setIsSaving(true);
       await api.post("/admin/file/give-permission", payload);
-
+      
       await queryClient.invalidateQueries({
         queryKey: ["private-file-permission", id],
       });
@@ -135,14 +135,15 @@ const AllPermission = () => {
       await queryClient.invalidateQueries({
         queryKey: ["roles-supervisor"],
       });
-
+      
       toast.success("Permissions saved successfully!");
-
-      setTimeout(() => {
-        navigate("/admin/all-personal-file");
-      }, 2000);
-
+      
+      setTimeout(()=>{
+        navigate("/admin/all-personal-file")
+      }, 2000)
+      
     } catch (error) {
+      console.error("Save error:", error);
       toast.error("Failed to save permissions.");
     } finally {
       setIsSaving(false);
@@ -159,12 +160,12 @@ const AllPermission = () => {
   if (usersError) return <div className="p-6 text-red-500">Error loading users data.</div>;
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen w-full ">
       <Toaster position="top-right" />
-
-      <div className="max-w-6xl mx-auto">
-
-        <div className="flex justify-between items-start mb-4 ">
+      
+      <div className="w-full">
+        
+        <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="text-xl font-bold text-gray-900">Give Permissions</h2>
             <p className="text-sm text-gray-500 mt-1">Assign view and edit access to users.</p>
@@ -209,24 +210,24 @@ const AllPermission = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-center align-middle">
-                      <input
-                        type="checkbox"
+                      <input 
+                        type="checkbox" 
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                         checked={permissions[user.id]?.view || false}
                         onChange={(e) => handleCheckboxChange(user.id, 'view', e.target.checked)}
                       />
                     </td>
                     <td className="px-6 py-4 text-center align-middle">
-                      <input
-                        type="checkbox"
+                      <input 
+                        type="checkbox" 
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                         checked={permissions[user.id]?.edit || false}
                         onChange={(e) => handleCheckboxChange(user.id, 'edit', e.target.checked)}
                       />
                     </td>
                     <td className="px-6 py-4 text-center align-middle">
-                      <input
-                        type="checkbox"
+                      <input 
+                        type="checkbox" 
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                         checked={permissions[user.id]?.all || false}
                         onChange={(e) => handleCheckboxChange(user.id, 'all', e.target.checked)}
@@ -240,14 +241,14 @@ const AllPermission = () => {
         </div>
 
         <div className="flex justify-end items-center gap-3 px-6 py-4 bg-gray-50 border-x border-b border-gray-200 rounded-b-xl shadow-sm">
-          <button
-            onClick={() => navigate(-1)}
+          <button 
+            onClick={() => navigate(-1)} 
             className="px-5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
           >
             Cancel
           </button>
-          <button
-            onClick={handleSave}
+          <button 
+            onClick={handleSave} 
             disabled={isSaving}
             className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 transition shadow-sm"
           >
