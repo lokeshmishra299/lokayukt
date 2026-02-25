@@ -880,7 +880,7 @@ function takefile(){
                   </button> */}
                   
                  
-                   {complaintData.assign_to_ro_aro ? (
+                   {complaintData.assign_to_ro ? (
                       <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
                         Assigned
                       </span>

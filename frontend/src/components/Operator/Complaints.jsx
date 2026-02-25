@@ -1897,7 +1897,7 @@ const handleMainRespondent = (id) => {
     ))}
   </select>
 </div>
-           <div>
+ <div>
   <label className="block text-gray-700 text-sm font-medium mb-2">
     विभाग का नाम: <span className="text-red-500">*</span>
   </label>
@@ -1910,9 +1910,10 @@ const handleMainRespondent = (id) => {
     value={person.departmentNature || ''}
     onChange={(e) => updatePerson(person.id, 'departmentNature', e.target.value)}
   >
-    <option value="">विभाग चुनें</option>
+    <option value="" className="font-sans text-sm">विभाग चुनें</option>
+    
     {departmentList.map((dept, i) => (
-      <option key={i} value={dept.name}>
+      <option key={i} value={dept.name} className="kruti-input text-[16px]">
         {dept.name}  {dept.name_hindi}
       </option>
     ))}

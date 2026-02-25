@@ -1008,121 +1008,95 @@ return flatList.filter(
 
             {/* Footer Buttons */}
 
-            {complaintData.assign_to_ps == UserID ||
-            complaintData.assign_to_ps == null ? (
-              <div className="border-t p-4">
-                <div className="flex flex-col sm:flex-row gap-3 justify-between">
-                  <div>
-
-                  {complaintData?.status == "Rejected" ? 
-                  <div>
-
-                  </div>
-                  :
-                       <button
-                      onClick={handlePullBack}
-                      className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
-                    >
-                      Pull Back
-                    </button>
-                  }
-                  
-
-                  
-
-                    {complaintData?.status == "Rejected" ? 
-
-                    <div>
-
-                    </div>
-                    :
-                      
-                      
-                      complaintData.assign_to_ps  ? (
-                      <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
-                        Assigned
-                      </span>
-                    ) : (
-                      <button
-                        onClick={handleAssignToSelf}
-                        className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
-                      >
-                        Take File in Hand
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="flex gap-2">
-
-
-                
-        <button
-  className={`px-4 py-2 border rounded text-sm
-    ${
-      complaintData?.status === "Rejected"
-        ? "bg-gray-400 border-gray-400 text-white cursor-not-allowed"
-        : "bg-red-600 border-red-600 text-white hover:bg-red-700"
-    }`}
-  onClick={() => {
-    if (complaintData?.status === "Rejected") return;
-    setShowModal(true);
-  }}
-  disabled={complaintData?.status === "Rejected"}
->
-  {complaintData?.status === "Rejected" ? "Rejected" : "Reject"}
-</button>
-
-           
-     
-                    {complaintData?.status === "Rejected" ? 
-                    <div>
-
-                    </div>
-                    :
-                    
-                        <button
-                      onClick={handleMarkAsReceived}
-                      disabled={returnWithRemarksMutation.isPending}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {returnWithRemarksMutation.isPending
-                        ? "Processing..."
-                        : "Return with Remarks"}
-                    </button>
-                    }
-                  
 
 
 
-                    {/* {complaintData.approved_rejected_by_ps == "1" ? ( */}
-                      {/* <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
-                        Forwarded
-                      </span> */}
-                    {/* ) : ( */}
 
-                    {complaintData?.status === "Rejected" ? 
-                    <div>
-                      
-                    </div>
-                    :
-                        <button
-                        onClick={handleforwardphysical}
-                        disabled={forwardComplaintMutation.isPending}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {forwardComplaintMutation.isPending
-                          ? "Processing..."
-                          : "Send / Mark"}
-                      </button>
-                    }
-                    
-                    {/* )} */}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div></div>
-            )}
+
+
+
+           {/* Footer Buttons */}
+{(complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null) && (
+  <div className="border-t p-4">
+    <div className="flex flex-col sm:flex-row gap-3 justify-between">
+      
+      {/* LEFT SIDE: Pull Back & Assign */}
+      <div className="flex gap-3">
+        
+        {/* Pull Back: Hide if Disposed or Rejected */}
+        {complaintData?.status !== "Final Disposal/Closed" && complaintData?.status !== "Rejected" && (
+          <button
+            onClick={handlePullBack}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+          >
+            Pull Back
+          </button>
+        )}
+
+        {/* Assign/Take File: Hide if Disposed or Rejected */}
+        {complaintData?.status !== "Final Disposal/Closed" && complaintData?.status !== "Rejected" && (
+          complaintData.assign_to_ps ? (
+            <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded text-sm cursor-not-allowed">
+              Assigned
+            </span>
+          ) : (
+            <button
+              onClick={handleAssignToSelf}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
+            >
+              Take File in Hand
+            </button>
+          )
+        )}
+      </div>
+
+      {/* RIGHT SIDE: Actions (Reject, Return, Forward) */}
+      <div className="flex gap-2">
+
+        {/* Reject: Hide if Disposed, Disable if already Rejected */}
+        {complaintData?.status !== "Final Disposal/Closed" && (
+          <button
+            className={`px-4 py-2 border rounded text-sm ${
+              complaintData?.status === "Rejected"
+                ? "bg-gray-400 border-gray-400 text-white cursor-not-allowed"
+                : "bg-red-600 border-red-600 text-white hover:bg-red-700"
+            }`}
+            onClick={() => {
+              if (complaintData?.status === "Rejected") return;
+              setShowModal(true);
+            }}
+            disabled={complaintData?.status === "Rejected"}
+          >
+            {complaintData?.status === "Rejected" ? "Rejected" : "Reject"}
+          </button>
+        )}
+
+        {/* Return with Remarks: Hide if Disposed or Rejected */}
+        {complaintData?.status !== "Final Disposal/Closed" && complaintData?.status !== "Rejected" && (
+          <button
+            onClick={handleMarkAsReceived}
+            disabled={returnWithRemarksMutation.isPending}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {returnWithRemarksMutation.isPending ? "Processing..." : "Return with Remarks"}
+          </button>
+        )}
+
+        {/* Forward (Send/Mark): Hide if Disposed or Rejected */}
+        {complaintData?.status !== "Final Disposal/Closed" && complaintData?.status !== "Rejected" && (
+          <button
+            onClick={handleforwardphysical}
+            disabled={forwardComplaintMutation.isPending}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {forwardComplaintMutation.isPending ? "Processing..." : "Send / Mark"}
+          </button>
+        )}
+
+      </div>
+    </div>
+  </div>
+)}
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-center text-gray-500">
