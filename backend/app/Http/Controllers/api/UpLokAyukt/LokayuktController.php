@@ -12,7 +12,7 @@ class LokayuktController extends Controller
    public function allComplains(){
       $userSubrole = Auth::user()->subrole->id; 
       $records = DB::table('complaints')
-            ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+            ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
             ->leftJoin('departments as dp', DB::raw("complaints.department_id"), '=', DB::raw("dp.id"))
             ->leftJoin('designations as ds', DB::raw("complaints.designation_id"), '=', DB::raw("ds.id"))
             ->leftJoin('complaintype as ct', DB::raw("complaints.complaintype_id"), '=', DB::raw("ct.id"))
@@ -40,7 +40,7 @@ class LokayuktController extends Controller
      public function viewComplaint($id)
      {
         $complainDetails = DB::table('complaints as cm')
-        ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+        ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
         ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
         ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
         ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')

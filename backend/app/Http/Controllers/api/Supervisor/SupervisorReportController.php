@@ -37,12 +37,12 @@ class SupervisorReportController extends Controller
         $roleid = request()->query('des') ?? 'all';
         $status = request()->query('status') ?? '';
        
-        $districtData = DB::table('district_master')->orderBy('district_name')->get();
+        $districtData = DB::table('district_master_new')->orderBy('district_name')->get();
                    $userSubrole = Auth::user()->subrole->name; 
          if($userSubrole){
             //             $records = DB::table('complaints')
             //     ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-            //     ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+            //     ->leftJoin('district_master_new as dd', 'complaints.district_id', '=', 'dd.district_code')
             //     ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
             //     ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
             //     ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -102,7 +102,7 @@ $records = DB::table('complaints')
         $join->on('complaints.id', '=', 'ca.complaint_id');
     })
     ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-    ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+    ->leftJoin('district_master_new as dd', 'complaints.district_id', '=', 'dd.district_code')
     ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
     ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
     ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -247,7 +247,7 @@ $records = DB::table('complaints')
     //     SELECT MAX(ca2.id)
     //     FROM complaint_actions as ca2
     //     WHERE ca2.complaint_id = ca1.complaint_id
-    // )) as `ca` on `complaints`.`id` = `ca`.`complaint_id` left join `complaints_details` as `cd` on `complaints`.`id` = `cd`.`complain_id` left join `district_master` as `dd` on `complaints`.`district_id` = `dd`.`district_code` left join `departments` as `dp` on `cd`.`department_id` = `dp`.`id` left join `designations` as `ds` on `cd`.`designation_id` = `ds`.`id` left join `complaintype` as `ct` on `cd`.`complaintype_id` = `ct`.`id` left join `subjects` as `sub` on `cd`.`subject_id` = `sub`.`id` where `ca`.`type` = 2 and `ca`.`status` IN ('Investigation Report','Forwarded') and `ca`.`forward_to_cio_io` = 228 or `ca`.`forward_by_cio_io` = 228 group by `complaints`.`id`, `complaints`.`name`, `dd`.`district_name`, `complaints`.`complain_no`, `complaints`.`created_at`, `complaints`.`status`, `dd`.`district_code`, `ds`.`name`, `forward_by_ds_js`, `forward_by_sec`, `forward_to_sec`, `forward_by_cio_io`, `forward_to_cio_io`;
+    // )) as `ca` on `complaints`.`id` = `ca`.`complaint_id` left join `complaints_details` as `cd` on `complaints`.`id` = `cd`.`complain_id` left join `district_master_new` as `dd` on `complaints`.`district_id` = `dd`.`district_code` left join `departments` as `dp` on `cd`.`department_id` = `dp`.`id` left join `designations` as `ds` on `cd`.`designation_id` = `ds`.`id` left join `complaintype` as `ct` on `cd`.`complaintype_id` = `ct`.`id` left join `subjects` as `sub` on `cd`.`subject_id` = `sub`.`id` where `ca`.`type` = 2 and `ca`.`status` IN ('Investigation Report','Forwarded') and `ca`.`forward_to_cio_io` = 228 or `ca`.`forward_by_cio_io` = 228 group by `complaints`.`id`, `complaints`.`name`, `dd`.`district_name`, `complaints`.`complain_no`, `complaints`.`created_at`, `complaints`.`status`, `dd`.`district_code`, `ds`.`name`, `forward_by_ds_js`, `forward_by_sec`, `forward_to_sec`, `forward_by_cio_io`, `forward_to_cio_io`;
         if(!$records->isEmpty()){
             
             return response()->json([
@@ -270,7 +270,7 @@ $records = DB::table('complaints')
   {
     //    $complainDetails = DB::table('complaints as cm')
     //    ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-    // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+    // ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
     // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
     // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
     // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -288,7 +288,7 @@ $records = DB::table('complaints')
     // ->first();
 
     $complainDetails = DB::table('complaints as cm')
-    ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+    ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
     ->select(
         'cm.*',
         'dd.district_name'
@@ -696,7 +696,7 @@ if ($userSubrole) {
     //     // $userSubroleRole = Auth::user()->subrole->name;
         
     //      $records = DB::table('complaints')
-    //         // ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+    //         // ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
     //         // ->leftJoin('departments as dp', DB::raw("complaints.department_id"), '=', DB::raw("dp.id"))
     //         // ->leftJoin('designations as ds', DB::raw("complaints.designation_id"), '=', DB::raw("ds.id"))
     //         // ->leftJoin('complaintype as ct', DB::raw("complaints.complaintype_id"), '=', DB::raw("ct.id"))
@@ -1280,9 +1280,9 @@ if ($userSubrole) {
         public function complainDistrictWise()
     {
        
-        $complainCounts = Complaint::select('district_master.district_name', DB::raw('count(*) as complain_count'))
-            ->join('district_master', 'complaints.district_id', '=', 'district_master.district_code')
-            ->groupBy('district_master.district_code', 'district_master.district_name')
+        $complainCounts = Complaint::select('district_master_new.district_name', DB::raw('count(*) as complain_count'))
+            ->join('district_master_new', 'complaints.district_id', '=', 'district_master_new.district_code')
+            ->groupBy('district_master_new.district_code', 'district_master_new.district_name')
              ->where('approved_rejected_by_ro', '1')
                 ->where('approved_rejected_by_ds_js', '0')
             // ->where('approved_rejected_by_ds_js', '0')
@@ -1290,7 +1290,7 @@ if ($userSubrole) {
             ->where('in_draft','0')
             ->limit(5)
             //  ->having('complain_count', '>', 0)
-            ->pluck('complain_count', 'district_master.district_name');
+            ->pluck('complain_count', 'district_master_new.district_name');
        return response()->json([
                'status' => true,
                'message' => 'Records Fetch successfully',

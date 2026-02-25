@@ -792,7 +792,7 @@ class OperatorComplaintsController extends Controller
     //         'name' => 'required|string|max:255',
     //         'mobile' => 'required|digits_between:10,15',
     //         'address' => 'required|string|max:255',
-    //         'district_id' => 'required|exists:district_master,district_code',
+    //         'district_id' => 'required|exists:district_master_new,district_code',
     //         'email' => 'required|email',
     //         // 'email' => 'required|email|unique:complaints,email',
     //         'dob' => 'nullable|date',
@@ -1165,7 +1165,7 @@ class OperatorComplaintsController extends Controller
         // $cmpedit = Complaint::findOrFail($id);
 
           $cmpedit = DB::table('complaints as cm')
-            ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+            ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
             ->select(
                 'cm.*',
                 'dd.district_name'
@@ -1199,7 +1199,7 @@ class OperatorComplaintsController extends Controller
         // $cmpedit = Complaint::findOrFail($id);
 
           $cmpedit = DB::table('complaints as cm')
-            ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+            ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
             ->select(
                 'cm.*',
                 'dd.district_name'
@@ -1238,7 +1238,7 @@ class OperatorComplaintsController extends Controller
     //             'name' => 'required|string|max:255',
     //             'mobile' => 'required|digits_between:10,15',
     //             'address' => 'required|string|max:255',
-    //             'district_id' => 'required|exists:district_master,district_code',
+    //             'district_id' => 'required|exists:district_master_new,district_code',
     //             'email' => 'required',
     //             'dob' => 'nullable|date',
     //             // 'fee_exempted' => 'required|boolean',
@@ -1340,7 +1340,7 @@ class OperatorComplaintsController extends Controller
                 'name' => 'required|string|max:255',
                 'mobile' => 'required|digits_between:10,15',
                 'address' => 'required|string|max:255',
-                'district_id' => 'required|exists:district_master,district_code',
+                'district_id' => 'required|exists:district_master_new,district_code',
                 'email' => 'required',
                 'dob' => 'nullable|date',
                 // 'fee_exempted' => 'required|boolean',
@@ -1517,7 +1517,7 @@ class OperatorComplaintsController extends Controller
                 'name' => 'required|string|max:255',
                 'mobile' => 'required|digits_between:10,15',
                 'address' => 'required|string|max:255',
-                'district_id' => 'required|exists:district_master,district_code',
+                'district_id' => 'required|exists:district_master_new,district_code',
                 'email' => 'required',
                 'dob' => 'nullable|date',
                 // 'fee_exempted' => 'required|boolean',
@@ -1694,7 +1694,7 @@ class OperatorComplaintsController extends Controller
             'name' => 'required|string|max:255',
             'title' => 'required|string',
             // 'mobile' => 'required|digits_between:10,15',
-            // 'district_id' => 'required|exists:district_master,district_code',
+            // 'district_id' => 'required|exists:district_master_new,district_code',
             // 'email' => 'required',
         ], [
             'name.required' => 'Name is required.',
@@ -1860,8 +1860,8 @@ class OperatorComplaintsController extends Controller
                     $join->on('cm.id', '=', 'resp.complaint_id')
                         ->where('resp.is_main', 1);
                 })
-                ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
-                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
+                ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master_new as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -1935,7 +1935,7 @@ class OperatorComplaintsController extends Controller
        
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-                ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -1975,7 +1975,7 @@ class OperatorComplaintsController extends Controller
        
            $complainDetails = DB::table('complaints as cm')
             // ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-                ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -2006,7 +2006,7 @@ class OperatorComplaintsController extends Controller
        
            $complainDetails = DB::table('complaints as cm')
             ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-                ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
                     ->leftJoin('complainants as cmlan', function ($join) {
                     $join->on('cm.id', '=', 'cmlan.complaint_id')
                         ->where('cmlan.is_main', 1);
@@ -2015,7 +2015,7 @@ class OperatorComplaintsController extends Controller
                     $join->on('cm.id', '=', 'resp.complaint_id')
                         ->where('resp.is_main', 1);
                 })
-                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
+                ->leftJoin('district_master_new as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')

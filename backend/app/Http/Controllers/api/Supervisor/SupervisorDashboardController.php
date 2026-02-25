@@ -745,7 +745,7 @@ class SupervisorDashboardController extends Controller
     //     //  dd($user_district_code,$user_tehsil_code,$user_block_code);
             // $blockdata = DB::table('block_master as bm')
     // ->leftJoin('complaints as hd', 'hd.block_id', '=', 'bm.block_code')
-    // // ->leftJoin('district_master as dm', 'hd.district_id', '=', 'dm.dist_code')
+    // // ->leftJoin('district_master_new as dm', 'hd.district_id', '=', 'dm.dist_code')
     // // ->leftJoin('tehsil_master as tm', 'hd.tahsil_id', '=', 'dm.tehsil_code')
     // ->select(
     //     'bm.block_code as block_id',
@@ -759,7 +759,7 @@ class SupervisorDashboardController extends Controller
     // // ->orderBy('bm.block_name')
     // // ->limit(10)
     // ->get();
-$blockdata = DB::table('district_master as dm')
+$blockdata = DB::table('district_master_new as dm')
     ->leftJoin('complaints as hd', 'hd.district_id', '=', 'dm.district_code') // use inner join to exclude empty blocks
      ->leftJoin('complaints_details as cd', 'hd.id', '=', 'cd.complain_id')
     ->select(

@@ -35,7 +35,7 @@ class OperatorReportController extends Controller
         $roleid = request()->query('des') ?? 'all';
         $status = request()->query('status') ?? '';
        
-        $districtData = DB::table('district_master')->orderBy('district_name')->get();
+        $districtData = DB::table('district_master_new')->orderBy('district_name')->get();
         // $departments = DB::table('departments')
         //     ->select('name', 'name_hi')
         //     ->orderBy('name')
@@ -54,7 +54,7 @@ class OperatorReportController extends Controller
         //     ->get();
         // $records = DB::table('complaints')
         // ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-        //     ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+        //     ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
         //     ->leftJoin('departments as dp', DB::raw("cd.department_id"), '=', DB::raw("dp.id"))
         //     ->leftJoin('designations as ds', DB::raw("cd.designation_id"), '=', DB::raw("ds.id"))
         //     ->leftJoin('complaintype as ct', DB::raw("cd.complaintype_id"), '=', DB::raw("ct.id"))
@@ -71,7 +71,7 @@ class OperatorReportController extends Controller
         //     );
         $records = DB::table('complaints')
     ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-    ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
+    ->leftJoin('district_master_new as dd', 'complaints.district_id', '=', 'dd.district_code')
     ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
     ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
     ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -221,7 +221,7 @@ class OperatorReportController extends Controller
   {
     //    $complainDetails = DB::table('complaints as cm')
     //    ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-    // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+    // ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
     // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
     // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
     // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -239,8 +239,8 @@ class OperatorReportController extends Controller
     // ->first();
 
     // $complainDetails = DB::table('complaints as cm')
-    // // ->leftJoin('district_master as dd', 'cm.permanent_district', '=', 'dd.district_code')
-    // ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
+    // // ->leftJoin('district_master_new as dd', 'cm.permanent_district', '=', 'dd.district_code')
+    // ->leftJoin('district_master_new as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
     // ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
     // ->leftJoin('complainants as cpt', DB::raw("cm.id"), '=', DB::raw("cpt.complaint_id "))
     // ->leftJoin('respondents as r', DB::raw("cm.id"), '=', DB::raw("r.complaint_id"))
@@ -263,12 +263,12 @@ class OperatorReportController extends Controller
     // ->where('cm.id', $id)
     // ->first();
     // $complainDetails->complainants =  DB::table('complainants')
-    //  ->leftJoin('district_master as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
+    //  ->leftJoin('district_master_new as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
     // ->select('complainants.*','ddn.district_name')
     //  ->where('complaint_id', $id)
     // ->get();
     //  $complainDetails->respondant =  DB::table('respondents')
-    //   ->leftJoin('district_master as r', 'respondents.respondent_district', '=', 'r.district_code')
+    //   ->leftJoin('district_master_new as r', 'respondents.respondent_district', '=', 'r.district_code')
     // ->select('respondents.*','r.district_name')
     // ->where('complaint_id', $id)
     // ->get();
@@ -290,7 +290,7 @@ class OperatorReportController extends Controller
 | MAIN COMPLAINT + MAIN COMPLAINANT + MAIN RESPONDENT
 |--------------------------------------------------*/
 // $complainDetails = DB::table('complaints as cm')
-//     ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
+//     ->leftJoin('district_master_new as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
 //     // MAIN COMPLAINANT (is_main = 1)
 //     ->leftJoin('complainants as cpt', function ($join) {
 //         $join->on('cm.id', '=', 'cpt.complaint_id')
@@ -330,7 +330,7 @@ class OperatorReportController extends Controller
 
 $complainDetails = DB::table('complaints as cm')
 
-    ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
+    ->leftJoin('district_master_new as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
   
     // MAIN COMPLAINANT ONLY
     ->join('complainants as cpt', function ($join) {
@@ -343,8 +343,8 @@ $complainDetails = DB::table('complaints as cm')
         $join->on('cm.id', '=', 'r.complaint_id')
              ->where('r.is_main', 1);
     })
-  ->leftJoin('district_master as dmc', 'cpt.permanent_district', '=', 'dmc.district_code')
-    ->leftJoin('district_master as rmc', 'r.respondent_district', '=', 'rmc.district_code')
+  ->leftJoin('district_master_new as dmc', 'cpt.permanent_district', '=', 'dmc.district_code')
+    ->leftJoin('district_master_new as rmc', 'r.respondent_district', '=', 'rmc.district_code')
 
     ->leftJoin('complaint_actions as ca', 'cm.id', '=', 'ca.complaint_id')
 
@@ -375,7 +375,7 @@ $complainDetails = DB::table('complaints as cm')
 | ALL Complainant
 |--------------------------------------------------*/
     $complainDetails->complainants =  DB::table('complainants')
-     ->leftJoin('district_master as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
+     ->leftJoin('district_master_new as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
     ->select('complainants.*','ddn.district_name')
      ->where('complaint_id', $id)
     ->get();
@@ -383,7 +383,7 @@ $complainDetails = DB::table('complaints as cm')
 | ALL RESPONDENTS
 |--------------------------------------------------*/
 $complainDetails->respondant = DB::table('respondents')
-    ->leftJoin('district_master as r', 'respondents.respondent_district', '=', 'r.district_code')
+    ->leftJoin('district_master_new as r', 'respondents.respondent_district', '=', 'r.district_code')
     ->select('respondents.*', 'r.district_name')
     ->where('complaint_id', $id)
     ->get();
@@ -489,7 +489,7 @@ $complainDetails->witness = DB::table('complaint_witness')
   {
     //    $complainDetails = DB::table('complaints as cm')
     //    ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-    // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+    // ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
     // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
     // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
     // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -507,7 +507,7 @@ $complainDetails->witness = DB::table('complaint_witness')
     // ->first();
 
     $complainDetails = DB::table('complaints as cm')
-    ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
+    ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
     ->select(
         'cm.*',
         'dd.district_name'
@@ -635,13 +635,13 @@ $complainDetails->details = DB::table('complaints_details as cd')
     public function complainDistrictWise()
     {
        
-        $complainCounts = Complaint::select('district_master.district_name', DB::raw('count(*) as complain_count'))
-            ->join('district_master', 'complaints.district_id', '=', 'district_master.district_code')
-            ->groupBy('district_master.district_code', 'district_master.district_name')
+        $complainCounts = Complaint::select('district_master_new.district_name', DB::raw('count(*) as complain_count'))
+            ->join('district_master_new', 'complaints.district_id', '=', 'district_master_new.district_code')
+            ->groupBy('district_master_new.district_code', 'district_master_new.district_name')
             ->where('in_draft','0')
             ->limit(5)
             //  ->having('complain_count', '>', 0)
-            ->pluck('complain_count', 'district_master.district_name');
+            ->pluck('complain_count', 'district_master_new.district_name');
        return response()->json([
                'status' => true,
                'message' => 'Records Fetch successfully',
@@ -835,7 +835,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
         
     //      $records = DB::table('complaints')
     //     //   ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-    //         // ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+    //         // ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
     //         // ->leftJoin('departments as dp', DB::raw("complaints.department_id"), '=', DB::raw("dp.id"))
     //         // ->leftJoin('designations as ds', DB::raw("complaints.designation_id"), '=', DB::raw("ds.id"))
     //         // ->leftJoin('complaintype as ct', DB::raw("complaints.complaintype_id"), '=', DB::raw("ct.id"))
@@ -871,7 +871,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
         
          $records = DB::table('complaints')
         //   ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-            // ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+            // ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
             // ->leftJoin('departments as dp', DB::raw("complaints.department_id"), '=', DB::raw("dp.id"))
             // ->leftJoin('designations as ds', DB::raw("complaints.designation_id"), '=', DB::raw("ds.id"))
             // ->leftJoin('complaintype as ct', DB::raw("complaints.complaintype_id"), '=', DB::raw("ct.id"))
@@ -920,7 +920,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
         
         //  $records = DB::table('complaints')
         // //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-        //     // ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+        //     // ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
         //     // ->leftJoin('departments as dp', DB::raw("complaints.department_id"), '=', DB::raw("dp.id"))
         //     // ->leftJoin('designations as ds', DB::raw("complaints.designation_id"), '=', DB::raw("ds.id"))
         //     // ->leftJoin('complaintype as ct', DB::raw("complaints.complaintype_id"), '=', DB::raw("ct.id"))
@@ -1111,7 +1111,7 @@ $records = DB::table('complaints')
 public function search(Request $request)
 {
     $query = DB::table('old_complaints_data')
-     ->leftJoin('district_master_new as dd', DB::raw("old_complaints_data.DISTT"), '=', DB::raw("dd.district_code"))
+     ->leftJoin('district_master_new_new as dd', DB::raw("old_complaints_data.DISTT"), '=', DB::raw("dd.district_code"))
      ->leftJoin('master_department as md', DB::raw("old_complaints_data.DEPTT"), '=', DB::raw("md.dept_code"))
      ->select('old_complaints_data.*','dd.district_name as DISTT','md.name as DEPTT');
     if ($request->comp_file) {
