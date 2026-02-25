@@ -267,7 +267,7 @@ function takefile(){
   // --- PULL BACK API (Supervisor) ---
   const pullBackMutation = useMutation({
     mutationFn: async ({ complaintId }) => {
-      return api.post(`/supervisor/pull-back-by-ro/${complaintId}`);
+      return api.post(`/supervisor/pull-back-by-so/${complaintId}`);
     },
     onSuccess: (res) => {
       toast.success("Complaint pulled back successfully");
@@ -281,7 +281,7 @@ function takefile(){
 
     const assignToSelfMutation = useMutation({
       mutationFn: async ({ complaintId }) => {
-        const res = await api.post(`/supervisor/assign-by-ro/${complaintId}`);
+        const res = await api.post(`/supervisor/assign-by-so/${complaintId}`);
         return res.data;
       },
       onSuccess: (data) => {
@@ -392,7 +392,7 @@ function takefile(){
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-ro/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-so/${complaintId}`, {
           forward_to: forwardTo,
           // remark: remarkData,
           target_date: targetDate,
