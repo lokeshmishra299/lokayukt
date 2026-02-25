@@ -327,7 +327,9 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::post('/upload-document',[SupervisorComplaintsController::class,'uploadDocument']);
         Route::post('/upload-draft-letter',[SupervisorComplaintsController::class,'uploadDraftLetter']);
         Route::post('/forward-by-so/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbySO']);
-        Route::post('/forward-by-ds-js/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyds']);
+        Route::post('/forward-by-ds/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyds']);
+        Route::post('/forward-by-js/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyjs']); 
+        Route::post('/forward-by-us/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyus']);
         Route::post('/forward-by-da/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyda']);
         Route::post('/forward-by-ro-aro/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyRoAro']);
         Route::post('/forward-by-ro/{complainId}',[SupervisorComplaintsController::class,'forwardComplaintbyRo']);
