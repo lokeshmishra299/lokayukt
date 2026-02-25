@@ -1529,7 +1529,7 @@ const handleMainRespondent = (id) => {
                 (ग) डाकघर या पुलिस थाना <span className="text-red-500">*</span>
               </label>
               <input
-                type="text" placeholder='संबंधित डाकघर / पुलिस थाना का नाम'
+                type="text" placeholder='संबंधित डाकघर  पुलिस थाना का नाम'
                   style={{ height: "48px" }} 
 
                 className={`kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
@@ -1541,7 +1541,7 @@ const handleMainRespondent = (id) => {
                 onChange={(e) => updateComplainant(complainant.id, 'postOffice', e.target.value)}
               />
             </div>
-           <div>
+<div>
   <label className="block text-gray-700 text-sm font-medium mb-2">
     (घ) जिला <span className="text-red-500">*</span>
   </label>
@@ -1558,10 +1558,11 @@ const handleMainRespondent = (id) => {
       updateComplainant(complainant.id, 'district', e.target.value)
     }
   >
-    <option value="">ज़िला चुनें</option>
+    {/* डिफ़ॉल्ट ऑप्शन को नॉर्मल फ़ॉन्ट में रखा है ताकि "ज़िला चुनें" सही दिखे */}
+    <option value="" className="font-sans text-sm">ज़िला चुनें</option>
 
     {districtList.map((dist, i) => (
-      <option key={i} value={dist.district_code}>
+      <option key={i} value={dist.district_code} className="kruti-input text-[16px]">
         {dist.district_name} {dist.dist_name_hi}
       </option>
     ))}
@@ -1771,7 +1772,7 @@ const handleMainRespondent = (id) => {
                   (ग) डाकघर या पुलिस थाना <span className="text-red-500">*</span>
                 </label>
                 <input
-                  type="text" placeholder='संबंधित डाकघर / पुलिस थाना का नाम'
+                  type="text" placeholder='संबंधित डाकघर पुलिस थाना का नाम'
                                     style={{ height: "48px" }} 
 
                   className={  `kruti-input w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 placeholder:text-xs ${
@@ -1787,7 +1788,7 @@ const handleMainRespondent = (id) => {
                 />
               </div>
               {/* UPDATED: District as Dropdown */}
-            <div>
+   <div>
   <label className="block text-gray-700 text-sm font-medium mb-2">
     (घ) जिला <span className="text-red-500">*</span>
   </label>
@@ -1810,9 +1811,10 @@ const handleMainRespondent = (id) => {
       })
     }
   >
-    <option value="">ज़िला चुनें</option>
+    <option value="" className="font-sans text-sm">ज़िला चुनें</option>
+    
     {districtList.map((dist, i) => (
-      <option key={i} value={dist.district_code}>
+      <option key={i} value={dist.district_code} className="kruti-input text-[16px]">
         {dist.district_name}  {dist.dist_name_hi}
       </option>
     ))}
@@ -1872,7 +1874,7 @@ const handleMainRespondent = (id) => {
         <div className="p-5 animate-slideDown">
    
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-           <div>
+ <div>
   <label className="block text-gray-700 text-sm font-medium mb-2">
     ज़िला: <span className="text-red-500">*</span>
   </label>
@@ -1886,9 +1888,10 @@ const handleMainRespondent = (id) => {
     value={person.district || ''} 
     onChange={(e) => updatePerson(person.id, 'district', e.target.value)}
   >
-    <option value="">ज़िला चुनें</option>
+    <option value="" className="font-sans text-sm">ज़िला चुनें</option>
+    
     {districtList.map((dist, i) => (
-      <option key={i} value={dist.district_code}>
+      <option key={i} value={dist.district_code} className="kruti-input text-[16px]">
         {dist.district_name}  {dist.dist_name_hi}
       </option>
     ))}
