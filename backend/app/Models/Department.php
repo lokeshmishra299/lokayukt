@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
 {
-    protected $table="departments";
+    protected $table="master_department";
 
-    protected $fillable=[
+    // protected $fillable=[
 
-        'name',
-        'name_hindi',
-        'status'
-    ];
+    //     'name',
+    //     'name_hindi',
+    //     'status'
+    // ];
 }

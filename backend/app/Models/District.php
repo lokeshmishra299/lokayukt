@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class District extends Model
 {
-    protected $table = 'district_master_new';
+ protected $table = 'district_master_new';
 
     // protected $primaryKey = 'district_code'; 
 
     public $timestamps = false; 
 
-    protected $fillable = [
-        'district_code',
-        'district_name',
-        'dist_name_hi'
+    // protected $fillable = [
+    //     'district_code',
+    //     'district_name',
+    //     'dist_name_hi'
        
-    ];
+    // ];
 }

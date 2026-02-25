@@ -93,19 +93,29 @@ class SupervisorComplaintsController extends Controller
 
     switch ($userSubrole) {
          case "ro":
-              $query->where(function ($q) use ($user) {
-                    $q->where('form_status', 1)
-                    ->where('approved_rejected_by_rk', 1)
-                    ->where('approved_rejected_by_ro', 0)
-                    ->where('rep.forward_to_ro_aro', $user)
-                    ->where('rep.forward_to_uplokayukt', '<>', 0);
-                })
-                ->orWhere(function ($q) use ($parentId) {
-                    $q->where('approved_rejected_by_rk', 1)
-                     ->where('approved_rejected_by_ro_aro', 0)
-                    ->where('complaints.approved_rejected_by_lokayukt', 1)
-                    ->where('rep.forward_to_uplokayukt', $parentId);
-                });
+            if($roleParent == "lok-ayukt"){
+                   $query->where(function ($q) use ($user) {
+                      $q->where('form_status', 1)
+                      ->where('approved_rejected_by_rk', 1)
+                      ->where('approved_rejected_by_ro', 0)
+                      ->where('rep.forward_to_ro', $user);
+                  });
+            }else{
+                
+                $query->where(function ($q) use ($user) {
+                      $q->where('form_status', 1)
+                      ->where('approved_rejected_by_rk', 1)
+                      ->where('approved_rejected_by_ro', 0)
+                      ->where('rep.forward_to_ro', $user)
+                      ->where('rep.forward_to_uplokayukt', '<>', 0);
+                  })
+                  ->orWhere(function ($q) use ($parentId) {
+                      $q->where('approved_rejected_by_rk', 1)
+                       ->where('approved_rejected_by_ro', 0)
+                      ->where('complaints.approved_rejected_by_lokayukt', 1)
+                      ->where('rep.forward_to_uplokayukt', $parentId);
+                  });
+            }
         //   $query->where('form_status', 1)
         //           ->where('approved_rejected_by_rk', 1)
         //           ->where('approved_rejected_by_ro', 0)
@@ -2133,6 +2143,8 @@ $complainDetails->actions = $actions;
                                 $apcAction->forward_to_uplokayukt = $request->forward_to;
                             }else{
                                  $apcAction->forward_to_ps = $request->forward_to;
+                                 $cmp->approved_rejected_by_ps = NULL;
+                                 $cmp->save();
                             }
 
                         } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
@@ -3268,6 +3280,34 @@ $complainDetails->actions = $actions;
              
             if($cmp){
                 $cmp->assign_to_ro_aro = $user; 
+                $cmp->save(); 
+            }
+          
+             return response()->json([
+                    'status' => true,
+                    'message' => "Assign".' '.$userName.' '."successfully",
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+    public function assignToRo(Request $request,$complainId){
+        //    dd($request->all());
+        $user = Auth::user()->id;
+        $userName = Auth::user()->name;
+       
+        if(isset($complainId) && $request->isMethod('post')){
+
+             $cmp =  Complaint::findOrFail($complainId);
+             
+            if($cmp){
+                $cmp->assign_to_ro = $user; 
                 $cmp->save(); 
             }
           
