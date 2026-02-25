@@ -126,18 +126,25 @@ $query->where(function ($q) use ($psId) {
     });
 
 })
-
+//update this code
 ->whereNotExists(function ($sub) use ($psId) {
     $sub->select(DB::raw(1))
         ->from('complaint_actions as rep')
         ->whereColumn('rep.complaint_id', 'complaints.id')
+        ->where('rep.id', function ($q) {
+            $q->select(DB::raw('MAX(id)'))
+              ->from('complaint_actions')
+              ->whereColumn('complaint_id', 'complaints.id');
+        })
         ->where('rep.forward_by_ps', $psId);
-})    // $query->where('complaints.approved_rejected_by_rk', 1)
-    //       ->where('complaints.approved_rejected_by_lokayukt', 0);
-    // //       ->orWhere(function ($q) {
-    //       $q->whereNotNull('rep.forward_by_ps')
-    //         ->orWhere('rep.forward_by_lokayukt','<>',0);
-    //   });
+})
+
+// ->whereNotExists(function ($sub) use ($psId) {
+//     $sub->select(DB::raw(1))
+//         ->from('complaint_actions as rep')
+//         ->whereColumn('rep.complaint_id', 'complaints.id')
+//         ->where('rep.forward_by_ps', $psId);
+// })   
     ->where('complaints.approved_rejected_by_lokayukt', '<>', 1);
 
 }elseif($roleParent === 'up-lok-ayukt'){
@@ -154,7 +161,7 @@ $query->where(function ($q) use ($psId) {
           ->whereNotNull('rep.forward_to_sec')
           ->where('rep.forward_to_sec', $parentId);
 }
-$records = $query->orderBy('complaints.updated_at')->get();
+$records = $query->orderBy('complaints.updated_at','DESC')->get();
 
 
      if ($roleParent === 'lok-ayukt') {
@@ -516,7 +523,7 @@ $complainDetails->actions = $actions;
         //   return response()->json($userParent);
         $users = User::with('subrole')
          ->whereNotNull('sub_role_id')
-        //  ->where('parent_user_id',$userParent)
+         ->where('parent_user_id',$userParent)
         ->get();
         $users = $users->map(function ($item) {
         if($item->subrole){
@@ -708,7 +715,7 @@ $complainDetails->actions = $actions;
         $validation = Validator::make($request->all(), [
             // 'forward_by_ds_js' => 'required|exists:users,id',
             'forward_to' => 'required|exists:users,id',
-            'target_date' => 'required',
+            // 'target_date' => 'required',
          
           
         ], [
@@ -716,7 +723,7 @@ $complainDetails->actions = $actions;
             // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
             'forward_to.required' => 'Forward to user is required.',
             'forward_to.exists' => 'Forward to user does not exist.',
-            'target_date.required' => 'Target Date is required.',
+            // 'target_date.required' => 'Target Date is required.',
            
         ]);
 
@@ -802,6 +809,13 @@ $complainDetails->actions = $actions;
                                             $apcAction->forward_to_ro_aro = $request->forward_to;
                                             if($cmp->approved_rejected_by_ro_aro == 1){
                                                 $cmp->approved_rejected_by_ro_aro = 0;
+                                                $cmp->save();
+                                            }
+                                    }elseif($subroleFwd === "ro"){
+
+                                            $apcAction->forward_to_ro = $request->forward_to;
+                                            if($cmp->approved_rejected_by_ro == 1){
+                                                $cmp->approved_rejected_by_ro = 0;
                                                 $cmp->save();
                                             }
                                     }

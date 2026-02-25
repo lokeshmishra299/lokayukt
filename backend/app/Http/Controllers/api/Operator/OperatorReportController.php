@@ -1110,14 +1110,16 @@ $records = DB::table('complaints')
 
 public function search(Request $request)
 {
-    $query = DB::table('old_complaints_data');
-
+    $query = DB::table('old_complaints_data')
+     ->leftJoin('district_master_new as dd', DB::raw("old_complaints_data.DISTT"), '=', DB::raw("dd.district_code"))
+     ->leftJoin('master_department as md', DB::raw("old_complaints_data.DEPTT"), '=', DB::raw("md.dept_code"))
+     ->select('old_complaints_data.*','dd.district_name as DISTT','md.name as DEPTT');
     if ($request->comp_file) {
         $query->where('COMP_NO', $request->comp_file);
     }
 
     if ($request->comp_resp) {
-        $query->where('COMP_NM', 'like', '%'.$request->comp_resp.'%');
+        $query->where('COMP_NM', 'Like', '%'.$request->comp_resp.'%');
     }
 
     if ($request->date) {
@@ -1129,11 +1131,11 @@ public function search(Request $request)
     }
 
     if ($request->district) {
-        $query->where('district', $request->district);
+        $query->where('DISTT', $request->district);
     }
 
     if ($request->department) {
-        $query->where('department', $request->department);
+        $query->where('DEPTT', $request->department);
     }
 
     // date range filter (from - to)
