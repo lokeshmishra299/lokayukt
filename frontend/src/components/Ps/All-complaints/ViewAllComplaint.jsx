@@ -262,6 +262,43 @@ return flatList.filter(
   });
 
 
+  // 1. State for Dispatch/Dispose Modal
+  const [showDispatch, setshowDispatch] = useState(false);
+
+  // 2. Functions to open/close modal
+  function diposeShow() {
+    setshowDispatch(true);
+  }
+  
+  function closePoup() {
+    setshowDispatch(false);
+  }
+
+  // 3. Dispose Mutation
+  const dispose = useMutation({
+    mutationFn: async ({ complaintId, remarkData }) => {
+      // ध्यान दें: यहाँ मैंने API endpoint /ps/dispose-complain कर दिया है
+      const res = await api.post(`/ps/dispose-complain/${id}`, {
+        complaint_id: complaintId,
+        remark: remarkData,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success("Dispose successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+      setRemark("");
+      setshowDispatch(false); // Modal बंद करने के लिए
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to dispose"
+      );
+    },
+  });
+
+
     const {
   mutate: rejectComplaint,
   isPending,
@@ -1008,95 +1045,82 @@ return flatList.filter(
 
             {/* Footer Buttons */}
 
-
-
-
-
-
-
-
            {/* Footer Buttons */}
-{(complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null) && (
-  <div className="border-t p-4">
-    <div className="flex flex-col sm:flex-row gap-3 justify-between">
-      
-      {/* LEFT SIDE: Pull Back & Assign */}
-      <div className="flex gap-3">
-        
-        {/* Pull Back: Hide if Disposed or Rejected */}
-        {complaintData?.status !== "Final Disposal/Closed" && complaintData?.status !== "Rejected" && (
-          <button
-            onClick={handlePullBack}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
-          >
-            Pull Back
-          </button>
-        )}
+           {/* Footer Buttons */}
+            {complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ? (
+              <div className="border-t p-4">
+                <div className="flex flex-col sm:flex-row gap-3 justify-between">
+                  
+                  {/* LEFT SIDE BUTTONS */}
+                  <div className="flex items-center gap-2">
+                    {/* 1. Pull Back Button */}
+                    <button
+                      onClick={handlePullBack}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+                    >
+                      Pull Back
+                    </button>
 
-        {/* Assign/Take File: Hide if Disposed or Rejected */}
-        {complaintData?.status !== "Final Disposal/Closed" && complaintData?.status !== "Rejected" && (
-          complaintData.assign_to_ps ? (
-            <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded text-sm cursor-not-allowed">
-              Assigned
-            </span>
-          ) : (
-            <button
-              onClick={handleAssignToSelf}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
-            >
-              Take File in Hand
-            </button>
-          )
-        )}
-      </div>
+                    {/* 2. Take File in Hand Button */}
+                    {complaintData.assign_to_ps ? (
+                      <span className="px-4 py-2 bg-blue-600 text-white rounded text-sm">
+                        Assigned
+                      </span>
+                    ) : (
+                      <button
+                        onClick={handleAssignToSelf}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+                      >
+                        Take File in Hand
+                      </button>
+                    )}
+                  </div>
 
-      {/* RIGHT SIDE: Actions (Reject, Return, Forward) */}
-      <div className="flex gap-2">
+                  {/* RIGHT SIDE BUTTONS */}
+                  <div className="flex items-center flex-wrap gap-2 mt-2 sm:mt-0">
+                    
+                    {/* 3. Reject Button */}
+                    <button
+                      className="px-4 py-2 border rounded text-sm bg-red-600 border-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => setShowModal(true)}
+                      disabled={isPending}
+                    >
+                      Reject
+                    </button>
 
-        {/* Reject: Hide if Disposed, Disable if already Rejected */}
-        {complaintData?.status !== "Final Disposal/Closed" && (
-          <button
-            className={`px-4 py-2 border rounded text-sm ${
-              complaintData?.status === "Rejected"
-                ? "bg-gray-400 border-gray-400 text-white cursor-not-allowed"
-                : "bg-red-600 border-red-600 text-white hover:bg-red-700"
-            }`}
-            onClick={() => {
-              if (complaintData?.status === "Rejected") return;
-              setShowModal(true);
-            }}
-            disabled={complaintData?.status === "Rejected"}
-          >
-            {complaintData?.status === "Rejected" ? "Rejected" : "Reject"}
-          </button>
-        )}
+                    {/* 4. Dispose Button */}
+                    <button
+                      onClick={diposeShow}
+                      disabled={dispose.isPending}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {dispose.isPending ? "Processing..." : "Dispose"}
+                    </button>
 
-        {/* Return with Remarks: Hide if Disposed or Rejected */}
-        {complaintData?.status !== "Final Disposal/Closed" && complaintData?.status !== "Rejected" && (
-          <button
-            onClick={handleMarkAsReceived}
-            disabled={returnWithRemarksMutation.isPending}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {returnWithRemarksMutation.isPending ? "Processing..." : "Return with Remarks"}
-          </button>
-        )}
+                    {/* 5. Return with Remarks Button */}
+                    <button
+                      onClick={handleMarkAsReceived}
+                      disabled={returnWithRemarksMutation.isPending}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {returnWithRemarksMutation.isPending ? "Processing..." : "Return with Remarks"}
+                    </button>
 
-        {/* Forward (Send/Mark): Hide if Disposed or Rejected */}
-        {complaintData?.status !== "Final Disposal/Closed" && complaintData?.status !== "Rejected" && (
-          <button
-            onClick={handleforwardphysical}
-            disabled={forwardComplaintMutation.isPending}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {forwardComplaintMutation.isPending ? "Processing..." : "Send / Mark"}
-          </button>
-        )}
-
-      </div>
-    </div>
-  </div>
-)}
+                    {/* 6. Send / Mark Button */}
+                    <button
+                      onClick={handleforwardphysical}
+                      disabled={forwardComplaintMutation.isPending}
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {forwardComplaintMutation.isPending ? "Processing..." : "Send / Mark"}
+                    </button>
+                    
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div></div>
+            )}
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-center text-gray-500">
@@ -1365,6 +1389,65 @@ return flatList.filter(
                     confirmConfig.type === "pullback"
                   ? "Yes"
                   : "Send"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* Dispose Modal */}
+      {showDispatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+            <button
+              onClick={closePoup}
+              disabled={dispose.isPending}
+              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FaTimes className="w-5 h-5 text-gray-600" />
+            </button>
+
+            <h3 className="text-lg font-semibold mb-4 pr-8">
+              Dispose Complaint
+            </h3>
+
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Disposal Remark <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+                rows={4}
+                placeholder="fuLrkj.k fVIi.kh ntZ djsa"
+                className="w-full kruti-input px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={closePoup}
+                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!remark.trim()) {
+                    toast.error("Please enter disposal remark");
+                    return;
+                  }
+                  dispose.mutate({
+                    complaintId: id,
+                    remarkData: remark,
+                  });
+                }}
+                disabled={dispose.isPending || !remark.trim()}
+                className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {dispose.isPending ? "Disposing..." : "Dispose Now"}
               </button>
             </div>
           </div>
