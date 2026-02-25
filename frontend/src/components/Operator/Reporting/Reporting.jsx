@@ -4,7 +4,8 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import Pagination from "../Pagination"; 
+import Pagination from "../../Pagination"; 
+import { FaEye, FaFileAlt } from "react-icons/fa";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
@@ -316,7 +317,7 @@ const Reporting = () => {
                 <th className="px-6 py-3 border-b">Department</th>
                 <th className="px-6 py-3 border-b">Nature</th>
                 <th className="px-6 py-3 border-b">Address</th>
-                {/* <th className="px-6 py-3 border-b">Address2</th> */}
+                <th className="px-6 py-3 border-b">Action</th>
               </tr>
             </thead>
 
@@ -376,6 +377,29 @@ const Reporting = () => {
                         <span className="kruti-input text-[17px]">{item.ADD1 || "ykxw ugha"}</span>
                       </td>
 
+                       <td className="px-6 py-4 font-medium text-gray-800">
+  <button
+    onClick={() => handleViewCP(item.ADD1)}
+    className="flex items-center gap-2 px-3 py-1.5
+               bg-blue-50 text-blue-700 border border-blue-200
+               rounded hover:bg-blue-100 transition text-sm"
+  >
+    <FaEye className="text-blue-600" />
+    View CP
+  </button>
+</td>
+
+                       <td className="px-6 py-4 font-medium text-gray-800">
+  <button
+    onClick={() => handleViewNP(item.ADD1)}
+    className="flex items-center gap-2 px-3 py-1.5
+               bg-green-50 text-green-700 border border-green-200
+               rounded hover:bg-green-100 transition text-sm"
+  >
+    <FaFileAlt className="text-green-600" />
+    View NP
+  </button>
+</td>
                      
                     </tr>
                   )
