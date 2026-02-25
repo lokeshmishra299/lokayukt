@@ -1111,7 +1111,7 @@ $records = DB::table('complaints')
 public function search(Request $request)
 {
     $query = DB::table('old_complaints_data')
-     ->leftJoin('district_master_new_new as dd', DB::raw("old_complaints_data.DISTT"), '=', DB::raw("dd.district_code"))
+     ->leftJoin('district_master_new as dd', DB::raw("old_complaints_data.DISTT"), '=', DB::raw("dd.district_code"))
      ->leftJoin('master_department as md', DB::raw("old_complaints_data.DEPTT"), '=', DB::raw("md.dept_code"))
      ->select('old_complaints_data.*','dd.district_name as DISTT','md.name as DEPTT');
     if ($request->comp_file) {
