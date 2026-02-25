@@ -12,7 +12,7 @@ class DistrictMasterSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('district_master')->insert([
+        DB::table('district_master_new')->insert([
             ['id' => 1, 'district_code' => 132, 'dist_name_hi' => 'सहारनपुर', 'district_name' => 'Saharanpur'],
             ['id' => 2, 'district_code' => 133, 'dist_name_hi' => 'मुजफ्फर नगर', 'district_name' => 'Muzaffarnagar'],
             ['id' => 3, 'district_code' => 134, 'dist_name_hi' => 'बिजनौर', 'district_name' => 'Bijnor'],
