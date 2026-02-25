@@ -47,7 +47,7 @@ class UserManagement extends Controller
             'role_id'      => 'required|exists:roles,id',
             // 'designation'  => 'required|exists:designations,id',
             // 'department'   => 'required|exists:departments,id',
-            'district_id'  => 'required|exists:district_master_new,district_code',
+            'district_id'  => 'required|exists:district_master,district_code',
             // 'ps_parent'  => 'required',
         ], [
 
@@ -161,7 +161,7 @@ class UserManagement extends Controller
             'role_id'      => 'required|exists:roles,id',
             'designation'  => 'nullable|string|max:230',
             'department'   => 'nullable|string|max:200',
-            'district_id'  => 'required|exists:district_master_new,district_code',
+            'district_id'  => 'required|exists:district_master,district_code',
         ], [
 
             'name.required'        => 'Name is required.',
@@ -292,7 +292,7 @@ class UserManagement extends Controller
             'role_id'      => 'required|exists:roles,id',
             // 'designation'  => 'required|exists:designations,id',
             // 'department'   => 'required|exists:departments,id',
-            'district_id'  => 'required|exists:district_master_new,district_code',
+            'district_id'  => 'required|exists:district_master,district_code',
             // 'ps_parent'  => 'required',
         ], [
 
@@ -406,7 +406,7 @@ class UserManagement extends Controller
             'role_id'      => 'required|exists:roles,id',
             'designation'  => 'nullable|string|max:230',
             'department'   => 'nullable|string|max:200',
-            'district_id'  => 'required|exists:district_master_new,district_code',
+            'district_id'  => 'required|exists:district_master,district_code',
         ], [
 
             'name.required'        => 'Name is required.',
