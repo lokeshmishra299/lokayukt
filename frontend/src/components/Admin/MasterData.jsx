@@ -1111,8 +1111,8 @@ const MasterData = () => {
           <table className="min-w-full text-xs sm:text-sm">
             <thead className="bg-gray-50">
               <tr className="border-b border-gray-200">
-                <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-medium text-gray-900">Name (English)</th>
                 <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-medium text-gray-900">Name (Hindi)</th>
+                {/* <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-medium text-gray-900">Name (Hindi)</th> */}
                 {tabId === 'districts' && (
                   <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-medium text-gray-900">Code</th>
                 )}
@@ -1138,8 +1138,8 @@ const MasterData = () => {
                 paginatedData.length > 0 ? (
                 paginatedData.map((item) => (
                   <tr key={`${tabId}-${item.id}`} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-2 sm:py-3 px-2 sm:px-3 font-medium text-gray-900">{item.name}</td>
-                    <td className="py-2 sm:py-3 px-2 sm:px-3 text-gray-700">{item.nameHi}</td>
+                    <td className="py-2 sm:py-3 px-2 sm:px-3 font-medium text-gray-900 kruti-input">{item.name}</td>
+                    {/* <td className="py-2 sm:py-3 px-2 sm:px-3 text-gray-700">{item.nameHi}</td> */}
                     {tabId === 'districts' && (
                       <td className="py-2 sm:py-3 px-2 sm:px-3 text-gray-700">{item.code}</td>
                     )}

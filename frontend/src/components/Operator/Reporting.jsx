@@ -178,33 +178,43 @@ const Reporting = () => {
 />
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">District</label>
-              <select
-                value={district}
-                onChange={(e) => setDistrict(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              >
-                <option value="">All Districts</option>
-                {!loadingDistricts && districtsList?.map((d) => (
-                  <option key={d.id} value={d.district_name}><span className="kruti-input">{d.district_name}</span></option>
-                ))}
-              </select>
-            </div>
+                   <div>
+  <label className="block text-xs font-medium text-gray-600 mb-1">District</label>
+  <select
+    value={district}
+    onChange={(e) => setDistrict(e.target.value)}
+    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+      district ? "kruti-input text-[16px]" : "text-sm font-sans"
+    }`}
+  >
+    <option value="" className="font-sans text-sm">All Districts</option>
+    
+    {!loadingDistricts && districtsList?.map((d) => (
+      <option key={d.id} value={d.id} className="kruti-input text-[16px]">
+        {d.district_name}
+      </option>
+    ))}
+  </select>
+</div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Department</label>
-              <select
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              >
-                <option value="">All Departments</option>
-                {!loadingDepartments && departmentsList?.map((d) => (
-                  <option key={d.id} value={d.name}><span className="kruti-input">{d.name}</span></option>
-                ))}
-              </select>
-            </div>
+          <div>
+  <label className="block text-xs font-medium text-gray-600 mb-1">Department</label>
+  <select
+    value={department}
+    onChange={(e) => setDepartment(e.target.value)}
+    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+      department ? "kruti-input text-[16px]" : "text-sm font-sans"
+    }`}
+  >
+    <option value="" className="font-sans text-sm">All Departments</option>
+    
+    {!loadingDepartments && departmentsList?.map((d) => (
+      <option key={d.id} value={d.id} className="kruti-input text-[16px]">
+        {d.name}
+      </option>
+    ))}
+  </select>
+</div>
 
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Enrollment From Date</label>
@@ -327,7 +337,7 @@ const Reporting = () => {
                       
                       <td 
                         className="px-6 py-4 font-medium text-blue-600 cursor-pointer hover:underline whitespace-nowrap" 
-                        onClick={() => handleViewComplaint(item.id)}
+                        // onClick={() => handleViewComplaint(item.id)}
                       >
                         {item.COMP_NO || "N/A"}
                       </td>
@@ -345,15 +355,15 @@ const Reporting = () => {
                       </td>
 
                       <td className="px-6 py-4 font-medium text-gray-800">
-                        <span className="kruti-input text-[17px]">{item.COMP_NM || "N/A"}</span>
+                        <span className="kruti-input text-[17px]">{item.COMP_NM || "ykxw ugha"}</span>
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                        <span className=" text-[17px] kruti-input">{item.DISTT || "N/A"}</span>
+                        <span className=" text-[17px] kruti-input">{item.DISTT || "ykxw ugha"}</span>
                       </td>
 
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800">
-                        <span className=" text-[17px] kruti-input">{item.DEPTT || "N/A"}</span>
+                        <span className=" text-[17px] kruti-input">{item.DEPTT || "ykxw ugha"}</span>
                       </td>
                       
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -363,7 +373,7 @@ const Reporting = () => {
                       </td>
 
                         <td className="px-6 py-4 font-medium text-gray-800">
-                        <span className="kruti-input text-[17px]">{item.ADD1 || "N/A"}</span>
+                        <span className="kruti-input text-[17px]">{item.ADD1 || "ykxw ugha"}</span>
                       </td>
 
                      

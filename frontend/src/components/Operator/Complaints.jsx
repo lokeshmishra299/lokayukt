@@ -1541,27 +1541,32 @@ const handleMainRespondent = (id) => {
                 onChange={(e) => updateComplainant(complainant.id, 'postOffice', e.target.value)}
               />
             </div>
-            <div>
-              <label className="block text-gray-700 text-sm font-medium mb-2">
-                (घ) जिला <span className="text-red-500">*</span>
-              </label>
-              <select
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                  errors.permanent_district ? 'border-red-500' : 'border-gray-300'
-                }`}
-                // ✅ Fixed: Using complainant.district
-                value={complainant.district || ''}
-                // ✅ Fixed: Updating specific complainant
-                onChange={(e) => updateComplainant(complainant.id, 'district', e.target.value)}
-              >
-                <option value="">ज़िला चुनें</option>
-                {districtList.map((dist, i) => (
-                  <option key={i} value={dist.district_code}>
-                    {dist.district_name} / {dist.dist_name_hi}
-                  </option>
-                ))}
-              </select>
-            </div>
+           <div>
+  <label className="block text-gray-700 text-sm font-medium mb-2">
+    (घ) जिला <span className="text-red-500">*</span>
+  </label>
+
+  <select
+    className={`w-full px-4 py-3 border rounded-lg 
+      focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+      transition-all duration-200
+      ${errors.permanent_district ? 'border-red-500' : 'border-gray-300'}
+      ${complainant.district ? 'kruti-input text-[16px]' : 'text-sm font-sans'}
+    `}
+    value={complainant.district || ''}
+    onChange={(e) =>
+      updateComplainant(complainant.id, 'district', e.target.value)
+    }
+  >
+    <option value="">ज़िला चुनें</option>
+
+    {districtList.map((dist, i) => (
+      <option key={i} value={dist.district_code}>
+        {dist.district_name} {dist.dist_name_hi}
+      </option>
+    ))}
+  </select>
+</div>
           </div>
 
           {/* ✅ FIXED SECTION: Place Field */}
@@ -1782,30 +1787,37 @@ const handleMainRespondent = (id) => {
                 />
               </div>
               {/* UPDATED: District as Dropdown */}
-              <div>
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  (घ) जिला <span className="text-red-500">*</span>
-                </label>
-                <select
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 ${
-                    errors.correspondence_district ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  value={formData.correspondenceAddress.district}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      correspondenceAddress: { ...formData.correspondenceAddress, district: e.target.value },
-                    })
-                  }
-                >
-                   <option value="">ज़िला चुनें</option>
-                    {districtList.map((dist, i) => (
-                    <option key={i} value={dist.district_code}>
-                        {dist.district_name} / {dist.dist_name_hi}
-                    </option>
-                    ))}
-                </select>
-              </div>
+            <div>
+  <label className="block text-gray-700 text-sm font-medium mb-2">
+    (घ) जिला <span className="text-red-500">*</span>
+  </label>
+
+  <select
+    className={`w-full px-4 py-3 border rounded-lg 
+      focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+      transition-all duration-200
+      ${errors.correspondence_district ? 'border-red-500' : 'border-gray-300'}
+      ${formData.correspondenceAddress.district ? 'kruti-input text-[16px]' : 'text-sm font-sans'}
+    `}
+    value={formData.correspondenceAddress.district}
+    onChange={(e) =>
+      setFormData({
+        ...formData,
+        correspondenceAddress: {
+          ...formData.correspondenceAddress,
+          district: e.target.value,
+        },
+      })
+    }
+  >
+    <option value="">ज़िला चुनें</option>
+    {districtList.map((dist, i) => (
+      <option key={i} value={dist.district_code}>
+        {dist.district_name}  {dist.dist_name_hi}
+      </option>
+    ))}
+  </select>
+</div>
             </div>
           </div>
 
@@ -1860,40 +1872,49 @@ const handleMainRespondent = (id) => {
         <div className="p-5 animate-slideDown">
    
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-gray-700 text-sm font-medium mb-2">
-                ज़िला: <span className="text-red-500">*</span>
-              </label>
-              <select
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
-                value={person.district || ''} 
-                onChange={(e) => updatePerson(person.id, 'district', e.target.value)}
-              >
-                <option value="">ज़िला चुनें</option>
-                  {districtList.map((dist, i) => (
-                  <option key={i} value={dist.district_code}>
-                    {dist.district_name} / {dist.dist_name_hi}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-gray-700 text-sm font-medium mb-2">
-                विभाग का नाम: <span className="text-red-500">*</span>
-              </label>
-              <select
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white"
-                value={person.departmentNature || ''}
-                onChange={(e) => updatePerson(person.id, 'departmentNature', e.target.value)}
-              >
-                <option value="">विभाग चुनें</option>
-                {departmentList.map((dept, i) => (
-                  <option key={i} value={dept.name}>
-                    {dept.name} / {dept.name_hindi}
-                  </option>
-                ))}
-              </select>
-            </div>
+           <div>
+  <label className="block text-gray-700 text-sm font-medium mb-2">
+    ज़िला: <span className="text-red-500">*</span>
+  </label>
+
+  <select
+    className={`w-full px-4 py-3 border border-gray-300 rounded-lg 
+      focus:ring-2 focus:ring-orange-500 focus:border-transparent 
+      transition-all duration-200 bg-white
+      ${person.district ? 'kruti-input text-[16px]' : 'text-sm font-sans'}
+    `}
+    value={person.district || ''} 
+    onChange={(e) => updatePerson(person.id, 'district', e.target.value)}
+  >
+    <option value="">ज़िला चुनें</option>
+    {districtList.map((dist, i) => (
+      <option key={i} value={dist.district_code}>
+        {dist.district_name}  {dist.dist_name_hi}
+      </option>
+    ))}
+  </select>
+</div>
+           <div>
+  <label className="block text-gray-700 text-sm font-medium mb-2">
+    विभाग का नाम: <span className="text-red-500">*</span>
+  </label>
+
+  <select
+    className={`w-full px-4 py-3 border border-gray-300 rounded-lg 
+      focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 bg-white
+      ${person.departmentNature ? 'kruti-input text-[16px]' : 'text-sm font-sans'}
+    `}
+    value={person.departmentNature || ''}
+    onChange={(e) => updatePerson(person.id, 'departmentNature', e.target.value)}
+  >
+    <option value="">विभाग चुनें</option>
+    {departmentList.map((dept, i) => (
+      <option key={i} value={dept.name}>
+        {dept.name}  {dept.name_hindi}
+      </option>
+    ))}
+  </select>
+</div>
           </div>
 
      
