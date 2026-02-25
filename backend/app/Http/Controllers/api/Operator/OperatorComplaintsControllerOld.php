@@ -22,7 +22,7 @@ class OperatorComplaintsControllerOld extends Controller
             'name' => 'required|string|max:255',
             'mobile' => 'required|digits:10,15',
             'address' => 'required|string|max:255',
-            'district_id' => 'required|exists:district_master_new,district_code',
+            'district_id' => 'required|exists:district_master,district_code',
             'email' => 'required|email|unique:complaints,email',
             'dob' => 'nullable|date',
             // 'fee_exempted' => 'required|boolean',
@@ -250,7 +250,7 @@ class OperatorComplaintsControllerOld extends Controller
                 'name' => 'required|string|max:255',
                 'mobile' => 'required|digits_between:10,15',
                 'address' => 'required|string|max:255',
-                'district_id' => 'required|exists:district_master_new,district_code',
+                'district_id' => 'required|exists:district_master,district_code',
                 'email' => 'required',
                 'dob' => 'nullable|date',
                 // 'fee_exempted' => 'required|boolean',
@@ -350,7 +350,7 @@ class OperatorComplaintsControllerOld extends Controller
             'name' => 'required|string|max:255',
             'title' => 'required|string',
             // 'mobile' => 'required|digits_between:10,15',
-            // 'district_id' => 'required|exists:district_master_new,district_code',
+            // 'district_id' => 'required|exists:district_master,district_code',
             // 'email' => 'required',
         ], [
             'name.required' => 'Name is required.',
@@ -486,7 +486,7 @@ class OperatorComplaintsControllerOld extends Controller
     public function allComplainsDashboard(){
        
            $complainDetails = DB::table('complaints as cm')
-                ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
                 ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')
@@ -512,7 +512,7 @@ class OperatorComplaintsControllerOld extends Controller
      public function allComplainspending(){
        
            $complainDetails = DB::table('complaints as cm')
-                ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
                 ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')
@@ -540,7 +540,7 @@ class OperatorComplaintsControllerOld extends Controller
      public function allComplainsapproved(){
        
            $complainDetails = DB::table('complaints as cm')
-                ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
                 ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')

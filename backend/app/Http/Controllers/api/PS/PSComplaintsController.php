@@ -30,7 +30,7 @@ class PSComplaintsController extends Controller
 
 
     $query = DB::table('complaints')
-    ->leftJoin('district_master_new as dd', 'complaints.district_id', '=', 'dd.district_code')
+    ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
     ->leftJoin('complainants as cmlan', function ($join) {
                     $join->on('complaints.id', '=', 'cmlan.complaint_id')
                         ->where('cmlan.is_main', 1);
@@ -39,7 +39,7 @@ class PSComplaintsController extends Controller
                     $join->on('complaints.id', '=', 'resp.complaint_id')
                         ->where('resp.is_main', 1);
                 })
-    ->leftJoin('district_master_new as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code');
+    ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code');
 
     // 🔥 Join only latest action
     if($roleParent === 'up-lok-ayukt' || $roleParent === 'supervisor'){
@@ -285,7 +285,7 @@ $records = $query->orderBy('complaints.updated_at','DESC')->get();
   {
     //    $complainDetails = DB::table('complaints as cm')
     //    ->leftJoin('complaints_details as cd', 'cm.id', '=', 'cd.complain_id')
-    // ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+    // ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
     // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
     // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
     // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -303,7 +303,7 @@ $records = $query->orderBy('complaints.updated_at','DESC')->get();
     // ->first();
 
 //     $complainDetails = DB::table('complaints as cm')
-//     ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+//     ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
 //     ->select(
 //         'cm.*',
 //         'dd.district_name'
@@ -327,7 +327,7 @@ $records = $query->orderBy('complaints.updated_at','DESC')->get();
 //     ->get();
              $complainDetails = DB::table('complaints as cm')
     ->leftJoin('users as u', 'cm.assign_to_ps', '=', 'u.id')
-    ->leftJoin('district_master_new as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
+    ->leftJoin('district_master as ddn', 'cm.correspondence_district', '=', 'ddn.district_code')
     ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
     
 
@@ -341,8 +341,8 @@ $records = $query->orderBy('complaints.updated_at','DESC')->get();
         $join->on('cm.id', '=', 'r.complaint_id')
              ->where('r.is_main', 1);
     })
-      ->leftJoin('district_master_new as dmc', 'cpt.permanent_district', '=', 'dmc.district_code')
-    ->leftJoin('district_master_new as rmc', 'r.respondent_district', '=', 'rmc.district_code')
+      ->leftJoin('district_master as dmc', 'cpt.permanent_district', '=', 'dmc.district_code')
+    ->leftJoin('district_master as rmc', 'r.respondent_district', '=', 'rmc.district_code')
     // ->leftJoin('complainants as cpt', DB::raw("cm.id"), '=', DB::raw("cpt.	complaint_id "))
     // ->leftJoin('respondents as r', DB::raw("cm.id"), '=', DB::raw("r.complaint_id"))
     ->select(
@@ -369,12 +369,12 @@ $records = $query->orderBy('complaints.updated_at','DESC')->get();
     ->where('cm.id', $id)
     ->first();
      $complainDetails->complainants =  DB::table('complainants')
-     ->leftJoin('district_master_new as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
+     ->leftJoin('district_master as ddn', 'complainants.permanent_district', '=', 'ddn.district_code')
     ->select('complainants.*','ddn.district_name')
      ->where('complaint_id', $id)
     ->get();
      $complainDetails->respondant =  DB::table('respondents')
-      ->leftJoin('district_master_new as r', 'respondents.respondent_district', '=', 'r.district_code')
+      ->leftJoin('district_master as r', 'respondents.respondent_district', '=', 'r.district_code')
     ->select('respondents.*','r.district_name')
     ->where('complaint_id', $id)
     ->get();
@@ -1126,7 +1126,7 @@ $complainDetails->actions = $actions;
 
         // $userSubrole = Auth::user()->subrole->name; 
            $complainDetails = DB::table('complaints as cm')
-                ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                 // ->leftJoin('departments as dp', 'cm.department_id', '=', 'dp.id')
                 // ->leftJoin('designations as ds', 'cm.designation_id', '=', 'ds.id')
                 // ->leftJoin('complaintype as ct', 'cm.complaintype_id', '=', 'ct.id')
@@ -1171,7 +1171,7 @@ $complainDetails->actions = $actions;
         $userParentData = User::with('role')->where('id',$parentId)->get();
         $roleParent = $userParentData[0]->role->name;
            $complainDetails = DB::table('complaints as cm')
-                ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                  ->leftJoin('complainants as cmlan', function ($join) {
                     $join->on('cm.id', '=', 'cmlan.complaint_id')
                         ->where('cmlan.is_main', 1);
@@ -1180,7 +1180,7 @@ $complainDetails->actions = $actions;
                     $join->on('cm.id', '=', 'resp.complaint_id')
                         ->where('resp.is_main', 1);
                 })
-                ->leftJoin('district_master_new as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
+                ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
                 ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent,$userId) {
         $join->on('cm.id', '=', 'rep.complaint_id')
              ->where(function ($q) use ($parentId, $roleParent,$userId) {
@@ -1265,7 +1265,7 @@ $complainDetails->actions = $actions;
     //     $userParentData = User::with('role')->where('id',$parentId)->get();
     //     $roleParent = $userParentData[0]->role->name;
     //        $complainDetails = DB::table('complaints as cm')
-    //             ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+    //             ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
     // //             ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent) {
     // //     $join->on('cm.id', '=', 'rep.complaint_id')
     // //          ->where(function ($q) use ($parentId, $roleParent) {

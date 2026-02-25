@@ -11,7 +11,7 @@ return new class extends Migration
      */
    public function up(): void
 {
-    Schema::create('district_master_new', function (Blueprint $table) {
+    Schema::create('district_master', function (Blueprint $table) {
         $table->id();
         $table->string('district_name');    // English name
         $table->string('dist_name_hi');     // Hindi name
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('district_master_new');
+        Schema::dropIfExists('district_master');
     }
 };

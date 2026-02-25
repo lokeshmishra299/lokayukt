@@ -37,12 +37,12 @@ class PSReportController extends Controller
         $roleid = request()->query('des') ?? 'all';
         $status = request()->query('status') ?? '';
        
-        $districtData = DB::table('district_master_new')->orderBy('district_name')->get();
+        $districtData = DB::table('district_master')->orderBy('district_name')->get();
                 //    $userSubrole = Auth::user()->subrole->name; 
 
                        $records = DB::table('complaints')
                 ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-                ->leftJoin('district_master_new as dd', 'complaints.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
                 ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
                 ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -201,7 +201,7 @@ class PSReportController extends Controller
   {
 
     $complainDetails = DB::table('complaints as cm')
-    ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+    ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
     ->leftJoin('complaint_actions as ca', DB::raw("cm.id"), '=', DB::raw("ca.complaint_id"))
     ->leftJoin('complainants as cpt', DB::raw("cm.id"), '=', DB::raw("cpt.	complaint_id "))
     // ->leftJoin('respondents as r', DB::raw("cm.id"), '=', DB::raw("r.complaint_id"))
@@ -230,7 +230,7 @@ class PSReportController extends Controller
     ->get();
 
 //     $complainDetails = DB::table('complaints as cm')
-//     ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+//     ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
 //     ->select(
 //         'cm.*',
 //         'dd.district_name'
@@ -266,7 +266,7 @@ class PSReportController extends Controller
         // $userSubroleRole = Auth::user()->subrole->name;
         
          $records = DB::table('complaints')
-            // ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+            // ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
             // ->leftJoin('departments as dp', DB::raw("complaints.department_id"), '=', DB::raw("dp.id"))
             // ->leftJoin('designations as ds', DB::raw("complaints.designation_id"), '=', DB::raw("ds.id"))
             // ->leftJoin('complaintype as ct', DB::raw("complaints.complaintype_id"), '=', DB::raw("ct.id"))
@@ -314,7 +314,7 @@ class PSReportController extends Controller
         // $userSubroleRole = Auth::user()->subrole->name;
         
          $records = DB::table('complaints')
-            // ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+            // ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
             // ->leftJoin('departments as dp', DB::raw("complaints.department_id"), '=', DB::raw("dp.id"))
             // ->leftJoin('designations as ds', DB::raw("complaints.designation_id"), '=', DB::raw("ds.id"))
             // ->leftJoin('complaintype as ct', DB::raw("complaints.complaintype_id"), '=', DB::raw("ct.id"))
@@ -823,9 +823,9 @@ class PSReportController extends Controller
     public function complainDistrictWise()
     {
        
-        $complainCounts = Complaint::select('district_master_new.district_name', DB::raw('count(*) as complain_count'))
-            ->join('district_master_new', 'complaints.district_id', '=', 'district_master_new.district_code')
-            ->groupBy('district_master_new.district_code', 'district_master_new.district_name')
+        $complainCounts = Complaint::select('district_master.district_name', DB::raw('count(*) as complain_count'))
+            ->join('district_master', 'complaints.district_id', '=', 'district_master.district_code')
+            ->groupBy('district_master.district_code', 'district_master.district_name')
              ->where('approved_rejected_by_ro', '1')
                 ->where('approved_rejected_by_ds_js', '0')
             // ->where('approved_rejected_by_ds_js', '0')
@@ -833,7 +833,7 @@ class PSReportController extends Controller
             ->where('in_draft','0')
             ->limit(5)
             //  ->having('complain_count', '>', 0)
-            ->pluck('complain_count', 'district_master_new.district_name');
+            ->pluck('complain_count', 'district_master.district_name');
        return response()->json([
                'status' => true,
                'message' => 'Records Fetch successfully',

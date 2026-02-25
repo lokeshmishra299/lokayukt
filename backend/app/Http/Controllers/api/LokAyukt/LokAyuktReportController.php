@@ -37,12 +37,12 @@ class LokAyuktReportController extends Controller
         $roleid = request()->query('des') ?? 'all';
         $status = request()->query('status') ?? '';
        
-        $districtData = DB::table('district_master_new')->orderBy('district_name')->get();
+        $districtData = DB::table('district_master')->orderBy('district_name')->get();
                 //    $userSubrole = Auth::user()->subrole->name; 
 
                        $records = DB::table('complaints')
                 ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
-                ->leftJoin('district_master_new as dd', 'complaints.district_id', '=', 'dd.district_code')
+                ->leftJoin('district_master as dd', 'complaints.district_id', '=', 'dd.district_code')
                 ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
                 ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
                 ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -200,7 +200,7 @@ class LokAyuktReportController extends Controller
     public function viewComplaint($id)
   {
     $complainDetails = DB::table('complaints as cm')
-    ->leftJoin('district_master_new as dd', 'cm.district_id', '=', 'dd.district_code')
+    ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
     ->select(
         'cm.*',
         'dd.district_name'
@@ -236,7 +236,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
         // $userSubroleRole = Auth::user()->subrole->name;
         
          $records = DB::table('complaints')
-            // ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+            // ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
             // ->leftJoin('departments as dp', DB::raw("complaints.department_id"), '=', DB::raw("dp.id"))
             // ->leftJoin('designations as ds', DB::raw("complaints.designation_id"), '=', DB::raw("ds.id"))
             // ->leftJoin('complaintype as ct', DB::raw("complaints.complaintype_id"), '=', DB::raw("ct.id"))
@@ -284,7 +284,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
         // $userSubroleRole = Auth::user()->subrole->name;
         
          $records = DB::table('complaints')
-            // ->leftJoin('district_master_new as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
+            // ->leftJoin('district_master as dd', DB::raw("complaints.district_id"), '=', DB::raw("dd.district_code"))
             // ->leftJoin('departments as dp', DB::raw("complaints.department_id"), '=', DB::raw("dp.id"))
             // ->leftJoin('designations as ds', DB::raw("complaints.designation_id"), '=', DB::raw("ds.id"))
             // ->leftJoin('complaintype as ct', DB::raw("complaints.complaintype_id"), '=', DB::raw("ct.id"))
@@ -793,12 +793,12 @@ $complainDetails->details = DB::table('complaints_details as cd')
     public function complainDistrictWise()
     {
        
-        $complainCounts = Complaint::select('district_master_new.district_name',
+        $complainCounts = Complaint::select('district_master.district_name',
          DB::raw('count(*) as complain_count'
         
         ))
-            ->join('district_master_new', 'complaints.district_id', '=', 'district_master_new.district_code')
-            ->groupBy('district_master_new.district_code', 'district_master_new.district_name')
+            ->join('district_master', 'complaints.district_id', '=', 'district_master.district_code')
+            ->groupBy('district_master.district_code', 'district_master.district_name')
              ->where('approved_rejected_by_ro', '1')
                 ->where('approved_rejected_by_ds_js', '0')
             // ->where('approved_rejected_by_ds_js', '0')
@@ -806,7 +806,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
             ->where('in_draft','0')
             ->limit(5)
             //  ->having('complain_count', '>', 0)
-            ->pluck('complain_count', 'district_master_new.district_name');
+            ->pluck('complain_count', 'district_master.district_name');
        return response()->json([
                'status' => true,
                'message' => 'Records Fetch successfully',
@@ -817,7 +817,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
     public function complaintDistWise(){
   
 
-    $data = DB::table('district_master_new as d')
+    $data = DB::table('district_master as d')
     ->leftJoin('complaints as c', 'c.district_id', '=', 'd.district_code')
     ->leftJoin('complainants as cm', 'cm.permanent_district', '=', 'd.district_code')
         ->select(
@@ -1009,7 +1009,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
         //  ->leftJoin('complaints_details as cd', 'complaints.id', '=', 'cd.complain_id')
         ->leftJoin('complainants as cmp', 'complaints.id', '=', 'cmp.complaint_id')
         ->leftJoin('respondents as rspd', 'rspd.complaint_id', '=', 'complaints.id')
-        ->leftJoin('district_master_new as dd', 'rspd.respondent_district', '=', 'dd.district_code')
+        ->leftJoin('district_master as dd', 'rspd.respondent_district', '=', 'dd.district_code')
         // ->leftJoin('departments as dp', 'cd.department_id', '=', 'dp.id')
         // ->leftJoin('designations as ds', 'cd.designation_id', '=', 'ds.id')
         // ->leftJoin('complaintype as ct', 'cd.complaintype_id', '=', 'ct.id')
@@ -1061,7 +1061,7 @@ $complainDetails->details = DB::table('complaints_details as cd')
   $data = DB::table('respondents as r')
     ->leftJoin('complaints as c', 'c.id', '=', 'r.complaint_id')
     ->leftJoin('complainants as cm', 'cm.complaint_id', '=', 'c.id')
-    ->leftJoin('district_master_new as dm', 'dm.district_code', '=', 'cm.permanent_district')
+    ->leftJoin('district_master as dm', 'dm.district_code', '=', 'cm.permanent_district')
     ->where('r.is_main', 1)   // ✅ ONLY MAIN DEPARTMENTS
     ->select(
         'r.department_name as department',
