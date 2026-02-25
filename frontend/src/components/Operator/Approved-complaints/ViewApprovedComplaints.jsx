@@ -406,7 +406,7 @@
           <p className="text-[14px] text-black font-semibold uppercase mb-1">
           जिला
           </p>
-          <p className="text-gray-800 text-sm">
+          <p className=" kruti-input text-gray-800 text-sm">
             {complaintData.main_complainant_district || "N/A"}
           </p>
         </div>
@@ -444,7 +444,7 @@
           <p className="text-[14px] text-black font-semibold uppercase mb-1">
           जिला
           </p>
-          <p className="text-gray-800 text-sm">
+          <p className=" kruti-input text-gray-800 text-sm">
             {complaintData.main_respondant_district || "N/A"}
           </p>
         </div>
@@ -550,24 +550,22 @@
                       {/* <FaEye /> Respondents */}
                       <FaEye /> प्रतिवादी
                     </button>
-                    <button
+                    {/* <button
                       onClick={() =>
                         setViewModalConfig({ open: true, type: "support" })
                       }
                       className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
                     >
-                      {/* <FaEye /> Supporting Persons */}
                       <FaEye /> समर्थनकर्ता व्यक्ति
-                    </button>
-                    <button
+                    </button> */}
+                    {/* <button
                       onClick={() =>
                         setViewModalConfig({ open: true, type: "witness" })
                       }
                       className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
                     >
-                      {/* <FaEye /> Witness Details */}
                       <FaEye /> गवाहों का विवरण
-                    </button>
+                    </button> */}
                   </div>
 
                   {/* Second Priview */}
@@ -1004,10 +1002,10 @@
                               <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm font-medium text-gray-900 border-r border-gray-200">
                                 {comp.complainant_name || "-"}
                               </td>
-                              <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                              <td className="px-6 py-4 F whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                                 {comp.father_name || "-"}
                               </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                              <td className="px-6 py-4  kruti-input whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                                 {comp.district_name || "-"}
                               </td>
                               <td className="px-6 py-4 kruti-input whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -1143,10 +1141,10 @@
                               <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                                 {resp.designation || "-"}
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                              <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                                 {resp.department_name || "-"}
                               </td>
-                              <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                              <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                                 {resp.district_name || "-"}
                               </td>
                               <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">

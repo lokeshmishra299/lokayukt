@@ -788,10 +788,10 @@ return flatList.filter(
                       <p className="text-[14px] text-black font-semibold uppercase mb-1">
                         जिला
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.main_complainant_district
-                        ) || "N/A"}
+                       || "ykxw ugha"}
                       </p>
                     </div>
                   </div>
@@ -832,10 +832,10 @@ return flatList.filter(
                       <p className="text-[14px] text-black font-semibold uppercase mb-1">
                         जिला
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.main_respondant_district
-                        ) || "N/A"}
+                        || "ykxw ugha"}
                       </p>
                     </div>
                   </div>
@@ -937,7 +937,7 @@ return flatList.filter(
                   <FaEye /> प्रतिवादी
                 </button>
 
-                <button
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "support" })
                   }
@@ -947,9 +947,9 @@ return flatList.filter(
                w-full sm:w-auto"
                 >
                   <FaEye /> समर्थनकर्ता व्यक्ति
-                </button>
+                </button> */}
 
-                <button
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "witness" })
                   }
@@ -959,7 +959,7 @@ return flatList.filter(
                w-full sm:w-auto"
                 >
                   <FaEye /> साक्षियों का विवरण
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -1624,7 +1624,7 @@ return flatList.filter(
                             <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.father_name || "-"}
                             </td>
-                            <td className=" px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className=" px-6 kruti-input py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.district_name || "-"}
                             </td>
                             <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -1748,10 +1748,10 @@ return flatList.filter(
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.designation || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.department_name || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.district_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
