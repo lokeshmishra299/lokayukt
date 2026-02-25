@@ -135,7 +135,9 @@ const Reporting = () => {
     setFileLoading(true);
     try {
       const response = await api.get(`/operator/view-cp/${id}`);
-      const path = response.data?.cp || response.data?.data?.cp; 
+      
+      // ✅ सही तरीका: चूँकि पाथ सीधे 'data' की (key) में आ रहा है
+      const path = typeof response.data?.data === 'string' ? response.data.data : null; 
       
       if (path) {
         const finalUrl = APP_URL + (path.startsWith('/') ? path : '/' + path);
@@ -143,7 +145,7 @@ const Reporting = () => {
         setModalTitle("View CP File");
         setIsModalOpen(true);
       } else {
-        toast.error("CP File path not found!");
+        toast.error("CP File path not found in response!");
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to load CP file");
@@ -153,12 +155,13 @@ const Reporting = () => {
   };
 
   // --- NEW: View NP API Call ---
-  const handleViewNP = async (id) => {
+ const handleViewNP = async (id) => {
     setFileLoading(true);
     try {
       const response = await api.get(`/operator/view-np/${id}`);
-      // Assuming api returns 'np' key holding the path
-      const path = response.data?.np || response.data?.data?.np;
+      
+      // ✅ सही तरीका: NP के लिए भी यही लॉजिक रहेगा
+      const path = typeof response.data?.data === 'string' ? response.data.data : null;
       
       if (path) {
         const finalUrl = APP_URL + (path.startsWith('/') ? path : '/' + path);
@@ -166,7 +169,7 @@ const Reporting = () => {
         setModalTitle("View NP File");
         setIsModalOpen(true);
       } else {
-        toast.error("NP File path not found!");
+        toast.error("NP File path not found in response!");
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to load NP file");

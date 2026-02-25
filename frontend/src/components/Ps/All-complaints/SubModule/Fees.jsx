@@ -19,16 +19,14 @@ const api = axios.create({
 const Fees = ({ complaint, onFeeApproved }) => {
   const { id } = useParams();
   const [erorrss, setErrorss] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Added loading state
+  const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
 
-  // 1. Local state add kiya gaya hai jisse UI bina refresh ke update ho sake
   const [isApproved, setIsApproved] = useState(
     complaint?.fee_approved_by_lokayukt == 1
   );
   const [localRemark, setLocalRemark] = useState(complaint?.remark || "");
 
-  // Parent se data baad me aaye to state sync karne ke liye
   useEffect(() => {
     setIsApproved(complaint?.fee_approved_by_lokayukt == 1);
     setLocalRemark(complaint?.remark || "");
@@ -55,47 +53,54 @@ const Fees = ({ complaint, onFeeApproved }) => {
 
   const handleApprove = async () => {
     try {
-      setIsLoading(true); // Start loading
+      setIsLoading(true);
       setErrorss(null);
       const res = await api.post(
         `/ps/fee-exempted/${id}`,
         fessSubmitForm
       );
-      console.log("Fee Submitted:", res.data);
       
-      // Success Toast
       toast.success("Fee Verified Successfully!");
 
-      // 2. State update karein taki UI turant badal jaye
+      // 🎯 SOLUTION: CACHE KO TURANT UPDATE KAREIN (Optimistic Update)
+      // Isse tab switch karne par UI ko instantly updated data milega
+      queryClient.setQueryData(["complaint-details", id], (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          fee_approved_by_lokayukt: 1, // Approval status turant 1 set karein
+          remark: fessSubmitForm.remarks,
+          fee_exempted: fessSubmitForm.fee_exempted
+        };
+      });
+
       setIsApproved(true);
       setLocalRemark(fessSubmitForm.remarks);
 
-      // React Query Cache Invalidate
-      queryClient.invalidateQueries({
-        predicate: (query) => query.queryKey.includes("complaint"),
+      // Background me fresh data lane ke liye invalidate
+      queryClient.invalidateQueries({ 
+        queryKey: ["complaint-details", id] 
       });
 
       if (onFeeApproved) {
         onFeeApproved();
       }
 
-      // Clear Remarks Field
-      setFessSubmitForm((prev) => ({
-        ...prev,
+      setFessSubmitForm({
+        fee_exempted: "2",
         remarks: "",
-      }));
+      });
     } catch (error) {
       console.log("Error he", error);
       const errorData = error?.response?.data || null;
       setErrorss(errorData);
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
   return (
     <>
-      {/* 3. isApproved state ka use kiya gaya hai condition check ke liye */}
       {isApproved ? (
         <div className="w-full flex items-center gap-4 p-6 bg-green-50 border border-green-300 rounded-xl shadow-sm">
           <FaCheckCircle className="text-green-600" size={28} />
@@ -106,12 +111,11 @@ const Fees = ({ complaint, onFeeApproved }) => {
               </p>
               <p className="text-green-700 text-sm">
                 <span className="text-black font-semibold">Remark:</span>{" "}
-                {/* 4. Yahan localRemark render ho raha hai */}
                 <span className="kruti-input">{localRemark || "ykxw ugha"}</span> 
               </p>
             </div>
             <p className="text-green-700 text-sm mt-1">
-              The fee has already been approved by the Lokayukt.
+              The fee has already been approved.
             </p>
           </div>
         </div>
