@@ -911,85 +911,85 @@ $complainDetails->actions = $actions;
 
     }
 
-    public function forwardComplaintbyds(Request $request,$complainId){
-        //    dd($request->all());
-        $user = Auth::user()->id;
-        // dd($usersubrole);
+    // public function forwardComplaintbyds(Request $request,$complainId){
+    //     //    dd($request->all());
+    //     $user = Auth::user()->id;
+    //     // dd($usersubrole);
    
 
-        $validation = Validator::make($request->all(), [
-            // 'forward_by_ds_js' => 'required|exists:users,id',
-            'forward_to' => 'required|exists:users,id',
-            'remarks' => 'required',
+    //     $validation = Validator::make($request->all(), [
+    //         // 'forward_by_ds_js' => 'required|exists:users,id',
+    //         'forward_to' => 'required|exists:users,id',
+    //         'remarks' => 'required',
          
           
-        ], [
-            // 'forward_by_ds_js.required' => 'Forward by Supervisor is required.',
-            // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
-            'forward_to.required' => 'Forward to user is required.',
-            'forward_to.exists' => 'Forward to user does not exist.',
-            'remarks.required' => 'Remark is required.',
+    //     ], [
+    //         // 'forward_by_ds_js.required' => 'Forward by Supervisor is required.',
+    //         // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
+    //         'forward_to.required' => 'Forward to user is required.',
+    //         'forward_to.exists' => 'Forward to user does not exist.',
+    //         'remarks.required' => 'Remark is required.',
            
-        ]);
+    //     ]);
 
-        if ($validation->fails()) {
-            return response()->json([
-                'status' => false,
-                'errors' => $validation->errors()
-            ], 422);
-        }
-        if(isset($complainId) && $request->isMethod('post')){
+    //     if ($validation->fails()) {
+    //         return response()->json([
+    //             'status' => false,
+    //             'errors' => $validation->errors()
+    //         ], 422);
+    //     }
+    //     if(isset($complainId) && $request->isMethod('post')){
 
-             $cmp =  Complaint::findOrFail($complainId);
+    //          $cmp =  Complaint::findOrFail($complainId);
 
-            if($cmp){
-                $cmp->approved_rejected_by_ds = 1;
-                // $cmp->forward_to_d_a = $request->forward_to_d_a;
-                // $remark ='Remark By Deputy Secretary / Joint Secretary';
-                // $remark.='\n';
-                // $remark.= $request->remarks;
-                // $remark.='\n';
-                // $cmp->remark = $remark;
+    //         if($cmp){
+    //             $cmp->approved_rejected_by_ds = 1;
+    //             // $cmp->forward_to_d_a = $request->forward_to_d_a;
+    //             // $remark ='Remark By Deputy Secretary / Joint Secretary';
+    //             // $remark.='\n';
+    //             // $remark.= $request->remarks;
+    //             // $remark.='\n';
+    //             // $cmp->remark = $remark;
                 
-                    if($cmp->save()){
-                        $apcAction = new ComplaintAction();
-                        $apcAction->complaint_id = $complainId;
-                        $apcAction->forward_by_ds_js = $user;
-                        $apcAction->forward_to_d_a = $request->forward_to_d_a;
-                        $apcAction->status = 'Forwarded';
-                        $apcAction->type = '1';
-                        $apcAction->remarks = $request->remarks;
-                        $apcAction->save();
-                    }
+    //                 if($cmp->save()){
+    //                     $apcAction = new ComplaintAction();
+    //                     $apcAction->complaint_id = $complainId;
+    //                     $apcAction->forward_by_ds_js = $user;
+    //                     $apcAction->forward_to_d_a = $request->forward_to_d_a;
+    //                     $apcAction->status = 'Forwarded';
+    //                     $apcAction->type = '1';
+    //                     $apcAction->remarks = $request->remarks;
+    //                     $apcAction->save();
+    //                 }
                 
-                // $cmpAction =new ComplaintAction();
-                // $cmpAction->complaint_id = $complainId;
-                // $cmpAction->forward_by_ds_js = $user;
-                // $cmpAction->forward_to_d_a = $request->forward_to_d_a; //add supervisor user_id 
-                // $cmpAction->status_ds_js = 1;
-                // $cmpAction->action_type = "Forwarded";
-                // $cmpAction->remarks = $request->remarks;
-                // $cmpAction->save();
-            }
-            // $cmp->forward_by = $request->forward_by;
-            // $cmp->forward_to_d_a = $request->forward_to_d_a;
-            // $cmp->sup_status = 1;
-            // $cmp->save();
+    //             // $cmpAction =new ComplaintAction();
+    //             // $cmpAction->complaint_id = $complainId;
+    //             // $cmpAction->forward_by_ds_js = $user;
+    //             // $cmpAction->forward_to_d_a = $request->forward_to_d_a; //add supervisor user_id 
+    //             // $cmpAction->status_ds_js = 1;
+    //             // $cmpAction->action_type = "Forwarded";
+    //             // $cmpAction->remarks = $request->remarks;
+    //             // $cmpAction->save();
+    //         }
+    //         // $cmp->forward_by = $request->forward_by;
+    //         // $cmp->forward_to_d_a = $request->forward_to_d_a;
+    //         // $cmp->sup_status = 1;
+    //         // $cmp->save();
     
-             return response()->json([
-                    'status' => true,
-                    'message' => 'Forwarded Successfully',
-                    'data' => $cmp
-                ], 200);
-        }else{
+    //          return response()->json([
+    //                 'status' => true,
+    //                 'message' => 'Forwarded Successfully',
+    //                 'data' => $cmp
+    //             ], 200);
+    //     }else{
             
-             return response()->json([
-                    'status' => false,
-                    'message' => 'Please check Id'
-                ], 401);
-        }
+    //          return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Please check Id'
+    //             ], 401);
+    //     }
 
-    }
+    // }
     // public function forwardComplaintbyroaro(Request $request,$complainId){
     //     //    dd($request->all());
     //     $user = Auth::user()->id;
@@ -1367,6 +1367,573 @@ $complainDetails->actions = $actions;
                         $apcAction = new ComplaintAction();
                         $apcAction->complaint_id = $complainId;
                         $apcAction->forward_by_ro_aro = $userId;
+                        // $apcAction->approved_rejected_by_ro_aro = $userId;
+
+                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','ps'])) {
+
+                            if ($roleFwd === 'lok-ayukt') {
+                                $apcAction->forward_to_lokayukt = $request->forward_to;
+                            } else if($roleFwd === 'up-lok-ayukt') {
+                                $apcAction->forward_to_uplokayukt = $request->forward_to;
+                            }else{
+                                 $apcAction->forward_to_ps = $request->forward_to;
+                            }
+
+                        } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
+
+                            switch ($subroleFwd) {
+                                 case 'ds':
+                                    $apcAction->forward_to_ds = $request->forward_to;
+                                    break;
+                                case 'js':
+                                    $apcAction->forward_to_js = $request->forward_to;
+                                    break;
+                                case 'us':
+                                    $apcAction->forward_to_us = $request->forward_to;
+                                    break;
+                                case 'sec':
+                                    $apcAction->forward_to_sec = $request->forward_to;
+                                    break;
+
+                                case 'cio-io':
+                                    $apcAction->forward_to_cio_io = $request->forward_to;
+                                    break;
+
+                                case 'so-us':
+                                    $apcAction->forward_to_so_us = $request->forward_to;
+                                    break;
+                               
+                                    case 'ro-aro':
+                                    $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    break;
+                                    case 'ro':
+                                    $apcAction->forward_to_ro = $request->forward_to;
+                                    break;
+                            }
+                        }
+
+                        if($request->sent_through_rk == 1){
+                             $apcAction->sent_through_rk = 1;
+                             $apcAction->sent_through_rk_id = $cmp->added_by;
+                        }
+
+                        $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        $apcAction->remarks = $request->remark;
+                        $apcAction->save();
+
+
+                        // $apcAction = new ComplaintAction();
+                        // $apcAction->complaint_id = $complainId;
+                        // $apcAction->forward_by_ps = $userId;
+
+                        // $apcAction->forward_to_lokayukt = $request->forward_to;
+                       
+                        // $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        // $apcAction->remarks = $request->remark;
+                        // $apcAction->save();
+                    }
+                
+                }
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Forwarded Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+     public function forwardComplaintbyds(Request $request,$complainId){
+        //    dd($request->all());
+        // $user = Auth::user()->id;
+        // dd($usersubrole);
+
+        $userRole = User::with('role')->where('id',$request->forward_to)->get();
+
+        
+            $roleFwd = $userRole[0]->role->name ?? null;
+        // dd($roleFwd);
+        
+          $user = User::with('role','subrole')->where('id',$request->forward_to)->get();
+            $subroleFwd = '';
+            
+            $subroleFwd = $user[0]->subrole->name ?? null;
+
+       
+ 
+
+        $userId = Auth::user()->id;
+   
+
+        $validation = Validator::make($request->all(), [
+            // 'forward_by_ds_js' => 'required|exists:users,id',
+            'forward_to' => 'required|exists:users,id',
+            // 'remark' => 'required',
+         
+          
+        ], [
+            // 'forward_by_ds_js.required' => 'Forward by Supervisor is required.',
+            // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
+            'forward_to.required' => 'Forward to user is required.',
+            'forward_to.exists' => 'Forward to user does not exist.',
+            // 'remark.required' => 'Remark is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        if(isset($complainId) && $request->isMethod('post')){
+
+            //  $userRole = User::with('role')->where('id',$request->forward_to)->get();
+            // dd($user[0]->role->name);
+            // $roleFwd = $userRole[0]->role->name;
+
+              
+            $cmp =  Complaint::findOrFail($complainId);
+            // dd($cmp);
+
+               if($cmp){
+                $cmp->approved_rejected_by_ro_aro = 1;
+                // $cmp->forward_to_d_a = $request->forward_to_d_a;
+                // $remark ='Remark By Deputy Secretary / Joint Secretary';
+                // $remark.='\n';
+                // $remark.= $request->remarks;
+                // $remark.='\n';
+                // $cmp->remark = $remark;
+                
+                    if($cmp->save()){
+
+                         $apcAction = new ComplaintAction();
+                            $apcAction->target_date = $request->target_date;
+                        //     $apcAction->forward_by_lokayukt = $userId;
+
+                             
+
+                        
+                        //     if($roleFwd === "lok-ayukt" || $roleFwd === "up-lok-ayukt"){
+                        //             if($roleFwd === "lok-ayukt"){
+                        //             $apcAction->forward_to_lokayukt = $request->forward_to;
+                        //         }elseif($roleFwd === "up-lok-ayukt"){
+                        //             $apcAction->forward_to_uplokayukt = $request->forward_to;
+                        //         }
+                        //     }else if($roleFwd === "supervisor"){
+                        //             if($subroleFwd === "ds-js"){
+                        //             $apcAction->forward_to_ds_js = $request->forward_to;
+                                
+                        //     }elseif($subroleFwd ==="sec"){
+                        //             $apcAction->forward_to_sec = $request->forward_to;
+                    
+                        //     }elseif($subroleFwd ==="cio-io"){
+
+                        //             $apcAction->forward_to_cio_io = $request->forward_to;
+                                    
+                        //     }elseif($subroleFwd ==="so-us"){
+
+                        //             $apcAction->forward_to_so_us = $request->forward_to;
+                                    
+                        //     }
+                        //     }
+                          
+  
+                        // // $apcAction->forward_to_uplokayukt = $request->forward_to;
+                    
+                        // $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        // $apcAction->remarks = $request->remark;
+                        // $apcAction->save();
+
+                        $apcAction = new ComplaintAction();
+                        $apcAction->complaint_id = $complainId;
+                        $apcAction->forward_by_ds = $userId;
+                        // $apcAction->approved_rejected_by_ro_aro = $userId;
+
+                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','ps'])) {
+
+                            if ($roleFwd === 'lok-ayukt') {
+                                $apcAction->forward_to_lokayukt = $request->forward_to;
+                            } else if($roleFwd === 'up-lok-ayukt') {
+                                $apcAction->forward_to_uplokayukt = $request->forward_to;
+                            }else{
+                                 $apcAction->forward_to_ps = $request->forward_to;
+                            }
+
+                        } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
+
+                            switch ($subroleFwd) {
+                                 case 'ds':
+                                    $apcAction->forward_to_ds = $request->forward_to;
+                                    break;
+                                case 'js':
+                                    $apcAction->forward_to_js = $request->forward_to;
+                                    break;
+                                case 'us':
+                                    $apcAction->forward_to_us = $request->forward_to;
+                                    break;
+                                case 'sec':
+                                    $apcAction->forward_to_sec = $request->forward_to;
+                                    break;
+
+                                case 'cio-io':
+                                    $apcAction->forward_to_cio_io = $request->forward_to;
+                                    break;
+
+                                case 'so-us':
+                                    $apcAction->forward_to_so_us = $request->forward_to;
+                                    break;
+                               
+                                    case 'ro-aro':
+                                    $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    break;
+                                    case 'ro':
+                                    $apcAction->forward_to_ro = $request->forward_to;
+                                    break;
+                            }
+                        }
+
+                        if($request->sent_through_rk == 1){
+                             $apcAction->sent_through_rk = 1;
+                             $apcAction->sent_through_rk_id = $cmp->added_by;
+                        }
+
+                        $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        $apcAction->remarks = $request->remark;
+                        $apcAction->save();
+
+
+                        // $apcAction = new ComplaintAction();
+                        // $apcAction->complaint_id = $complainId;
+                        // $apcAction->forward_by_ps = $userId;
+
+                        // $apcAction->forward_to_lokayukt = $request->forward_to;
+                       
+                        // $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        // $apcAction->remarks = $request->remark;
+                        // $apcAction->save();
+                    }
+                
+                }
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Forwarded Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+     public function forwardComplaintbyjs(Request $request,$complainId){
+        //    dd($request->all());
+        // $user = Auth::user()->id;
+        // dd($usersubrole);
+
+        $userRole = User::with('role')->where('id',$request->forward_to)->get();
+
+        
+            $roleFwd = $userRole[0]->role->name ?? null;
+        // dd($roleFwd);
+        
+          $user = User::with('role','subrole')->where('id',$request->forward_to)->get();
+            $subroleFwd = '';
+            
+            $subroleFwd = $user[0]->subrole->name ?? null;
+
+       
+ 
+
+        $userId = Auth::user()->id;
+   
+
+        $validation = Validator::make($request->all(), [
+            // 'forward_by_ds_js' => 'required|exists:users,id',
+            'forward_to' => 'required|exists:users,id',
+            // 'remark' => 'required',
+         
+          
+        ], [
+            // 'forward_by_ds_js.required' => 'Forward by Supervisor is required.',
+            // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
+            'forward_to.required' => 'Forward to user is required.',
+            'forward_to.exists' => 'Forward to user does not exist.',
+            // 'remark.required' => 'Remark is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        if(isset($complainId) && $request->isMethod('post')){
+
+            //  $userRole = User::with('role')->where('id',$request->forward_to)->get();
+            // dd($user[0]->role->name);
+            // $roleFwd = $userRole[0]->role->name;
+
+              
+            $cmp =  Complaint::findOrFail($complainId);
+            // dd($cmp);
+
+               if($cmp){
+                $cmp->approved_rejected_by_js = 1;
+                // $cmp->forward_to_d_a = $request->forward_to_d_a;
+                // $remark ='Remark By Deputy Secretary / Joint Secretary';
+                // $remark.='\n';
+                // $remark.= $request->remarks;
+                // $remark.='\n';
+                // $cmp->remark = $remark;
+                
+                    if($cmp->save()){
+
+                         $apcAction = new ComplaintAction();
+                            $apcAction->target_date = $request->target_date;
+                        //     $apcAction->forward_by_lokayukt = $userId;
+
+                             
+
+                        
+                        //     if($roleFwd === "lok-ayukt" || $roleFwd === "up-lok-ayukt"){
+                        //             if($roleFwd === "lok-ayukt"){
+                        //             $apcAction->forward_to_lokayukt = $request->forward_to;
+                        //         }elseif($roleFwd === "up-lok-ayukt"){
+                        //             $apcAction->forward_to_uplokayukt = $request->forward_to;
+                        //         }
+                        //     }else if($roleFwd === "supervisor"){
+                        //             if($subroleFwd === "ds-js"){
+                        //             $apcAction->forward_to_ds_js = $request->forward_to;
+                                
+                        //     }elseif($subroleFwd ==="sec"){
+                        //             $apcAction->forward_to_sec = $request->forward_to;
+                    
+                        //     }elseif($subroleFwd ==="cio-io"){
+
+                        //             $apcAction->forward_to_cio_io = $request->forward_to;
+                                    
+                        //     }elseif($subroleFwd ==="so-us"){
+
+                        //             $apcAction->forward_to_so_us = $request->forward_to;
+                                    
+                        //     }
+                        //     }
+                          
+  
+                        // // $apcAction->forward_to_uplokayukt = $request->forward_to;
+                    
+                        // $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        // $apcAction->remarks = $request->remark;
+                        // $apcAction->save();
+
+                        $apcAction = new ComplaintAction();
+                        $apcAction->complaint_id = $complainId;
+                        $apcAction->forward_by_js = $userId;
+                        // $apcAction->approved_rejected_by_ro_aro = $userId;
+
+                        if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','ps'])) {
+
+                            if ($roleFwd === 'lok-ayukt') {
+                                $apcAction->forward_to_lokayukt = $request->forward_to;
+                            } else if($roleFwd === 'up-lok-ayukt') {
+                                $apcAction->forward_to_uplokayukt = $request->forward_to;
+                            }else{
+                                 $apcAction->forward_to_ps = $request->forward_to;
+                            }
+
+                        } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
+
+                            switch ($subroleFwd) {
+                                 case 'ds':
+                                    $apcAction->forward_to_ds = $request->forward_to;
+                                    break;
+                                case 'js':
+                                    $apcAction->forward_to_js = $request->forward_to;
+                                    break;
+                                case 'us':
+                                    $apcAction->forward_to_us = $request->forward_to;
+                                    break;
+                                case 'sec':
+                                    $apcAction->forward_to_sec = $request->forward_to;
+                                    break;
+
+                                case 'cio-io':
+                                    $apcAction->forward_to_cio_io = $request->forward_to;
+                                    break;
+
+                                case 'so-us':
+                                    $apcAction->forward_to_so_us = $request->forward_to;
+                                    break;
+                               
+                                    case 'ro-aro':
+                                    $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    break;
+                                    case 'ro':
+                                    $apcAction->forward_to_ro = $request->forward_to;
+                                    break;
+                            }
+                        }
+
+                        if($request->sent_through_rk == 1){
+                             $apcAction->sent_through_rk = 1;
+                             $apcAction->sent_through_rk_id = $cmp->added_by;
+                        }
+
+                        $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        $apcAction->remarks = $request->remark;
+                        $apcAction->save();
+
+
+                        // $apcAction = new ComplaintAction();
+                        // $apcAction->complaint_id = $complainId;
+                        // $apcAction->forward_by_ps = $userId;
+
+                        // $apcAction->forward_to_lokayukt = $request->forward_to;
+                       
+                        // $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        // $apcAction->remarks = $request->remark;
+                        // $apcAction->save();
+                    }
+                
+                }
+             return response()->json([
+                    'status' => true,
+                    'message' => 'Forwarded Successfully',
+                    'data' => $cmp
+                ], 200);
+        }else{
+            
+             return response()->json([
+                    'status' => false,
+                    'message' => 'Please check Id'
+                ], 401);
+        }
+
+    }
+     public function forwardComplaintbyus(Request $request,$complainId){
+        //    dd($request->all());
+        // $user = Auth::user()->id;
+        // dd($usersubrole);
+
+        $userRole = User::with('role')->where('id',$request->forward_to)->get();
+
+        
+            $roleFwd = $userRole[0]->role->name ?? null;
+        // dd($roleFwd);
+        
+          $user = User::with('role','subrole')->where('id',$request->forward_to)->get();
+            $subroleFwd = '';
+            
+            $subroleFwd = $user[0]->subrole->name ?? null;
+
+       
+ 
+
+        $userId = Auth::user()->id;
+   
+
+        $validation = Validator::make($request->all(), [
+            // 'forward_by_ds_js' => 'required|exists:users,id',
+            'forward_to' => 'required|exists:users,id',
+            // 'remark' => 'required',
+         
+          
+        ], [
+            // 'forward_by_ds_js.required' => 'Forward by Supervisor is required.',
+            // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
+            'forward_to.required' => 'Forward to user is required.',
+            'forward_to.exists' => 'Forward to user does not exist.',
+            // 'remark.required' => 'Remark is required.',
+           
+        ]);
+
+        if ($validation->fails()) {
+            return response()->json([
+                'status' => false,
+                'errors' => $validation->errors()
+            ], 422);
+        }
+        if(isset($complainId) && $request->isMethod('post')){
+
+            //  $userRole = User::with('role')->where('id',$request->forward_to)->get();
+            // dd($user[0]->role->name);
+            // $roleFwd = $userRole[0]->role->name;
+
+              
+            $cmp =  Complaint::findOrFail($complainId);
+            // dd($cmp);
+
+               if($cmp){
+                $cmp->approved_rejected_by_us = 1;
+                // $cmp->forward_to_d_a = $request->forward_to_d_a;
+                // $remark ='Remark By Deputy Secretary / Joint Secretary';
+                // $remark.='\n';
+                // $remark.= $request->remarks;
+                // $remark.='\n';
+                // $cmp->remark = $remark;
+                
+                    if($cmp->save()){
+
+                         $apcAction = new ComplaintAction();
+                            $apcAction->target_date = $request->target_date;
+                        //     $apcAction->forward_by_lokayukt = $userId;
+
+                             
+
+                        
+                        //     if($roleFwd === "lok-ayukt" || $roleFwd === "up-lok-ayukt"){
+                        //             if($roleFwd === "lok-ayukt"){
+                        //             $apcAction->forward_to_lokayukt = $request->forward_to;
+                        //         }elseif($roleFwd === "up-lok-ayukt"){
+                        //             $apcAction->forward_to_uplokayukt = $request->forward_to;
+                        //         }
+                        //     }else if($roleFwd === "supervisor"){
+                        //             if($subroleFwd === "ds-js"){
+                        //             $apcAction->forward_to_ds_js = $request->forward_to;
+                                
+                        //     }elseif($subroleFwd ==="sec"){
+                        //             $apcAction->forward_to_sec = $request->forward_to;
+                    
+                        //     }elseif($subroleFwd ==="cio-io"){
+
+                        //             $apcAction->forward_to_cio_io = $request->forward_to;
+                                    
+                        //     }elseif($subroleFwd ==="so-us"){
+
+                        //             $apcAction->forward_to_so_us = $request->forward_to;
+                                    
+                        //     }
+                        //     }
+                          
+  
+                        // // $apcAction->forward_to_uplokayukt = $request->forward_to;
+                    
+                        // $apcAction->status = 'Forwarded';
+                        // $apcAction->type = '1';
+                        // $apcAction->remarks = $request->remark;
+                        // $apcAction->save();
+
+                        $apcAction = new ComplaintAction();
+                        $apcAction->complaint_id = $complainId;
+                        $apcAction->forward_by_us = $userId;
                         // $apcAction->approved_rejected_by_ro_aro = $userId;
 
                         if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','ps'])) {
