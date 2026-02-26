@@ -38,6 +38,27 @@ const SearchableDropdown = ({
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
 
+const getDisplayLabel = (option) => {
+  if (!option) return "";
+
+  const name =
+    option.name ||
+    option.user_name ||
+    `User ${option.id}`;
+
+  // 👇 yahin subrole_name add kiya
+  const roleLabel =
+    option.subrole_name ||
+    option.role?.label ||
+    option.role?.name ||
+    "";
+
+  return roleLabel ? `${name} (${roleLabel})` : name;
+};
+
+
+
+
 
 
   useEffect(() => {
@@ -89,13 +110,7 @@ const SearchableDropdown = ({
             !selectedOption ? "text-gray-500" : "text-gray-900"
           }`}
         >
-          {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+          {selectedOption ? getDisplayLabel(selectedOption) : placeholder}
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -123,7 +138,8 @@ const SearchableDropdown = ({
                   }`}
                   onClick={() => handleSelect(option)}
                 >
-                  {option.name || option.user_name || `User ${option.id}`}
+                  {/* {option.name || option.user_name || `User ${option.id}`} */}
+                  {getDisplayLabel(option)}
                   {option.district_name ? (
                     <span className="text-gray-500 text-xs ml-1">
                       ({option.district_name})
@@ -164,7 +180,7 @@ function takefile(){
 
 
     const capitalizeFirstLetter = (text = "") => {
-  if (!text) return "N/A";
+  if (!text) return "ykxw ugha";
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
 
@@ -176,6 +192,7 @@ function takefile(){
   const [showMobileTabs, setShowMobileTabs] = useState(false);
   const [showDispatch, setshowDispatch] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
+  const [targetDate, setTargetDate] = useState("");
 
   function diposeShow (){
     setshowDispatch(true)
@@ -250,7 +267,7 @@ function takefile(){
   // --- PULL BACK API (Supervisor) ---
   const pullBackMutation = useMutation({
     mutationFn: async ({ complaintId }) => {
-      return api.post(`/supervisor/pull-back-by-ro-aro/${complaintId}`);
+      return api.post(`/supervisor/pull-back-by-ro/${complaintId}`);
     },
     onSuccess: (res) => {
       toast.success("Complaint pulled back successfully");
@@ -264,7 +281,7 @@ function takefile(){
 
     const assignToSelfMutation = useMutation({
       mutationFn: async ({ complaintId }) => {
-        const res = await api.post(`/supervisor/assign-by-ro-aro/${complaintId}`);
+        const res = await api.post(`/supervisor/assign-by-ro/${complaintId}`);
         return res.data;
       },
       onSuccess: (data) => {
@@ -334,7 +351,8 @@ function takefile(){
     mutationFn: async ({ complaintId, remarkData }) => {
       const res = await api.post(`/supervisor/dispose-complain/${id}`, {
         complaint_id: complaintId,
-        remark: remarkData,
+        // remark: remarkData,
+        target_date: targetDate,
       });
       return res.data;
     },
@@ -374,9 +392,10 @@ function takefile(){
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-ro-aro/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-ro/${complaintId}`, {
           forward_to: forwardTo,
-          remark: remarkData,
+          // remark: remarkData,
+          target_date: targetDate,
           sent_through_rk: sent_through_rk ? 1 : 0
         });
         return res.data;
@@ -384,6 +403,10 @@ function takefile(){
       onSuccess: (data) => {
         toast.success(data.message || "Forwarded successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+             setTimeout(()=>{
+          navigate("/supervisor/all-complaints")
+        }, 2000)
         setRemark("");
         setThroughRC(false)
         setSelectedForwardTo("");
@@ -411,8 +434,8 @@ function takefile(){
         remarkData: remark,
       });
     } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
-        toast.error("Please select forward to and enter a remark");
+      if (!selectedForwardTo ) {
+        toast.error("Please select forward");
         return;
       }
       forwardComplaintMutation.mutate({
@@ -592,7 +615,7 @@ function takefile(){
            नाम
         </p>
         <p className=" kruti-input text-gray-800 text-sm">
-          {complaintData.main_complainant_name || "N/A"}
+          {complaintData.main_complainant_name || "ykxw ugha"}
         </p>
       </div>
 
@@ -602,7 +625,7 @@ function takefile(){
           पिता का नाम
         </p>
         <p className="kruti-input text-gray-800 text-sm">
-          {complaintData.main_complainant_father || "N/A"}
+          {complaintData.main_complainant_father || "ykxw ugha"}
         </p>
       </div>
 
@@ -611,8 +634,8 @@ function takefile(){
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
         जिला
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_district) || "N/A"}
+        <p className="text-gray-800 kruti-input text-sm">
+          {complaintData.main_complainant_district || "ykxw ugha"}
         </p>
       </div>
     </div>
@@ -629,7 +652,7 @@ function takefile(){
           नाम
         </p>
         <p className=" kruti-input text-gray-800 text-sm">
-          {complaintData.main_respondent_name || "N/A"}
+          {complaintData.main_respondent_name || "ykxw ugha"}
         </p>
       </div>
 
@@ -639,7 +662,7 @@ function takefile(){
          पद
         </p>
         <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondent_designation) || "N/A"}
+          {capitalizeFirstLetter(complaintData.main_respondent_designation) || "ykxw ugha"}
         </p>
       </div>
 
@@ -648,8 +671,8 @@ function takefile(){
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
          जिला
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondant_district) || "N/A"}
+        <p className="text-gray-800 kruti-input text-sm">
+          {complaintData.main_respondant_district || "ykxw ugha"}
         </p>
       </div>
     </div>
@@ -663,7 +686,7 @@ function takefile(){
           व्यक्ति से संबंध
         </p>
         <p className="kruti-input text-gray-800 text-sm">
-          {complaintData.relation_with_person || "NA"}
+          {complaintData.relation_with_person || "N/A"}
         </p>
       </div>
 
@@ -674,7 +697,7 @@ function takefile(){
             कार्यवाही तिथि
           </p>
           <p className="text-gray-800 text-sm">
-            {capitalizeFirstLetter(complaintData.cause_date) || "NA"}
+            {capitalizeFirstLetter(complaintData.cause_date) || "N/A"}
           </p>
         </div>
       )}
@@ -741,22 +764,22 @@ function takefile(){
                 >
                   <FaEye /> प्रतिवादी
                 </button>
-                <button
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "support" })
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
                 >
                   <FaEye /> समर्थनकर्ता व्यक्ति
-                </button>
-                <button
+                </button> */}
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "witness" })
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
                 >
                   <FaEye /> गवाह का विवरण
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -856,8 +879,8 @@ function takefile(){
                     Pull Back
                   </button> */}
                   
-                 
-                   {/* {complaintData.assign_to_ro_aro ? (
+{/*                  
+                   {complaintData.assign_to_ro_aro ? (
                       <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
                         Assigned
                       </span>
@@ -1107,33 +1130,22 @@ function takefile(){
 )}
 
 
-                {confirmConfig.type !== "assign" &&
-                  confirmConfig.type !== "pullback" && (
-                    <>
-                      <div className="mb-5 mt-3">
+                {confirmConfig.type === "forward" && (
+  <div className="mb-5 mt-3">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Target Date <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="date"
+      value={targetDate}
+      min={new Date().toISOString().split("T")[0]}
+      onChange={(e) => setTargetDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+)}
 
-                       {/* <label className="flex items-center gap-2 cursor-pointer mt-2">
-  <input
-    type="checkbox"
-    checked={sent_through_rk}
-    onChange={(e) => setThroughRC(e.target.checked)}
-    className="w-4 h-4"
-  />
-  <span className="text-sm">Checkbox If Send through RC</span>
-</label> */}
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Remark <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                          value={remark}
-                          onChange={(e) => setRemark(e.target.value)}
-                          rows={4}
-                          placeholder="Enter your remark here..."
-                          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                        />
-                      </div>
-                    </>
-                  )}
     
                 {/* Buttons */}
                 <div className="flex justify-end gap-3">
@@ -1159,11 +1171,10 @@ function takefile(){
                   assignToSelfMutation.isPending || 
                   pullBackMutation.isPending || 
                   (confirmConfig.type === "receive" && !remark.trim()) ||
-                  (confirmConfig.type === "forward" &&
-                    (!remark.trim() ||
-                      !selectedForwardTo ||
-                      isLoadingOptions ||
-                      isFetchingOptions))
+                (confirmConfig.type === "forward" &&
+  (!selectedForwardTo ||
+    isLoadingOptions ||
+    isFetchingOptions))
                 }
                 className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
@@ -1287,7 +1298,7 @@ function takefile(){
                     </p>
                     <p className="text-gray-800 font-medium">
                       {complaintData.complainants?.[0]?.complainant_name ||
-                        "N/A"}
+                        "ykxw ugha"}
                     </p>
                   </div>
 
@@ -1296,7 +1307,7 @@ function takefile(){
                       Father Name
                     </p>
                     <p className="text-gray-800 font-medium">
-                      {complaintData.complainants?.[0]?.father_name || "N/A"}
+                      {complaintData.complainants?.[0]?.father_name || "ykxw ugha"}
                     </p>
                   </div>
 
@@ -1306,7 +1317,7 @@ function takefile(){
                     </p>
                     <p className="text-gray-800 font-medium">
                       {complaintData.complainants?.[0]?.is_public_servant ||
-                        "N/A"}
+                        "ykxw ugha"}
                     </p>
                   </div>
 
@@ -1315,7 +1326,7 @@ function takefile(){
                       Occupation
                     </p>
                     <p className="text-gray-800 font-medium">
-                      {complaintData.complainants?.[0]?.occupation || "N/A"}
+                      {complaintData.complainants?.[0]?.occupation || "ykxw ugha"}
                     </p>
                   </div>
                 </div>
@@ -1391,7 +1402,7 @@ function takefile(){
                             <td className="px-6 kruti-input py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.father_name || "-"}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className="px-6 kruti-input py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.district_name || "-"}
                             </td>
                             <td className="px-6 kruti-input py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -1461,7 +1472,7 @@ function takefile(){
                             NAME
                           </p>
                           <p className="text-sm text-gray-800">
-                            {resp?.respondent_name || "N/A"}
+                            {resp?.respondent_name || "ykxw ugha"}
                           </p>
                         </div>
                         <div>
@@ -1469,7 +1480,7 @@ function takefile(){
                             DESIGNATION
                           </p>
                           <p className="text-sm text-gray-800">
-                            {resp?.designation || "N/A"}
+                            {resp?.designation || "ykxw ugha"}
                           </p>
                         </div>
 
@@ -1478,7 +1489,7 @@ function takefile(){
                             ADDRESS
                           </p>
                           <p className="text-sm text-gray-800">
-                            {resp?.current_address || "N/A"}
+                            {resp?.current_address || "ykxw ugha"}
                           </p>
                         </div>
                       </div>
@@ -1542,10 +1553,10 @@ function takefile(){
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.designation || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.department_name || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 py-3 kruti-input text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.district_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">

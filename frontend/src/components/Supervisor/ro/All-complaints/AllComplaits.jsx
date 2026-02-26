@@ -525,19 +525,34 @@ useEffect(() => {
                   {/* <option value="Pending">Pending</option> */}
                 </select>
 
-                <select
-                  className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
-                  disabled={districtLoading}
-                  value={selectedDistrict}
-                  onChange={(e) => setSelectedDistrict(e.target.value)}
-                >
-                  <option value="">District: All</option>
-                  {districtData?.map((item) => (
-                    <option key={item.id} value={item.district_name}>
-                      {item.district_name}
-                    </option>
-                  ))}
-                </select>
+                                                                  <select
+  disabled={districtLoading}
+  value={selectedDistrict}
+  onChange={(e) => setSelectedDistrict(e.target.value)}
+  // 👇 कंडीशन: selectedDistrict है तो kruti-input, नहीं तो text-xs font-sans
+  className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+    selectedDistrict ? "kruti-input text-[16px]" : "text-xs font-sans"
+  }`}
+>
+  {/* 👇 'District: All' हमेशा इंग्लिश में रहेगा */}
+  <option value="" className="font-sans text-xs">
+    District: All
+  </option>
+
+  {districtData?.map((item) => {
+    const districtName =
+      item.dist_new || item.district_name || item.name || "";
+
+    return (
+      // 👇 यहाँ kruti-input लगा दिया है ताकि लिस्ट में नाम सही हिंदी में दिखें
+      <option key={item.id} value={districtName} className="kruti-input text-[16px]">
+        {districtName}
+      </option>
+    );
+  })}
+</select>
+
+                
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
                   value={selectedFeeStatus}
