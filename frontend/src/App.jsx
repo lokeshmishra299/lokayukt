@@ -1018,7 +1018,7 @@ function App() {
        {/* Supervisor  Routes */}
        {/* ds-js */}
 
-         {role === 'supervisor' && subrole === 'ds' && (
+         {role === 'supervisor' && subrole === 'dsss' && (
         <Route path="/supervisor" element={<SupervisorLayoutro />}>
           <Route path="dashboard" element={<SupervisorDashboardro />} />
           <Route path="complaints" element={<SupervisorComplaintsro />} />
