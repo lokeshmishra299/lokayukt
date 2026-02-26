@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { FaSearch, FaSpinner } from "react-icons/fa";
+import { FaSearch, FaSpinner, FaTimes, FaEye, FaFileAlt } from "react-icons/fa"; // Added FaTimes
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import Pagination from "../Pagination"; 
+import Pagination from "../../Pagination"; 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 const token = localStorage.getItem("access_token");
+
+// /api ko hatakar file ka base URL banaya
+const APP_URL = BASE_URL.replace("/api", ""); 
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -39,8 +42,13 @@ const Reporting = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  // API se aane wala per_page
   const [itemsPerPage, setItemsPerPage] = useState(10); 
+
+  // --- NEW: Modal States ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalFileUrl, setModalFileUrl] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
+  const [fileLoading, setFileLoading] = useState(false);
 
   const { data: districtsList, isLoading: loadingDistricts } = useQuery({
     queryKey: ["districts-list"],
@@ -73,7 +81,6 @@ const Reporting = () => {
         enroll_to: enrollmentToDate,     
         complaint_date: complaintDate,
         nature: nature,
-        // pagination requst me
         page: page 
       };
 
@@ -82,13 +89,11 @@ const Reporting = () => {
       });
 
       if (response.data.status === true || response.data.status === "success") {
-        // Yeh apka paginated object hai
         const paginationData = response.data.data; 
         const fetchedData = paginationData?.data || []; 
         
         setResults(fetchedData);
         
-        // Backend se aaye pagination data ko state me set karein
         setCurrentPage(paginationData?.current_page || 1);
         setTotalPages(paginationData?.last_page || 1);
         setTotalItems(paginationData?.total || 0);
@@ -125,8 +130,56 @@ const Reporting = () => {
     });
   };
 
+  // --- NEW: View CP API Call ---
+  const handleViewCP = async (id) => {
+    setFileLoading(true);
+    try {
+      const response = await api.get(`/operator/view-cp/${id}`);
+      
+      // ✅ सही तरीका: चूँकि पाथ सीधे 'data' की (key) में आ रहा है
+      const path = typeof response.data?.data === 'string' ? response.data.data : null; 
+      
+      if (path) {
+        const finalUrl = APP_URL + (path.startsWith('/') ? path : '/' + path);
+        setModalFileUrl(finalUrl);
+        setModalTitle("View CP File");
+        setIsModalOpen(true);
+      } else {
+        toast.error("CP File path not found in response!");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to load CP file");
+    } finally {
+      setFileLoading(false);
+    }
+  };
+
+  // --- NEW: View NP API Call ---
+ const handleViewNP = async (id) => {
+    setFileLoading(true);
+    try {
+      const response = await api.get(`/operator/view-np/${id}`);
+      
+      // ✅ सही तरीका: NP के लिए भी यही लॉजिक रहेगा
+      const path = typeof response.data?.data === 'string' ? response.data.data : null;
+      
+      if (path) {
+        const finalUrl = APP_URL + (path.startsWith('/') ? path : '/' + path);
+        setModalFileUrl(finalUrl);
+        setModalTitle("View NP File");
+        setIsModalOpen(true);
+      } else {
+        toast.error("NP File path not found in response!");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to load NP file");
+    } finally {
+      setFileLoading(false);
+    }
+  };
+
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen relative">
       <Toaster position="top-right" />
       <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm p-4">
         
@@ -153,8 +206,7 @@ const Reporting = () => {
               />
             </div>
 
-
-              <div>
+            <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
               <input
                 type="number"
@@ -168,53 +220,53 @@ const Reporting = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Complaint </label>
-            <input
-  type="text"
-  placeholder="शिकायतें"
-  value={corrResp}
-  onChange={(e) => setCorrResp(e.target.value)}
-  className="w-full px-3 py-1 kruti-input text-lg placeholder:text-sm placeholder:font-sans border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Complaint</label>
+              <input
+                type="text"
+                placeholder="शिकायतें"
+                value={corrResp}
+                onChange={(e) => setCorrResp(e.target.value)}
+                className="w-full px-3 py-1 kruti-input text-lg placeholder:text-sm placeholder:font-sans border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
 
-                   <div>
-  <label className="block text-xs font-medium text-gray-600 mb-1">District</label>
-  <select
-    value={district}
-    onChange={(e) => setDistrict(e.target.value)}
-    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
-      district ? "kruti-input text-[16px]" : "text-sm font-sans"
-    }`}
-  >
-    <option value="" className="font-sans text-sm">All Districts</option>
-    
-    {!loadingDistricts && districtsList?.map((d) => (
-      <option key={d.id} value={d.id} className="kruti-input text-[16px]">
-        {d.district_name}
-      </option>
-    ))}
-  </select>
-</div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">District</label>
+              <select
+                value={district}
+                onChange={(e) => setDistrict(e.target.value)}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+                  district ? "kruti-input text-[16px]" : "text-sm font-sans"
+                }`}
+              >
+                <option value="" className="font-sans text-sm">All Districts</option>
+                
+                {!loadingDistricts && districtsList?.map((d) => (
+                  <option key={d.id} value={d.id} className="kruti-input text-[16px]">
+                    {d.district_name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div>
-  <label className="block text-xs font-medium text-gray-600 mb-1">Department</label>
-  <select
-    value={department}
-    onChange={(e) => setDepartment(e.target.value)}
-    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
-      department ? "kruti-input text-[16px]" : "text-sm font-sans"
-    }`}
-  >
-    <option value="" className="font-sans text-sm">All Departments</option>
-    
-    {!loadingDepartments && departmentsList?.map((d) => (
-      <option key={d.id} value={d.id} className="kruti-input text-[16px]">
-        {d.name}
-      </option>
-    ))}
-  </select>
-</div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Department</label>
+              <select
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+                  department ? "kruti-input text-[16px]" : "text-sm font-sans"
+                }`}
+              >
+                <option value="" className="font-sans text-sm">All Departments</option>
+                
+                {!loadingDepartments && departmentsList?.map((d) => (
+                  <option key={d.id} value={d.id} className="kruti-input text-[16px]">
+                    {d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Enrollment From Date</label>
@@ -268,22 +320,8 @@ const Reporting = () => {
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 bg-white"
               />
             </div>
-{/* 
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Year</label>
-              <input
-                type="number"
-                placeholder="YYYY"
-                min="1990"
-                max="2099"
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div> */}
 
             <div>
-              {/* Naya Search hamesha Page 1 se shuru hoga */}
               <button
                 onClick={() => handleSearch(1)}
                 disabled={isLoading}
@@ -316,7 +354,7 @@ const Reporting = () => {
                 <th className="px-6 py-3 border-b">Department</th>
                 <th className="px-6 py-3 border-b">Nature</th>
                 <th className="px-6 py-3 border-b">Address</th>
-                {/* <th className="px-6 py-3 border-b">Address2</th> */}
+                <th className="px-6 py-3 border-b">Action</th>
               </tr>
             </thead>
 
@@ -324,7 +362,7 @@ const Reporting = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="11" className="px-4 py-8 text-center text-gray-500">
-                   Searching records...
+                    Searching records...
                   </td>
                 </tr>
               ) : results.length > 0 ? (
@@ -376,7 +414,30 @@ const Reporting = () => {
                         <span className="kruti-input text-[17px]">{item.ADD1 || "ykxw ugha"}</span>
                       </td>
 
-                     
+                       <td className="px-6 py-4 font-medium text-gray-800 space-y-2">
+                        {/* Note: I've passed item.id here instead of item.ADD1 so it passes ID to API */}
+                        <button
+                          onClick={() => handleViewCP(item.id || item.COMP_NO)}
+                          disabled={fileLoading}
+                          className="flex items-center gap-2 px-3 py-1.5 w-full justify-center
+                                     bg-blue-50 text-blue-700 border border-blue-200
+                                     rounded hover:bg-blue-100 transition text-sm disabled:opacity-50"
+                        >
+                          <FaEye className="text-blue-600" />
+                          View CP
+                        </button>
+
+                        <button
+                          onClick={() => handleViewNP(item.id || item.COMP_NO)}
+                          disabled={fileLoading}
+                          className="flex items-center gap-2 px-3 py-1.5 w-full justify-center
+                                     bg-green-50 text-green-700 border border-green-200
+                                     rounded hover:bg-green-100 transition text-sm disabled:opacity-50"
+                        >
+                          <FaFileAlt className="text-green-600" />
+                          View NP
+                        </button>
+                      </td>
                     </tr>
                   )
                 })
@@ -396,16 +457,45 @@ const Reporting = () => {
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
-              // Yaha click karne pe API wapas page number leke call hogi
               onPageChange={(page) => handleSearch(page)} 
               totalItems={totalItems}
-              // API ke mutabiq dynamic items per page
               itemsPerPage={itemsPerPage} 
             />
           </div>
         )}
 
       </div>
+
+      {/* --- NEW: Popup Modal for Viewing Files --- */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden animate-slideDown">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
+              <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <FaEye className="text-blue-600" />
+                {modalTitle}
+              </h3>
+              <button 
+                onClick={() => setIsModalOpen(false)} 
+                className="text-gray-400 hover:text-red-500 bg-gray-200 hover:bg-red-100 p-2 rounded-full transition-colors"
+              >
+                <FaTimes className="w-4 h-4" />
+              </button>
+            </div>
+            
+            {/* Modal Body / Iframe */}
+            <div className="flex-1 w-full h-full bg-gray-100 p-2">
+              <iframe
+                src={modalFileUrl}
+                className="w-full h-full border-0 rounded-md shadow-sm bg-white"
+                title={modalTitle}
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

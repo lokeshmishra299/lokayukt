@@ -560,8 +560,8 @@ const UserManagement = () => {
 
                                 {/* Department */}
                                 <td className="py-2 px-4">
-                                  <div className="text-xs text-gray-700">
-                                    {displayValue(user.department?.name || user.department)}
+                                  <div className="text-xs kruti-input text-gray-700">
+                                    {user.department?.name || user.department || "ykxw ugha"}
                                   </div>
                                 </td>
 

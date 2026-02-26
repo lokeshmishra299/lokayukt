@@ -46,6 +46,25 @@ const SearchableDropdown = ({
   const [searchTerm, setSearchTerm] = useState("");
   const wrapperRef = useRef(null);
 
+
+  const getDisplayLabel = (option) => {
+  if (!option || typeof option !== "object") return "";
+
+  const name =
+    option.name ||
+    option.user_name ||
+    `User ${option.id}`;
+
+  const subRole =
+    option.subrole_name ||        // ✅ ps/get-users
+    option.subrole?.label ||
+    option.role?.label ||
+    "";
+
+  return subRole ? `${name} (${subRole})` : name;
+};
+
+
   useEffect(() => {
     function handleClickOutside(event) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -67,7 +86,9 @@ const selectedOption = (options || []).find(
 const filteredOptions = (options || []).filter((option) => {
   if (!option || typeof option !== "object") return false; // 🛡 protection
 
-  const label = option.name || option.user_name;
+
+  const label = getDisplayLabel(option);
+
   if (!label) return false; // remove nameless entries
 
   const district = option.district_name || "";
@@ -102,12 +123,8 @@ const filteredOptions = (options || []).filter((option) => {
           }`}
         >
           {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+  ? getDisplayLabel(selectedOption)
+  : placeholder}
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -135,7 +152,7 @@ const filteredOptions = (options || []).filter((option) => {
                   }`}
                   onClick={() => handleSelect(option)}
                 >
-                  {option.name || option.user_name || `User ${option.id}`}
+                  {getDisplayLabel(option)}
                   {option.district_name ? (
                     <span className="text-gray-500 text-xs ml-1">
                       ({option.district_name})
@@ -157,7 +174,7 @@ const filteredOptions = (options || []).filter((option) => {
   );
 };
 
-const ViewAllComplaint = () => {
+const ViewApprovedComplaints = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -168,13 +185,14 @@ const ViewAllComplaint = () => {
 
   const queryClient = useQueryClient();
 
-  const [activeTab, setActiveTab] = useState("documents");
+  const [activeTab, setActiveTab] = useState("fee");
   const [showPreview, setShowPreview] = useState(false);
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
      const [showModal, setShowModal] = useState(false);
      const [Rejectedloading,setRejectedloading] = useState(false)
      const [targetDate, setTargetDate] = useState("");
+     const [fieldErrors, setFieldErrors] = useState({});
 
   
 
@@ -244,6 +262,43 @@ return flatList.filter(
   });
 
 
+  // 1. State for Dispatch/Dispose Modal
+  const [showDispatch, setshowDispatch] = useState(false);
+
+  // 2. Functions to open/close modal
+  function diposeShow() {
+    setshowDispatch(true);
+  }
+  
+  function closePoup() {
+    setshowDispatch(false);
+  }
+
+  // 3. Dispose Mutation
+  const dispose = useMutation({
+    mutationFn: async ({ complaintId, remarkData }) => {
+      // ध्यान दें: यहाँ मैंने API endpoint /ps/dispose-complain कर दिया है
+      const res = await api.post(`/ps/dispose-complain/${id}`, {
+        complaint_id: complaintId,
+        remark: remarkData,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success("Dispose successfully");
+      queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+      setRemark("");
+      setshowDispatch(false); // Modal बंद करने के लिए
+      setConfirmConfig({ open: false, type: null });
+    },
+    onError: (error) => {
+      toast.error(
+        error?.response?.data?.message || "Failed to dispose"
+      );
+    },
+  });
+
+
     const {
   mutate: rejectComplaint,
   isPending,
@@ -278,10 +333,20 @@ return flatList.filter(
     onSuccess: (data) => {
       toast.success(data.message || "Pulled back successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+      setTimeout(()=>{
+          navigate("/ps/all-complaints")
+        }, 2000)
       setConfirmConfig({ open: false, type: null });
     },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to pull back");
+  onError: (error) => {
+      const resData = error?.response?.data;
+      // ✅ अगर बैकएंड से validation 'errors' ऑब्जेक्ट आता है:
+      if (resData && resData.errors) {
+        setFieldErrors(resData.errors);
+      } else {
+        toast.error(resData?.message || "Failed to forward");
+      }
     },
   });
 
@@ -310,6 +375,10 @@ return flatList.filter(
     onSuccess: (data) => {
       toast.success(data.message || "Returned successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+        setTimeout(()=>{
+          navigate("/ps/all-complaints")
+        }, 2000)
       setRemark("");
       setConfirmConfig({ open: false, type: null });
     },
@@ -320,12 +389,12 @@ return flatList.filter(
     },
   });
 
-  const forwardComplaintMutation = useMutation({
+ const forwardComplaintMutation = useMutation({
     mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
       const res = await api.post(`/ps/forward-complain-by-ps/${complaintId}`, {
         forward_to: forwardTo,
         // remark: remarkData,
-          target_date: targetDate,
+        target_date: targetDate,
         sent_through_rk: sent_through_rk ? 1 : 0,
       });
       return res.data;
@@ -333,13 +402,29 @@ return flatList.filter(
     onSuccess: (data) => {
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-      // setRemark("");
+
+      setTimeout(()=>{
+        navigate("/ps/all-complaints")
+      }, 2000)
+
       setTargetDate("");
       setSelectedForwardTo("");
       setConfirmConfig({ open: false, type: null });
+      setFieldErrors({}); // ✅ Success पर भी एरर क्लियर करें
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to forward");
+      // 🎯 यहाँ हम बैकएंड के हर तरह के एरर फॉर्मेट को हैंडल कर रहे हैं
+      const resData = error?.response?.data;
+      
+      if (resData?.errors) {
+        // अगर validation error है (जैसे target_date)
+        setFieldErrors(resData.errors);
+        toast.error("Please fill required fields."); // एक जनरल टोस्ट भी दिखाएं
+      } else if (resData?.message) {
+        toast.error(resData.message);
+      } else {
+        toast.error("Failed to forward");
+      }
     },
   });
 
@@ -357,10 +442,7 @@ return flatList.filter(
     toast.error("Please select officer");
     return;
   }
-  if (!targetDate) {
-    toast.error("Please select target date");
-    return;
-  }
+ 
 
   forwardComplaintMutation.mutate({
     complaintId: id,
@@ -431,6 +513,7 @@ return flatList.filter(
     setRemark("");
       setTargetDate("");
     setSelectedForwardTo("");
+    setFieldErrors({});
   };
 
   const getStatusColor = (status) => {
@@ -705,10 +788,10 @@ return flatList.filter(
                       <p className="text-[14px] text-black font-semibold uppercase mb-1">
                         जिला
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.main_complainant_district
-                        ) || "N/A"}
+                       || "ykxw ugha"}
                       </p>
                     </div>
                   </div>
@@ -749,10 +832,10 @@ return flatList.filter(
                       <p className="text-[14px] text-black font-semibold uppercase mb-1">
                         जिला
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.main_respondant_district
-                        ) || "N/A"}
+                        || "ykxw ugha"}
                       </p>
                     </div>
                   </div>
@@ -854,7 +937,7 @@ return flatList.filter(
                   <FaEye /> प्रतिवादी
                 </button>
 
-                <button
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "support" })
                   }
@@ -864,9 +947,9 @@ return flatList.filter(
                w-full sm:w-auto"
                 >
                   <FaEye /> समर्थनकर्ता व्यक्ति
-                </button>
+                </button> */}
 
-                <button
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "witness" })
                   }
@@ -876,7 +959,7 @@ return flatList.filter(
                w-full sm:w-auto"
                 >
                   <FaEye /> साक्षियों का विवरण
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -885,7 +968,7 @@ return flatList.filter(
             complaintData.assign_to_ps == null ? (
               <div className="md:hidden border-b bg-white">
                 <div className="flex flex-col">
-                  {[ "documents", "notings", "movement"].map((tab) => (
+                  {["fee", "documents", "notings", "movement"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => {
@@ -917,7 +1000,7 @@ return flatList.filter(
             complaintData.assign_to_ps == null ? (
               <div className="hidden md:flex border-b px-6">
                 <div className="flex gap-6 overflow-x-auto">
-                  {[ "documents", "notings", "movement"].map((tab) => (
+                  {["fee", "documents", "notings", "movement"].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab)}
@@ -962,63 +1045,117 @@ return flatList.filter(
 
             {/* Footer Buttons */}
 
-            {complaintData.assign_to_ps == UserID ||
-            complaintData.assign_to_ps == null ? (
+           {/* Footer Buttons */}
+          {/* Footer Buttons */}
+            {complaintData.assign_to_ps == UserID || complaintData.assign_to_ps == null ? (
               <div className="border-t p-4">
                 <div className="flex flex-col sm:flex-row gap-3 justify-between">
-                  <div>
-                    {/* <button
-                      onClick={handlePullBack}
-                      className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
-                    >
-                      Pull Back
-                    </button> */}
+                  
+                  {/* LEFT SIDE BUTTONS */}
+                  <div className="flex items-center gap-2">
+                    {/* 1. Pull Back Button */}
+                    {/* {complaintData?.status == "Final Disposal/Closed" || complaintData?.status == "Rejected" ? (
+                      <div></div>
+                    ) : (
+                      <button
+                        onClick={handlePullBack}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
+                      >
+                        Pull Back
+                      </button>
+                    )} */}
 
-                    {/* {complaintData.assign_to_ps ? (
-                      <span className="px-4 py-2 ml-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
+                    {/* 2. Take File in Hand Button */}
+                    {/* {complaintData?.status == "Final Disposal/Closed" || complaintData?.status == "Rejected" ? (
+                      <div></div>
+                    ) : complaintData.assign_to_ps ? (
+                      <span className="px-4 py-2 bg-blue-600 text-white rounded text-sm cursor-not-allowed opacity-50">
                         Assigned
                       </span>
                     ) : (
                       <button
                         onClick={handleAssignToSelf}
-                        className="px-4 py-2 border  border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm ml-2"
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm"
                       >
                         Take File in Hand
                       </button>
                     )} */}
                   </div>
 
-                  <div className="flex gap-2">
+                  {/* RIGHT SIDE BUTTONS */}
+                  <div className="flex items-center flex-wrap gap-2 mt-2 sm:mt-0">
+                    
+                    {/* 3. Reject Button */}
+                    {/* {complaintData?.status == "Final Disposal/Closed" ? (
+                      <div></div>
+                    ) : (
+                      <button
+                        className={`px-4 py-2 border rounded text-sm
+                          ${complaintData?.status === "Rejected"
+                            ? "bg-gray-400 border-gray-400 text-white cursor-not-allowed"
+                            : "bg-red-600 border-red-600 text-white hover:bg-red-700"
+                          }`}
+                        onClick={() => {
+                          if (complaintData?.status === "Rejected") return;
+                          setShowModal(true);
+                        }}
+                        disabled={complaintData?.status === "Rejected"}
+                      >
+                        {complaintData?.status === "Rejected" ? "Rejected" : "Reject"}
+                      </button>
+                    )} */}
 
-         {/* <button
-        className="px-4 py-2 bg-red-600 border border-red-600 text-white rounded hover:bg-red-700 text-sm"
-        onClick={() => setShowModal(true)}
-      >
-        Reject
-      </button> */}
+                    {/* 4. Dispose Button */}
+                    {/* {complaintData?.status !== "Rejected" && (
+                      <button
+                        onClick={diposeShow}
+                        disabled={
+                          dispose.isPending ||
+                          complaintData?.status === "Final Disposal/Closed"
+                        }
+                        className={`px-4 py-2 border rounded text-sm
+                          ${
+                            complaintData?.status === "Final Disposal/Closed"
+                              ? "border-gray-300 text-gray-400 cursor-not-allowed bg-gray-100"
+                              : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                          }
+                          ${dispose.isPending ? "opacity-50 cursor-not-allowed" : ""}
+                        `}
+                      >
+                        {dispose.isPending
+                          ? "Processing..."
+                          : complaintData?.status === "Final Disposal/Closed"
+                          ? "Disposed"
+                          : "Dispose"}
+                      </button>
+                    )} */}
 
-                    {/* <button
-                      onClick={handleMarkAsReceived}
-                      disabled={returnWithRemarksMutation.isPending}
-                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {returnWithRemarksMutation.isPending
-                        ? "Processing..."
-                        : "Return with Remarks"}
-                    </button> */}
+                    {/* 5. Return with Remarks Button */}
+                    {/* {complaintData?.status == "Final Disposal/Closed" || complaintData?.status == "Rejected" ? (
+                      <div></div>
+                    ) : (
+                      <button
+                        onClick={handleMarkAsReceived}
+                        disabled={returnWithRemarksMutation.isPending}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {returnWithRemarksMutation.isPending ? "Processing..." : "Return with Remarks"}
+                      </button>
+                    )} */}
 
-
-
-                  
-                      {/* <button
+                    {/* 6. Send / Mark Button */}
+                    {/* {complaintData?.status === "Final Disposal/Closed" || complaintData?.status === "Rejected" ? (
+                      <div></div>
+                    ) : (
+                      <button
                         onClick={handleforwardphysical}
                         disabled={forwardComplaintMutation.isPending}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm sm:ml-auto mt-2 sm:mt-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {forwardComplaintMutation.isPending
-                          ? "Processing..."
-                          : "Send / Mark"}
-                      </button> */}
+                        {forwardComplaintMutation.isPending ? "Processing..." : "Send / Mark"}
+                      </button>
+                    )} */}
+                    
                   </div>
                 </div>
               </div>
@@ -1210,8 +1347,10 @@ return flatList.filter(
       value={remark}
       onChange={(e) => setRemark(e.target.value)}
       rows={4}
-      placeholder="Enter remark here…"
-      className="w-full px-3 py-2 border border-gray-300 rounded
+      // placeholder="Enter remark here…"
+      placeholder="vkids rFkk fVIi.kh ;gk¡ fy[ksa"
+
+      className="w-full  kruti-input px-3 py-2 border border-gray-300 rounded
                  focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
     />
   </div>
@@ -1221,16 +1360,34 @@ return flatList.filter(
 {confirmConfig.type === "forward" && (
   <div className="mb-5">
     <label className="block text-sm font-medium text-gray-700 mb-2">
-      Target Date <span className="text-red-500">*</span>
+      Target Date 
+      {/* <span className="text-red-500">*</span> */}
     </label>
     <input
       type="date"
       min={new Date().toISOString().split("T")[0]}
       value={targetDate}
-      onChange={(e) => setTargetDate(e.target.value)}
-      className="w-full px-3 py-2 border border-gray-300 rounded
-                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      onChange={(e) => {
+        setTargetDate(e.target.value);
+        // ✅ जैसे ही यूज़र कुछ टाइप करे, एरर हटा दें
+        if (fieldErrors?.target_date) {
+          setFieldErrors((prev) => ({ ...prev, target_date: null }));
+        }
+      }}
+      className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${
+        fieldErrors?.target_date 
+          ? "border-red-500 focus:ring-red-400 bg-red-50" 
+          : "border-gray-300 focus:ring-blue-500"
+      }`}
     />
+    
+    {/* 🎯 यहाँ लाल रंग में एरर मैसेज दिखेगा */}
+    {fieldErrors?.target_date && (
+      <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
+       
+        {fieldErrors.target_date[0]}
+      </p>
+    )}
   </div>
 )}
 
@@ -1256,10 +1413,11 @@ return flatList.filter(
                 disabled={
                   returnWithRemarksMutation.isPending ||
                   forwardComplaintMutation.isPending ||
+                  assignToSelfMutation.isPending || 
+                  pullBackMutation.isPending ||
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
                     (!selectedForwardTo ||
-  !targetDate ||
   isLoadingOptions ||
   isFetchingOptions))
                 }
@@ -1272,6 +1430,65 @@ return flatList.filter(
                     confirmConfig.type === "pullback"
                   ? "Yes"
                   : "Send"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* Dispose Modal */}
+      {showDispatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-5 relative">
+            <button
+              onClick={closePoup}
+              disabled={dispose.isPending}
+              className="absolute top-3 right-3 p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FaTimes className="w-5 h-5 text-gray-600" />
+            </button>
+
+            <h3 className="text-lg font-semibold mb-4 pr-8">
+              Dispose Complaint
+            </h3>
+
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Disposal Remark <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={remark}
+                onChange={(e) => setRemark(e.target.value)}
+                rows={4}
+                placeholder="fuLrkj.k fVIi.kh ntZ djsa"
+                className="w-full kruti-input px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+              />
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={closePoup}
+                className="px-4 py-2 text-sm rounded border border-gray-300 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => {
+                  if (!remark.trim()) {
+                    toast.error("Please enter disposal remark");
+                    return;
+                  }
+                  dispose.mutate({
+                    complaintId: id,
+                    remarkData: remark,
+                  });
+                }}
+                disabled={dispose.isPending || !remark.trim()}
+                className="px-4 py-2 text-sm rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {dispose.isPending ? "Disposing..." : "Dispose Now"}
               </button>
             </div>
           </div>
@@ -1407,7 +1624,7 @@ return flatList.filter(
                             <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.father_name || "-"}
                             </td>
-                            <td className=" px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className=" px-6 kruti-input py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.district_name || "-"}
                             </td>
                             <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -1531,10 +1748,10 @@ return flatList.filter(
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.designation || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.department_name || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.district_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
@@ -1755,4 +1972,4 @@ return flatList.filter(
   );
 };
 
-export default ViewAllComplaint;
+export default ViewApprovedComplaints;

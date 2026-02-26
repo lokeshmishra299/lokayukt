@@ -163,7 +163,7 @@ const PreView = ({ complaintData }) => {
                              <div className="font-bold text-blue-800 underline mb-1">परिवादी {index + 1}</div>
                              <p><span className="font-semibold text-gray-700">(क) स्थान :</span> <span className="kruti-input text-[20px] font-normal">{safeData(comp.permanent_place)}</span></p>
                              <p><span className="font-semibold text-gray-700">(ख) डाकघर :</span> <span className="kruti-input text-[20px] font-normal">{safeData(comp.permanent_post_office)}</span></p>
-                             <p><span className="font-semibold text-gray-700">(ग) जिला :</span> <span className=" text-[15px] font-normal">{safeData(comp.district_name)}</span></p>
+                             <p><span className="font-semibold text-gray-700">(ग) जिला :</span> <span className=" kruti-input text-[15px] font-normal">{safeData(comp.district_name)}</span></p>
                         </div>
                     ))
                 ) : <div className="pl-4 mt-0.5 font-medium">NA</div>}
@@ -179,7 +179,7 @@ const PreView = ({ complaintData }) => {
                   <p>(क) नाम : <span className="kruti-input text-[20px] font-normal">{safeData(data.correspondence_name)}</span></p>
                   <p>(ख) स्थान : <span className="kruti-input text-[20px] font-normal">{safeData(data.correspondence_place)}</span></p>
                   <p>(ग) डाकघर/थाना : <span className="kruti-input text-[20px] font-normal">{safeData(data.correspondence_post_office)}</span></p>
-                  <p>(घ) जिला : <span className=" text-[15px] font-normal">{safeData(data.correspondence_district)}</span></p>
+                  <p>(घ) जिला : <span className=" text-[15px] kruti-input font-normal">{safeData(data.correspondence_district)}</span></p>
                 </div>
               </div>
             </div>
@@ -202,8 +202,8 @@ const PreView = ({ complaintData }) => {
                             <div className="space-y-1 font-medium text-gray-800 text-sm">
                                 <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">नाम:</span> <span className="kruti-input text-[20px] font-normal">{safeData(resp.respondent_name)}</span></div>
                                 <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">पदनाम:</span> <span className=" text-[15px] font-normal">{safeData(resp.designation)}</span></div>
-                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">विभाग:</span> <span className=" text-[15px] font-normal">{safeData(resp.department_name)}</span></div>
-                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">जिला:</span> <span className=" text-[15px] font-normal">{safeData(resp.district_name || resp.respondent_district)}</span></div>
+                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">विभाग:</span> <span className=" kruti-input text-[15px] font-normal">{safeData(resp.department_name)}</span></div>
+                                <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">जिला:</span> <span className=" kruti-input text-[15px] font-normal">{safeData(resp.district_name || resp.respondent_district)}</span></div>
                                 <div className="grid grid-cols-[80px_1fr]"><span className="font-semibold text-gray-900">पता:</span> <span className="kruti-input text-[20px] font-normal">{safeData(resp.current_address)}</span></div>
                             </div>
                         </div>

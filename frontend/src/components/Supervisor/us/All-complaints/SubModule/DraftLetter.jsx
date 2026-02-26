@@ -15,6 +15,7 @@ import draftToHtml from "draftjs-to-html";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import EditDraft from "./EditDraft";
+import Pagination from "../../../../Pagination";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
@@ -31,6 +32,8 @@ const api = axios.create({
 
 const DraftLetter = ({ complaint }) => {
   const [pdfViewUrl, setPdfViewUrl] = useState(null);
+  const [draftPage, setDraftPage] = useState(1);
+const itemsPerPage = 10;
   const [loadingDoc, setLoadingDoc] = useState(null);
   const [openAddDocuments, setopenAddDocuments] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -306,6 +309,7 @@ const [sentToPersonInfo, setSentToPersonInfo] = useState("")
         setDraftTitle("");
         setNote("");
         setSentToPersonInfo("");
+          setSentEditorState(EditorState.createEmpty()); 
         setEditorState(EditorState.createEmpty());
         setErrors({});
         refetch();
@@ -482,6 +486,16 @@ if (!sentContent.hasText()) {
     enabled: !!complaint?.id,
   });
 
+  useEffect(() => {
+  setDraftPage(1);
+}, [documents]);
+
+const lastIndex = draftPage * itemsPerPage;
+const firstIndex = lastIndex - itemsPerPage;
+const currentDrafts = documents.slice(firstIndex, lastIndex);
+const totalPages = Math.ceil(documents.length / itemsPerPage);
+
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -505,29 +519,23 @@ if (!sentContent.hasText()) {
       <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Draft</h2>
         <div className="flex items-center gap-2">
-          {Number(complaint?.approved_rejected_by_ro_aro) !== 1 && (
-              <button
-            className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
-            onClick={() => {
-                setErrors({}); 
-                setOpenNoteModal(true);
-            }}
-          >
-            Create Draft
-          </button>
-          )
-
-          }
+    <button
+  className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
+  onClick={() => {
+    setErrors({});
+    setOpenNoteModal(true);
+  }}
+>
+  Create Draft
+</button>
          
-        {Number(complaint?.approved_rejected_by_ro_aro) !== 1 && (
-  <button
-    onClick={handleAddDocuments}
-    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-  >
-    <FaCloudUploadAlt className="w-4 h-4" />
-    Add Draft
-  </button>
-)}
+      <button
+  onClick={handleAddDocuments}
+  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+>
+  <FaCloudUploadAlt className="w-4 h-4" />
+  Add Draft
+</button>
          
         </div>
       </div>
@@ -539,7 +547,7 @@ if (!sentContent.hasText()) {
             No documents available
           </div>
         ) : (
-          documents.map((doc) => (
+          currentDrafts.map((doc) => (
             <div
               key={doc.id}
               className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow"
@@ -547,7 +555,7 @@ if (!sentContent.hasText()) {
               <div className="flex items-center gap-3">
                 <BsFileEarmarkPdf className="w-6 h-6 text-blue-600" />
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-800">
+                  <span className="text-sm kruti-input font-medium text-gray-800">
                     {doc.title || "NA"}
                   </span>
                   {doc.type && (
@@ -586,6 +594,16 @@ if (!sentContent.hasText()) {
           ))
         )}
       </div>
+
+      {documents.length > itemsPerPage && (
+  <Pagination
+    currentPage={draftPage}
+    totalPages={totalPages}
+    onPageChange={setDraftPage}
+    totalItems={documents.length}
+    itemsPerPage={itemsPerPage}
+  />
+)}
 
       {editDraftPopup && (
         <EditDraft
@@ -806,12 +824,7 @@ if (!sentContent.hasText()) {
                 }`}
               >
 
-              <style>{`
-                  .public-DraftStyleDefault-block {
-                    margin: 0 !important;
-                    padding: 0 !important;
-                  }
-                `}</style>
+            
                 
                 {/* <Editor
                   editorState={editorState}
@@ -840,6 +853,8 @@ if (!sentContent.hasText()) {
 
 
 <style>{`
+.kruti-input div[data-block="true"], 
+.kruti-input p,
 .public-DraftStyleDefault-block {
   margin: 0 !important;
   padding: 0 !important;
@@ -848,7 +863,7 @@ if (!sentContent.hasText()) {
 .kruti-input .public-DraftEditor-content {
   font-family: 'KrutiDev' !important;
   font-size: 20px !important;
-  line-height: 1.5 !important;
+  line-height: 1.1 !important; 
 }
 
 .kruti-input .public-DraftEditorPlaceholder-root {
@@ -868,7 +883,6 @@ if (!sentContent.hasText()) {
   font-family: 'KrutiDev' !important;
 }
 `}</style>
-
                 <Editor
 
                 
@@ -1013,13 +1027,21 @@ if (!sentContent.hasText()) {
             <div className="-ml-5 mt-2"> 
               
               <div
-                className="ml-6 draft-preview-content"
-                dangerouslySetInnerHTML={{
-                  __html: sentToPersonInfo
-                    ?.replace(/<li>/g, '<li style="font-family: KrutiDev; font-size:20px;">')
-                    .replace(/<p>/g, '<p style="font-family: KrutiDev; font-size:20px; margin:0;">'),
-                }}
-              />
+  className="ml-6 draft-preview-content"
+  dangerouslySetInnerHTML={{
+    __html: sentToPersonInfo
+      ?.replace(
+  /<li>/g,
+  '<li style="font-family: KrutiDev; font-size:20px; margin:0; padding:0; line-height:1.1;">'
+)
+.replace(
+  /<p>/g,
+  '<p style="font-family: KrutiDev; font-size:20px; margin:0; padding:0; line-height:1.1;">'
+)
+  }}
+/>
+
+
             </div>
 
 
@@ -1038,9 +1060,18 @@ if (!sentContent.hasText()) {
               className="rounded-md bg-white min-h-[200px] md:min-h-[260px] draft-preview-content"
               dangerouslySetInnerHTML={{
                 __html: note
-                  .replace(/<li>/g, '<li style="font-family: Arial, sans-serif;"><span style="font-family: KrutiDev; font-size:22px;">')
-                  .replace(/<\/li>/g, '</span></li>')
-                  .replace(/<p>/g, '<p style="font-family: KrutiDev; font-size:22px;">')
+                 .replace(
+  /<li>/g,
+  '<li style="font-family: Arial, sans-serif; margin:0; padding:0; line-height:1.1;"><span style="font-family: KrutiDev; font-size:22px; line-height:1.1;">'
+)
+.replace(
+  /<\/li>/g,
+  '</span></li>'
+)
+.replace(
+  /<p>/g,
+  '<p style="font-family: KrutiDev; font-size:22px; margin:0; padding:0; line-height:1.1;">'
+)
               }}
             />
 

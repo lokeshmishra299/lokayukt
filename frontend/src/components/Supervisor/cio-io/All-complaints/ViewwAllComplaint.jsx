@@ -565,8 +565,8 @@ const ViewAllComplaint = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
         जिला
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_district) || "N/A"}
+        <p className="text-gray-800 kruti-input text-sm">
+          {complaintData.main_complainant_district || "ykxw ugha"}
         </p>
       </div>
     </div>
@@ -602,8 +602,8 @@ const ViewAllComplaint = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
          जिला
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondant_district) || "N/A"}
+        <p className="text-gray-800 kruti-input text-sm">
+          {complaintData.main_respondant_district || "ykxw ugha"}
         </p>
       </div>
     </div>
@@ -695,22 +695,22 @@ const ViewAllComplaint = () => {
                 >
                   <FaEye /> प्रतिवादी
                 </button>
-                <button
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "support" })
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
                 >
                   <FaEye /> समर्थनकर्ता व्यक्ति
-                </button>
-                <button
+                </button> */}
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "witness" })
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
                 >
                   <FaEye /> गवाह का विवरण
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -1178,7 +1178,7 @@ const ViewAllComplaint = () => {
                             <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.father_name || "-"}
                             </td>
-                            <td className=" px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className=" px-6 kruti-input py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.district_name || "-"}
                             </td>
                             <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -1329,10 +1329,10 @@ const ViewAllComplaint = () => {
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.designation || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.department_name || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.district_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">

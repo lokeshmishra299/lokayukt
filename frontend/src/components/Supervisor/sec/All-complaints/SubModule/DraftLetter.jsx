@@ -519,23 +519,47 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
       <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
         <h2 className="text-lg font-semibold text-gray-800">Draft</h2>
         <div className="flex items-center gap-2">
-    <button
-  className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
-  onClick={() => {
-    setErrors({});
-    setOpenNoteModal(true);
-  }}
->
-  Create Draft
-</button>
+          {
+
+            complaint?.assign_to_ro_aro ? 
+            Number(complaint?.approved_rejected_by_ro_aro) !== 1 && (
+              <button
+            className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
+            onClick={() => {
+                setErrors({}); 
+                setOpenNoteModal(true);
+            }}
+          >
+            Create Draft
+          </button>
+          )
+          :
+          <div>
+
+          </div>
+
+          }
          
-      <button
-  onClick={handleAddDocuments}
-  className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
->
-  <FaCloudUploadAlt className="w-4 h-4" />
-  Add Draft
-</button>
+        {
+          
+
+          complaint?.assign_to_ro_aro
+          ? 
+          Number(complaint?.approved_rejected_by_ro_aro) !== 1 && (
+  <button
+    onClick={handleAddDocuments}
+    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+  >
+    <FaCloudUploadAlt className="w-4 h-4" />
+    Add Draft
+  </button>
+)
+:
+<div>
+  
+</div>
+
+}
          
         </div>
       </div>
@@ -786,17 +810,17 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
 
 
 
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium my-2">
   Sent To Person Info
 </label>
 
-<div className="border border-gray-300 rounded-md">
+<div className="border border-gray-300 rounded-md mt-5">
   <Editor
     editorState={sentEditorState}
     onEditorStateChange={onSentEditorChange}
     // handlePastedText={handlePastedText}
     stripPastedStyles={true}
-    editorClassName="kruti-input px-3 min-h-[100px]"
+    editorClassName="kruti-input px-3  min-h-[100px]"
     editorStyle={{ lineHeight: "1.2", minHeight: "120px" }}
     placeholder="यहाँ भेजे गए व्यक्ति की जानकारी लिखें..."
     toolbar={{
@@ -815,7 +839,7 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
 
 
             
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium my-2">
                 Draft Content <span className="text-red-500">*</span>
               </label>
               <div
@@ -861,6 +885,7 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
 }
 
 .kruti-input .public-DraftEditor-content {
+ padding-top: 6px !important;
   font-family: 'KrutiDev' !important;
   font-size: 20px !important;
   line-height: 1.1 !important; 

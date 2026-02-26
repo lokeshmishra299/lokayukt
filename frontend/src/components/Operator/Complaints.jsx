@@ -166,7 +166,7 @@ const ComplaintPrintView = React.forwardRef(({ complainants, persons, formData }
                     <div>पदनाम : <span className="">{p.designation || '——'}</span></div>
                     <div>वर्तमान पता : <span className="kruti-input">{p.currentAddress || '——'}</span></div>
                     <div>ज़िला : <span className="kruti-input">{p.district || '——'}</span></div>
-                    <div>विभाग : <span className="">{p.departmentNature || '——'}</span></div>
+                    <div>विभाग : <span className="kruti-input">{p.departmentNature || '——'}</span></div>
                     <div>श्रेणी : <span className="">{p.officerCategory || '——'}</span></div>
                   </div>
                 ))}

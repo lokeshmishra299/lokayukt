@@ -637,32 +637,42 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
               )}
 
               {/* District */}
-              <div>
-                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                  District / जिला *
-                </label>
-                <select
-                  name="district_id"
-                  value={formData.district_id}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
-                    errors.district_id ? "border-red-500" : "border-gray-300"
-                  }`}
-                  disabled={isLoadingDistricts}
-                >
-                  <option value="">Select District</option>
-                  {districts.map((district) => (
-                    <option key={district.id} value={district.district_code}>
-                      {district.district_name}
-                    </option>
-                  ))}
-                </select>
-                {errors.district_id && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    {errors.district_id}
-                  </p>
-                )}
-              </div>
+            <div>
+    <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+      District / जिला *
+    </label>
+    <select
+      name="district_id"
+      value={formData.district_id}
+      onChange={handleInputChange}
+      // 🎯 डायनामिक फॉन्ट: वैल्यू सेलेक्ट होने पर 'kruti-input', खाली रहने पर नॉर्मल (English)
+      className={`w-full px-3 py-2 border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
+        errors.district_id ? "border-red-500" : "border-gray-300"
+      } ${formData.district_id ? 'kruti-input text-[20px]' : 'font-sans text-sm'}`}
+      disabled={isLoadingDistricts}
+    >
+      {/* 🎯 डिफ़ॉल्ट ऑप्शन हमेशा इंग्लिश में रहेगा */}
+      <option value="" style={{ fontFamily: 'sans-serif', fontSize: '14px' }}>
+        Select District
+      </option>
+      
+      {/* 🎯 जिलों के नाम हमेशा KrutiDev में दिखेंगे */}
+      {districts.map((district) => (
+        <option 
+          key={district.id} 
+          value={district.district_code}
+          style={{ fontFamily: 'KrutiDev', fontSize: '20px' }}
+        >
+          {district.district_name}
+        </option>
+      ))}
+    </select>
+    {errors.district_id && (
+      <p className="mt-1 text-sm text-red-600 flex items-center">
+        {errors.district_id}
+      </p>
+    )}
+  </div>
 
               {/* Designation */}
               <div>
@@ -697,36 +707,46 @@ const [showConfirmPassword, setShowConfirmPassword] = useState(false);
               </div>
 
               {/* Department */}
-              <div>
-                <label
-                  htmlFor="department"
-                  className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
-                >
-                  Department *
-                </label>
-                <select
-                  id="department"
-                  name="department"
-                  value={formData.department}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 text-sm border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
-                    errors.department ? "border-red-500" : "border-gray-300"
-                  }`}
-                  disabled={isLoadingDepartments}
-                >
-                  <option value="">Select Department</option>
-                  {departments.map((department) => (
-                    <option key={department.id} value={department.id}>
-                      {department.name}
-                    </option>
-                  ))}
-                </select>
-                {errors.department && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    {errors.department}
-                  </p>
-                )}
-              </div>
+             <div>
+    <label
+      htmlFor="department"
+      className="block text-xs sm:text-sm font-medium text-gray-700 mb-1"
+    >
+      Department *
+    </label>
+    <select
+      id="department"
+      name="department"
+      value={formData.department}
+      onChange={handleInputChange}
+      // 🎯 डायनामिक फॉन्ट: वैल्यू सेलेक्ट होने पर 'kruti-input', खाली रहने पर नॉर्मल (English)
+      className={`w-full px-3 py-2 border rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white ${
+        errors.department ? "border-red-500" : "border-gray-300"
+      } ${formData.department ? 'kruti-input text-[20px]' : 'font-sans text-sm'}`}
+      disabled={isLoadingDepartments}
+    >
+      {/* 🎯 डिफ़ॉल्ट ऑप्शन हमेशा इंग्लिश में रहेगा */}
+      <option value="" style={{ fontFamily: 'sans-serif', fontSize: '14px' }}>
+        Select Department
+      </option>
+      
+      {/* 🎯 डिपार्टमेंट के नाम हमेशा KrutiDev में दिखेंगे */}
+      {departments.map((department) => (
+        <option 
+          key={department.id} 
+          value={department.id}
+          style={{ fontFamily: 'KrutiDev', fontSize: '20px' }}
+        >
+          {department.name}
+        </option>
+      ))}
+    </select>
+    {errors.department && (
+      <p className="mt-1 text-sm text-red-600 flex items-center">
+        {errors.department}
+      </p>
+    )}
+  </div>
             </div>
           </div>
 

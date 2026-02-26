@@ -53,6 +53,13 @@ const SearchableDropdown = ({
 
   const selectedOption = options?.find((opt) => opt && opt.id == value);
 
+  const getRoleLabel = (option) => {
+  if (option?.subrole_name) return option.subrole_name;   // CIO / RO etc
+  if (option?.role?.label) return option.role.label;     // UpLokayukt
+  return "";
+};
+
+
   const filteredOptions = options.filter((option) => {
      if (!option) return false;
     const label = option.name || option.user_name || `User ${option.id}`;
@@ -85,13 +92,13 @@ const SearchableDropdown = ({
             !selectedOption ? "text-gray-500" : "text-gray-900"
           }`}
         >
-          {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+         {selectedOption
+  ? `${selectedOption.name || selectedOption.user_name}${
+      getRoleLabel(selectedOption)
+        ? ` (${getRoleLabel(selectedOption)})`
+        : ""
+    }`
+  : placeholder}
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -120,13 +127,11 @@ const SearchableDropdown = ({
                   onClick={() => handleSelect(option)}
                 >
                   {option.name || option.user_name || `User ${option.id}`}
-                  {option.district_name ? (
-                    <span className="text-gray-500 text-xs ml-1">
-                      ({option.district_name})
-                    </span>
-                  ) : (
-                    ""
-                  )}
+                  {getRoleLabel(option) && (
+  <span className="">
+    ({getRoleLabel(option)})
+  </span>
+)}
                 </div>
               ))
             ) : (
@@ -157,6 +162,7 @@ const ViewApprovedComplaints = () => {
   const [currentPreviewFile, setCurrentPreviewFile] = useState(null);
   const [showMobileTabs, setShowMobileTabs] = useState(false);
     const [sent_through_rk, setThroughRC] = useState(false);
+    const [targetDate, setTargetDate] = useState("");
   
 
   // Single config for Action modals (Receive, Forward, Pullback)
@@ -257,7 +263,7 @@ const ViewApprovedComplaints = () => {
     // --- PULL BACK API (Supervisor) ---
   const pullBackMutation = useMutation({
     mutationFn: async ({ complaintId }) => {
-      return api.post(`/supervisor/pull-back-by-ro-aro/${complaintId}`);
+      return api.post(`/supervisor/pull-back-by-io/${complaintId}`);
     },
     onSuccess: (res) => {
       toast.success("Complaint pulled back successfully");
@@ -313,9 +319,10 @@ const ViewApprovedComplaints = () => {
   
   const forwardComplaintMutation = useMutation({
       mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
-        const res = await api.post(`/supervisor/forward-by-cio/${complaintId}`, {
+        const res = await api.post(`/supervisor/forward-by-io/${complaintId}`, {
           forward_to: forwardTo,
-          remark: remarkData,
+          // remark: remarkData,
+            target_date: targetDate, 
          sent_through_rk: sent_through_rk ? 1 : 0
 
         });
@@ -324,7 +331,14 @@ const ViewApprovedComplaints = () => {
       onSuccess: (data) => {
         toast.success(data.message || "Forwarded successfully");
         queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
-        setRemark("");
+
+            setTimeout(()=>{
+          navigate("/supervisor/all-complaints")
+        }, 2000)
+        // setRemark("");
+        setTargetDate("");
+        setThroughRC(false);
+
         setSelectedForwardTo("");
         setConfirmConfig({ open: false, type: null });
       },
@@ -350,11 +364,11 @@ const ViewApprovedComplaints = () => {
         remarkData: remark,
 
       });
-    } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
-        toast.error("Please select forward to and enter a remark");
-        return;
-      }
+    }  else if (confirmConfig.type === "forward") {
+  if (!selectedForwardTo) {
+    toast.error("Please select officer");
+    return;
+  }
       forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
@@ -551,8 +565,8 @@ const ViewApprovedComplaints = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
         जिला
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_complainant_district) || "N/A"}
+        <p className="text-gray-800 kruti-input text-sm">
+          {complaintData.main_complainant_district || "ykxw ugha"}
         </p>
       </div>
     </div>
@@ -588,8 +602,8 @@ const ViewApprovedComplaints = () => {
         <p className="text-[14px] text-black font-semibold uppercase mb-1">
          जिला
         </p>
-        <p className="text-gray-800 text-sm">
-          {capitalizeFirstLetter(complaintData.main_respondant_district) || "N/A"}
+        <p className="text-gray-800 kruti-input text-sm">
+          {complaintData.main_respondant_district || "ykxw ugha"}
         </p>
       </div>
     </div>
@@ -681,22 +695,22 @@ const ViewApprovedComplaints = () => {
                 >
                   <FaEye /> प्रतिवादी
                 </button>
-                <button
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "support" })
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
                 >
                   <FaEye /> समर्थनकर्ता व्यक्ति
-                </button>
-                <button
+                </button> */}
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "witness" })
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
                 >
                   <FaEye /> गवाह का विवरण
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -932,23 +946,42 @@ const ViewApprovedComplaints = () => {
                   </>
                 )}
 
-
-             {confirmConfig.type === "forward" && (
-  <label className="flex items-center gap-2 cursor-pointer mt-2">
+                {confirmConfig.type === "forward" && (
+  <label className="flex items-center gap-2 mt-2 cursor-pointer">
     <input
       type="checkbox"
       checked={sent_through_rk}
       onChange={(e) => setThroughRC(e.target.checked)}
-      className="w-4 h-4"
+      className="w-4 h-4 accent-blue-600"
     />
-    <span className="text-sm">Checkbox If Send through RC</span>
+    <span className="text-sm text-gray-700">
+      Send through Record Section (RC)
+    </span>
   </label>
 )}
+
+
+  {confirmConfig.type === "forward" && (
+  <div className="mb-5 mt-3">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Target Date <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="date"
+      value={targetDate}
+      min={new Date().toISOString().split("T")[0]}
+      onChange={(e) => setTargetDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+)}
+
     
                 {confirmConfig.type !== "assign" &&
                   confirmConfig.type !== "pullback" && (
                     <>
-                      <div className="mb-5">
+                      {/* <div className="mb-5">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Remark <span className="text-red-500">*</span>
                         </label>
@@ -959,7 +992,7 @@ const ViewApprovedComplaints = () => {
                           placeholder="Enter your remark here..."
                           className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                         />
-                      </div>
+                      </div> */}
                     </>
                   )}
     
@@ -986,10 +1019,9 @@ const ViewApprovedComplaints = () => {
     pullBackMutation.isPending || // ✅ Ye add kiya (Button disable hoga)
     (confirmConfig.type === "receive" && !remark.trim()) ||
     (confirmConfig.type === "forward" &&
-      (!remark.trim() ||
-        !selectedForwardTo ||
-        isLoadingOptions ||
-        isFetchingOptions))
+  (!selectedForwardTo ||
+   isLoadingOptions ||
+   isFetchingOptions))
   }
   className="px-4 py-2 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
 >
@@ -1146,7 +1178,7 @@ const ViewApprovedComplaints = () => {
                             <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.father_name || "-"}
                             </td>
-                            <td className=" px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className=" px-6 kruti-input py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.district_name || "-"}
                             </td>
                             <td className=" kruti-input px-6 py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -1297,10 +1329,10 @@ const ViewApprovedComplaints = () => {
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.designation || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.department_name || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.district_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">

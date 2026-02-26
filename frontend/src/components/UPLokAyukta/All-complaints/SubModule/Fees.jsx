@@ -23,13 +23,11 @@ const Fees = ({ complaint, onFeeApproved }) => {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
 
-  // 1. Local states add ki gayi hain jisse UI turant update ho jaye
   const [isApproved, setIsApproved] = useState(
     complaint?.fee_approved_by_lokayukt == 1
   );
   const [localRemark, setLocalRemark] = useState(complaint?.remark || "");
 
-  // Agar parent se data baad me change hota hai to local state sync karne ke liye
   useEffect(() => {
     setIsApproved(complaint?.fee_approved_by_lokayukt == 1);
     setLocalRemark(complaint?.remark || "");
@@ -65,14 +63,22 @@ const Fees = ({ complaint, onFeeApproved }) => {
       );
       console.log("Fee Submitted:", res.data);
       
-      // Success Toast
       toast.success("Fee Verified Successfully!");
 
-      // 2. State update karke turant UI change karein aur remark set karein
+      // 🎯 SOLUTION: CACHE KO TURANT UPDATE KAREIN (Optimistic Update)
+      queryClient.setQueryData(["complaint-details", id], (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          fee_approved_by_lokayukt: 1, // status turant 1 set karein
+          remark: fessSubmitForm.remarks,
+          fee_exempted: fessSubmitForm.fee_exempted
+        };
+      });
+
       setIsApproved(true);
       setLocalRemark(fessSubmitForm.remarks);
 
-      // React Query cache invalidate karein taki background me fresh data aa jaye
       queryClient.invalidateQueries({
         predicate: (query) => query.queryKey.includes("complaint"),
       });
@@ -81,11 +87,10 @@ const Fees = ({ complaint, onFeeApproved }) => {
         onFeeApproved();
       }
 
-      // Clear Remarks Field
-      setFessSubmitForm((prev) => ({
-        ...prev,
+      setFessSubmitForm({
+        fee_exempted: "2",
         remarks: "",
-      }));
+      });
     } catch (error) {
       console.log("Error he", error);
       const errorData = error?.response?.data || null;
@@ -97,7 +102,6 @@ const Fees = ({ complaint, onFeeApproved }) => {
 
   return (
     <>
-      {/* 3. Condition ko isApproved state se replace kiya gaya hai */}
       {isApproved ? (
         <div className="w-full flex items-center gap-4 p-6 bg-green-50 border border-green-300 rounded-xl shadow-sm">
           <FaCheckCircle className="text-green-600" size={28} />
@@ -108,7 +112,6 @@ const Fees = ({ complaint, onFeeApproved }) => {
               </p>
               <p className="text-green-700 text-sm">
                 <span className="text-black font-semibold">Remark:</span>{" "}
-                {/* 4. Yahan localRemark ka use kiya gaya hai */}
                 <span className="kruti-input">{localRemark || "ykxw ugha"}</span> 
               </p>
             </div>

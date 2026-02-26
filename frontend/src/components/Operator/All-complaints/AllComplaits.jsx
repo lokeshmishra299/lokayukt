@@ -582,28 +582,32 @@ if (selectedCaseType === "today") {
                   {/* <option value="Pending">Pending</option> */}
                 </select>
 
-                <select
-                  disabled={districtLoading}
-                  value={selectedDistrict}
-                  onChange={(e) => setSelectedDistrict(e.target.value)}
-                  className="border border-gray-300 px-2 py-1 rounded-md text-xs" // Styling ensure kar lein
-                >
-                  <option value="">District: All</option>
+             <select
+  disabled={districtLoading}
+  value={selectedDistrict}
+  onChange={(e) => setSelectedDistrict(e.target.value)}
+  // 👇 कंडीशन: selectedDistrict है तो kruti-input, नहीं तो text-xs font-sans
+  className={`border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white ${
+    selectedDistrict ? "kruti-input text-[16px]" : "text-xs font-sans"
+  }`}
+>
+  {/* 👇 'District: All' हमेशा इंग्लिश में रहेगा */}
+  <option value="" className="font-sans text-xs">
+    District: All
+  </option>
 
-                  {districtData?.map((item) => {
-                    // API se district list me jo naam wali key ho wo yahan use karein
-                    // Maan lijiye district API me key 'district_name' ya 'name' hai
-                    const districtName =
-                      item.dist_new || item.district_name || item.name || "";
+  {districtData?.map((item) => {
+    const districtName =
+      item.dist_new || item.district_name || item.name || "";
 
-                    return (
-                      // IMP: value={districtName} hona chahiye, value={item.id} NAHI
-                      <option key={item.id} value={districtName}>
-                        {districtName}
-                      </option>
-                    );
-                  })}
-                </select>
+    return (
+      // 👇 यहाँ kruti-input लगा दिया है ताकि लिस्ट में नाम सही हिंदी में दिखें
+      <option key={item.id} value={districtName} className="kruti-input text-[16px]">
+        {districtName}
+      </option>
+    );
+  })}
+</select>
 
                 <select
                   className="border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"

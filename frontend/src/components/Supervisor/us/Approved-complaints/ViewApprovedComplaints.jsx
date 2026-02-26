@@ -61,7 +61,14 @@ const SearchableDropdown = ({
 
   const filteredOptions = options.filter((option) => {
     if (!option) return false;
-    const label = option.name || option.user_name || `User ${option.id}`;
+    // const label = option.name || option.user_name || `User ${option.id}`;
+    const roleLabel = getRoleLabel(option);
+
+const label =
+  `${option.name || option.user_name || `User ${option.id}`}` +
+  (roleLabel ? ` (${roleLabel})` : "");
+
+
     const district = option.district_name || "";
     const search = searchTerm.toLowerCase();
     return (
@@ -91,13 +98,16 @@ const SearchableDropdown = ({
             !selectedOption ? "text-gray-500" : "text-gray-900"
           }`}
         >
-          {selectedOption
-            ? `${selectedOption.name || selectedOption.user_name}${
-                selectedOption.district_name
-                  ? ` (${selectedOption.district_name})`
-                  : ""
-              }`
-            : placeholder}
+         {selectedOption
+  ? `${selectedOption.name || selectedOption.user_name}${
+      selectedOption.subrole_name
+        ? ` (${selectedOption.subrole_name})`
+        : selectedOption.district_name
+        ? ` (${selectedOption.district_name})`
+        : ""
+    }`
+  : placeholder}
+
         </span>
         <FaChevronDown className="w-3 h-3 text-gray-500 ml-2" />
       </div>
@@ -117,23 +127,23 @@ const SearchableDropdown = ({
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option) => (
                 <div
-                  key={option.id}
-                  className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
-                    value == option.id
-                      ? "bg-blue-100 text-blue-800"
-                      : "text-gray-700"
-                  }`}
-                  onClick={() => handleSelect(option)}
-                >
-                  {option.name || option.user_name || `User ${option.id}`}
-                  {option.district_name ? (
-                    <span className="text-gray-500 text-xs ml-1">
-                      ({option.district_name})
-                    </span>
-                  ) : (
-                    ""
-                  )}
-                </div>
+  key={option.id}
+  className={`px-3 py-2 text-sm cursor-pointer hover:bg-blue-50 ${
+    value == option.id
+      ? "bg-blue-100 text-blue-800"
+      : "text-gray-700"
+  }`}
+  onClick={() => handleSelect(option)}
+>
+  {option.name || option.user_name || `User ${option.id}`}
+
+  {getRoleLabel(option) && (
+    <span className="">
+      ({getRoleLabel(option)})
+    </span>
+  )}
+</div>
+
               ))
             ) : (
               <div className="px-3 py-2 text-sm text-gray-500">
@@ -147,7 +157,14 @@ const SearchableDropdown = ({
   );
 };
 
-const ViewApprovedComplaints = () => {
+const getRoleLabel = (option) => {
+  if (option?.subrole_name) return option.subrole_name;
+  if (option?.role?.label) return option.role.label;
+  return "";
+};
+
+
+const ViewAllComplaint = () => {
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -173,6 +190,7 @@ const ViewApprovedComplaints = () => {
   const [showMobileTabs, setShowMobileTabs] = useState(false);
   const [showDispatch, setshowDispatch] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
+  const [targetDate, setTargetDate] = useState("");
 
   function diposeShow() {
     setshowDispatch(true);
@@ -246,7 +264,7 @@ const ViewApprovedComplaints = () => {
   // --- PULL BACK API (Supervisor) ---
   const pullBackMutation = useMutation({
     mutationFn: async ({ complaintId }) => {
-      return api.post(`/supervisor/pull-back-by-ro-aro/${complaintId}`);
+      return api.post(`/supervisor/pull-back-by-sec/${complaintId}`);
     },
     onSuccess: (res) => {
       toast.success("Complaint pulled back successfully");
@@ -260,7 +278,7 @@ const ViewApprovedComplaints = () => {
 
   const assignToSelfMutation = useMutation({
     mutationFn: async ({ complaintId }) => {
-      const res = await api.post(`/supervisor/assign-by-ro-aro/${complaintId}`);
+      const res = await api.post(`/supervisor/assign-by-sec/${complaintId}`);
       return res.data;
     },
     onSuccess: (data) => {
@@ -372,7 +390,8 @@ const ViewApprovedComplaints = () => {
         `/supervisor/forward-by-sec/${complaintId}`,
         {
           forward_to: forwardTo,
-          remark: remarkData,
+          // remark: remarkData,
+                  target_date: targetDate, 
           sent_through_rk: sent_through_rk ? 1 : 0,
         }
       );
@@ -381,6 +400,11 @@ const ViewApprovedComplaints = () => {
     onSuccess: (data) => {
       toast.success(data.message || "Forwarded successfully");
       queryClient.invalidateQueries({ queryKey: ["complaint-details", id] });
+
+        setTimeout(()=>{
+          navigate("/supervisor/all-complaints")
+        }, 2000)
+        
       setRemark("");
       setThroughRC(false);
       setSelectedForwardTo("");
@@ -408,10 +432,7 @@ const ViewApprovedComplaints = () => {
         remarkData: remark,
       });
     } else if (confirmConfig.type === "forward") {
-      if (!selectedForwardTo || !remark.trim()) {
-        toast.error("Please select forward to and enter a remark");
-        return;
-      }
+    
       forwardComplaintMutation.mutate({
         complaintId: id,
         forwardTo: selectedForwardTo,
@@ -602,13 +623,13 @@ const ViewApprovedComplaints = () => {
 
                     {/* District */}
                     <div>
-                      <p className="text-[14px] text-black font-semibold uppercase mb-1">
+                      <p className="text-[14px]  text-black font-semibold uppercase mb-1">
                         जिला
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.main_complainant_district
-                        ) || "N/A"}
+                      || "ykxw ugha"}
                       </p>
                     </div>
                   </div>
@@ -648,10 +669,10 @@ const ViewApprovedComplaints = () => {
                       <p className="text-[14px] text-black font-semibold uppercase mb-1">
                         जिला
                       </p>
-                      <p className="text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
+                      <p className="text-gray-800 kruti-input text-sm">
+                        {
                           complaintData.main_respondant_district
-                        ) || "N/A"}
+                         || "ykxw ugha"}
                       </p>
                     </div>
                   </div>
@@ -754,22 +775,22 @@ const ViewApprovedComplaints = () => {
                 >
                   <FaEye /> प्रतिवादी
                 </button>
-                <button
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "support" })
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-md border border-green-200 hover:bg-green-100 transition-colors text-sm font-medium"
                 >
                   <FaEye /> समर्थनकर्ता व्यक्ति
-                </button>
-                <button
+                </button> */}
+                {/* <button
                   onClick={() =>
                     setViewModalConfig({ open: true, type: "witness" })
                   }
                   className="flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-700 rounded-md border border-purple-200 hover:bg-purple-100 transition-colors text-sm font-medium"
                 >
                   <FaEye /> गवाह का विवरण
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -1095,16 +1116,17 @@ const ViewApprovedComplaints = () => {
                         Checkbox If Send through RC
                       </span>
                     </label>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Remark <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      value={remark}
-                      onChange={(e) => setRemark(e.target.value)}
-                      rows={4}
-                      placeholder="Enter your remark here..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
+                   <label className="block text-sm font-medium text-gray-700 mb-2">
+  Target Date <span className="text-red-500">*</span>
+</label>
+                   <input
+  type="date"
+  value={targetDate}
+  min={new Date().toISOString().split("T")[0]}
+  onChange={(e) => setTargetDate(e.target.value)}
+  className="w-full px-3 py-2 border border-gray-300 rounded
+             focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
                   </div>
                 </>
               )}
@@ -1134,7 +1156,7 @@ const ViewApprovedComplaints = () => {
                   pullBackMutation.isPending || // ✅ Pull Back Loading
                   (confirmConfig.type === "receive" && !remark.trim()) ||
                   (confirmConfig.type === "forward" &&
-                    (!remark.trim() ||
+                    (
                       !selectedForwardTo ||
                       isLoadingOptions ||
                       isFetchingOptions))
@@ -1359,7 +1381,7 @@ const ViewApprovedComplaints = () => {
                             <td className="px-6 kruti-input py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.father_name || "-"}
                             </td>
-                            <td className="px-6  py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
+                            <td className="px-6 kruti-input  py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
                               {comp.district_name || "-"}
                             </td>
                             <td className="px-6 kruti-input py-4 whitespace-nowrap text-sm text-gray-700 border-r border-gray-200">
@@ -1508,10 +1530,10 @@ const ViewApprovedComplaints = () => {
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.designation || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.department_name || "-"}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
+                            <td className="px-4 kruti-input py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
                               {resp.district_name || "-"}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-600 border-r border-gray-100 whitespace-nowrap">
@@ -1646,4 +1668,4 @@ const ViewApprovedComplaints = () => {
   );
 };
 
-export default ViewApprovedComplaints;
+export default ViewAllComplaint;

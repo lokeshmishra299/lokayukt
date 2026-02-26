@@ -85,7 +85,7 @@ import AllDraft from './components/Operator/Draft/AllDraft';
 import ViewDraft from './components/Operator/Draft/ViewDraft';
 import EditDraft from './components/Operator/Draft/EditDraft';
 import RcLog from './components/Operator/RcLog';
-import Reporting from './components/Operator/Reporting';
+import Reporting from './components/Operator/Reporting/Reporting';
 
 
 
