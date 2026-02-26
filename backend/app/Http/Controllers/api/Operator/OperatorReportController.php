@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ComplainDetails;
 use App\Models\Complaint;
 use App\Models\ComplainDocuments;
+use App\Models\OldComplaintsData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Role;
@@ -568,6 +569,50 @@ $complainDetails->details = DB::table('complaints_details as cd')
                'status' => true,
                'message' => 'File Fetch successfully',
                'data' => $cmp->filepath,
+           ]);
+
+    }
+      public function getFileCP($id){
+        // dd("nn");
+        $cmp = OldComplaintsData::findOrFail($id);
+       $cmpNO = ($cmp->COMP_NO < 10) ? '0' . $cmp->COMP_NO : $cmp->COMP_NO;
+        $cmpY = $cmp->YEAR1;
+        // $baseurl = 'http://192.168.0.251/api';
+        $path = Storage::url('/'.$cmpY .'-'.$cmpY.'CP');
+        $cmp->cp = $path;
+        // $cmpDetail = ComplainDocuments::where('complain_id',$cmp->id)->get();
+        // foreach($cmpDetail as $c){
+
+        //     $path[] = Storage::url($c->file);
+
+        //     $cmp->filepath = $path;
+        // }
+           return response()->json([
+               'status' => true,
+               'message' => 'File Fetch successfully',
+               'data' => $cmp->cp,
+           ]);
+
+    }
+
+       public function getFileNP($id){
+        $cmp = OldComplaintsData::findOrFail($id);
+       $cmpNO = ($cmp->COMP_NO < 10) ? '0' . $cmp->COMP_NO : $cmp->COMP_NO;
+        $cmpY = $cmp->YEAR1;
+        // $baseurl = 'http://192.168.0.251/api';
+        $path = Storage::url('/'.$cmpY .'-'.$cmpY.'NP');
+        $cmp->np = $path;
+        // $cmpDetail = ComplainDocuments::where('complain_id',$cmp->id)->get();
+        // foreach($cmpDetail as $c){
+
+        //     $path[] = Storage::url($c->file);
+
+        //     $cmp->filepath = $path;
+        // }
+           return response()->json([
+               'status' => true,
+               'message' => 'File Fetch successfully',
+               'data' => $cmp->np,
            ]);
 
     }
