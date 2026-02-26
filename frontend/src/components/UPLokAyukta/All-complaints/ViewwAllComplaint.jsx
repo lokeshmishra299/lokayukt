@@ -1331,9 +1331,9 @@ const ViewAllComplaint = () => {
                   type="checkbox"
                   checked={sent_through_rk}
                   onChange={(e) => setThroughRC(e.target.checked)}
-                  className="w-4 h-4"
+                  className="w-4 mb-2 h-4"
                 />
-                <span className="text-sm">Checkbox If Send through RC</span>
+                <span className="text-sm mb-2">Checkbox If Send through RC</span>
               </label>
             )}
 

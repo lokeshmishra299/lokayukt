@@ -1284,9 +1284,9 @@ return flatList.filter(
                         type="checkbox"
                         checked={sent_through_rk}
                         onChange={(e) => setSentThroughRK(e.target.checked)} // ✅ CORRECT
-                        className="w-4 h-4"
+                        className="w-4 h-4 mb-2"
                       />
-                      <span className="text-sm">
+                      <span className="text-sm mb-2">
                         Checkbox If Send through RC
                       </span>
                     </label>
