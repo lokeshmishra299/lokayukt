@@ -19,6 +19,7 @@ use App\Http\Controllers\api\PS\PSCommonController;
 use App\Http\Controllers\api\PS\PSDashboardController;
 use App\Http\Controllers\api\CommonController;
 use App\Http\Controllers\api\ComplaintsController;
+use App\Http\Controllers\api\Dispatch\DispatchCommonController;
 use App\Http\Controllers\api\LoginController;
 use App\Http\Controllers\api\Operator\OperatorCommonController;
 use App\Http\Controllers\api\Operator\OperatorComplaintsController;
@@ -33,7 +34,7 @@ use App\Http\Controllers\api\UpLokAyukt\UpLokAyuktDashboardController;
 use App\Http\Controllers\api\UpLokAyukt\UpLokAyuktCommonController;
 use App\Http\Controllers\api\Dispatch\DispatchComplaintsController;
 use App\Http\Controllers\api\Dispatch\DispatchDashboardController;
-
+use App\Http\Controllers\api\Dispatch\DispatchReportController;
 use App\Http\Controllers\api\UserManagement;
 use Illuminate\Support\Facades\Route;
 // use App\Http\Middleware\AuthMiddleware;
@@ -59,6 +60,12 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/get-roles-supervisor', [CommonController::class, 'getRolesSupervisors']);
 
         Route::post('/access-files-permission',[CommonController::class,'accessFilePermission']);
+
+        // 26-02-26
+        Route::post('/add-notes-employee',[SupervisorComplaintsController::class,'addNotesEmployee']);
+        Route::get('/get-document/{id}',[SupervisorComplaintsController::class,'getNotesEmployee']);
+
+
 
 
         //PRIVATE FILES 23-02-2026
@@ -247,6 +254,8 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/view-complaint/{id}',[OperatorReportController::class,'viewComplaint']);
         Route::get('/view-draft/{id}',[OperatorReportController::class,'viewDraft']);
         Route::get('/get-file-preview/{id}',[OperatorReportController::class,'getFilePreview']);
+        Route::get('/view-cp/{id}',[OperatorReportController::class,'getFileCP']);
+        Route::get('/view-np/{id}',[OperatorReportController::class,'getFileNP']);
         Route::get('/edit-complaint/{id}',[OperatorComplaintsController::class,'editComplain']);
         Route::post('/update-complaint/{id}',[OperatorComplaintsController::class,'updateComplain']);
         Route::get('/edit-draft/{id}',[OperatorComplaintsController::class,'editDraft']);
