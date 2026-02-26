@@ -435,6 +435,7 @@ const Notes = ({ complaint }) => {
                     .fetched-note-content div {
                        margin-top: 0 !important;
                        margin-bottom: 2px !important; /* हल्का सा गैप ताकि लाइनें बिल्कुल न चिपकें */
+                        padding-top: 6px !important;
                        line-height: 1.1 !important;   /* लाइन की ऊंचाई एकदम कम कर दी */
                     }
                     .fetched-note-content ol, 
@@ -569,6 +570,7 @@ const Notes = ({ complaint }) => {
   /* 2. Main Content - Apply Kruti Dev */
   .kruti-input .public-DraftEditor-content {
     font-family: 'KrutiDev' !important;
+     padding-top: 6px !important;
     font-size: 20px !important;
     line-height: 1.1 !important;
   }

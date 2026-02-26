@@ -4,15 +4,16 @@ import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { EditorState, convertToRaw } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from "draftjs-to-html";
-import { Modifier } from "draft-js";
+
+// 🎯 सिर्फ एक बार और सही इम्पोर्ट (Error Fixed)
+import { EditorState, convertToRaw, Modifier, ContentState } from "draft-js";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("access_token");
-const name = localStorage.getItem("name")
+const name = localStorage.getItem("name");
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -41,39 +42,32 @@ const Notes = ({ complaint }) => {
 
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
 
+  // 🎯 पेस्टिंग फिक्स: सारी पुरानी स्टाइल हटाकर नॉर्मल 20px/22px टेक्स्ट पेस्ट करेगा
   const handlePastedText = (text, html, editorState) => {
-  const contentState = editorState.getCurrentContent();
-  const selection = editorState.getSelection();
+    const pastedBlocks = ContentState.createFromText(text).getBlockMap();
+    const newContent = Modifier.replaceWithFragment(
+      editorState.getCurrentContent(),
+      editorState.getSelection(),
+      pastedBlocks
+    );
+    const newState = EditorState.push(editorState, newContent, "insert-fragment");
+    onEditorStateChange(newState);
+    return "handled";
+  };
 
-  const newContent = Modifier.replaceText(
-    contentState,
-    selection,
-    text,      // plain text only
-    editorState.getCurrentInlineStyle()
-  );
-
-  const newState = EditorState.push(editorState, newContent, "insert-characters");
-  setEditorState(newState);
-
-  return true; // ⛔ stop default HTML paste
-};
-
-  // --- 1. SMART SPLIT HELPER (IMPROVED) ---
+  // --- 1. SMART SPLIT HELPER ---
   const getSafeSplitY = (ctx, width, startY, pageHeightPx, totalHeight) => {
     const proposedSplit = Math.min(startY + pageHeightPx, totalHeight);
     if (proposedSplit >= totalHeight) return totalHeight;
 
-    // रेंज बढ़ाई ताकि सुरक्षित जगह मिल सके (150px)
     const scanRange = 150; 
     const imageData = ctx.getImageData(0, proposedSplit - scanRange, width, scanRange);
     const data = imageData.data;
 
-    // नीचे से ऊपर स्कैन करें
     for (let y = scanRange - 1; y >= 0; y--) {
       let isRowWhite = true;
       for (let x = 0; x < width; x += 10) {
         const idx = (y * width + x) * 4;
-        // अगर पिक्सल डार्क है (टेक्स्ट है) - थोड़ा सेंसिटिविटी बढ़ाई (< 250)
         if (data[idx] < 250 || data[idx + 1] < 250 || data[idx + 2] < 250) {
           isRowWhite = false;
           break;
@@ -81,11 +75,10 @@ const Notes = ({ complaint }) => {
       }
       if (isRowWhite) return (proposedSplit - scanRange) + y;
     }
-    // अगर जगह न मिले, तो मजबूरी में वहीं से काटें
     return proposedSplit;
   };
 
-  // --- 2. MASTER PDF GENERATOR (Fix for Cutting Text) ---
+  // --- 2. MASTER PDF GENERATOR ---
   const generatePdfDocument = async () => {
     if (!popupRef.current) return null;
 
@@ -93,7 +86,6 @@ const Notes = ({ complaint }) => {
       const elementsToHide = popupRef.current.querySelectorAll(".pdf-hide-section");
       elementsToHide.forEach((el) => (el.style.display = "none"));
 
-      // Canvas बनाएँ
       const canvas = await html2canvas(popupRef.current, {
         scale: 2,
         backgroundColor: "#ffffff",
@@ -101,25 +93,21 @@ const Notes = ({ complaint }) => {
         logging: false,
         windowHeight: popupRef.current.scrollHeight + 50,
         
-        // 👇 सबसे जरुरी बदलाव: PDF के लिए स्पेसिंग बढ़ाना ताकि टेक्स्ट न कटे 👇
         onclone: (document) => {
           const el = document.getElementById("pdf-content-div");
           if (el) {
-            // बॉर्डर हटाएं
             el.style.border = "none";
             el.style.boxShadow = "none";
             el.style.margin = "0";
             
-            // PDF जनरेट करते समय गैप थोड़ा बढ़ाएं ताकि Smart Splitter काम करे
-            // यह यूजर को नहीं दिखेगा, सिर्फ PDF में असर करेगा
             const styles = document.createElement("style");
             styles.innerHTML = `
             .draft-preview-content * {
-        font-family: 'KrutiDev' !important;
-    }
-                .draft-preview-content p { margin-bottom: 10px !important; line-height: 1.5 !important; }
-                .draft-preview-content li { margin-bottom: 8px !important; line-height: 1.5 !important; }
-                .draft-preview-content ol, .draft-preview-content ul { margin-bottom: 10px !important; }
+                font-family: 'KrutiDev' !important;
+            }
+            .draft-preview-content p { margin-bottom: 10px !important; line-height: 1.5 !important; }
+            .draft-preview-content li { margin-bottom: 8px !important; line-height: 1.5 !important; }
+            .draft-preview-content ol, .draft-preview-content ul { margin-bottom: 10px !important; }
             `;
             document.head.appendChild(styles);
           }
@@ -128,13 +116,12 @@ const Notes = ({ complaint }) => {
 
       elementsToHide.forEach((el) => (el.style.display = "flex"));
 
-      // PDF Setup
       const ctx = canvas.getContext("2d");
       const pdf = new jsPDF("p", "mm", "a4");
       const pdfWidth = 210;
       const pageHeight = 297;
-      const marginTop = 15;     // ऊपर मार्जिन
-      const marginBottom = 15;  // नीचे मार्जिन
+      const marginTop = 15;    
+      const marginBottom = 15; 
       const printableHeight = pageHeight - marginTop - marginBottom;
       
       const imgWidth = canvas.width;
@@ -147,7 +134,6 @@ const Notes = ({ complaint }) => {
       while (currentY < imgHeight) {
         if (pageCount > 0) pdf.addPage();
 
-        // सेफ कट पॉइंट ढूंढें
         const splitY = getSafeSplitY(ctx, imgWidth, currentY, printableHeightPx, imgHeight);
         const sliceHeight = splitY - currentY;
 
@@ -156,13 +142,11 @@ const Notes = ({ complaint }) => {
         tempCanvas.height = sliceHeight;
         const tempCtx = tempCanvas.getContext("2d");
         
-        // स्लाइस काटें
         tempCtx.drawImage(canvas, 0, currentY, imgWidth, sliceHeight, 0, 0, imgWidth, sliceHeight);
 
         const sliceImgData = tempCanvas.toDataURL("image/png");
         const pdfSliceHeight = (sliceHeight * pdfWidth) / imgWidth;
 
-        // PDF में डालें (Margin के साथ)
         pdf.addImage(sliceImgData, "PNG", 0, marginTop, pdfWidth, pdfSliceHeight);
 
         currentY = splitY;
@@ -271,21 +255,14 @@ const Notes = ({ complaint }) => {
     }
   };
 
-  // const handleViewDocFromNote = async (fileName) => {
-  //   setActiveNoteId(noteId);
-  //   if (!fileName) return;
-  //   const url = await fetchPdfPath(fileName);
-  //   if (url) setViewDocUrl(url);
-  //   else toast.error("Document not found");
-  // };
   const handleViewDocFromNote = async (fileName, noteId) => {
-  setActiveNoteId(noteId);   
-  if (!fileName) return;
+    setActiveNoteId(noteId);   
+    if (!fileName) return;
 
-  const url = await fetchPdfPath(fileName);
-  if (url) setViewDocUrl(url);
-  else toast.error("Document not found");
-};
+    const url = await fetchPdfPath(fileName);
+    if (url) setViewDocUrl(url);
+    else toast.error("Document not found");
+  };
 
   const onEditorStateChange = (editorState) => {
     setEditorState(editorState);
@@ -347,16 +324,10 @@ const Notes = ({ complaint }) => {
     setPageRanges(updated);
   };
 
-  // const isFormValid = () => {
-  //   const contentState = editorState.getCurrentContent();
-  //   return contentState.hasText() && selectedDoc !== "";
-  // };
-
-
   const isFormValid = () => {
-  const contentState = editorState.getCurrentContent();
-  return contentState.hasText(); 
-};
+    const contentState = editorState.getCurrentContent();
+    return contentState.hasText(); 
+  };
 
   const getDocName = (dId) => {
     if (!documents.length || !dId) return null;
@@ -379,17 +350,15 @@ const Notes = ({ complaint }) => {
         </p>
         <button
           className="bg-blue-600 text-white px-3 py-2 text-xs rounded-lg hover:bg-blue-700 transition"
-          // onClick={() => setOpen(true)}
           onClick={() => {
-      setNote(""); 
-      setEditorState(EditorState.createEmpty()); 
-      setSelectedDoc("");
-      setPageRanges([{ from: "", to: "" }]);
-      setPdfViewUrl(null);
-      setOpen(true); // Open Modal
-    }}
-  >
-        
+            setNote(""); 
+            setEditorState(EditorState.createEmpty()); 
+            setSelectedDoc("");
+            setPageRanges([{ from: "", to: "" }]);
+            setPdfViewUrl(null);
+            setOpen(true); 
+          }}
+        >
           Add Note / Noting
         </button>
       </div>
@@ -423,15 +392,14 @@ const Notes = ({ complaint }) => {
                     </p>
                   </div>
 
-
-                        
-                {/* --- गैप हटाने के लिए CSS --- */}
+                  {/* 🎯 आपकी ओरिजिनल लाइन-हाइट 1.1 बरकरार रखी गई है */}
                   <style>{`
                     .fetched-note-content p, 
                     .fetched-note-content div {
+                        padding-top: 6px !important;   
                        margin-top: 0 !important;
-                       margin-bottom: 2px !important; /* हल्का सा गैप ताकि लाइनें बिल्कुल न चिपकें */
-                       line-height: 1.1 !important;   /* लाइन की ऊंचाई एकदम कम कर दी */
+                       margin-bottom: 2px !important; 
+                       line-height: 1.1 !important;  
                     }
                     .fetched-note-content ol, 
                     .fetched-note-content ul {
@@ -441,7 +409,6 @@ const Notes = ({ complaint }) => {
                     }
                   `}</style>
 
-                  {/* 🎯 यहाँ से whitespace-pre-wrap हटा दिया गया है और fetched-note-content क्लास जोड़ी गई है */}
                   <div
                     className="mt-2 fetched-note-content kruti-input text-sm text-gray-700 overflow-x-auto"
                     dangerouslySetInnerHTML={{ __html: item.description }}
@@ -455,18 +422,12 @@ const Notes = ({ complaint }) => {
                           <div className="flex items-center gap-2 flex-wrap">
                             <button
                               onClick={() => handleViewDocFromNote(referencedFile, item.id)}
-                            //   className={`flex items-center gap-1 px-2 py-0.5 rounded border transition-colors ${
-                            //     viewDocUrl && viewDocUrl.includes(referencedFile || '') 
-                            //       ? "bg-blue-600 text-white border-blue-600"
-                            //       : "text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border-blue-200"
-                            //   }`}
-                            // >
-                            className={`flex items-center gap-1 px-2 py-0.5 rounded border transition-colors ${
-    activeNoteId === item.id 
-      ? "bg-blue-600 text-white border-blue-600" // Active Style
-      : "text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border-blue-200" // Inactive
-  }`}
->
+                              className={`flex items-center gap-1 px-2 py-0.5 rounded border transition-colors ${
+                                activeNoteId === item.id 
+                                  ? "bg-blue-600 text-white border-blue-600" 
+                                  : "text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 border-blue-200"
+                              }`}
+                            >
                               <FaEye className="w-3 h-3" />
                               <span className="font-medium">{referencedTitle}</span>
                               {item.range_from && item.range_two && (
@@ -492,11 +453,10 @@ const Notes = ({ complaint }) => {
                   Document View
               </h3>
               <button
-                // onClick={() => setViewDocUrl(null)}
                 onClick={() => {
-    setViewDocUrl(null);
-    setActiveNoteId(null); 
-  }}
+                  setViewDocUrl(null);
+                  setActiveNoteId(null); 
+                }}
                 className="p-1.5 text-gray-500 hover:bg-gray-100 hover:text-red-500 rounded-full transition-colors"
                 title="Close Viewer"
               >
@@ -534,19 +494,45 @@ const Notes = ({ complaint }) => {
 
               <div className={`border rounded-md ${errors.description ? "border-red-500" : "border-gray-300"}`}>
                 
-                {/* --- FIX 1: EDITOR CSS FOR NO GAP --- */}
+                {/* 🎯 आपकी ओरिजिनल लाइन-हाइट 1.1 और 1.2 बरकरार रखी गई है */}
                 <style>{`
                   .public-DraftStyleDefault-block {
                     margin: 0 !important;
                     padding: 0 !important;
                   }
+                  .kruti-input .public-DraftEditor-content {
+                      padding-top: 6px !important;   
+                    font-family: 'KrutiDev' !important;
+                    font-size: 20px !important;
+                    line-height: 1.1 !important;
+                  }
+                  .kruti-input .public-DraftEditorPlaceholder-root {
+                    font-family: sans-serif !important; 
+                    font-size: 14px !important;
+                    color: #9ca3af !important; 
+                    position: absolute;
+                    z-index: 0;
+                    pointer-events: none;
+                  }
+                  .kruti-input ol, 
+                  .kruti-input ul, 
+                  .kruti-input li {
+                    font-family: sans-serif !important; 
+                  }
+                  .kruti-input li span, 
+                  .kruti-input li div {
+                    font-family: 'KrutiDev' !important;
+                    font-size: 22px !important;
+                  }
                 `}</style>
 
-                {/* <Editor
+                <Editor
                   editorState={editorState}
                   onEditorStateChange={onEditorStateChange}
                   toolbarClassName="toolbarClassName"
                   wrapperClassName="wrapperClassName"
+                  handlePastedText={handlePastedText} 
+                  stripPastedStyles={true}
                   editorClassName="editorClassName kruti-input px-3 min-h-[120px] md:min-h-[150px]"
                   editorStyle={{ lineHeight: '1.2', minHeight: '150px' }}
                   placeholder="Enter your note here..."
@@ -554,66 +540,7 @@ const Notes = ({ complaint }) => {
                     options: ["inline", "blockType", "fontSize", "list", "textAlign", "colorPicker", "link", "emoji", "remove", "history"],
                     inline: { options: ["bold", "italic", "underline"] },
                   }}
-                /> */}
-
-<style>{`
-  /* 1. Remove default block margins */
-  .public-DraftStyleDefault-block {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* 2. Main Content - Apply Kruti Dev */
-  .kruti-input .public-DraftEditor-content {
-    font-family: 'KrutiDev' !important;
-    font-size: 20px !important;
-    line-height: 1.1 !important;
-  }
-
-  /* 3. Placeholder - Force English Font */
-  .kruti-input .public-DraftEditorPlaceholder-root {
-    font-family: sans-serif !important; 
-    font-size: 14px !important;
-    color: #9ca3af !important; 
-    position: absolute;
-    z-index: 0;
-    pointer-events: none;
-  }
-  
-  /* --- 👇 NEW FIX FOR 1. 2. NUMBERS 👇 --- */
-  
-  /* 4. List Containers & Items - Force English Font for Markers */
-  /* इससे 1., 2. और बुलेट्स (.) अंग्रेजी में दिखेंगे */
-  .kruti-input ol, 
-  .kruti-input ul, 
-  .kruti-input li {
-    font-family: sans-serif !important; 
-  }
-
-  /* 5. List Content - Force Hindi Font for Text inside List */
-  /* लिस्ट के अंदर लिखे गए शब्दों को वापस Kruti Dev में बदलें */
-  .kruti-input li span, 
-  .kruti-input li div {
-    font-family: 'KrutiDev' !important;
-    font-size: 22px !important;
-  }
-`}</style>
-
-<Editor
-  editorState={editorState}
-  onEditorStateChange={onEditorStateChange}
-  toolbarClassName="toolbarClassName"
-  wrapperClassName="wrapperClassName"
-   handlePastedText={handlePastedText} 
-   stripPastedStyles={true}
-  editorClassName="editorClassName kruti-input px-3 min-h-[120px] md:min-h-[150px]"
-  editorStyle={{ lineHeight: '1.2', minHeight: '150px' }}
-  placeholder="Enter your note here..."
-  toolbar={{
-    options: ["inline", "blockType", "fontSize", "list", "textAlign", "colorPicker", "link", "emoji", "remove", "history"],
-    inline: { options: ["bold", "italic", "underline"] },
-  }}
-/>
+                />
               </div>
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description[0]}</p>}
 
@@ -687,45 +614,38 @@ const Notes = ({ complaint }) => {
         <div className="fixed inset-0 bg-black/30 z-50 flex items-center justify-center p-4 overflow-y-auto">
           <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl my-auto">
             
-            {/* --- IMPORTANT: ID for PDF Generation --- */}
             <div ref={popupRef} id="pdf-content-div" className="bg-white rounded-lg overflow-hidden">
               
-              {/* --- FIX 2: PREVIEW CSS FOR NO GAP & NO HIDDEN CONTENT --- */}
-          {/* --- FIX 2: PREVIEW CSS FOR NO GAP & NO HIDDEN CONTENT --- */}
-<style>{`
-  .draft-preview-content * {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    line-height: 1.15 !important;
-  }
-  
-  /* Regular paragraphs should be Hindi */
-  .draft-preview-content p {
-     font-family: 'KrutiDev' !important;
-     font-size: 22px !important;
-     min-height: 1em;
-     margin-bottom: 4px !important;
-  }
+              {/* 🎯 आपकी ओरिजिनल लाइन-हाइट 1.15 बरकरार रखी गई है */}
+              <style>{`
+                .draft-preview-content * {
+                  margin-top: 0 !important;
+                  margin-bottom: 0 !important;
+                  padding-top: 0 !important;
+                  padding-bottom: 0 !important;
+                  line-height: 1.15 !important;
+                }
+                .draft-preview-content p {
+                   font-family: 'KrutiDev' !important;
+                   font-size: 22px !important;
+                   min-height: 1em;
+                   margin-bottom: 4px !important;
+                }
+                .draft-preview-content ol, 
+                .draft-preview-content ul, 
+                .draft-preview-content li {
+                  font-family: sans-serif !important; 
+                  list-style-position: outside !important;
+                  margin-left: 20px !important; 
+                }
+                .draft-preview-content ol { list-style-type: decimal !important; }
+                .draft-preview-content ul { list-style-type: disc !important; }
+                .draft-preview-content li {
+                  display: list-item !important;
+                  margin-bottom: 2px !important;
+                }
+              `}</style>
 
-  /* LISTS FIX: Numbers (ol/ul/li) should be English */
-  .draft-preview-content ol, 
-  .draft-preview-content ul, 
-  .draft-preview-content li {
-    font-family: sans-serif !important; 
-    list-style-position: outside !important;
-    margin-left: 20px !important; /* Space for numbers */
-  }
-
-  .draft-preview-content ol { list-style-type: decimal !important; }
-  .draft-preview-content ul { list-style-type: disc !important; }
-  
-  .draft-preview-content li {
-    display: list-item !important;
-    margin-bottom: 2px !important;
-  }
-`}</style>
               <div className="px-4 py-3 md:px-6 md:py-4 border-b flex flex-wrap justify-between items-center bg-gray-100 pdf-hide-section gap-2">
                 <p className="text-sm font-semibold text-gray-800">Preview Note</p>
                 <div className="flex items-center gap-2 ml-auto">
@@ -741,32 +661,23 @@ const Notes = ({ complaint }) => {
                 </div>
               </div>
 
-              {/* Header Removed as requested */}
               <div className="px-6 py-6 md:px-8 md:py-8 text-sm leading-relaxed text-gray-800 space-y-4 md:space-y-6">
                 
-                {/* --- CONTENT AREA --- */}
-                {/* Class 'draft-preview-content' is required for spacing fix */}
-                {/* <div
-                  className="rounded-md kruti-input bg-white px-2 py-2 md:px-5 md:py-4 min-h-[200px] draft-preview-content"
-                  dangerouslySetInnerHTML={{ __html: note }}
-                /> */}
-
+                {/* 🎯 आपकी ओरिजिनल लाइन-हाइट 1.0 बरकरार रखी गई है */}
                 <div
-  className="rounded-md kruti-input bg-white px-2 py-2 md:px-5 md:py-4 min-h-[200px] draft-preview-content"
-  dangerouslySetInnerHTML={{
-    __html: note
-    .replace(/<li>/g, '<li style="font-family: Arial, sans-serif !important; margin-bottom: 0px !important; line-height: 1.0 !important;"><span style="font-family: \'KrutiDev\' !important; font-size: 22px;">')
-    .replace(/<\/li>/g, '</span></li>')
-    .replace(/<p>/g, '<p style="font-family: \'KrutiDev\' !important; font-size: 22px; margin-top: 0px !important; margin-bottom: 2px !important; line-height: 1.0 !important;">')
-  }}
-/>
+                  className="rounded-md kruti-input bg-white px-2 py-2 md:px-5 md:py-4 min-h-[200px] draft-preview-content"
+                  dangerouslySetInnerHTML={{
+                    __html: note
+                    .replace(/<li>/g, '<li style="font-family: Arial, sans-serif !important; margin-bottom: 0px !important; line-height: 1.0 !important;"><span style="font-family: \'KrutiDev\' !important; font-size: 22px;">')
+                    .replace(/<\/li>/g, '</span></li>')
+                    .replace(/<p>/g, '<p style="font-family: \'KrutiDev\' !important; font-size: 22px; margin-top: 0px !important; margin-bottom: 2px !important; line-height: 1.0 !important;">')
+                  }}
+                />
 
-                {/* --- FOOTER / SIGNATURE --- */}
                 <div className="flex justify-between pt-4">
                   <div />
                   <div className="text-right text-xs text-gray-600">
                     <p className="uppercase tracking-wide">Noting By</p>
-                    {/* <p className="font-semibold mt-1 text-gray-800">Shri Sanjay Mishra</p> */}
                     <p>{name}</p>
                   </div>
                 </div>
@@ -781,7 +692,6 @@ const Notes = ({ complaint }) => {
         </div>
       )}
 
-      {/* <Toaster position="top-right" /> */}
     </div>
   );
 };

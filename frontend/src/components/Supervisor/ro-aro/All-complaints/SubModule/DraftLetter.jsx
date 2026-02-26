@@ -810,17 +810,17 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
 
 
 
-            <label className="block text-sm font-medium mb-2">
+            <label className="block text-sm font-medium my-2">
   Sent To Person Info
 </label>
 
-<div className="border border-gray-300 rounded-md">
+<div className="border border-gray-300 rounded-md mt-5">
   <Editor
     editorState={sentEditorState}
     onEditorStateChange={onSentEditorChange}
     // handlePastedText={handlePastedText}
     stripPastedStyles={true}
-    editorClassName="kruti-input px-3 min-h-[100px]"
+    editorClassName="kruti-input px-3  min-h-[100px]"
     editorStyle={{ lineHeight: "1.2", minHeight: "120px" }}
     placeholder="यहाँ भेजे गए व्यक्ति की जानकारी लिखें..."
     toolbar={{
@@ -839,7 +839,7 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
 
 
             
-              <label className="block text-sm font-medium mb-2">
+              <label className="block text-sm font-medium my-2">
                 Draft Content <span className="text-red-500">*</span>
               </label>
               <div
@@ -885,6 +885,7 @@ const totalPages = Math.ceil(documents.length / itemsPerPage);
 }
 
 .kruti-input .public-DraftEditor-content {
+ padding-top: 6px !important;
   font-family: 'KrutiDev' !important;
   font-size: 20px !important;
   line-height: 1.1 !important; 

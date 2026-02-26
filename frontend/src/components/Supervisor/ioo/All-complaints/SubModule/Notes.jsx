@@ -427,6 +427,7 @@ const Notes = ({ complaint }) => {
                     .fetched-note-content div {
                        margin-top: 0 !important;
                        margin-bottom: 2px !important; /* हल्का सा गैप ताकि लाइनें बिल्कुल न चिपकें */
+                        padding-top: 6px !important;
                        line-height: 1.1 !important;   /* लाइन की ऊंचाई एकदम कम कर दी */
                     }
                     .fetched-note-content ol, 
@@ -561,6 +562,7 @@ const Notes = ({ complaint }) => {
   /* 2. Main Content - Apply Kruti Dev */
   .kruti-input .public-DraftEditor-content {
     font-family: 'KrutiDev' !important;
+     padding-top: 6px !important;
     font-size: 20px !important;
     line-height: 1.1 !important;
   }
@@ -750,9 +752,9 @@ const Notes = ({ complaint }) => {
   className="rounded-md kruti-input bg-white px-2 py-2 md:px-5 md:py-4 min-h-[200px] draft-preview-content"
   dangerouslySetInnerHTML={{
     __html: note
-            .replace(/<li>/g, '<li style="font-family: Arial, sans-serif !important; margin-bottom: 0px !important; line-height: 1.0 !important;"><span style="font-family: \'KrutiDev\' !important; font-size: 22px;">')
-      .replace(/<\/li>/g, '</span></li>')
-      .replace(/<p>/g, '<p style="font-family: \'KrutiDev\' !important; font-size: 22px; margin-top: 0px !important; margin-bottom: 2px !important; line-height: 1.0 !important;">')
+           .replace(/<li>/g, '<li style="font-family: Arial, sans-serif !important; margin-bottom: 0px !important; line-height: 1.0 !important;"><span style="font-family: \'KrutiDev\' !important; font-size: 22px;">')
+    .replace(/<\/li>/g, '</span></li>')
+    .replace(/<p>/g, '<p style="font-family: \'KrutiDev\' !important; font-size: 22px; margin-top: 0px !important; margin-bottom: 2px !important; line-height: 1.0 !important;">')
   }}
 />
 
