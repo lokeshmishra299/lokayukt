@@ -765,7 +765,7 @@ const releaseComplaintMutation = useMutation({
                       <p className="text-gray-800 kruti-input text-sm">
                         {
                           complaintData.main_complainant_father
-                         || "N/A"}
+                         || "ykxw ugha"}
                       </p>
                     </div>
 
