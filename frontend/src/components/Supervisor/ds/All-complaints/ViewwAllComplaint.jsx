@@ -388,10 +388,10 @@ const ViewAllComplaint = () => {
   const forwardComplaintMutation = useMutation({
     mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
       const res = await api.post(
-        `/supervisor/forward-by-sec/${complaintId}`,
+        `/supervisor/forward-by-ds/${complaintId}`,
         {
           forward_to: forwardTo,
-          // remark: remarkData,
+          // remark: remarkData,f
                   target_date: targetDate, 
                   assigned_date: assignedDate,
           sent_through_rk: sent_through_rk ? 1 : 0,
