@@ -191,6 +191,7 @@ const ViewAllComplaint = () => {
   const [showDispatch, setshowDispatch] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
   const [targetDate, setTargetDate] = useState("");
+  const [assignedDate, setAssignedDate] = useState("");
 
   function diposeShow() {
     setshowDispatch(true);
@@ -392,6 +393,7 @@ const ViewAllComplaint = () => {
           forward_to: forwardTo,
           // remark: remarkData,
                   target_date: targetDate, 
+                  assigned_date: assignedDate,
           sent_through_rk: sent_through_rk ? 1 : 0,
         }
       );
@@ -406,6 +408,8 @@ const ViewAllComplaint = () => {
         }, 2000)
         
       setRemark("");
+      setTargetDate(""); // इसे भी क्लियर करें 
+      setAssignedDate("");
       setThroughRC(false);
       setSelectedForwardTo("");
       setConfirmConfig({ open: false, type: null });
@@ -449,6 +453,8 @@ const ViewAllComplaint = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
+    setTargetDate("");   // <-- इसे भी क्लियर करें
+    setAssignedDate("");
   };
 
   const getStatusColor = (status) => {
@@ -1116,6 +1122,24 @@ const ViewAllComplaint = () => {
                         Checkbox If Send through RC
                       </span>
                     </label>
+
+
+                    {confirmConfig.type === "forward" && (
+                <div className="mb-5 mt-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Assigned Date 
+                  </label>
+                  <input
+                    type="date"
+                    value={assignedDate}
+                    onChange={(e) => setAssignedDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded
+                               focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              )}
+
+              
                    <label className="block text-sm font-medium text-gray-700 mb-2">
   Target Date <span className="text-red-500">*</span>
 </label>
@@ -1130,6 +1154,10 @@ const ViewAllComplaint = () => {
                   </div>
                 </>
               )}
+
+              
+
+              
 
             {/* Buttons */}
             <div className="flex justify-end gap-3">

@@ -163,6 +163,7 @@ const ViewAllComplaint = () => {
   const [showMobileTabs, setShowMobileTabs] = useState(false);
     const [sent_through_rk, setThroughRC] = useState(false);
     const [targetDate, setTargetDate] = useState("");
+    const [assignedDate, setAssignedDate] = useState("")
   
 
   // Single config for Action modals (Receive, Forward, Pullback)
@@ -323,6 +324,7 @@ const ViewAllComplaint = () => {
           forward_to: forwardTo,
           // remark: remarkData,
             target_date: targetDate, 
+            assigned_date: assignedDate,
          sent_through_rk: sent_through_rk ? 1 : 0
 
         });
@@ -337,6 +339,7 @@ const ViewAllComplaint = () => {
         }, 2000)
         // setRemark("");
         setTargetDate("");
+        setAssignedDate("");
         setThroughRC(false);
 
         setSelectedForwardTo("");
@@ -385,6 +388,8 @@ const ViewAllComplaint = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
+    setTargetDate("");   // <-- इसे भी क्लियर कर दें 
+    setAssignedDate("");
   };
 
   const getStatusColor = (status) => {
@@ -960,6 +965,21 @@ const ViewAllComplaint = () => {
   </label>
 )}
 
+
+{confirmConfig.type === "forward" && (
+                  <div className="mb-5 mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Assigned Date 
+                    </label>
+                    <input
+                      type="date"
+                      value={assignedDate}
+                      onChange={(e) => setAssignedDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
 
   {confirmConfig.type === "forward" && (
   <div className="mb-5 mt-3">

@@ -216,6 +216,7 @@ const [releaseForwardTo, setReleaseForwardTo] = useState("");
   const [showReleaseModal, setShowReleaseModal] = useState(false);
 const [releaseRemark, setReleaseRemark] = useState("");
 const [targetDate, setTargetDate] = useState("");
+const [assignedDate, setAssignedDate] = useState("")
 
 
   const handleReject = () => {
@@ -536,6 +537,7 @@ const releaseComplaintMutation = useMutation({
           forward_to: forwardTo,
           // remark: remarkData,
            target_date: targetDate,
+           assigned_date: assignedDate,
           sent_through_rk: sent_through_rk ? 1 : 0,
         },
       );
@@ -550,6 +552,7 @@ const releaseComplaintMutation = useMutation({
          navigate("/lokayukt/all-complaints")
       }, 2000)
           setTargetDate("");
+          setAssignedDate("")
       setThroughRC(false);
       setSelectedForwardTo("");
       setConfirmConfig({ open: false, type: null });
@@ -598,6 +601,8 @@ const releaseComplaintMutation = useMutation({
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
+    setTargetDate("");   // <-- (optional) अगर आप target date भी reset करना चाहें 
+    setAssignedDate("");
   };
 
   const getStatusColor = (status) => {
@@ -1405,6 +1410,22 @@ const releaseComplaintMutation = useMutation({
       rows={4}
       className="w-full kruti-input px-3 py-2 border border-gray-300 rounded
                  focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+    />
+  </div>
+)}
+
+
+
+{confirmConfig.type === "forward" && (
+  <div className="mb-5 mt-3">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Assigned Date 
+    </label>
+    <input
+      type="date"
+      value={assignedDate}
+      onChange={(e) => setAssignedDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
   </div>
 )}

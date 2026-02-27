@@ -193,6 +193,7 @@ function takefile(){
   const [showDispatch, setshowDispatch] = useState(false);
   const [sent_through_rk, setThroughRC] = useState(false);
   const [targetDate, setTargetDate] = useState("");
+  const [assignedDate, setAssignedDate] = useState("");
 
   function diposeShow (){
     setshowDispatch(true)
@@ -396,6 +397,7 @@ function takefile(){
           forward_to: forwardTo,
           // remark: remarkData,
           target_date: targetDate,
+          assigned_date: assignedDate,
           sent_through_rk: sent_through_rk ? 1 : 0
         });
         return res.data;
@@ -410,6 +412,8 @@ function takefile(){
         setRemark("");
         setThroughRC(false)
         setSelectedForwardTo("");
+        setTargetDate("");   // <-- इसे भी जोड़ दें ताकि डेटा क्लियर हो जाए
+        setAssignedDate("");
         setConfirmConfig({ open: false, type: null });
       },
       onError: (error) => {
@@ -454,6 +458,8 @@ function takefile(){
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
+    setTargetDate("");   // <-- इसे भी जोड़ दें 
+    setAssignedDate("");
   };
 
 
@@ -922,7 +928,7 @@ function takefile(){
                       : "Return with Remarks"}
                   </button> */}
 
-                    {complaintData.approved_rejected_by_ro == "1" ? (
+                    {complaintData.approved_rejected_by_ro_aro == "1" ? (
                     <span className="px-4 py-2 bg-blue-600 text-white rounded  text-sm cursor-not-allowed">
                       Forwarded
                     </span>
@@ -1129,6 +1135,21 @@ function takefile(){
   </label>
 )}
 
+
+{confirmConfig.type === "forward" && (
+                  <div className="mb-5 mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Assigned Date 
+                    </label>
+                    <input
+                      type="date"
+                      value={assignedDate}
+                      onChange={(e) => setAssignedDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
 
                 {confirmConfig.type === "forward" && (
   <div className="mb-5 mt-3">
