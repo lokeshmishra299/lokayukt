@@ -194,6 +194,7 @@ const ViewAllComplaint = () => {
      const [targetDate, setTargetDate] = useState("");
      const [assignedDate, setAssignedDate] = useState("");
      const [fieldErrors, setFieldErrors] = useState({});
+     const [otp, setOtp] = useState("");
 
   
 
@@ -391,13 +392,14 @@ return flatList.filter(
   });
 
  const forwardComplaintMutation = useMutation({
-    mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+    mutationFn: async ({ complaintId, forwardTo, remarkData, otpData }) => {
       const res = await api.post(`/ps/forward-complain-by-ps/${complaintId}`, {
         forward_to: forwardTo,
         // remark: remarkData,
         target_date: targetDate,
         assigned_date: assignedDate,
         sent_through_rk: sent_through_rk ? 1 : 0,
+        otp: otpData,
       });
       return res.data;
     },
@@ -412,6 +414,7 @@ return flatList.filter(
       setTargetDate("");
       setAssignedDate("");
       setSelectedForwardTo("");
+      setOtp("");
       setConfirmConfig({ open: false, type: null });
       setFieldErrors({}); // ✅ Success पर भी एरर क्लियर करें
     },
@@ -451,6 +454,7 @@ return flatList.filter(
     complaintId: id,
     forwardTo: selectedForwardTo,
     targetDate: targetDate,
+    otpData: otp,
   });
 }
 
@@ -517,6 +521,7 @@ return flatList.filter(
       setTargetDate("");
       setAssignedDate("");
     setSelectedForwardTo("");
+    setOtp("");
     setFieldErrors({});
   };
 
@@ -1430,6 +1435,26 @@ return flatList.filter(
     )}
   </div>
 )}
+
+
+{/* SEND → OTP Input & Button */}
+            {confirmConfig.type === "forward" && (
+              <div className="mb-5 mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Enter OTP <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="OTP दर्ज करें"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                
+                </div>
+              </div>
+            )}
 
 
             {/* Buttons */}

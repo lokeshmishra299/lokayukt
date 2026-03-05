@@ -182,6 +182,7 @@ const ViewAllComplaint = () => {
   const [releaseType, setReleaseType] = useState("");
   const [targetDate, setTargetDate] = useState("");
   const [assignedDate, setAssignedDate] = useState("");
+  const [otp, setOtp] = useState("");
 
   const handleReject = () => {
     console.log("Rejected!");
@@ -478,7 +479,7 @@ const ViewAllComplaint = () => {
   // });
 
   const forwardComplaintMutation = useMutation({
-    mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+    mutationFn: async ({ complaintId, forwardTo, remarkData, otpData }) => {
       const res = await api.post(
         `/uplokayukt/forward-by-uplokayukt/${complaintId}`,
         {
@@ -487,6 +488,7 @@ const ViewAllComplaint = () => {
           target_date: targetDate,
           assigned_date: assignedDate,
           sent_through_rk: sent_through_rk ? 1 : 0,
+          otp: otpData,
         },
       );
       return res.data;
@@ -503,11 +505,12 @@ const ViewAllComplaint = () => {
       setTargetDate("");
       setAssignedDate("");
       setSelectedForwardTo("");
+      setOtp("");
       setConfirmConfig({ open: false, type: null });
     },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to forward");
-    },
+    // onError: (error) => {
+    //   toast.error(error?.response?.data?.message);
+    // },
   });
 
   const handleMarkAsReceived = () =>
@@ -540,6 +543,7 @@ const ViewAllComplaint = () => {
         complaintId: id,
         forwardTo: selectedForwardTo,
         targetDate: targetDate,
+        otpData: otp,
       });
     } else if (confirmConfig.type === "pullback") {
       pullBackMutation.mutate({
@@ -552,8 +556,10 @@ const ViewAllComplaint = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
+    setOtp("");
     setTargetDate("");
     setAssignedDate("");
+    setOtp("");
   };
 
   const getStatusColor = (status) => {
@@ -1412,6 +1418,26 @@ const ViewAllComplaint = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded
                  focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+            )}
+
+
+            {/* SEND → OTP Input & Button */}
+            {confirmConfig.type === "forward" && (
+              <div className="mb-5 mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Enter OTP <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="OTP दर्ज करें"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+               
+                </div>
               </div>
             )}
 
