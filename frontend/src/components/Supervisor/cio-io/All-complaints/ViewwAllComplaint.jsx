@@ -163,7 +163,8 @@ const ViewAllComplaint = () => {
   const [showMobileTabs, setShowMobileTabs] = useState(false);
     const [sent_through_rk, setThroughRC] = useState(false);
     const [targetDate, setTargetDate] = useState("");
-    const [assignedDate, setAssignedDate] = useState("")
+    const [assignedDate, setAssignedDate] = useState("");
+    const [otp, setOtp] = useState("");
   
 
   // Single config for Action modals (Receive, Forward, Pullback)
@@ -319,13 +320,14 @@ const ViewAllComplaint = () => {
 
   
   const forwardComplaintMutation = useMutation({
-      mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+      mutationFn: async ({ complaintId, forwardTo, remarkData, otpData }) => {
         const res = await api.post(`/supervisor/forward-by-cio/${complaintId}`, {
           forward_to: forwardTo,
           // remark: remarkData,
             target_date: targetDate, 
             assigned_date: assignedDate,
-         sent_through_rk: sent_through_rk ? 1 : 0
+         sent_through_rk: sent_through_rk ? 1 : 0,
+         otp: otpData,
 
         });
         return res.data;
@@ -343,6 +345,7 @@ const ViewAllComplaint = () => {
         setThroughRC(false);
 
         setSelectedForwardTo("");
+        setOtp("");
         setConfirmConfig({ open: false, type: null });
       },
       onError: (error) => {
@@ -376,6 +379,7 @@ const ViewAllComplaint = () => {
         complaintId: id,
         forwardTo: selectedForwardTo,
         remarkData: remark,
+        otpData: otp,
       });
     }  else if (confirmConfig.type === "pullback") {
       pullBackMutation.mutate({
@@ -390,6 +394,7 @@ const ViewAllComplaint = () => {
     setSelectedForwardTo("");
     setTargetDate("");   // <-- इसे भी क्लियर कर दें 
     setAssignedDate("");
+    setOtp("");
   };
 
   const getStatusColor = (status) => {
@@ -996,6 +1001,26 @@ const ViewAllComplaint = () => {
     />
   </div>
 )}
+
+
+{/* SEND → OTP Input & Button */}
+                {confirmConfig.type === "forward" && (
+                  <div className="mb-5 mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Enter OTP <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        placeholder="OTP दर्ज करें"
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    
+                    </div>
+                  </div>
+                )}
 
     
                 {confirmConfig.type !== "assign" &&

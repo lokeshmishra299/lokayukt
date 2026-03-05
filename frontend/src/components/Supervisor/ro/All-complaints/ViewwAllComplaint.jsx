@@ -194,6 +194,7 @@ function takefile(){
   const [sent_through_rk, setThroughRC] = useState(false);
   const [targetDate, setTargetDate] = useState("");
   const [assignedDate, setAssignedDate] = useState("");
+  const [otp, setOtp] = useState("");
 
   function diposeShow (){
     setshowDispatch(true)
@@ -392,13 +393,14 @@ function takefile(){
 
   
   const forwardComplaintMutation = useMutation({
-      mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+      mutationFn: async ({ complaintId, forwardTo, remarkData, otpData }) => {
         const res = await api.post(`/supervisor/forward-by-ro/${complaintId}`, {
           forward_to: forwardTo,
           // remark: remarkData,
           target_date: targetDate,
           assigned_date: assignedDate,
-          sent_through_rk: sent_through_rk ? 1 : 0
+          sent_through_rk: sent_through_rk ? 1 : 0,
+          otp: otpData,
         });
         return res.data;
       },
@@ -414,6 +416,7 @@ function takefile(){
         setSelectedForwardTo("");
         setTargetDate("");   // <-- इसे भी जोड़ दें ताकि डेटा क्लियर हो जाए
         setAssignedDate("");
+        setOtp("");
         setConfirmConfig({ open: false, type: null });
       },
       onError: (error) => {
@@ -446,6 +449,7 @@ function takefile(){
         complaintId: id,
         forwardTo: selectedForwardTo,
         remarkData: remark,
+        otpData: otp
       });
     }  else if (confirmConfig.type === "pullback") {
       pullBackMutation.mutate({
@@ -460,6 +464,7 @@ function takefile(){
     setSelectedForwardTo("");
     setTargetDate("");   // <-- इसे भी जोड़ दें 
     setAssignedDate("");
+    setOtp("");
   };
 
 
@@ -1166,6 +1171,27 @@ function takefile(){
     />
   </div>
 )}
+
+
+
+{/* SEND → OTP Input & Button */}
+                {confirmConfig.type === "forward" && (
+                  <div className="mb-5 mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Enter OTP <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        placeholder="OTP दर्ज करें"
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                   
+                    </div>
+                  </div>
+                )}
 
     
                 {/* Buttons */}
