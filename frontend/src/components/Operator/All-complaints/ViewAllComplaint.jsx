@@ -890,7 +890,7 @@
 
 
 {/* SEND → OTP Input & Button */}
- {confirmConfig.type === "forward" && (
+ {confirmConfig.type === "forward" && selectedForwardTo && (
   <div className="mb-5">
     <label className="block text-sm font-medium text-gray-700 mb-2">
       Enter OTP <span className="text-red-500">*</span>
