@@ -926,6 +926,7 @@ $complainDetails->actions = $actions;
                         $apcAction->complaint_id = $complainId;
                         $apcAction->forward_by_lokayukt = $userId;
                         $apcAction->target_date = $request->target_date;
+                        $apcAction->assigned_date = $request->assigned_date;
 
                         if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt'])) {
 

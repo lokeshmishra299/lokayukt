@@ -466,25 +466,50 @@ $complainDetails->actions = $actions;
         // dd($usersByRole['lok-ayukt']);
    }
 
-    public function getUsers(){
+//     public function getUsers(){
      
-        $usersByRole = User::with('role')
-         ->whereNotNull('role_id')
-        ->get()
-        ->groupBy(fn ($user) => $user->role->name);
+//         $usersByRole = User::with('role')
+//          ->whereNotNull('role_id')
+//         ->get()
+//         ->groupBy(fn ($user) => $user->role->name);
         
 
-         if(!empty($usersByRole['lok-ayukt'])){
-            $data[] =  $usersByRole['lok-ayukt'];
-            $data[] =  $usersByRole['up-lok-ayukt'];
+//          if(!empty($usersByRole['lok-ayukt'])){
+//             $data[] =  $usersByRole['lok-ayukt'];
+//             $data[] =  $usersByRole['up-lok-ayukt'];
 
-           return response()->json($data);
-        }else{
+//            return response()->json($data);
+//         }else{
 
-            return response()->json(["message"=>"Data Not Found"]);
-        }
-        // dd($usersByRole['lok-ayukt']);
-   }
+//             return response()->json(["message"=>"Data Not Found"]);
+//         }
+//         // dd($usersByRole['lok-ayukt']);
+//    }
+
+public function getUsers()
+{
+    $userId = Auth::user()->id;
+    $usersByRole = User::with('role','subRole')
+        ->whereHas('role') // ensures role exists
+        ->where('id','<>',$userId)
+        ->get()
+        ->groupBy(function ($user) {
+            return $user->role->name;
+        });
+
+    if (!empty($usersByRole['lok-ayukt'])) {
+
+        $data = [];
+        $data[] = $usersByRole['lok-ayukt'] ?? [];
+        $data[] = $usersByRole['up-lok-ayukt'] ?? [];
+        $data[] = $usersByRole['ps'] ?? [];
+        $data[] = $usersByRole['supervisor'] ?? [];
+
+        return response()->json($data);
+    } else {
+        return response()->json(["message" => "Data Not Found"]);
+    }
+}
 
    public function getUpLokayuktUsers(){
     $usersByRole = User::with('role')
@@ -519,12 +544,16 @@ $complainDetails->actions = $actions;
    }
 
    public function getSubROleUsers(){
+     $userId = Auth::user()->id;
          $userParent = Auth::user()->parent_user_id;
-        //   return response()->json($userParent);
+     
         $users = User::with('subrole')
-         ->whereNotNull('sub_role_id')
+        //  ->whereNotNull('sub_role_id')
          ->where('parent_user_id',$userParent)
+          ->where('id','<>',$userId)
         ->get();
+
+             return response()->json($users);
         $users = $users->map(function ($item) {
         if($item->subrole){
           return [
@@ -710,12 +739,13 @@ $complainDetails->actions = $actions;
       
 
         $userId = Auth::user()->id;
+        $userOtp = Auth::user()->otp;
    
 
         $validation = Validator::make($request->all(), [
             // 'forward_by_ds_js' => 'required|exists:users,id',
             'forward_to' => 'required|exists:users,id',
-            // 'target_date' => 'required',
+            'otp' => 'required|numeric',
          
           
         ], [
@@ -723,7 +753,7 @@ $complainDetails->actions = $actions;
             // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
             'forward_to.required' => 'Forward to user is required.',
             'forward_to.exists' => 'Forward to user does not exist.',
-            // 'target_date.required' => 'Target Date is required.',
+            'otp.required' => 'OTP is required.',
            
         ]);
 
@@ -733,9 +763,9 @@ $complainDetails->actions = $actions;
                 'errors' => $validation->errors()
             ], 422);
         }
-        if(isset($complainId) && $request->isMethod('post')){
-
-            //  $userRole = User::with('role')->where('id',$request->forward_to)->get();
+        if(isset($complainId) && $request->isMethod('post') && $request->filled('otp')){
+            if($request->otp === $userOtp){
+                  //  $userRole = User::with('role')->where('id',$request->forward_to)->get();
             // dd($user[0]->role->name);
             // $roleFwd = $userRole[0]->role->name;
 
@@ -762,6 +792,7 @@ $complainDetails->actions = $actions;
                          $apcAction = new ComplaintAction();
                             $apcAction->complaint_id = $complainId;
                             $apcAction->forward_by_ps = $userId;
+                            $apcAction->assigned_date = $request->assigned_date;
                             $apcAction->target_date = $request->target_date;
                            
                             if($request->sent_through_rk == 1){
@@ -833,8 +864,11 @@ $complainDetails->actions = $actions;
                         $cmp->save();
 
                     }
+               }
+
+          
                 
-                }
+            }
              return response()->json([
                     'status' => true,
                     'message' => 'Forwarded Successfully',
@@ -1170,6 +1204,7 @@ $complainDetails->actions = $actions;
         // dd($parentId);
         $userParentData = User::with('role')->where('id',$parentId)->get();
         $roleParent = $userParentData[0]->role->name;
+         $userParentSubrole = Auth::user()->userParentRole ?? '';  
            $complainDetails = DB::table('complaints as cm')
                 ->leftJoin('district_master as dd', 'cm.district_id', '=', 'dd.district_code')
                  ->leftJoin('complainants as cmlan', function ($join) {
@@ -1181,9 +1216,9 @@ $complainDetails->actions = $actions;
                         ->where('resp.is_main', 1);
                 })
                 ->leftJoin('district_master as dd1', 'cmlan.permanent_district', '=', 'dd1.district_code')
-                ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent,$userId) {
+                ->join('complaint_actions as rep', function ($join) use ($parentId, $roleParent,$userId,$userParentSubrole) {
         $join->on('cm.id', '=', 'rep.complaint_id')
-             ->where(function ($q) use ($parentId, $roleParent,$userId) {
+             ->where(function ($q) use ($parentId, $roleParent,$userId,$userParentSubrole) {
 
                  if ($roleParent === 'lok-ayukt') {
                     $q->where('cm.approved_rejected_by_ps','1')
@@ -1192,8 +1227,11 @@ $complainDetails->actions = $actions;
                  } elseif ($roleParent === 'up-lok-ayukt') {
                     //  $q->where('rep.forward_to_uplokayukt', $parentId);
                      $q->where('rep.forward_by_ps', $userId);
-                 } elseif ($roleParent === 'supervisor') {
-                     $q->where('rep.forward_by_ps', $userId);
+                 } elseif ($roleParent === 'supervisor' && $userParentSubrole->sub_role_id == 14) {
+                     $q->where('rep.status', 'Forwarded')
+                        ->where('cm.approved_rejected_by_sec','1')
+                        ->whereNotNull('rep.forward_to_sec')
+                        ->where('rep.forward_to_sec', $parentId);
                     //  $q->where('rep.forward_to_sec', $parentId);
                  } else {
                      // 🔥 fallback (safe)

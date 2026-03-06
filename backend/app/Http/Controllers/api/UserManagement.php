@@ -88,12 +88,13 @@ class UserManagement extends Controller
         $userName = $count > 0 ? $baseUserName . '-' . str_pad($count + 1, 3, '0', STR_PAD_LEFT) : $baseUserName . '-001';
 
         // parent_user_id
-       
+       $otp = rand(100000, 999999);
 
         $user = User::create([
             'name'         => $request->name,
             'email'        => $request->email,
             'number'       => $request->number,
+            'otp'          => $otp,
             'role_id'      => $request->role_id,
             'sub_role_id'      => $request->sub_role_id,
             'district_id'  => $request->district_id,
