@@ -117,7 +117,7 @@ const Sidebar = ({
         </div>
 
         {/* Navigation Menu with Sections */}
-        <nav className="flex-1 px-6 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 px-6 overflow-y-auto custom-scrollbar pb-4">
           {/* Workbox Section */}
           {(isMobile || !isCollapsed) && (
             <p className="text-[13px]  text-gray-800 mb-2 ml-2">Workbox</p>
@@ -172,171 +172,54 @@ const Sidebar = ({
               </Link>
             </li>
 
-
-           
-            
-                        {/* Send */}
-                        <li>
-                          <Link
-                            to="/supervisor/approved-complaints"
-                            onClick={handleLinkClick}
-                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                              isActive("/approved-complaints")
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "text-gray-700 hover:bg-gray-200"
-                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
-                          >
-                            <div className="flex items-center gap-3">
-                              <FiSend size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
-                              {(isMobile || !isCollapsed) && <span>Sent</span>}
-                            </div>
-                            {isActive("/approved-complaints") && (isMobile) && (
-                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                                <div className="w-4 h-4 bg-white rounded-full"></div>
-                              </div>
-                            )}
-                          </Link>
-                        </li>
-
-
-                        {/* userMangment */}
-                      
-                   
-
-                        {/* <li>
-                          <Link
-                            to="/supervisor/user-management"
-                            onClick={handleLinkClick}
-                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                              isActive("/user-management")
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "text-gray-700 hover:bg-gray-200"
-                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
-                          >
-                            <div className="flex items-center gap-3">
-                              <HiMiniUsers size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
-                              {(isMobile || !isCollapsed) && <span>User Management</span>}
-                            </div>
-                            {isActive("/user-management") && (isMobile) && (
-                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                                <div className="w-4 h-4 bg-white rounded-full"></div>
-                              </div>
-                            )}
-                          </Link>
-                        </li> */}
-
-
-                            {/* masterData */}
-                        {/* <li>
-                          <Link
-                            to="/supervisor/master-data"
-                            onClick={handleLinkClick}
-                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                              isActive("/master-data")
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "text-gray-700 hover:bg-gray-200"
-                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
-                          >
-                            <div className="flex items-center gap-3">
-                              <FaDatabase size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
-                              {(isMobile || !isCollapsed) && <span>Master Data</span>}
-                            </div>
-                            {isActive("/master-data") && (isMobile) && (
-                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                                <div className="w-4 h-4 bg-white rounded-full"></div>
-                              </div>
-                            )}
-                          </Link>
-                        </li> */}
-
-
-
-
-
-
-                          {/* <li>
-                          <Link
-                            to="/supervisor/user-management"
-                            onClick={handleLinkClick}
-                            className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                              isActive("/user-management")
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "text-gray-700 hover:bg-gray-200"
-                            } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                            title={!isMobile && isCollapsed ? "Send" : ""}
-                          >
-                            <div className="flex items-center gap-3">
-                              <HiMiniUsers size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
-                              {(isMobile || !isCollapsed) && <span>User Management</span>}
-                            </div>
-                            {isActive("/user-management") && (isMobile) && (
-                              <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                                <div className="w-4 h-4 bg-white rounded-full"></div>
-                              </div>
-                            )}
-                          </Link>
-                        </li> */}
+            {/* Send */}
+            <li>
+              <Link
+                to="/supervisor/approved-complaints"
+                onClick={handleLinkClick}
+                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
+                  isActive("/approved-complaints")
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-gray-700 hover:bg-gray-200"
+                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
+                title={!isMobile && isCollapsed ? "Send" : ""}
+              >
+                <div className="flex items-center gap-3">
+                  <FiSend size={18}  className="w-[18px] h-[18px] flex-shrink-0" />
+                  {(isMobile || !isCollapsed) && <span>Sent</span>}
+                </div>
+                {isActive("/approved-complaints") && (isMobile) && (
+                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
+                    <div className="w-4 h-4 bg-white rounded-full"></div>
+                  </div>
+                )}
+              </Link>
+            </li>
 
           </ul>
-
-          {/* Case & Administration Section */}
-          {/* {(isMobile || !isCollapsed) && (
-            <p className="text-[13px]  text-gray-800 mb-3 mt-6">Case & Administration</p>
-          )} */}
 
           <ul className="space-y-2">
-            {/* Progress Register */}
-            {/* <li>
-              <Link
-                to="/supervisor/progress-register"
-                onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                  isActive("/progress-register")
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-200"
-                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                title={!isMobile && isCollapsed ? "Progress Register" : ""}
-              >
-                <div className="flex items-center gap-3">
-                  <FiBarChart2 size={20} className="w-[18px] h-[18px] flex-shrink-0" />
-                  {(isMobile || !isCollapsed) && <span>Progress Register</span>}
-                </div>
-                {isActive("/progress-register") && (isMobile) && (
-                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                  </div>
-                )}
-              </Link>
-            </li> */}
-
-            {/* Search & Reports */}
-            {/* <li>
-              <Link
-                to="/supervisor/search-reports"
-                onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                  isActive("/search-reports")
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-200"
-                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                title={!isMobile && isCollapsed ? "Search & Reports" : ""}
-              >
-                <div className="flex items-center gap-3">
-                  <FiSearch size={20}  className="w-[18px] h-[18px] flex-shrink-0" />
-                  {(isMobile || !isCollapsed) && <span>Search & Reports</span>}
-                </div>
-                {isActive("/search-reports") && (isMobile ) && (
-                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                  </div>
-                )}
-              </Link>
-            </li> */}
+            {/* Progress Register Commented out... */}
           </ul>
         </nav>
+
+        {/* 👇 MAIN DASHBOARD BUTTON (Sabse Niche Chipkaya Hua) 👇 */}
+        <div className="p-4 border-t border-gray-300 w-full bg-[#E7ECF5] mt-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <Link
+            to="/main-dashboard"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 text-sm font-medium transition-all duration-200 rounded-lg ${
+              location.pathname === "/main-dashboard"
+                ? "bg-green-600 text-white shadow-md"
+                : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+            } ${isCollapsed && !isMobile ? "justify-center px-2 py-2" : "px-4 py-3"}`}
+            title={isCollapsed && !isMobile ? "Main Dashboard" : ""}
+          >
+            <FaHome className="w-[18px] h-[18px] flex-shrink-0" />
+            {(!isCollapsed || isMobile) && <span>Main Dashboard</span>}
+          </Link>
+        </div>
+
       </div>
     </>
   );
