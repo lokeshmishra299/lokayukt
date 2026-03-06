@@ -8,7 +8,8 @@ import {
   FaSearch,
   FaUsers,
   FaDatabase,
-  FaTimes
+  FaTimes,
+  FaExternalLinkAlt // <-- Icon Added Here
 } from "react-icons/fa";
 import { IoFileTray } from "react-icons/io5";
 import { FaFileSignature } from "react-icons/fa6";
@@ -66,7 +67,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
 
       {/* SIDEBAR */}
       <aside
-        className={`fixed left-0 top-16 bottom-0 bg-[#E7ECF5] border-r shadow-xl transition-all duration-300 z-50
+        className={`fixed left-0 top-16 bottom-0 bg-[#E7ECF5] border-r shadow-xl transition-all duration-300 z-50 flex flex-col
           ${isMobile
             ? `w-64 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`
             : isCollapsed
@@ -85,7 +86,7 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
         )}
 
         {/* NAV */}
-        <nav className="h-full overflow-y-auto px-3 py-6 space-y-2">
+        <nav className="flex-1 overflow-y-auto px-3 py-6 space-y-2 custom-scrollbar">
 
           {/* Dashboard */}
           <Link
@@ -168,7 +169,6 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
             {(!isCollapsed || isMobile) && "Personal Files"}
           </Link> */}
 
-
           <Link
             to="/employee/view-pending-files"
             onClick={handleLinkClick}
@@ -185,6 +185,24 @@ const Sidebar = ({ isMobileMenuOpen, toggleMobileMenu, isCollapsed }) => {
           </Link>
 
         </nav>
+
+        {/* 👇 MAIN DASHBOARD BUTTON (Sabse Niche Chipkaya Hua) 👇 */}
+        <div className="p-4 border-t border-gray-300 w-full bg-[#E7ECF5] mt-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <Link
+            to="/main-dashboard"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 text-sm font-medium transition-all duration-200 rounded-lg ${
+              location.pathname === "/main-dashboard"
+                ? "bg-green-600 text-white shadow-md"
+                : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+            } ${isCollapsed && !isMobile ? "justify-center px-2 py-2" : "px-4 py-3"}`}
+            title={isCollapsed && !isMobile ? "Main Dashboard" : ""}
+          >
+            <FaHome className="w-[18px] h-[18px] flex-shrink-0" />
+            {(!isCollapsed || isMobile) && <span>Main Dashboard</span>}
+          </Link>
+        </div>
+
       </aside>
     </>
   );
