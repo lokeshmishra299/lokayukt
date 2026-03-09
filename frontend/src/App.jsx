@@ -870,34 +870,52 @@ function App() {
   const [subrole, setSubrole] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    React.useEffect(() => {
+      const token = localStorage.getItem("access_token");
 
-    if (token) {
-      axios.get(`${BASE_URL}/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      .then(res => {
-        setRole(res.data.role.name);
-        setSubrole(res.data.subrole?.name);
-      })
-      .catch(() => {
-        localStorage.removeItem("access_token");
-      })
-      .finally(() => {
+      if (token) {
+        axios.get(`${BASE_URL}/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        .then(res => {
+          setRole(res.data.role.name);
+          setSubrole(res.data.subrole?.name);
+        })
+        .catch(() => {
+          localStorage.removeItem("access_token");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+      } else {
         setLoading(false);
-      });
-    } else {
-      setLoading(false);
-    }
-  }, []);
+      }
+    }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
+if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 font-sans p-4">
+        {/* Container for the two skeleton cards */}
+        <div className="flex flex-col sm:flex-row gap-8">
+          
+         
+          <div className="w-[360px] h-[300px] bg-white rounded-2xl flex flex-col items-center justify-center p-8 shadow-sm">
+            <div className="w-24 h-24 bg-slate-200 rounded-full mb-10 animate-pulse"></div>
+            <div className="h-8 bg-slate-200 rounded-md w-56 animate-pulse"></div>
+          </div>
+
+          <div className="w-[360px] h-[300px] bg-white rounded-2xl flex flex-col items-center justify-center p-8 shadow-sm">
+            <div className="w-24 h-24 bg-slate-200 rounded-full mb-10 animate-pulse"></div>
+            <div className="h-8 bg-slate-200 rounded-md w-56 animate-pulse"></div>
+          </div>
+
+        </div>
+      </div>
+    );
   }
-
+  
   return (
     <QueryClientProvider client={queryClient}>
     <Routes>

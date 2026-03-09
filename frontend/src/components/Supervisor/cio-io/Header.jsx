@@ -3,10 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FiBell, FiHelpCircle, FiChevronDown, FiLayers } from "react-icons/fi";
 import { FaBars, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
 import { toast, Toaster } from "react-hot-toast";
-
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -17,6 +14,10 @@ const Header = ({ toggleMobileMenu }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  
+  // Nayi state API se data store karne ke liye
+  const [apiUserData, setApiUserData] = useState(null); 
+
   const dropdownRef = useRef(null);
   const timeoutRef = useRef(null);
 
@@ -31,29 +32,43 @@ const Header = ({ toggleMobileMenu }) => {
     });
   };
 
+  // API Call to fetch user details (Name, Role, Subrole)
   useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768);
+    let isMounted = true;
+    const fetchUserData = async () => {
+      try {
+        const api = getApiInstance();
+        const response = await api.get('/me'); 
+        if (isMounted) {
+          setApiUserData(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching user data from API:", error);
+      }
     };
 
+    fetchUserData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Screen size check
+  useEffect(() => {
+    const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     
-    return () => {
-      window.removeEventListener('resize', checkScreenSize);
-    };
+    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   // Update time every minute
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 60000);
-
+    const timer = setInterval(() => setCurrentDateTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
-  // Click outside to close dropdown
+  // Solid Click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -61,15 +76,11 @@ const Header = ({ toggleMobileMenu }) => {
       }
     };
 
-    if (showProfileDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showProfileDropdown]);
-
+  // Formatting Date and Time
   const formatDateTime = () => {
     const now = currentDateTime;
     const day = now.getDate();
@@ -88,7 +99,6 @@ const Header = ({ toggleMobileMenu }) => {
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
-    
     setIsLoggingOut(true);
     
     try {
@@ -99,11 +109,8 @@ const Header = ({ toggleMobileMenu }) => {
         toast.success('Logout Successfully');
         
         timeoutRef.current = setTimeout(() => {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('user');
-          localStorage.removeItem('role'); 
-          localStorage.removeItem('subrole'); 
-          window.open("/login", "_self");
+          localStorage.clear(); // Saare items ek saath clear karne ke liye
+          navigate('/login');   // window.open ki jagah
         }, 1500);
        
       } else {
@@ -116,66 +123,54 @@ const Header = ({ toggleMobileMenu }) => {
         toast.error('Network error during logout. Please try again.');
       }
     } finally {
-      timeoutRef.current = setTimeout(() => {
-        setIsLoggingOut(false);
-      }, 1500);
+      timeoutRef.current = setTimeout(() => setIsLoggingOut(false), 1500);
     }
   };
 
   // Cleanup timeout on unmount
   useEffect(() => {
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
 
-  const getUserData = () => {
+  // Fallback ke liye local storage data (Agar API fail ho jaye)
+  const getLocalUserData = () => {
     try {
       const userData = localStorage.getItem('user');
       return userData ? JSON.parse(userData) : null;
     } catch (error) {
-      console.warn('Error parsing user data:', error);
       return null;
     }
   };
 
-  const getUserRole = () => {
-    try {
-      const role = localStorage.getItem('role');
-      return role || 'lokayukt';
-    } catch (error) {
-      return 'lokayukt';
-    }
-  };
+  const localUser = getLocalUserData();
 
-  const user = getUserData();
-  const userRole = getUserRole();
+  // Prefer API data over Local Storage data
+  const finalName = apiUserData?.name || localUser?.name ;
+  const finalEmail = apiUserData?.email || localUser?.email ;
+  const finalRoleLabel = apiUserData?.subrole?.label || apiUserData?.role?.label ;
 
   const getUserInitials = () => {
-    if (user?.name) {
-      const nameParts = user.name.split(' ');
+    if (finalName && finalName !== 'User Name') {
+      const nameParts = finalName.split(' ');
       if (nameParts.length >= 2) {
         return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
       }
-      return user.name.substring(0, 2).toUpperCase();
+      return finalName.substring(0, 2).toUpperCase();
     }
-    return 'LK';
+    return '';
   };
 
   return (
     <>
-      <Toaster
-        position="top-right"
-      
-      />
+      <Toaster position="top-right" />
 
-      {/* ✅ FIXED Header - stays at top */}
+      {/* FIXED Header */}
       <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50 h-16">
         <div className="w-full h-full flex items-center justify-between px-4 md:px-6">
           
-          {/* LEFT SECTION - Logo + Title */}
+          {/* LEFT SECTION */}
           <div className="flex items-center gap-3">
             {isMobile && (
               <button
@@ -203,7 +198,7 @@ const Header = ({ toggleMobileMenu }) => {
             )}
           </div>
 
-          {/* RIGHT SECTION - Notifications + Profile */}
+          {/* RIGHT SECTION */}
           <div className="flex items-center gap-5">
             
             <div className="relative cursor-pointer" aria-label="Notifications">
@@ -219,6 +214,7 @@ const Header = ({ toggleMobileMenu }) => {
               />
             )}
 
+            {/* PROFILE SECTION */}
             <div className="relative" ref={dropdownRef}>
               <div 
                 className="flex items-center gap-2 cursor-pointer"
@@ -233,11 +229,11 @@ const Header = ({ toggleMobileMenu }) => {
                 {!isMobile && (
                   <div className="flex items-center gap-2">
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-700">
-                        {user?.name || 'User Name'}
+                      <span className="text-sm font-medium text-gray-700 capitalize truncate max-w-[120px]">
+                        {finalName}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {/* {userRole === "lok-ayukt" ? "LokAyukta" : "LokAyukta"} */}
+                      <span className="text-xs text-gray-500 capitalize">
+                        {finalRoleLabel}
                       </span>
                     </div>
                     <FiChevronDown className="text-gray-600" />
@@ -249,20 +245,25 @@ const Header = ({ toggleMobileMenu }) => {
                 )}
               </div>
 
+              {/* DROPDOWN MENU */}
               {showProfileDropdown && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[60]">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[60] transition-all duration-200 ease-out">
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-800">{user?.name || 'User Name'}</p>
-                    <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
-                    <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
-                      {userRole === "lok-ayukt" ? "Cio" : "Cio"}
+                    <p className="text-sm font-semibold text-gray-800 capitalize truncate">
+                      {finalName}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {finalEmail}
+                    </p>
+                    <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full capitalize">
+                      {finalRoleLabel}
                     </span>
                   </div>
 
                   <button
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className={`w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors ${
+                    className={`w-full flex items-center gap-3 px-4 py-2 mt-1 text-sm text-red-600 hover:bg-red-50 transition-colors ${
                       isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''
                     }`}
                   >

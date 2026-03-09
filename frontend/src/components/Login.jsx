@@ -104,8 +104,8 @@ const Login = () => {
 }
 
           else if (userRole === "supervisor") {
-            localStorage.setItem('subrole', response.data.data.user.subrole.name);
-            localStorage.setItem('name', response?.data?.data?.user?.name);
+            // localStorage.setItem('subrole', response.data.data.user.subrole.name);
+            // localStorage.setItem('name', response?.data?.data?.user?.name);
 
             window.open("/main-dashboard", "_self");
           }
