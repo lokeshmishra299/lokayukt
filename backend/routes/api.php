@@ -36,10 +36,16 @@ use App\Http\Controllers\api\Dispatch\DispatchComplaintsController;
 use App\Http\Controllers\api\Dispatch\DispatchDashboardController;
 use App\Http\Controllers\api\Dispatch\DispatchReportController;
 use App\Http\Controllers\api\UserManagement;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 // use App\Http\Middleware\AuthMiddleware;
 
 Route::post('/login',[LoginController::class,'login']);
+
+
+Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
+    return $request->user()->load('role','subrole');
+});
 
 Route::middleware('auth:sanctum')->group(function(){
     Route::post('/logout', [LoginController::class, 'logout']);

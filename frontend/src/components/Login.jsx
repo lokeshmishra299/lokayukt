@@ -54,8 +54,8 @@ const Login = () => {
       if (response.data.status === 'success') {
         // Store authentication data in localStorage
         localStorage.setItem('access_token', response.data.data.access_token);
-        localStorage.setItem('user', JSON.stringify(response.data.data.user));
-        localStorage.setItem('role', response.data.data.user.role.name);
+        // localStorage.setItem('user', JSON.stringify(response.data.data.user));
+        // localStorage.setItem('role', response.data.data.user.role.name);
         const userRole = response.data.data.user.role.name;
         toast.success("Login Successful!"); 
         setTimeout(() => {
