@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import axios from "axios";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ProtectedRoute from "./protectedUnknownRoutes/ProtectedRoute.jsx";
+import { useAuth } from './protectedUnknownRoutes/AuthContext.jsx';
 import './index.css'
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -866,33 +867,8 @@ const queryClient = new QueryClient();
 
 function App() {
 
-  const [role, setRole] = React.useState(null);
-  const [subrole, setSubrole] = React.useState(null);
-  const [loading, setLoading] = React.useState(true);
-
-    React.useEffect(() => {
-      const token = localStorage.getItem("access_token");
-
-      if (token) {
-        axios.get(`${BASE_URL}/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        .then(res => {
-          setRole(res.data.role.name);
-          setSubrole(res.data.subrole?.name);
-        })
-        .catch(() => {
-          localStorage.removeItem("access_token");
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-      } else {
-        setLoading(false);
-      }
-    }, []);
+  const { role, subrole, loading } = useAuth();
+  
 
 if (loading) {
     return (
