@@ -261,10 +261,11 @@ class LokAyuktDashboardController extends Controller
     //         ], 400);
     // }
           $query = $query->whereYear('cmp.created_at', $date->year)
-            ->whereMonth('cmp.created_at', $date->month)
-            ->where('cmp.approved_rejected_by_rk', 1)
-            ->where('cmp.approved_rejected_by_lokayukt', 0)
-            ->orderByDesc('cmp.id');
+                ->whereMonth('cmp.created_at', $date->month)
+                ->where('cmp.approved_rejected_by_rk', 1)
+                ->where('cmp.approved_rejected_by_lokayukt', 0);
+                // ->count();
+
             $queryDay = $queryDay->where('cmp.form_status', 1)
               ->where('cmp.approved_rejected_by_rk', 1)
            ->whereDate('cmp.created_at', now()->toDateString()) // ✅ only today

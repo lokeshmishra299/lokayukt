@@ -181,6 +181,8 @@ const ViewAllComplaint = () => {
   const [showReleaseModal, setShowReleaseModal] = useState(false);
   const [releaseType, setReleaseType] = useState("");
   const [targetDate, setTargetDate] = useState("");
+  const [assignedDate, setAssignedDate] = useState("");
+  const [otp, setOtp] = useState("");
 
   const handleReject = () => {
     console.log("Rejected!");
@@ -477,14 +479,16 @@ const ViewAllComplaint = () => {
   // });
 
   const forwardComplaintMutation = useMutation({
-    mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+    mutationFn: async ({ complaintId, forwardTo, remarkData, otpData }) => {
       const res = await api.post(
         `/uplokayukt/forward-by-uplokayukt/${complaintId}`,
         {
           forward_to: forwardTo,
           // remark: remarkData,
           target_date: targetDate,
+          assigned_date: assignedDate,
           sent_through_rk: sent_through_rk ? 1 : 0,
+          otp: otpData,
         },
       );
       return res.data;
@@ -499,12 +503,14 @@ const ViewAllComplaint = () => {
       
       setRemark("");
       setTargetDate("");
+      setAssignedDate("");
       setSelectedForwardTo("");
+      setOtp("");
       setConfirmConfig({ open: false, type: null });
     },
-    onError: (error) => {
-      toast.error(error?.response?.data?.message || "Failed to forward");
-    },
+    // onError: (error) => {
+    //   toast.error(error?.response?.data?.message);
+    // },
   });
 
   const handleMarkAsReceived = () =>
@@ -537,6 +543,7 @@ const ViewAllComplaint = () => {
         complaintId: id,
         forwardTo: selectedForwardTo,
         targetDate: targetDate,
+        otpData: otp,
       });
     } else if (confirmConfig.type === "pullback") {
       pullBackMutation.mutate({
@@ -549,7 +556,10 @@ const ViewAllComplaint = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
+    setOtp("");
     setTargetDate("");
+    setAssignedDate("");
+    setOtp("");
   };
 
   const getStatusColor = (status) => {
@@ -1331,9 +1341,9 @@ const ViewAllComplaint = () => {
                   type="checkbox"
                   checked={sent_through_rk}
                   onChange={(e) => setThroughRC(e.target.checked)}
-                  className="w-4 h-4"
+                  className="w-4 mb-2 h-4"
                 />
-                <span className="text-sm">Checkbox If Send through RC</span>
+                <span className="text-sm mb-2">Checkbox If Send through RC</span>
               </label>
             )}
 
@@ -1376,6 +1386,23 @@ const ViewAllComplaint = () => {
               </div>
             )}
 
+
+
+            {confirmConfig.type === "forward" && (
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Assigned Date 
+                </label>
+                <input
+                  type="date"
+                  value={assignedDate}
+                  onChange={(e) => setAssignedDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded
+                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            )}
+            
             {/* SEND → Target Date */}
             {confirmConfig.type === "forward" && (
               <div className="mb-5">
@@ -1391,6 +1418,26 @@ const ViewAllComplaint = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded
                  focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+            )}
+
+
+            {/* SEND → OTP Input & Button */}
+            {confirmConfig.type === "forward" && selectedForwardTo &&  (
+              <div className="mb-5 mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Enter OTP <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="OTP दर्ज करें"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+               
+                </div>
               </div>
             )}
 

@@ -163,6 +163,8 @@ const ViewAllComplaint = () => {
   const [showMobileTabs, setShowMobileTabs] = useState(false);
     const [sent_through_rk, setThroughRC] = useState(false);
     const [targetDate, setTargetDate] = useState("");
+    const [assignedDate, setAssignedDate] = useState("");
+    const [otp, setOtp] = useState("");
   
 
   // Single config for Action modals (Receive, Forward, Pullback)
@@ -318,12 +320,14 @@ const ViewAllComplaint = () => {
 
   
   const forwardComplaintMutation = useMutation({
-      mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+      mutationFn: async ({ complaintId, forwardTo, remarkData, otpData }) => {
         const res = await api.post(`/supervisor/forward-by-io/${complaintId}`, {
           forward_to: forwardTo,
           // remark: remarkData,
             target_date: targetDate, 
-         sent_through_rk: sent_through_rk ? 1 : 0
+            assigned_date: assignedDate,
+         sent_through_rk: sent_through_rk ? 1 : 0,
+         otp: otpData,
 
         });
         return res.data;
@@ -337,9 +341,11 @@ const ViewAllComplaint = () => {
         }, 2000)
         // setRemark("");
         setTargetDate("");
+        setAssignedDate("");
         setThroughRC(false);
 
         setSelectedForwardTo("");
+        setOtp("");
         setConfirmConfig({ open: false, type: null });
       },
       onError: (error) => {
@@ -373,6 +379,7 @@ const ViewAllComplaint = () => {
         complaintId: id,
         forwardTo: selectedForwardTo,
         remarkData: remark,
+        otpData: otp,
       });
     }  else if (confirmConfig.type === "pullback") {
       pullBackMutation.mutate({
@@ -385,6 +392,9 @@ const ViewAllComplaint = () => {
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
+    setTargetDate("");   // <-- इसे भी क्लियर कर दें 
+    setAssignedDate("");
+    setOtp("");
   };
 
   const getStatusColor = (status) => {
@@ -961,6 +971,21 @@ const ViewAllComplaint = () => {
 )}
 
 
+{confirmConfig.type === "forward" && (
+                  <div className="mb-5 mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Assigned Date 
+                    </label>
+                    <input
+                      type="date"
+                      value={assignedDate}
+                      onChange={(e) => setAssignedDate(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded
+                                 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                )}
+
   {confirmConfig.type === "forward" && (
   <div className="mb-5 mt-3">
     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -976,6 +1001,26 @@ const ViewAllComplaint = () => {
     />
   </div>
 )}
+
+
+
+{/* SEND → OTP Input & Button */}
+                {confirmConfig.type === "forward" && selectedForwardTo && (
+                  <div className="mb-5 mt-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Enter OTP <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        placeholder="OTP दर्ज करें"
+                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                )}
 
     
                 {confirmConfig.type !== "assign" &&

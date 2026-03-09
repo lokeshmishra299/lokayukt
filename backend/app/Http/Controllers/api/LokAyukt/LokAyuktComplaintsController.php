@@ -48,31 +48,6 @@ class LokAyuktComplaintsController extends Controller
                       'resp.respondent_name as respondentName',
         );
 
-//   $query->whereNotExists(function ($q) {
-//         $q->select(DB::raw(1))
-//           ->from('complaint_actions as rep')
-//           ->whereColumn('rep.complaint_id', 'complaints.id')
-//           ->where(function ($q2) {
-//               $q2->whereNotNull('rep.forward_by_ps')
-//                  ->orWhere('rep.forward_by_lokayukt', '<>', 0);
-//           });
-//     });
-// $query->where('complaints.approved_rejected_by_lokayukt', 0)
-// ->whereExists(function ($q) {
-//     $q->select(DB::raw(1))
-//       ->from('complaint_actions as rep')
-//       ->whereColumn('rep.complaint_id', 'complaints.id')
-
-//       // latest action only
-//       ->whereRaw('rep.id = (
-//             SELECT MAX(id)
-//             FROM complaint_actions
-//             WHERE complaint_id = complaints.id
-//       )')
-
-//       // latest forward Lokayukt ko aya ho
-//       ->where('rep.forward_to_lokayukt', '<>', 0);
-// });
       $query->where('complaints.approved_rejected_by_lokayukt', 0)
 ->where(function ($main) {
 
@@ -97,26 +72,7 @@ class LokAyuktComplaintsController extends Controller
     });
 
 });
-    //   ->where(function ($q) {
-    //       $q->whereNull('rep.forward_by_ps')
-    //         ->orWhere('rep.forward_by_lokayukt', 0);
-    //   });
-
-
-    //  $query->where('form_status', 1)
-    //             //   ->where('approved_rejected_by_ro', 1)
-    //               ->where('approved_rejected_by_rk', 1)
-    //               ->where('approved_rejected_by_lokayukt','<>', 1)
-    //               ->whereNull('rep.forward_by_ps')
-    //               ->OrwhereNull('rep.forward_by_lokayukt')
-    //               ->where('rep.forward_by_lokayukt',0);
-                    // ->where(function($q){
-                    //         $q->where('approved_rejected_by_so_us',1)
-                    //         ->Orwhere('approved_rejected_by_ds_js', 1);               
-                    //      })
-                    // ->where('approved_rejected_by_d_a', 1);
-                    // ->whereNotNull('forward_to_d_a');
-
+   
     $records = $query->distinct('complaints.id')->orderBy('complaints.updated_at','DESC')->get();
  
                 //  $todayCount = DB::table('complaints')
@@ -370,20 +326,35 @@ $complainDetails->actions = $actions;
    }
 
 
-   public function getUpLokayuktUsers(){
-    $usersByRole = User::with('role')
-     ->whereNotNull('role_id')
-        ->get()
-        ->groupBy(fn ($user) => $user->role->name);
-        if(!empty($usersByRole['up-lok-ayukt'])){
+//    public function getUpLokayuktUsers(){
+//     $usersByRole = User::with('role')
+//      ->whereNotNull('role_id')
+//         ->get()
+//         ->groupBy(fn ($user) => $user->role->name);
+//         if(!empty($usersByRole['up-lok-ayukt'])){
 
-            return response()->json($usersByRole['up-lok-ayukt']);
-        }else{
+//             return response()->json($usersByRole['up-lok-ayukt']);
+//         }else{
 
-            return response()->json(["message"=>"Data Not Found"]);
-        }
+//             return response()->json(["message"=>"Data Not Found"]);
+//         }
        
-   }
+//    }
+public function getUpLokayuktUsers()
+{
+    $usersByRole = User::with('role')
+        ->whereHas('role') // 🔥 ensures role exists
+        ->get()
+        ->groupBy(function ($user) {
+            return $user->role->name;
+        });
+
+    if (!empty($usersByRole['up-lok-ayukt'])) {
+        return response()->json($usersByRole['up-lok-ayukt']);
+    } else {
+        return response()->json(["message" => "Data Not Found"]);
+    }
+}
    public function getDealingAssistantUsers(){
     // $usersBySubRole = User::with('role','subrole')
     //     ->get()
@@ -839,7 +810,7 @@ $complainDetails->actions = $actions;
         $validation = Validator::make($request->all(), [
             // 'forward_by_ds_js' => 'required|exists:users,id',
             'forward_to' => 'required|exists:users,id',
-            'target_date' => 'required',
+            // 'target_date' => 'required',
          
           
         ], [
@@ -847,7 +818,7 @@ $complainDetails->actions = $actions;
             // 'forward_by_ds_js.exists' => 'Forward by user does not exist.',
             'forward_to.required' => 'Forward to user is required.',
             'forward_to.exists' => 'Forward to user does not exist.',
-            'target_date.required' => 'Target date is required.',
+            // 'target_date.required' => 'Target date is required.',
            
         ]);
 
@@ -921,6 +892,7 @@ $complainDetails->actions = $actions;
                         $apcAction->complaint_id = $complainId;
                         $apcAction->forward_by_lokayukt = $userId;
                         $apcAction->target_date = $request->target_date;
+                        $apcAction->assigned_date = $request->assigned_date;
 
                         if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt'])) {
 

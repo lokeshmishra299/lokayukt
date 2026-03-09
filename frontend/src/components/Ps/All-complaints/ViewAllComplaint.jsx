@@ -192,7 +192,9 @@ const ViewAllComplaint = () => {
      const [showModal, setShowModal] = useState(false);
      const [Rejectedloading,setRejectedloading] = useState(false)
      const [targetDate, setTargetDate] = useState("");
+     const [assignedDate, setAssignedDate] = useState("");
      const [fieldErrors, setFieldErrors] = useState({});
+     const [otp, setOtp] = useState("");
 
   
 
@@ -390,12 +392,14 @@ return flatList.filter(
   });
 
  const forwardComplaintMutation = useMutation({
-    mutationFn: async ({ complaintId, forwardTo, remarkData }) => {
+    mutationFn: async ({ complaintId, forwardTo, remarkData, otpData }) => {
       const res = await api.post(`/ps/forward-complain-by-ps/${complaintId}`, {
         forward_to: forwardTo,
         // remark: remarkData,
         target_date: targetDate,
+        assigned_date: assignedDate,
         sent_through_rk: sent_through_rk ? 1 : 0,
+        otp: otpData,
       });
       return res.data;
     },
@@ -408,7 +412,9 @@ return flatList.filter(
       }, 2000)
 
       setTargetDate("");
+      setAssignedDate("");
       setSelectedForwardTo("");
+      setOtp("");
       setConfirmConfig({ open: false, type: null });
       setFieldErrors({}); // ✅ Success पर भी एरर क्लियर करें
     },
@@ -448,6 +454,7 @@ return flatList.filter(
     complaintId: id,
     forwardTo: selectedForwardTo,
     targetDate: targetDate,
+    otpData: otp,
   });
 }
 
@@ -512,7 +519,9 @@ return flatList.filter(
     setConfirmConfig({ open: false, type: null });
     setRemark("");
       setTargetDate("");
+      setAssignedDate("");
     setSelectedForwardTo("");
+    setOtp("");
     setFieldErrors({});
   };
 
@@ -1227,6 +1236,9 @@ return flatList.filter(
                 : "Assign to Yourself?"}
             </h3>
 
+
+
+                
             {/* --- FORWARDING LOGIC START --- */}
             {confirmConfig.type === "forward" && (
               <>
@@ -1284,9 +1296,9 @@ return flatList.filter(
                         type="checkbox"
                         checked={sent_through_rk}
                         onChange={(e) => setSentThroughRK(e.target.checked)} // ✅ CORRECT
-                        className="w-4 h-4"
+                        className="w-4 h-4 mb-2"
                       />
-                      <span className="text-sm">
+                      <span className="text-sm mb-2">
                         Checkbox If Send through RC
                       </span>
                     </label>
@@ -1356,6 +1368,39 @@ return flatList.filter(
   </div>
 )}
 
+
+{confirmConfig.type === "forward" && (
+              <div className="mb-5">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Assigned Date 
+                </label>
+                <input
+                  type="date"
+                  value={assignedDate}
+                  onChange={(e) => {
+                    setAssignedDate(e.target.value);
+                    // ✅ जैसे ही यूज़र कुछ टाइप करे, एरर हटा दें
+                    if (fieldErrors?.assigned_date) {
+                      setFieldErrors((prev) => ({ ...prev, assigned_date: null }));
+                    }
+                  }}
+                  className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 ${
+                    fieldErrors?.assigned_date 
+                      ? "border-red-500 focus:ring-red-400 bg-red-50" 
+                      : "border-gray-300 focus:ring-blue-500"
+                  }`}
+                />
+                
+                {/* 🎯 यहाँ लाल रंग में एरर मैसेज दिखेगा */}
+                {fieldErrors?.assigned_date && (
+                  <p className="text-xs text-red-500 mt-1.5 font-medium flex items-center gap-1">
+                    {fieldErrors.assigned_date[0]}
+                  </p>
+                )}
+              </div>
+            )}
+
+
 {/* SEND → Target Date */}
 {confirmConfig.type === "forward" && (
   <div className="mb-5">
@@ -1390,6 +1435,26 @@ return flatList.filter(
     )}
   </div>
 )}
+
+
+{/* SEND → OTP Input & Button */}
+            {confirmConfig.type === "forward" && selectedForwardTo && (
+              <div className="mb-5 mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Enter OTP <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="OTP दर्ज करें"
+                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                
+                </div>
+              </div>
+            )}
 
 
             {/* Buttons */}

@@ -71,6 +71,8 @@
     const [selectedForwardTo, setSelectedForwardTo] = useState("");
     const [priviewPopup, setPriviewPopup] = useState(false);
     const [targetDate, setTargetDate] = useState("");
+    const [assignedDate, setAssignedDate] = useState("");
+    const [otp, setOtp] = useState("");
 
 
     // const {data: complaintData,isLoading,isError,error,} = useQuery({
@@ -147,6 +149,8 @@
           forward_to: forwardTo,
           // remark: remarkData,
           target_date: targetDate,
+          assigned_date: assignedDate,
+          otp: otp,
         });
         return res.data;
       },
@@ -159,6 +163,9 @@
         }, 2000)
         setRemark("");
         setSelectedForwardTo("");
+        setOtp("");
+        setTargetDate(""); // अगर आप इसे भी reset करना चाहते हैं
+    setAssignedDate("");
         setConfirmConfig({ open: false, type: null });
       },
       onError: (error) => {
@@ -192,6 +199,7 @@
           forwardTo: selectedForwardTo,
           // remarkData: remark,
               targetDate: targetDate,
+              otp: otp,
           
         });
       } else if (confirmConfig.type === "pullback") {
@@ -203,7 +211,10 @@
     const handleConfirmNo = () => {
       setConfirmConfig({ open: false, type: null });
       setRemark("");
+      setTargetDate(""); // (optional)
+  setAssignedDate("");
       setSelectedForwardTo("");
+      setOtp("");
     };
 
     const getStatusColor = (status) => {
@@ -842,6 +853,22 @@
 )}
 
 
+
+{confirmConfig.type === "forward" && (
+  <div className="mb-5">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Assigned Date 
+    </label>
+    <input
+      type="date"
+      value={assignedDate}
+      onChange={(e) => setAssignedDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+)}
+
+
   {/* SEND → Target Date */}
  {confirmConfig.type === "forward" && (
   <div className="mb-5">
@@ -857,6 +884,27 @@
       className="w-full px-3 py-2 border border-gray-300 rounded 
                  focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
+  </div>
+)}
+
+
+
+{/* SEND → OTP Input & Button */}
+ {confirmConfig.type === "forward" && selectedForwardTo && (
+  <div className="mb-5">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Enter OTP <span className="text-red-500">*</span>
+    </label>
+    <div className="flex gap-2">
+      <input
+        type="text"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        placeholder="OTP दर्ज करें"
+        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+  
+    </div>
   </div>
 )}
 

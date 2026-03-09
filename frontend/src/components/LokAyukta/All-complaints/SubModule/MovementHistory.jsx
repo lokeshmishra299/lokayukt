@@ -51,6 +51,7 @@ const MovementHistory = ({ complaint }) => {
     const toUs = label("US", item.forward_to_us_name);
     const toDs = label("DS", item.forward_to_ds_name);
     const toDispatch = label("Dispatch", item.forward_to_dispatch_name);
+    const toPs = label("PS", item.forward_to_ps_name);
 
 
     /* ================= RK ================= */
@@ -68,8 +69,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_rk && item.sent_through_rk === 1 && item.forward_to_sec) { return `${rk} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_rk && item.forward_to_sec) { return `${rk} → ${toSec}`; }
 
-    if (item.forward_by_rk && item.sent_through_rk === 1 && item.forward_to_ps) { return `${rk} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_rk && item.forward_to_ps) { return `${rk} → ${ps}`; }
+    if (item.forward_by_rk && item.sent_through_rk === 1 && item.forward_to_ps) { return `${rk} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_rk && item.forward_to_ps) { return `${rk} → ${toPs}`; }
 
     if (item.forward_by_rk && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${rk} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_rk && item.forward_to_cio_io) { return `${rk} → ${toCio}`; }
@@ -107,8 +108,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_sec) { return `Hon’ble ${lok} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_lokayukt && item.forward_to_sec) { return `Hon’ble ${lok} → ${toSec}`; }
 
-    if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_ps) { return `Hon’ble ${lok} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_lokayukt && item.forward_to_ps) { return `Hon’ble ${lok} → ${ps}`; }
+    if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_ps) { return `Hon’ble ${lok} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_lokayukt && item.forward_to_ps) { return `Hon’ble ${lok} → ${toPs}`; }
 
     if (item.forward_by_lokayukt && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `Hon’ble ${lok} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_lokayukt && item.forward_to_cio_io) { return `Hon’ble ${lok} → ${toCio}`; }
@@ -146,8 +147,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_uplokayukt && item.sent_through_rk === 1 && item.forward_to_sec) { return `Hon’ble ${uplok} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_uplokayukt && item.forward_to_sec) { return `Hon’ble ${uplok} → ${toSec}`; }
 
-    if (item.forward_by_uplokayukt && item.sent_through_rk === 1 && item.forward_to_ps) { return `Hon’ble ${uplok} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_uplokayukt && item.forward_to_ps) { return `Hon’ble ${uplok} → ${ps}`; }
+    if (item.forward_by_uplokayukt && item.sent_through_rk === 1 && item.forward_to_ps) { return `Hon’ble ${uplok} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_uplokayukt && item.forward_to_ps) { return `Hon’ble ${uplok} → ${toPs}`; }
 
     if (item.forward_by_uplokayukt && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `Hon’ble ${uplok} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_uplokayukt && item.forward_to_cio_io) { return `Hon’ble ${uplok} → ${toCio}`; }
@@ -185,8 +186,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_sec) { return `${ps} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_ps && item.forward_to_sec) { return `${ps} → ${toSec}`; }
 
-    if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_ps) { return `${ps} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_ps && item.forward_to_ps) { return `${ps} → ${ps}`; }
+    if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_ps) { return `${ps} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_ps && item.forward_to_ps) { return `${ps} → ${toPs}`; }
 
     if (item.forward_by_ps && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${ps} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_ps && item.forward_to_cio_io) { return `${ps} → ${toCio}`; }
@@ -224,8 +225,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_sec) { return `${roAro} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_ro_aro && item.forward_to_sec) { return `${roAro} → ${toSec}`; }
 
-    if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_ps) { return `${roAro} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_ro_aro && item.forward_to_ps) { return `${roAro} → ${ps}`; }
+    if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_ps) { return `${roAro} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_ro_aro && item.forward_to_ps) { return `${roAro} → ${toPs}`; }
 
     if (item.forward_by_ro_aro && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${roAro} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_ro_aro && item.forward_to_cio_io) { return `${roAro} → ${toCio}`; }
@@ -263,8 +264,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_ro && item.sent_through_rk === 1 && item.forward_to_sec) { return `${ro} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_ro && item.forward_to_sec) { return `${ro} → ${toSec}`; }
 
-    if (item.forward_by_ro && item.sent_through_rk === 1 && item.forward_to_ps) { return `${ro} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_ro && item.forward_to_ps) { return `${ro} → ${ps}`; }
+    if (item.forward_by_ro && item.sent_through_rk === 1 && item.forward_to_ps) { return `${ro} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_ro && item.forward_to_ps) { return `${ro} → ${toPs}`; }
 
     if (item.forward_by_ro && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${ro} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_ro && item.forward_to_cio_io) { return `${ro} → ${toCio}`; }
@@ -302,8 +303,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_cio_io && item.sent_through_rk === 1 && item.forward_to_sec) { return `${cio} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_cio_io && item.forward_to_sec) { return `${cio} → ${toSec}`; }
 
-    if (item.forward_by_cio_io && item.sent_through_rk === 1 && item.forward_to_ps) { return `${cio} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_cio_io && item.forward_to_ps) { return `${cio} → ${ps}`; }
+    if (item.forward_by_cio_io && item.sent_through_rk === 1 && item.forward_to_ps) { return `${cio} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_cio_io && item.forward_to_ps) { return `${cio} → ${toPs}`; }
 
     if (item.forward_by_cio_io && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${cio} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_cio_io && item.forward_to_cio_io) { return `${cio} → ${toCio}`; }
@@ -341,8 +342,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_io && item.sent_through_rk === 1 && item.forward_to_sec) { return `${io} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_io && item.forward_to_sec) { return `${io} → ${toSec}`; }
 
-    if (item.forward_by_io && item.sent_through_rk === 1 && item.forward_to_ps) { return `${io} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_io && item.forward_to_ps) { return `${io} → ${ps}`; }
+    if (item.forward_by_io && item.sent_through_rk === 1 && item.forward_to_ps) { return `${io} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_io && item.forward_to_ps) { return `${io} → ${toPs}`; }
 
     if (item.forward_by_io && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${io} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_io && item.forward_to_cio_io) { return `${io} → ${toCio}`; }
@@ -380,8 +381,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_sec && item.sent_through_rk === 1 && item.forward_to_sec) { return `${sec} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_sec && item.forward_to_sec) { return `${sec} → ${toSec}`; }
 
-    if (item.forward_by_sec && item.sent_through_rk === 1 && item.forward_to_ps) { return `${sec} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_sec && item.forward_to_ps) { return `${sec} → ${ps}`; }
+    if (item.forward_by_sec && item.sent_through_rk === 1 && item.forward_to_ps) { return `${sec} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_sec && item.forward_to_ps) { return `${sec} → ${toPs}`; }
 
     if (item.forward_by_sec && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${sec} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_sec && item.forward_to_cio_io) { return `${sec} → ${toCio}`; }
@@ -419,8 +420,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_js && item.sent_through_rk === 1 && item.forward_to_sec) { return `${js} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_js && item.forward_to_sec) { return `${js} → ${toSec}`; }
 
-    if (item.forward_by_js && item.sent_through_rk === 1 && item.forward_to_ps) { return `${js} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_js && item.forward_to_ps) { return `${js} → ${ps}`; }
+    if (item.forward_by_js && item.sent_through_rk === 1 && item.forward_to_ps) { return `${js} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_js && item.forward_to_ps) { return `${js} → ${toPs}`; }
 
     if (item.forward_by_js && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${js} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_js && item.forward_to_cio_io) { return `${js} → ${toCio}`; }
@@ -455,8 +456,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_us && item.sent_through_rk === 1 && item.forward_to_sec) { return `${us} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_us && item.forward_to_sec) { return `${us} → ${toSec}`; }
 
-    if (item.forward_by_us && item.sent_through_rk === 1 && item.forward_to_ps) { return `${us} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_us && item.forward_to_ps) { return `${us} → ${ps}`; }
+    if (item.forward_by_us && item.sent_through_rk === 1 && item.forward_to_ps) { return `${us} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_us && item.forward_to_ps) { return `${us} → ${toPs}`; }
 
     if (item.forward_by_us && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${us} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_us && item.forward_to_cio_io) { return `${us} → ${toCio}`; }
@@ -491,8 +492,8 @@ const MovementHistory = ({ complaint }) => {
     if (item.forward_by_ds && item.sent_through_rk === 1 && item.forward_to_sec) { return `${ds} → Record Section (RC) → ${toSec}`; }
     if (item.forward_by_ds && item.forward_to_sec) { return `${ds} → ${toSec}`; }
 
-    if (item.forward_by_ds && item.sent_through_rk === 1 && item.forward_to_ps) { return `${ds} → Record Section (RC) → ${ps}`; }
-    if (item.forward_by_ds && item.forward_to_ps) { return `${ds} → ${ps}`; }
+    if (item.forward_by_ds && item.sent_through_rk === 1 && item.forward_to_ps) { return `${ds} → Record Section (RC) → ${toPs}`; }
+    if (item.forward_by_ds && item.forward_to_ps) { return `${ds} → ${toPs}`; }
 
     if (item.forward_by_ds && item.sent_through_rk === 1 && item.forward_to_cio_io) { return `${ds} → Record Section (RC) → ${toCio}`; }
     if (item.forward_by_ds && item.forward_to_cio_io) { return `${ds} → ${toCio}`; }

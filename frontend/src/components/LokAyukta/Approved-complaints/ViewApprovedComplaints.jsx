@@ -735,9 +735,9 @@ const releaseComplaintMutation = useMutation({
                         जिला
                       </p>
                       <p className="text-gray-800 kruti-input text-sm">
-                        {capitalizeFirstLetter(
-                          complaintData.main_complainant_district,
-                        ) || "N/A"}
+                        {
+                          complaintData.main_complainant_district
+                        || "ykxw ugha"}
                       </p>
                     </div>
                   </div>
@@ -778,9 +778,9 @@ const releaseComplaintMutation = useMutation({
                         जिला
                       </p>
                       <p className=" kruti-input text-gray-800 text-sm">
-                        {capitalizeFirstLetter(
-                          complaintData.main_respondant_district,
-                        ) || "N/A"}
+                        {
+                          complaintData.main_respondant_district
+                        || "ykxw ugha"}
                       </p>
                     </div>
                   </div>

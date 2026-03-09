@@ -216,6 +216,8 @@ const [releaseForwardTo, setReleaseForwardTo] = useState("");
   const [showReleaseModal, setShowReleaseModal] = useState(false);
 const [releaseRemark, setReleaseRemark] = useState("");
 const [targetDate, setTargetDate] = useState("");
+const [assignedDate, setAssignedDate] = useState("")
+const [otp, setOtp] = useState("");
 
 
   const handleReject = () => {
@@ -456,6 +458,7 @@ const releaseComplaintMutation = useMutation({
           complaint_id: complaintId,
           remark: remarkData,
           sent_through_rk: sent_through_rk ? 1 : 0,
+          otp: otpData,
         },
       });
       return res.data;
@@ -536,6 +539,7 @@ const releaseComplaintMutation = useMutation({
           forward_to: forwardTo,
           // remark: remarkData,
            target_date: targetDate,
+           assigned_date: assignedDate,
           sent_through_rk: sent_through_rk ? 1 : 0,
         },
       );
@@ -550,8 +554,10 @@ const releaseComplaintMutation = useMutation({
          navigate("/lokayukt/all-complaints")
       }, 2000)
           setTargetDate("");
+          setAssignedDate("")
       setThroughRC(false);
       setSelectedForwardTo("");
+      setOtp("");
       setConfirmConfig({ open: false, type: null });
     },
     onError: (error) => {
@@ -585,6 +591,7 @@ const releaseComplaintMutation = useMutation({
   forwardComplaintMutation.mutate({
     complaintId: id,
     forwardTo: selectedForwardTo,
+    otpData: otp,
   });
       
     } else if (confirmConfig.type === "pullback") {
@@ -598,6 +605,9 @@ const releaseComplaintMutation = useMutation({
     setConfirmConfig({ open: false, type: null });
     setRemark("");
     setSelectedForwardTo("");
+    setTargetDate("");   // <-- (optional) अगर आप target date भी reset करना चाहें 
+    setAssignedDate("");
+    setOtp("");
   };
 
   const getStatusColor = (status) => {
@@ -765,7 +775,7 @@ const releaseComplaintMutation = useMutation({
                       <p className="text-gray-800 kruti-input text-sm">
                         {
                           complaintData.main_complainant_father
-                         || "N/A"}
+                         || "ykxw ugha"}
                       </p>
                     </div>
 
@@ -1409,6 +1419,22 @@ const releaseComplaintMutation = useMutation({
   </div>
 )}
 
+
+
+{confirmConfig.type === "forward" && (
+  <div className="mb-5 mt-3">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Assigned Date 
+    </label>
+    <input
+      type="date"
+      value={assignedDate}
+      onChange={(e) => setAssignedDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+)}
+
 {/* SEND → Target Date */}
 {confirmConfig.type === "forward" && (
   <div className="mb-5 mt-3">
@@ -1427,6 +1453,25 @@ const releaseComplaintMutation = useMutation({
   </div>
 )}
 
+
+{/* SEND → OTP Input & Button */}
+{confirmConfig.type === "forward" && selectedForwardTo && (
+  <div className="mb-5 mt-3">
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Enter OTP <span className="text-red-500">*</span>
+    </label>
+    <div className="flex gap-2">
+      <input
+        type="text"
+        value={otp}
+        onChange={(e) => setOtp(e.target.value)}
+        placeholder="OTP दर्ज करें"
+        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+     
+    </div>
+  </div>
+)}
 
             {/* Buttons */}
             <div className="flex justify-end gap-3">

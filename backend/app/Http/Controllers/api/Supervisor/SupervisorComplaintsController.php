@@ -341,10 +341,10 @@ class SupervisorComplaintsController extends Controller
                 //    ->where('forward_to_lokayukt', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1);
                 // $query->groupBy('rep.target_date');    
-                        $query->where('approved_rejected_by_ds', 0)
+                        $query->where('approved_rejected_by_js', 0)
                         ->where('rep.status', 'Forwarded')
-                                ->whereNotNull('rep.forward_to_ds')
-                                 ->where('rep.forward_to_ds',$user);
+                                ->whereNotNull('rep.forward_to_js')
+                                 ->where('rep.forward_to_js',$user);
                 //  $query->where('rep.type', 2)
                 //                 ->where('rep.status', 'Report Requested')
                 //                 ->whereNotNull('rep.forward_to_ds')
@@ -1337,6 +1337,7 @@ $complainDetails->actions = $actions;
 
                          $apcAction = new ComplaintAction();
                             $apcAction->target_date = $request->target_date;
+                            $apcAction->assigned_date = $request->assigned_date;
                         //     $apcAction->forward_by_lokayukt = $userId;
 
                              
@@ -1514,7 +1515,7 @@ $complainDetails->actions = $actions;
             // dd($cmp);
 
                if($cmp){
-                $cmp->approved_rejected_by_ro_aro = 1;
+                $cmp->approved_rejected_by_ds = 1;
                 // $cmp->forward_to_d_a = $request->forward_to_d_a;
                 // $remark ='Remark By Deputy Secretary / Joint Secretary';
                 // $remark.='\n';
@@ -1526,6 +1527,7 @@ $complainDetails->actions = $actions;
 
                          $apcAction = new ComplaintAction();
                             $apcAction->target_date = $request->target_date;
+                            $apcAction->assigned_date = $request->assigned_date;
                         //     $apcAction->forward_by_lokayukt = $userId;
 
                              
@@ -1581,21 +1583,29 @@ $complainDetails->actions = $actions;
                         } elseif ($roleFwd === 'supervisor' && $subroleFwd) {
 
                             switch ($subroleFwd) {
-                                 case 'ds':
-                                    $apcAction->forward_to_ds = $request->forward_to;
-                                    break;
+                                //  case 'ds':
+                                //     $apcAction->forward_to_ds = $request->forward_to;
+                                //     break;
                                 case 'js':
                                     $apcAction->forward_to_js = $request->forward_to;
+                                    $cmp->approved_rejected_by_js = 0;
+                                    $cmp->save();
                                     break;
                                 case 'us':
                                     $apcAction->forward_to_us = $request->forward_to;
+                                    $cmp->approved_rejected_by_us = 0;
+                                    $cmp->save();
                                     break;
                                 case 'sec':
                                     $apcAction->forward_to_sec = $request->forward_to;
+                                    $cmp->approved_rejected_by_sec = 0;
+                                    $cmp->save();
                                     break;
 
                                 case 'cio-io':
                                     $apcAction->forward_to_cio_io = $request->forward_to;
+                                    $cmp->approved_rejected_by_cio_io = 0;
+                                    $cmp->save();
                                     break;
 
                                 case 'so-us':
@@ -1604,9 +1614,13 @@ $complainDetails->actions = $actions;
                                
                                     case 'ro-aro':
                                     $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    $cmp->approved_rejected_by_ro_aro = 0;
+                                    $cmp->save();
                                     break;
                                     case 'ro':
                                     $apcAction->forward_to_ro = $request->forward_to;
+                                    $cmp->approved_rejected_by_ro = 0;
+                                    $cmp->save();
                                     break;
                             }
                         }
@@ -1715,6 +1729,7 @@ $complainDetails->actions = $actions;
 
                          $apcAction = new ComplaintAction();
                             $apcAction->target_date = $request->target_date;
+                            $apcAction->assigned_date = $request->assigned_date;
                         //     $apcAction->forward_by_lokayukt = $userId;
 
                              
@@ -1772,30 +1787,46 @@ $complainDetails->actions = $actions;
                             switch ($subroleFwd) {
                                  case 'ds':
                                     $apcAction->forward_to_ds = $request->forward_to;
+                                    $cmp->approved_rejected_by_ds = 0;
+                                    $cmp->save();
                                     break;
                                 case 'js':
                                     $apcAction->forward_to_js = $request->forward_to;
+                                    $cmp->approved_rejected_by_js = 0;
+                                    $cmp->save();
                                     break;
                                 case 'us':
                                     $apcAction->forward_to_us = $request->forward_to;
+                                    $cmp->approved_rejected_by_us = 0;
+                                    $cmp->save();
                                     break;
                                 case 'sec':
                                     $apcAction->forward_to_sec = $request->forward_to;
+                                    $cmp->approved_rejected_by_sec = 0;
+                                    $cmp->save();
                                     break;
 
                                 case 'cio-io':
                                     $apcAction->forward_to_cio_io = $request->forward_to;
+                                    $cmp->approved_rejected_by_cio_io = 0;
+                                    $cmp->save();
                                     break;
 
                                 case 'so-us':
-                                    $apcAction->forward_to_so_us = $request->forward_to;
+                                    $apcAction->forward_to_so = $request->forward_to;
+                                    $cmp->approved_rejected_by_so = 0;
+                                    $cmp->save();
                                     break;
                                
                                     case 'ro-aro':
                                     $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    $cmp->approved_rejected_by_ro_aro = 0;
+                                    $cmp->save();
                                     break;
                                     case 'ro':
                                     $apcAction->forward_to_ro = $request->forward_to;
+                                    $cmp->approved_rejected_by_ro = 0;
+                                    $cmp->save();
                                     break;
                             }
                         }
@@ -1904,6 +1935,7 @@ $complainDetails->actions = $actions;
 
                          $apcAction = new ComplaintAction();
                             $apcAction->target_date = $request->target_date;
+                            $apcAction->assigned_date = $request->assigned_date;
                         //     $apcAction->forward_by_lokayukt = $userId;
 
                              
@@ -1961,30 +1993,46 @@ $complainDetails->actions = $actions;
                             switch ($subroleFwd) {
                                  case 'ds':
                                     $apcAction->forward_to_ds = $request->forward_to;
+                                    $cmp->approved_rejected_by_ds = 0;
+                                    $cmp->save();
                                     break;
                                 case 'js':
                                     $apcAction->forward_to_js = $request->forward_to;
+                                    $cmp->approved_rejected_by_js = 0;
+                                    $cmp->save();
                                     break;
                                 case 'us':
                                     $apcAction->forward_to_us = $request->forward_to;
+                                    $cmp->approved_rejected_by_us = 0;
+                                    $cmp->save();
                                     break;
                                 case 'sec':
                                     $apcAction->forward_to_sec = $request->forward_to;
+                                    $cmp->approved_rejected_by_sec = 0;
+                                    $cmp->save();
                                     break;
 
                                 case 'cio-io':
                                     $apcAction->forward_to_cio_io = $request->forward_to;
+                                    $cmp->approved_rejected_by_cio_io = 0;
+                                    $cmp->save();
                                     break;
 
-                                case 'so-us':
+                                case 'so':
                                     $apcAction->forward_to_so_us = $request->forward_to;
+                                    $cmp->approved_rejected_by_so = 0;
+                                    $cmp->save();
                                     break;
                                
                                     case 'ro-aro':
                                     $apcAction->forward_to_ro_aro = $request->forward_to;
+                                    $cmp->approved_rejected_by_ro_aro = 0;
+                                    $cmp->save();
                                     break;
                                     case 'ro':
                                     $apcAction->forward_to_ro = $request->forward_to;
+                                    $cmp->approved_rejected_by_ro = 0;
+                                    $cmp->save();
                                     break;
                             }
                         }
@@ -2093,6 +2141,7 @@ $complainDetails->actions = $actions;
 
                          $apcAction = new ComplaintAction();
                             $apcAction->target_date = $request->target_date;
+                            $apcAction->assigned_date = $request->assigned_date;
                         //     $apcAction->forward_by_lokayukt = $userId;
 
                              
@@ -2326,6 +2375,7 @@ $complainDetails->actions = $actions;
                         $apcAction->complaint_id = $complainId;
                         $apcAction->forward_by_sec = $userId;
                          $apcAction->target_date = $request->target_date;
+                         $apcAction->assigned_date = $request->assigned_date;
                         // $apcAction->approved_rejected_by_ro_aro = $userId;
 
                         if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','dispatch'])) {
@@ -2479,6 +2529,7 @@ $complainDetails->actions = $actions;
                         $apcAction->complaint_id = $complainId;
                         $apcAction->forward_by_cio_io = $userId;
                         $apcAction->target_date = $request->target_date;;
+                        $apcAction->assigned_date = $request->assigned_date;
                         // $apcAction->approved_rejected_by_ro_aro = $userId;
 
                         if (in_array($roleFwd, ['lok-ayukt', 'up-lok-ayukt','ps'])) {
@@ -2808,21 +2859,39 @@ $complainDetails->actions = $actions;
 
                 
     switch ($userSubrole) {
-        case "so-us":
+        case "so":
             $complainDetails->where('form_status', 1)
                   ->where('approved_rejected_by_rk', 1)
-                  ->where('approved_rejected_by_so_us', 1);
+                  ->where('approved_rejected_by_so', 1);
                
                 //   ->where('approved_by_ro', 1);
             // $complainDetails->where('complaints.added_by', $user);
             break;
 
-        case "ds-js":
+        case "ds":
           $complainDetails->where('form_status', 1)
                   ->where('approved_rejected_by_rk', 1)
-                  ->where('approved_rejected_by_so_us', 0)
+                //   ->where('approved_rejected_by_so_us', 0)
                 //   ->whereOr('approved_rejected_by_so_us', 1)
-                  ->where('approved_rejected_by_ds_js', 1);
+                  ->where('approved_rejected_by_ds', 1);
+                //   ->where('forward_so', 1)
+                //   ->whereOr('forward_to_uplokayukt', 1); 
+            break;
+        case "js":
+          $complainDetails->where('form_status', 1)
+                  ->where('approved_rejected_by_rk', 1)
+                //   ->where('approved_rejected_by_so_us', 0)
+                //   ->whereOr('approved_rejected_by_so_us', 1)
+                  ->where('approved_rejected_by_js', 1);
+                //   ->where('forward_so', 1)
+                //   ->whereOr('forward_to_uplokayukt', 1); 
+            break;
+        case "us":
+          $complainDetails->where('form_status', 1)
+                  ->where('approved_rejected_by_rk', 1)
+                //   ->where('approved_rejected_by_so_us', 0)
+                //   ->whereOr('approved_rejected_by_so_us', 1)
+                  ->where('approved_rejected_by_us', 1);
                 //   ->where('forward_so', 1)
                 //   ->whereOr('forward_to_uplokayukt', 1); 
             break;

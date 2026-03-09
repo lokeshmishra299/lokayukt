@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AiOutlineHome } from "react-icons/ai";
-import {FiInbox,FiSend,FiFileText,FiBarChart2,FiSearch}  from "react-icons/fi";
+import { FiInbox, FiSend, FiFileText, FiBarChart2, FiSearch } from "react-icons/fi";
 import {
-  
   FaHome,
   FaFileAlt,
   FaChartBar,
@@ -14,8 +13,8 @@ import {
   FaSave,
   FaChevronLeft,
   FaChevronRight,
+  FaExternalLinkAlt // <-- Icon Added Here
 } from "react-icons/fa";
-
 
 const Sidebar = ({
   isMobileMenuOpen,
@@ -109,58 +108,13 @@ const Sidebar = ({
           </button>
         )}
 
-        {/* Desktop Toggle Button */}
-        {/* {!isMobile && (
-          <button
-            onClick={toggleSidebar}
-            className={`absolute bg-white text-gray-600 rounded-full shadow-lg hover:bg-gray-50 border border-gray-300 transition-all duration-300 z-10 ${
-              isCollapsed ? "-right-3 top-6 p-2" : "-right-4 top-6 p-3"
-            }`}
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {isCollapsed ? (
-              <FaChevronRight className="w-4 h-4" />
-            ) : (
-              <FaChevronLeft className="w-4 h-4" />
-            )}
-          </button>
-        )} */}
-
         {/* Header Section */}
         <div className={`px-6 py-6 flex-shrink-0 ${!isMobile && isCollapsed ? "px-3" : ""}`}>
-          {/* Logo */}
-          {/* <div className={`flex items-center mb-4 ${!isMobile && isCollapsed ? "justify-center" : "gap-3"}`}>
-            <div className={`${!isMobile && isCollapsed ? "text-2xl" : "text-3xl"}`}>⚖️</div>
-            {(isMobile || !isCollapsed) && (
-              <div>
-                <h3 className="text-lg font-bold text-gray-800">LokAyukta</h3>
-                <h4 className="text-sm font-semibold text-gray-700">CRMS</h4>
-                <span className="text-xs text-gray-500">Complaint Management</span>
-              </div>
-            )}
-          </div> */}
-
-          {/* Subrole Badge & Actions */}
-          {/* <div className="flex justify-between items-center mb-4">
-            {(isMobile || !isCollapsed) && (
-              <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-xs  capitalize">
-                {subrole === "review-operator" ? "RO" : "EO"}
-              </span>
-            )}
-
-            {(isMobile || !isCollapsed) && (
-              <div className="flex gap-2">
-                <button className="relative flex items-center px-2 py-1 border border-gray-300 rounded text-xs hover:bg-gray-200 transition-colors">
-                  <FaBell className="w-3 h-3" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
-                </button>
-              </div>
-            )}
-          </div> */}
+          {/* Logo & Subrole Badge Comments... */}
         </div>
 
         {/* Navigation Menu with Sections */}
-        <nav className="flex-1 px-6 overflow-y-auto custom-scrollbar">
+        <nav className="flex-1 px-6 overflow-y-auto custom-scrollbar pb-4">
           {/* Workbox Section */}
           {(isMobile || !isCollapsed) && (
             <p className="text-[13px]  text-gray-800 mb-2 ml-2">Workbox</p>
@@ -190,30 +144,6 @@ const Sidebar = ({
                 )}
               </Link>
             </li>
-
-            {/* New Complaints */}
-            {/* <li>
-              <Link
-                to="/ps/complaints"
-                onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                  isActive("/complaints")
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-200"
-                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                title={!isMobile && isCollapsed ? "New Complaints" : ""}
-              >
-                <div className="flex items-center gap-3">
-                  <FiFileText size={20} className="w-[18px] h-[18px] flex-shrink-0" />
-                  {(isMobile || !isCollapsed) && <span>New Complaints</span>}
-                </div>
-                {isActive("/complaints") && (isMobile) && (
-                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                  </div>
-                )}
-              </Link>
-            </li> */}
 
             {/* Inbox */}
             <li>
@@ -262,87 +192,31 @@ const Sidebar = ({
                 )}
               </Link>
             </li>
-
-            {/* Drafts */}
-            {/* <li>
-              <Link
-                to="/ps/draft"
-                onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                  isActive("/draft")
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-200"
-                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                title={!isMobile && isCollapsed ? "Drafts" : ""}
-              >
-                <div className="flex items-center gap-3">
-                    <FiFileText size={18} className="w-[18px] h-[18px] flex-shrink-0" />
-                  {(isMobile || !isCollapsed) && <span>Drafts</span>}
-                </div>
-                {isActive("/draft") && (isMobile) && (
-                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                  </div>
-                )}
-              </Link>
-            </li> */}
           </ul>
-
-          {/* Case & Administration Section */}
-          {/* {(isMobile || !isCollapsed) && (
-            <p className="text-[13px]  text-gray-800 mb-3 mt-6">Case & Administration</p>
-          )} */}
 
           <ul className="space-y-2">
-            {/* Progress Register */}
-            {/* <li>
-              <Link
-                to="/operator/progress-register"
-                onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                  isActive("/progress-register")
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-200"
-                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                title={!isMobile && isCollapsed ? "Progress Register" : ""}
-              >
-                <div className="flex items-center gap-3">
-                  <FiBarChart2 size={20} className="w-[18px] h-[18px] flex-shrink-0" />
-                  {(isMobile || !isCollapsed) && <span>Progress Register</span>}
-                </div>
-                {isActive("/progress-register") && (isMobile) && (
-                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                  </div>
-                )}
-              </Link>
-            </li> */}
-
-            {/* Search & Reports */}
-            {/* <li>
-              <Link
-                to="/operator/search-reports"
-                onClick={handleLinkClick}
-                className={`flex items-center justify-between text-sm  transition-all duration-200 rounded-lg ${
-                  isActive("/search-reports")
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "text-gray-700 hover:bg-gray-200"
-                } ${!isMobile && isCollapsed ? "justify-center px-2 py-2" : "px-3 py-2"}`}
-                title={!isMobile && isCollapsed ? "Search & Reports" : ""}
-              >
-                <div className="flex items-center gap-3">
-                  <FiSearch size={20}  className="w-[18px] h-[18px] flex-shrink-0" />
-                  {(isMobile || !isCollapsed) && <span>Search & Reports</span>}
-                </div>
-                {isActive("/search-reports") && (isMobile) && (
-                  <div className="w-10 h-5 bg-blue-400 rounded-full flex items-center justify-end pr-[2px]">
-                    <div className="w-4 h-4 bg-white rounded-full"></div>
-                  </div>
-                )}
-              </Link>
-            </li> */}
+            {/* Progress Register Commented */}
+            {/* Search & Reports Commented */}
           </ul>
         </nav>
+
+        {/* 👇 MAIN DASHBOARD BUTTON (Sabse Niche Chipkaya Hua) 👇 */}
+        <div className="p-4 border-t border-gray-300 w-full bg-[#E7ECF5] mt-auto shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+          <Link
+            to="/main-dashboard"
+            onClick={handleLinkClick}
+            className={`flex items-center gap-3 text-sm font-medium transition-all duration-200 rounded-lg ${
+              location.pathname === "/main-dashboard"
+                ? "bg-green-600 text-white shadow-md"
+                : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+            } ${isCollapsed && !isMobile ? "justify-center px-2 py-2" : "px-4 py-3"}`}
+            title={isCollapsed && !isMobile ? "Main Dashboard" : ""}
+          >
+            <FaHome className="w-[18px] h-[18px] flex-shrink-0" />
+            {(!isCollapsed || isMobile) && <span>Main Dashboard</span>}
+          </Link>
+        </div>
+
       </div>
     </>
   );

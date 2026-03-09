@@ -2,6 +2,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import ProtectedRoute from "./protectedUnknownRoutes/ProtectedRoute.jsx";
 import './index.css'
 
 // Admin
@@ -875,7 +876,9 @@ function App() {
 
       {/*  Admin Routes */}
       {role === 'admin' && (
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/admin" element={<ProtectedRoute>
+          <AdminLayout />
+        </ProtectedRoute>}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="complaints" element={<AdminComplaints />} />
           <Route path="search-reports/view/:id" element={<AdminViewComplaints />} />
@@ -901,46 +904,50 @@ function App() {
         </Route>
       )}
 
+      {/* Employ Routes */}
+      {(
+        role === 'emp' ||
+        role === 'jamadar' ||
+        role === 'office' ||
+        role === 'farrash' ||
+        role === 'sweeper' ||
+        role === 'gardener' ||
+        role === 'cook' ||
+        role === 'watchman' ||
+        role === 'peon' ||
+        role === 'steno' ||
+        role === 'assistant-clerk' ||
+        role === 'computer-assistant' ||
+        role === 'orderly/jamadar' ||
+        role === 'car-driver'
+      ) && (
+        <Route path="/employee" element={<ProtectedRoute>
+          <EmployLayout />
+        </ProtectedRoute>}>
+          <Route path="dashboard" element={<EmployDashboard />} />
+          <Route path="complaints" element={<EmployComplaints />} />
+          <Route path="add-files" element={<EmployAddFiles />} />
+          <Route path="view-files" element={<EmployViewFiles />} />
+          <Route path="user-management" element={<EmployUserManagement />} />
 
- {(
-  role === 'emp' ||
-  role === 'jamadar' ||
-  role === 'office' ||
-  role === 'farrash' ||
-  role === 'sweeper' ||
-  role === 'gardener' ||
-  role === 'cook' ||
-  role === 'watchman' ||
-  role === 'peon' ||
-  role === 'steno' ||
-  role === 'assistant-clerk' ||
-  role === 'computer-assistant' ||
-  role === 'orderly/jamadar' ||
-  role === 'car-driver'
-) && (
-  <Route path="/employee" element={<EmployLayout />}>
-    <Route path="dashboard" element={<EmployDashboard />} />
-    <Route path="complaints" element={<EmployComplaints />} />
-    <Route path="add-files" element={<EmployAddFiles />} />
-    <Route path="view-files" element={<EmployViewFiles />} />
-    <Route path="user-management" element={<EmployUserManagement />} />
 
 
-
-    
-                <Route path="view-personal-files" element={<EmployViewPersonalFiles />} />
-          <Route path="add-personal-files" element={<EmployAddPersonalFiles />} />
-          <Route path="view-personal-files/:id" element={<EmployPersonalFileById />} />
-          <Route path="view-pending-files" element={<EmployPendingFiles />} />
-          <Route path="view-pending-files/:id" element={<EmployPendingFileBYId />} />
-  </Route>
-)}
+          
+                      <Route path="view-personal-files" element={<EmployViewPersonalFiles />} />
+                <Route path="add-personal-files" element={<EmployAddPersonalFiles />} />
+                <Route path="view-personal-files/:id" element={<EmployPersonalFileById />} />
+                <Route path="view-pending-files" element={<EmployPendingFiles />} />
+                <Route path="view-pending-files/:id" element={<EmployPendingFileBYId />} />
+        </Route>
+      )}
       {/*  Operator Routes */}
       {role === 'operator' && (
         <>  
 
 
-      <Route path="/employee" element={<OperatorEmployLayout />}>
+      <Route path="/employee" element={<ProtectedRoute>
+        <OperatorEmployLayout />
+      </ProtectedRoute>}>
           <Route path="dashboard" element={<OperatorEmployDashboard />} />
           <Route path="complaints" element={<OperatorEmployComplaints />} />
           <Route path="add-files" element={<OperatorEmployAddFiles />} />
@@ -961,7 +968,9 @@ function App() {
           <Route path="main-dashboard" element={<OperatorEmployUserDashboard />} />
 
 
-        <Route path="/operator" element={<OperatorLayout />}>
+        <Route path="/operator" element={<ProtectedRoute>
+          <OperatorLayout />
+        </ProtectedRoute> }>
           <Route path="dashboard" element={<OperatorDashboard />} />
           <Route path="complaints" element={<OperatorComplaints />} />
           <Route path="progress-register" element={<OperatorProgressRegister />} />
@@ -1018,8 +1027,10 @@ function App() {
        {/* Supervisor  Routes */}
        {/* ds-js */}
 
-         {role === 'supervisor' && subrole === 'ds' && (
-        <Route path="/supervisor" element={<SupervisorLayoutro />}>
+         {role === 'supervisor' && subrole === 'dsss' && (
+        <Route path="/supervisor" element={<ProtectedRoute>
+          <SupervisorLayoutro />
+        </ProtectedRoute>}>
           <Route path="dashboard" element={<SupervisorDashboardro />} />
           <Route path="complaints" element={<SupervisorComplaintsro />} />
           <Route path="progress-register" element={<SupervisorProgressRegisterro />} />
@@ -1045,7 +1056,9 @@ function App() {
 
         <>
 
-                 <Route path="/employee" element={<DsEmployLayout />}>
+                 <Route path="/employee" element={<ProtectedRoute>
+                  <DsEmployLayout />
+                 </ProtectedRoute>}>
           <Route path="dashboard" element={<DsEmployDashboard />} />
           <Route path="complaints" element={<DsEmployComplaints />} />
           <Route path="add-files" element={<DsEmployAddFiles />} />
@@ -1094,7 +1107,9 @@ function App() {
         <>
 
         
-               <Route path="/employee" element={<JsEmployLayout />}>
+               <Route path="/employee" element={<ProtectedRoute>
+                <JsEmployLayout />
+               </ProtectedRoute>}>
           <Route path="dashboard" element={<JsEmployDashboard />} />
           <Route path="complaints" element={<JsEmployComplaints />} />
           <Route path="add-files" element={<JsEmployAddFiles />} />
@@ -1143,7 +1158,9 @@ function App() {
         <>
 
         
-             <Route path="/employee" element={<UsEmployLayout />}>
+             <Route path="/employee" element={<ProtectedRoute>
+              <UsEmployLayout />
+             </ProtectedRoute>}>
           <Route path="dashboard" element={<UsEmployDashboard />} />
           <Route path="complaints" element={<UsEmployComplaints />} />
           <Route path="add-files" element={<UsEmployAddFiles />} />
@@ -1189,8 +1206,10 @@ function App() {
 
 
          {/* US No */}
-      {role === 'supervisor' && subrole === 'us' && (
-        <Route path="/supervisor" element={<SupervisorLayoutjs />}>
+      {role === 'supervisor' && subrole === 'usss' && (
+        <Route path="/supervisor" element={<ProtectedRoute>
+          <SupervisorLayoutjs />
+        </ProtectedRoute>}>
           <Route path="dashboard" element={<SupervisorDashboardjs />} />
           <Route path="complaints" element={<SupervisorComplaintsjs />} />
           <Route path="progress-register" element={<SupervisorProgressRegisterjs />} />
@@ -1215,7 +1234,9 @@ function App() {
          {role === 'supervisor' && subrole === 'ro-aro' && (
           <>
 
-            <Route path="/employee" element={<RoAroEmployLayout />}>
+            <Route path="/employee" element={<ProtectedRoute>
+              <RoAroEmployLayout />
+            </ProtectedRoute>}>
           <Route path="dashboard" element={<RoAroEmployDashboard />} />
           <Route path="complaints" element={<RoAroEmployComplaints />} />
           <Route path="add-files" element={<RoAroEmployAddFiles />} />
@@ -1264,7 +1285,9 @@ function App() {
          {role === 'supervisor' && subrole === 'so' && (
           <>
 
-            <Route path="/employee" element={<SoEmployLayout />}>
+            <Route path="/employee" element={<ProtectedRoute>
+              <SoEmployLayout />
+            </ProtectedRoute>}>
           <Route path="dashboard" element={<SoEmployDashboard />} />
           <Route path="complaints" element={<SoEmployComplaints />} />
           <Route path="add-files" element={<SoEmployAddFiles />} />
@@ -1311,7 +1334,9 @@ function App() {
           {role === 'supervisor' && subrole === 'pro' && (
           <>
 
-            <Route path="/employee" element={<ProEmployLayout />}>
+            <Route path="/employee" element={<ProtectedRoute>
+              <ProEmployLayout />
+            </ProtectedRoute>}>
           <Route path="dashboard" element={<ProEmployDashboard />} />
           <Route path="complaints" element={<ProEmployComplaints />} />
           <Route path="add-files" element={<ProEmployAddFiles />} />
@@ -1362,7 +1387,9 @@ function App() {
 
 
           
-            <Route path="/employee" element={<AroEmployLayout />}>
+            <Route path="/employee" element={<ProtectedRoute>
+              <AroEmployLayout />
+            </ProtectedRoute>}>
           <Route path="dashboard" element={<AroEmployDashboard />} />
           <Route path="complaints" element={<AroEmployComplaints />} />
           <Route path="add-files" element={<AroEmployAddFiles />} />
@@ -1414,7 +1441,9 @@ function App() {
         <>
 
 
-               <Route path="/employee" element={<SecEmployLayout />}>
+               <Route path="/employee" element={<ProtectedRoute>
+                <SecEmployLayout />
+               </ProtectedRoute>}>
           <Route path="dashboard" element={<SecEmployDashboard />} />
           <Route path="complaints" element={<SecEmployComplaints />} />
           <Route path="add-files" element={<SecEmployAddFiles />} />
@@ -1466,7 +1495,9 @@ function App() {
       
       <>
 
-          <Route path="/employee" element={<CioEmployLayout />}>
+          <Route path="/employee" element={<ProtectedRoute>
+            <CioEmployLayout />
+          </ProtectedRoute>}>
           <Route path="dashboard" element={<CioEmployDashboard />} />
           <Route path="complaints" element={<CioEmployComplaints />} />
           <Route path="add-files" element={<CioEmployAddFiles />} />
@@ -1518,7 +1549,9 @@ function App() {
 
       
 
-            <Route path="/employee" element={<IoEmployLayout />}>
+            <Route path="/employee" element={<ProtectedRoute>
+              <IoEmployLayout />
+            </ProtectedRoute>}>
           <Route path="dashboard" element={<IoEmployDashboard />} />
           <Route path="complaints" element={<IoEmployComplaints />} />
           <Route path="add-files" element={<IoEmployAddFiles />} />
@@ -1565,7 +1598,9 @@ function App() {
        {/* dea-assis*/}
     
      {role === 'supervisor' && subrole === 'dea-assis' && (
-        <Route path="/supervisor" element={<SupervisorLayoutdea />}>
+        <Route path="/supervisor" element={<ProtectedRoute>
+          <SupervisorLayoutdea />
+        </ProtectedRoute>}>
           <Route path="dashboard" element={<SupervisorDashboarddea />} />
           <Route path="complaints" element={<SupervisorComplaintsdea />} />
           <Route path="progress-register" element={<SupervisorProgressRegisterdea />} />
@@ -1588,7 +1623,9 @@ function App() {
 
         {/* Lok-ayukt  Routes */}
       {role === 'lok-ayukt' && (
-        <Route path="/lokayukt" element={<LokayuktLayout />}>
+        <Route path="/lokayukt" element={<ProtectedRoute>
+          <LokayuktLayout />
+        </ProtectedRoute>}>
            <Route path="dashboard" element={<LokayuktDashboard />} />
           <Route path="complaints" element={<LokayuktComplaints />} />
           <Route path="progress-register" element={<LokayuktProgressRegister />} />
@@ -1625,7 +1662,9 @@ function App() {
         <>
 
 
-         <Route path="/employee" element={<PsEmployLayout />}>
+         <Route path="/employee" element={<ProtectedRoute>
+          <PsEmployLayout />
+         </ProtectedRoute>}>
           <Route path="dashboard" element={<PsEmployDashboard />} />
           <Route path="complaints" element={<PsEmployComplaints />} />
           <Route path="add-files" element={<PsEmployAddFiles />} />
@@ -1678,7 +1717,9 @@ function App() {
         <>
 
 
-         <Route path="/employee" element={<ApsEmployLayout />}>
+         <Route path="/employee" element={<ProtectedRoute>
+          <ApsEmployLayout />
+         </ProtectedRoute>}>
           <Route path="dashboard" element={<ApsEmployDashboard />} />
           <Route path="complaints" element={<ApsEmployComplaints />} />
           <Route path="add-files" element={<ApsEmployAddFiles />} />
@@ -1720,7 +1761,9 @@ function App() {
 
          {/* UPLok-ayukt  Routes */}
       {role === 'up-lok-ayukt' && (
-        <Route path="/uplokayukt" element={<UpLokayuktLayout />}>
+        <Route path="/uplokayukt" element={<ProtectedRoute>
+          <UpLokayuktLayout />
+        </ProtectedRoute>}>
            <Route path="dashboard" element={<UpLokayuktDashboard />} />
           <Route path="complaints" element={<UpLokayuktComplaints />} />
           <Route path="progress-register" element={<UpLokayuktProgressRegister />} />
@@ -1751,7 +1794,9 @@ function App() {
 
           <>
 
-             <Route path="/employee" element={<DspEmployLayout />}>
+             <Route path="/employee" element={<ProtectedRoute>
+              <DspEmployLayout />
+             </ProtectedRoute>}>
           <Route path="dashboard" element={<DspEmployDashboard />} />
           <Route path="complaints" element={<DspEmployComplaints />} />
           <Route path="add-files" element={<DspEmployAddFiles />} />
@@ -1798,7 +1843,7 @@ function App() {
 
 
 
-
+      <Route path="*" element={<Navigate to="/login" replace />} />
 
 
     </Routes>
