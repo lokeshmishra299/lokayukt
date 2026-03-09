@@ -3139,6 +3139,28 @@ $complainDetails->actions = $actions;
 
     }
 
+     public function getNotesEmployee(Request $request,$id){
+        if($request->isMethod('get')){
+            // $Notes = ComplaintNotes::where('complaint_id',$id)
+            // ->get();
+
+            $Notes = ComplaintNotes::where('complaint_id', $id)
+            ->leftJoin('users', 'complaints_notes.forward_by', '=', 'users.id') // Left Join with users table
+            ->select('complaints_notes.*', 'users.name as forwarded_by_name', 'users.email as forwarded_by_email') // You can select any fields you want
+            ->orderBy('id','desc')
+            ->get();
+
+   
+           return response()->json([
+                    'status' => true,
+                    'message' => 'Notes Fetch successfully.',
+                    'data' => $Notes
+                ], 200);
+        }
+       
+    }
+
+
      public function createDraft(Request $request)
     {
         // dd($request->file);
@@ -3222,26 +3244,26 @@ $complainDetails->actions = $actions;
        
     }
 
-     public function getNotesEmployee(Request $request,$id){
-        if($request->isMethod('get')){
-            // $Notes = ComplaintNotes::where('complaint_id',$id)
-            // ->get();
+    //  public function getNotesEmployee(Request $request,$id){
+    //     if($request->isMethod('get')){
+    //         // $Notes = ComplaintNotes::where('complaint_id',$id)
+    //         // ->get();
 
-            $Notes = EmployeeComplainNotes::where('employee_file_id', $id)
-            ->leftJoin('users', 'employee_complain_notes.forward_by', '=', 'users.id') // Left Join with users table
-            ->select('employee_complain_notes.*', 'users.name as forwarded_by_name', 'users.email as forwarded_by_email') // You can select any fields you want
-            ->orderBy('id','desc')
-            ->get();
+    //         $Notes = EmployeeComplainNotes::where('employee_file_id', $id)
+    //         ->leftJoin('users', 'employee_complain_notes.forward_by', '=', 'users.id') // Left Join with users table
+    //         ->select('employee_complain_notes.*', 'users.name as forwarded_by_name', 'users.email as forwarded_by_email') // You can select any fields you want
+    //         ->orderBy('id','desc')
+    //         ->get();
 
    
-           return response()->json([
-                    'status' => true,
-                    'message' => 'Notes Fetch successfully.',
-                    'data' => $Notes
-                ], 200);
-        }
+    //        return response()->json([
+    //                 'status' => true,
+    //                 'message' => 'Notes Fetch successfully.',
+    //                 'data' => $Notes
+    //             ], 200);
+    //     }
        
-    }
+    // }
     
     public function editNotes(Request $request,$id){
         if($request->isMethod('post')){

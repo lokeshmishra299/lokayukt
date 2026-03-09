@@ -68,6 +68,10 @@ Route::middleware('auth:sanctum')->group(function(){
 
 
 
+        Route::get('/get-notes/{id}',[SupervisorComplaintsController::class,'getNotes']);
+
+
+
         //PRIVATE FILES 23-02-2026
 
         Route::post('/upload-private-file',[EmployeesController::class,'uploadPrivateFiles']);
