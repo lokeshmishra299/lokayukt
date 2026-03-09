@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiBell, FiChevronDown, FiLayers } from "react-icons/fi";
 import { FaBars, FaSync, FaSignOutAlt, FaUser } from 'react-icons/fa';
-// import { ToastContainer, toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -15,6 +14,9 @@ const Header = ({ toggleMobileMenu }) => {
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  
+  // State to hold the API data
+  const [userData, setUserData] = useState(null);
 
   const getApiInstance = () => {
     const token = localStorage.getItem("access_token");
@@ -26,6 +28,21 @@ const Header = ({ toggleMobileMenu }) => {
       },
     });
   };
+
+  // Fetch User Data from API
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const api = getApiInstance();
+        const response = await api.get('/me'); 
+        setUserData(response.data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
@@ -77,21 +94,9 @@ const Header = ({ toggleMobileMenu }) => {
     }
   };
 
-  const getUserData = () => {
-    try {
-      const u = localStorage.getItem("user");
-      return u ? JSON.parse(u) : null;
-    } catch {
-      return null;
-    }
-  };
-
-  const user = getUserData();
-  const role = localStorage.getItem("role") || "Admin";
-
   const getInitials = () =>
-    user?.name
-      ? user.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+    userData?.name
+      ? userData.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
       : "AD";
 
   return (
@@ -158,8 +163,13 @@ const Header = ({ toggleMobileMenu }) => {
                 {!isMobile && (
                   <div className="flex items-center gap-2">
                     <div className="text-sm">
-                      <p className="font-medium text-gray-700">{user?.name}</p>
-                      <p className="text-xs text-gray-500">{role}</p>
+                      <p className="font-medium text-gray-700 capitalize">
+                        {userData?.name || 'Loading...'}
+                      </p>
+                      <p className="text-xs text-gray-500 capitalize">
+                        {/* Fallback chain: subrole label -> role label -> 'Admin' */}
+                        {userData?.subrole?.label || userData?.role?.label }
+                      </p>
                     </div>
                     <FiChevronDown />
                   </div>
@@ -169,16 +179,18 @@ const Header = ({ toggleMobileMenu }) => {
               {showProfileDropdown && (
                 <div className="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-lg">
                   <div className="px-4 py-3 border-b">
-                    <p className="text-sm font-semibold">{user?.name}</p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
+                    <p className="text-sm font-semibold capitalize">{userData?.name || 'Loading...'}</p>
+                    <p className="text-xs text-gray-500">{userData?.email || ''}</p>
                   </div>
 
                   <button
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50"
+                    className={`w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50 ${
+                      isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
-                    <FaSignOutAlt />
+                    <FaSignOutAlt className={isLoggingOut ? 'animate-pulse' : ''} />
                     {isLoggingOut ? "Logging out..." : "Logout"}
                   </button>
                 </div>

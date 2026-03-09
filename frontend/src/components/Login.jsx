@@ -65,7 +65,7 @@ const Login = () => {
           }
 
           else if (userRole === "operator") {
-            localStorage.setItem('subrole', response.data.data.user.subrole.name);
+            // localStorage.setItem('subrole', response.data.data.user.subrole.name);
             // localStorage.setItem('UserN', response.data.data.user.name);
 
             window.open("/main-dashboard", "_self");

@@ -3,9 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { FiBell, FiHelpCircle, FiChevronDown, FiLayers } from "react-icons/fi";
 import { FaBars, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-// import { ToastContainer, toast } from "react-toastify";
 import { toast, Toaster } from "react-hot-toast";
-
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
@@ -17,6 +15,9 @@ const Header = ({ toggleMobileMenu }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
+  // State to hold the API data
+  const [userData, setUserData] = useState(null);
+
   const getApiInstance = () => {
     const token = localStorage.getItem("access_token");
     return axios.create({
@@ -27,6 +28,21 @@ const Header = ({ toggleMobileMenu }) => {
       },
     });
   };
+
+  // Fetch User Data from API
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const api = getApiInstance();
+        const response = await api.get('/me'); 
+        setUserData(response.data);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -60,7 +76,7 @@ const Header = ({ toggleMobileMenu }) => {
           localStorage.removeItem('subrole'); 
           window.open("/login", "_self");
         }, 1500);
-       
+        
       } else {
         toast.error('Logout failed. Please try again.');
       }
@@ -77,36 +93,20 @@ const Header = ({ toggleMobileMenu }) => {
     }
   };
 
-  const getUserData = () => {
-    try {
-      const userData = localStorage.getItem('user');
-      return userData ? JSON.parse(userData) : null;
-    } catch (error) {
-      console.warn('Error parsing user data:', error);
-      return null;
-    }
-  };
-
-  const subrole = localStorage.getItem("subrole");
-  const user = getUserData();
-
   const getUserInitials = () => {
-    if (user?.name) {
-      const nameParts = user.name.split(' ');
+    if (userData?.name) {
+      const nameParts = userData.name.split(' ');
       if (nameParts.length >= 2) {
         return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
       }
-      return user.name.substring(0, 2).toUpperCase();
+      return userData.name.substring(0, 2).toUpperCase();
     }
-    return 'SX';
+    return 'U';
   };
 
   return (
     <>
-      <Toaster
-        position="top-right"
-        
-      />
+      <Toaster position="top-right" />
 
       {/* ✅ FIXED Header - stays at top */}
       <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50 h-16">
@@ -166,11 +166,13 @@ const Header = ({ toggleMobileMenu }) => {
                 {!isMobile && (
                   <div className="flex items-center gap-2">
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-700">
-                        {user?.name || 'User Name'}
+                      <span className="text-sm font-medium text-gray-700 capitalize">
+                         {/* Display API Name */}
+                        {userData?.name || 'Loading...'}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {subrole === "review-operator" ? "personal secretary" : "personal secretary"}
+                      <span className="text-xs text-gray-500 capitalize">
+                        {/* Display API Subrole Label, fallback to Role Label */}
+                        {userData?.subrole?.label || userData?.role?.label || ''}
                       </span>
                     </div>
                     <FiChevronDown className="text-gray-600" />
@@ -185,10 +187,15 @@ const Header = ({ toggleMobileMenu }) => {
               {showProfileDropdown && (
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                   <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-semibold text-gray-800">{user?.name || 'User Name'}</p>
-                    <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
-                    <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
-                      {subrole === "review-operator" ? "RK" : "RK"}
+                    <p className="text-sm font-semibold text-gray-800 capitalize">
+                      {userData?.name || 'Loading...'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {userData?.email || ''}
+                    </p>
+                    <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full capitalize">
+                       {/* Display API Subrole Label, fallback to Role Label */}
+                      {userData?.subrole?.label || userData?.role?.label}
                     </span>
                   </div>
 
