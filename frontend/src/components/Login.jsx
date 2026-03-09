@@ -105,7 +105,7 @@ const Login = () => {
 
           else if (userRole === "supervisor") {
             // localStorage.setItem('subrole', response.data.data.user.subrole.name);
-            // localStorage.setItem('name', response?.data?.data?.user?.name);
+            localStorage.setItem('name', response?.data?.data?.user?.name);
 
             window.open("/main-dashboard", "_self");
           }
@@ -128,6 +128,8 @@ const Login = () => {
           else if (userRole === "dispatch") {
             window.open("/main-dashboard", "_self");
             localStorage.setItem("UserID", response.data.data.user.id);
+            localStorage.setItem('name', response?.data?.data?.user?.name);
+
           }
           else {
             toast.error("Unauthorized role.");
