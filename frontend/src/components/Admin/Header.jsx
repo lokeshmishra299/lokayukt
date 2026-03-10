@@ -1,8 +1,11 @@
-// components/Header.jsx
 import React, { useState, useEffect } from 'react';
 import { FiBell, FiChevronDown, FiLayers } from "react-icons/fi";
 import { FaBars, FaSync, FaSignOutAlt, FaUser } from 'react-icons/fa';
 import { toast, Toaster } from "react-hot-toast";
+import { useNavigate } from 'react-router-dom';
+
+// NAYA CHANGE: useAuth lana zaroori hai state clear karne ke liye
+import { useAuth } from '../../protectedUnknownRoutes/AuthContext.jsx'; 
 
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -10,6 +13,10 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const Header = ({ toggleMobileMenu }) => {
+  const navigate = useNavigate();
+  // NAYA CHANGE: auth context se setter functions nikale
+  const { setRole, setSubrole, setUser } = useAuth();
+
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -80,18 +87,34 @@ const Header = ({ toggleMobileMenu }) => {
 
       if (res.data.status === "success") {
         toast.success("Logout Successfully");
+        
         setTimeout(() => {
+          // 1. Storage clear karein
           localStorage.clear();
-          window.open("/login", "_self");
-        }, 1500);
+          
+          // 2. React Context (Memory) ko clean karein
+          if(setRole) setRole(null);
+          if(setSubrole) setSubrole(null);
+          if(setUser) setUser(null);
+
+          // 3. Browser History manipulation trick (Back button disable karne ke liye)
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function () {
+              window.history.go(1);
+          };
+
+          // 4. Navigate to login with 'replace'
+          navigate("/login", { replace: true });
+        }, 2000);
+
       } else {
         toast.error("Logout failed");
+        setIsLoggingOut(false);
       }
     } catch {
       toast.error("Network error");
-    } finally {
-      setTimeout(() => setIsLoggingOut(false), 1500);
-    }
+      setIsLoggingOut(false);
+    } 
   };
 
   const getInitials = () =>

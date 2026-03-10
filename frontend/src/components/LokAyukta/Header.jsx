@@ -7,10 +7,17 @@ import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
+// NAYA CHANGE: Aapka exact path yahan hai
+import { useAuth } from '../../protectedUnknownRoutes/AuthContext.jsx';
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const Header = ({ toggleMobileMenu }) => {
   const navigate = useNavigate();
+  
+  // NAYA CHANGE: Context se state clear karne ke functions
+  const { setRole, setSubrole, setUser } = useAuth();
+
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -116,8 +123,22 @@ const Header = ({ toggleMobileMenu }) => {
         toast.success('Logout Successfully');
         
         timeoutRef.current = setTimeout(() => {
+          // 1. LocalStorage ko saaf karein
           localStorage.clear();
-          window.open("/login", "_self");
+
+          // 2. React ki memory (Context API) ko reset karein
+          if (setRole) setRole(null);
+          if (setSubrole) setSubrole(null);
+          if (setUser) setUser(null);
+
+          // 3. MAIN TRICK: Browser History Block karna
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function () {
+              window.history.go(1);
+          };
+
+          // 4. navigate with replace (window.open ki jagah)
+          navigate("/login", { replace: true });
         }, 1500);
       } else {
         toast.error('Logout failed. Please try again.');
@@ -131,7 +152,7 @@ const Header = ({ toggleMobileMenu }) => {
     } finally {
       timeoutRef.current = setTimeout(() => {
         setIsLoggingOut(false);
-      }, 1500);
+      }, 2000);
     }
   };
 

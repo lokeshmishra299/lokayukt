@@ -6,10 +6,17 @@ import { useNavigate } from 'react-router-dom';
 import { toast, Toaster } from "react-hot-toast";
 import axios from "axios";
 
+// NAYA CHANGE: Aapka bataya hua exact path
+import { useAuth } from '../../protectedUnknownRoutes/AuthContext.jsx';
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const Header = ({ toggleMobileMenu }) => {
   const navigate = useNavigate();
+  
+  // NAYA CHANGE: Context se state update functions nikal liye
+  const { setRole, setSubrole, setUser } = useAuth();
+
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -70,9 +77,23 @@ const Header = ({ toggleMobileMenu }) => {
         toast.success('Logout Successfully');
         
         setTimeout(() => {
+          // 1. LocalStorage clear karein
           localStorage.clear();
-          window.open("/login", "_self");
-        }, 1500);
+
+          // 2. Context API ki state (Memory) clear karein
+          if (setRole) setRole(null);
+          if (setSubrole) setSubrole(null);
+          if (setUser) setUser(null);
+
+          // 3. Browser History block trick (Back button kaam nahi karega)
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function () {
+              window.history.go(1);
+          };
+
+          // 4. Navigate using replace (window.open ki jagah)
+          navigate("/login", { replace: true });
+        }, 2000);
       } else {
         toast.error('Logout failed. Please try again.');
       }

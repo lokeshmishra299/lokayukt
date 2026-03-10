@@ -6,10 +6,15 @@ import { useNavigate } from 'react-router-dom';
 import { toast, Toaster } from "react-hot-toast";
 import axios from "axios";
 
+import { useAuth } from './../../../../protectedUnknownRoutes/AuthContext.jsx'; 
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const Header = ({ toggleMobileMenu }) => {
   const navigate = useNavigate();
+  // NAYA CHANGE: Auth Context se setters nikal liye
+  const { setRole, setSubrole, setUser } = useAuth(); 
+
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -109,12 +114,27 @@ const Header = ({ toggleMobileMenu }) => {
         toast.success('Logout Successfully');
         
         timeoutRef.current = setTimeout(() => {
-          localStorage.clear(); // Saare items ek saath clear karne ke liye
-          navigate('/login');   // window.open ki jagah
-        }, 1500);
-       
+          // 1. Saare items ek saath clear karne ke liye
+          localStorage.clear(); 
+          
+          // 2. React Context (Memory) ko clean karein
+          if(setRole) setRole(null);
+          if(setSubrole) setSubrole(null);
+          if(setUser) setUser(null);
+
+          // 3. Browser History Block Trick
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function () {
+              window.history.go(1);
+          };
+
+          // 4. navigate with replace (taaki history stack overwrite ho jaye)
+          navigate('/login', { replace: true }); 
+        }, 2000);
+        
       } else {
         toast.error('Logout failed. Please try again.');
+        setIsLoggingOut(false);
       }
     } catch (error) {
       if (error.response?.data?.message) {
@@ -122,9 +142,8 @@ const Header = ({ toggleMobileMenu }) => {
       } else {
         toast.error('Network error during logout. Please try again.');
       }
-    } finally {
-      timeoutRef.current = setTimeout(() => setIsLoggingOut(false), 1500);
-    }
+      setIsLoggingOut(false);
+    } 
   };
 
   // Cleanup timeout on unmount

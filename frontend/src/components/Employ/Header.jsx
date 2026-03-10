@@ -2,8 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { FiBell, FiChevronDown, FiLayers } from "react-icons/fi";
 import { FaBars, FaSync, FaSignOutAlt, FaUser } from 'react-icons/fa';
-// import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from 'react-router-dom'; // NAYA CHANGE
 import { toast, Toaster } from "react-hot-toast";
+
+// NAYA CHANGE: Aapka exact path
+import { useAuth } from '../../protectedUnknownRoutes/AuthContext.jsx'; 
 
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -11,6 +14,10 @@ import axios from "axios";
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const Header = ({ toggleMobileMenu }) => {
+  // NAYA CHANGE: Hook calls
+  const navigate = useNavigate();
+  const { setRole, setSubrole, setUser } = useAuth();
+
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -64,10 +71,25 @@ const Header = ({ toggleMobileMenu }) => {
 
       if (res.data.status === "success") {
         toast.success("Logout Successfully");
+        
         setTimeout(() => {
+          // 1. LocalStorage clear
           localStorage.clear();
-          window.open("/login", "_self");
-        }, 1500);
+
+          // 2. React Context Clear
+          if (setRole) setRole(null);
+          if (setSubrole) setSubrole(null);
+          if (setUser) setUser(null);
+
+          // 3. Browser History Block Trick
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function () {
+              window.history.go(1);
+          };
+
+          // 4. Navigate using replace
+          navigate("/login", { replace: true });
+        }, 2000);
       } else {
         toast.error("Logout failed");
       }

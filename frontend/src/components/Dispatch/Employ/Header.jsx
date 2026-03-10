@@ -1,22 +1,29 @@
 // components/Header.jsx
-import React, { useState, useEffect } from 'react';
-import { FiBell, FiChevronDown, FiLayers } from "react-icons/fi";
-import { FaBars, FaSync, FaSignOutAlt, FaUser } from 'react-icons/fa';
-// import { ToastContainer, toast } from "react-toastify";
+import React, { useState, useEffect, useRef } from 'react';
+import { FiBell, FiHelpCircle, FiChevronDown, FiLayers } from "react-icons/fi";
+import { FaBars, FaSignOutAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import { toast, Toaster } from "react-hot-toast";
-
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+
+// NAYA CHANGE: Context path import kiya hai
+import { useAuth } from '../../../protectedUnknownRoutes/AuthContext.jsx'; 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const Header = ({ toggleMobileMenu }) => {
+  const navigate = useNavigate();
+  // NAYA CHANGE: Auth context setter functions
+  const { setRole, setSubrole, setUser: setContextUser } = useAuth(); 
+
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
 
-  // ================= LOGIC (UNCHANGED) =================
   const getApiInstance = () => {
     const token = localStorage.getItem("access_token");
     return axios.create({
@@ -29,94 +36,174 @@ const Header = ({ toggleMobileMenu }) => {
   };
 
   useEffect(() => {
-    const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
     checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
   }, []);
 
+  // Update time every minute
   useEffect(() => {
-    const timer = setInterval(() => setCurrentDateTime(new Date()), 60000);
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 60000);
+
     return () => clearInterval(timer);
   }, []);
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    if (showProfileDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileDropdown]);
 
   const formatDateTime = () => {
     const now = currentDateTime;
     const day = now.getDate();
-    const month = now.toLocaleDateString("en-US", { month: "short" });
+    const month = now.toLocaleDateString('en-US', { month: 'short' });
     const year = now.getFullYear();
     let hours = now.getHours();
     const minutes = now.getMinutes();
-    const ampm = hours >= 12 ? "pm" : "am";
-    hours = hours % 12 || 12;
-    return `${day} ${month} ${year}, ${hours}:${minutes < 10 ? "0" : ""}${minutes} ${ampm}`;
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+    
+    return `${day} ${month} ${year}, ${hours}:${minutesStr} ${ampm}`;
   };
-
-  const handleRefresh = () => window.location.reload();
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
+    
     setIsLoggingOut(true);
-
+    
     try {
       const api = getApiInstance();
-      const res = await api.post("/logout");
+      const response = await api.post('/logout');
 
-      if (res.data.status === "success") {
-        toast.success("Logout Successfully");
-        setTimeout(() => {
-          localStorage.clear();
-          window.open("/login", "_self");
-        }, 1500);
+      if (response.data.status === 'success') {
+        toast.success('Logout Successfully');
+        
+        timeoutRef.current = setTimeout(() => {
+          // 1. Saare items clear karein
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('user');
+          localStorage.removeItem('role'); 
+          localStorage.removeItem('subrole'); 
+          localStorage.removeItem('name'); 
+          localStorage.removeItem('UserID'); 
+
+          // 2. React Context bhi clear karein taaki protected route trigger ho
+          if(setRole) setRole(null);
+          if(setSubrole) setSubrole(null);
+          if(setContextUser) setContextUser(null);
+
+          // 3. Browser History Block - user piche ke pages nahi dekh paayega
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function () {
+              window.history.go(1);
+          };
+
+          // 4. Proper navigation
+          navigate("/login", { replace: true });
+        }, 2000);
+        
       } else {
-        toast.error("Logout failed");
+        toast.error('Logout failed. Please try again.');
+        setIsLoggingOut(false);
       }
-    } catch {
-      toast.error("Network error");
-    } finally {
-      setTimeout(() => setIsLoggingOut(false), 1500);
-    }
+    } catch (error) {
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error('Network error during logout. Please try again.');
+      }
+      setIsLoggingOut(false);
+    } 
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const getUserData = () => {
     try {
-      const u = localStorage.getItem("user");
-      return u ? JSON.parse(u) : null;
-    } catch {
+      const userData = localStorage.getItem('user');
+      return userData ? JSON.parse(userData) : null;
+    } catch (error) {
+      console.warn('Error parsing user data:', error);
       return null;
     }
   };
 
+  const getUserRole = () => {
+    try {
+      const role = localStorage.getItem('role');
+      return role || 'lokayukt';
+    } catch (error) {
+      return 'lokayukt';
+    }
+  };
+
   const user = getUserData();
-  const role = localStorage.getItem("role") || "Admin";
+  const userRole = getUserRole();
 
-  const getInitials = () =>
-    user?.name
-      ? user.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
-      : "AD";
+  const getUserInitials = () => {
+    if (user?.name) {
+      const nameParts = user.name.split(' ');
+      if (nameParts.length >= 2) {
+        return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+      }
+      return user.name.substring(0, 2).toUpperCase();
+    }
+    return 'LK';
+  };
 
-  // ================= UI =================
   return (
     <>
       <Toaster position="top-right" />
 
-      {/* ✅ FULL WIDTH HEADER */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b shadow-sm z-50">
-        <div className="h-full flex items-center justify-between px-6">
-
-          {/* LEFT */}
-          <div className="flex items-center gap-4">
+      {/* ✅ FIXED Header - stays at top */}
+      <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50 h-16">
+        <div className="w-full h-full flex items-center justify-between px-4 md:px-6">
+          
+          {/* LEFT SECTION - Logo + Title */}
+          <div className="flex items-center gap-3">
             {isMobile && (
               <button
                 onClick={toggleMobileMenu}
-                className="p-2 rounded-md hover:bg-gray-100 md:hidden"
+                className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors md:hidden"
+                aria-label="Toggle mobile menu"
               >
-                <FaBars />
+                <FaBars className="w-5 h-5" />
               </button>
             )}
 
-            <div className="w-11 h-11 rounded-full bg-blue-600 flex items-center justify-center">
-              <FiLayers className="text-white text-xl" />
+            <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+              <FiLayers size={26} className="text-white" />
             </div>
 
             {!isMobile && (
@@ -131,64 +218,72 @@ const Header = ({ toggleMobileMenu }) => {
             )}
           </div>
 
-          {/* RIGHT */}
+          {/* RIGHT SECTION - Notifications + Profile */}
           <div className="flex items-center gap-5">
-
-            {/* Refresh */}
-            <button
-              onClick={handleRefresh}
-              className="p-2 rounded-md hover:bg-gray-100 text-blue-600"
-              title="Refresh"
-            >
-              <FaSync />
-            </button>
-
-            {/* Notification */}
-            <div className="relative cursor-pointer">
-              <FiBell className="text-gray-700" size={20} />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+            
+            <div className="relative cursor-pointer" aria-label="Notifications">
+              <FiBell size={20} className="text-gray-700" />
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500"></span>
             </div>
 
-            {/* Profile */}
-            <div className="relative">
-              <div
+            {!isMobile && (
+              <FiHelpCircle 
+                size={20} 
+                className="text-gray-700 cursor-pointer" 
+                aria-label="Help"
+              />
+            )}
+
+            <div className="relative" ref={dropdownRef}>
+              <div 
                 className="flex items-center gap-2 cursor-pointer"
                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
               >
-                <div className="w-9 h-9 rounded-full bg-yellow-500 flex items-center justify-center text-white font-semibold">
-                  {getInitials()}
+                <div className="w-9 h-9 rounded-full bg-yellow-500 flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {getUserInitials()}
+                  </span>
                 </div>
 
                 {!isMobile && (
                   <div className="flex items-center gap-2">
-                    <div className="text-sm">
-                      <p className="font-medium text-gray-700">{user?.name}</p>
-                      <p className="text-xs text-gray-500">{role}</p>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-700">
+                        {user?.name || 'User Name'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {userRole === "lok-ayukt" ? "Dispatch" : "Dispatch"}
+                      </span>
                     </div>
-                    <FiChevronDown />
+                    <FiChevronDown className="text-gray-600" />
                   </div>
+                )}
+
+                {isMobile && (
+                  <FiChevronDown className="text-gray-600" />
                 )}
               </div>
 
               {showProfileDropdown && (
-                <div className="absolute right-0 mt-2 w-60 bg-white border rounded-lg shadow-lg">
-                  <div className="px-4 py-3 border-b">
-                    <p className="text-sm font-semibold">{user?.name}</p>
-                    <p className="text-xs text-gray-500">{user?.email}</p>
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[60]">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-800">{user?.name || 'User Name'}</p>
+                    <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
                   </div>
 
                   <button
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50"
+                    className={`w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors ${
+                      isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
-                    <FaSignOutAlt />
-                    {isLoggingOut ? "Logging out..." : "Logout"}
+                    <FaSignOutAlt className={`w-4 h-4 ${isLoggingOut ? 'animate-pulse' : ''}`} />
+                    <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
                   </button>
                 </div>
               )}
             </div>
-
           </div>
         </div>
       </header>

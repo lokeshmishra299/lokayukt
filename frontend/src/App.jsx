@@ -4,6 +4,7 @@ import axios from "axios";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ProtectedRoute from "./protectedUnknownRoutes/ProtectedRoute.jsx";
 import { useAuth } from './protectedUnknownRoutes/AuthContext.jsx';
+import PublicRoute from "./protectedUnknownRoutes/PublicRoute.jsx";
 import './index.css'
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
@@ -896,8 +897,17 @@ if (loading) {
     <QueryClientProvider client={queryClient}>
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
+     <Route path="/" element={
+        <PublicRoute>
+          <Login />
+        </PublicRoute>
+      } />
+      
+      <Route path="/login" element={
+        <PublicRoute>
+          <Login />
+        </PublicRoute>
+      } />
 
       {/*  Admin Routes */}
       {role === 'admin' && (

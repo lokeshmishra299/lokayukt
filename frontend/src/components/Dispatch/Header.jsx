@@ -3,16 +3,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FiBell, FiHelpCircle, FiChevronDown, FiLayers } from "react-icons/fi";
 import { FaBars, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
 import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+
+// NAYA CHANGE: Context path import kiya hai
+import { useAuth } from '../../protectedUnknownRoutes/AuthContext.jsx'; 
 
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const Header = ({ toggleMobileMenu }) => {
   const navigate = useNavigate();
+  // NAYA CHANGE: Auth context setter functions
+  const { setRole, setSubrole, setUser: setContextUser } = useAuth(); 
+
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -99,15 +103,32 @@ const Header = ({ toggleMobileMenu }) => {
         toast.success('Logout Successfully');
         
         timeoutRef.current = setTimeout(() => {
+          // 1. Saare items clear karein
           localStorage.removeItem('access_token');
           localStorage.removeItem('user');
           localStorage.removeItem('role'); 
           localStorage.removeItem('subrole'); 
-          window.open("/login", "_self");
-        }, 1500);
-       
+          localStorage.removeItem('name'); 
+          localStorage.removeItem('UserID'); 
+
+          // 2. React Context bhi clear karein taaki protected route trigger ho
+          if(setRole) setRole(null);
+          if(setSubrole) setSubrole(null);
+          if(setContextUser) setContextUser(null);
+
+          // 3. Browser History Block - user piche ke pages nahi dekh paayega
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function () {
+              window.history.go(1);
+          };
+
+          // 4. Proper navigation
+          navigate("/login", { replace: true });
+        }, 2000);
+        
       } else {
         toast.error('Logout failed. Please try again.');
+        setIsLoggingOut(false);
       }
     } catch (error) {
       if (error.response?.data?.message) {
@@ -115,11 +136,8 @@ const Header = ({ toggleMobileMenu }) => {
       } else {
         toast.error('Network error during logout. Please try again.');
       }
-    } finally {
-      timeoutRef.current = setTimeout(() => {
-        setIsLoggingOut(false);
-      }, 1500);
-    }
+      setIsLoggingOut(false);
+    } 
   };
 
   // Cleanup timeout on unmount
@@ -166,10 +184,7 @@ const Header = ({ toggleMobileMenu }) => {
 
   return (
     <>
-      <Toaster
-             position="top-right"
-          
-           />
+      <Toaster position="top-right" />
 
       {/* ✅ FIXED Header - stays at top */}
       <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50 h-16">
@@ -254,9 +269,6 @@ const Header = ({ toggleMobileMenu }) => {
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-sm font-semibold text-gray-800">{user?.name || 'User Name'}</p>
                     <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
-                    {/* <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
-                      {userRole === "lok-ayukt" ? "LokAyukta" : "LokAyukta"}
-                    </span> */}
                   </div>
 
                   <button

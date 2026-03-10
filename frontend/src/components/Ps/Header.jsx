@@ -1,5 +1,5 @@
 // components/Header.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FiBell, FiHelpCircle, FiChevronDown, FiLayers } from "react-icons/fi";
 import { FaBars, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -7,16 +7,27 @@ import { toast, Toaster } from "react-hot-toast";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
+// NAYA CHANGE: Aapka exact path yahan hai
+import { useAuth } from '../../protectedUnknownRoutes/AuthContext.jsx';
+
 const BASE_URL = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 
 const Header = ({ toggleMobileMenu }) => {
   const navigate = useNavigate();
+  
+  // NAYA CHANGE: Context se state clear karne ke functions
+  const { setRole, setSubrole, setUser } = useAuth();
+
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [isMobile, setIsMobile] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-
+  
   // State to hold the API data
   const [userData, setUserData] = useState(null);
+  
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
 
   const getApiInstance = () => {
     const token = localStorage.getItem("access_token");
@@ -57,6 +68,48 @@ const Header = ({ toggleMobileMenu }) => {
     };
   }, []);
 
+  // Update time every minute
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 60000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    if (showProfileDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileDropdown]);
+
+  const formatDateTime = () => {
+    const now = currentDateTime;
+    const day = now.getDate();
+    const month = now.toLocaleDateString('en-US', { month: 'short' });
+    const year = now.getFullYear();
+    let hours = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+    
+    return `${day} ${month} ${year}, ${hours}:${minutesStr} ${ampm}`;
+  };
+
   const handleLogout = async () => {
     if (isLoggingOut) return;
     
@@ -69,14 +122,24 @@ const Header = ({ toggleMobileMenu }) => {
       if (response.data.status === 'success') {
         toast.success('Logout Successfully');
         
-        setTimeout(() => {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('user');
-          localStorage.removeItem('role'); 
-          localStorage.removeItem('subrole'); 
-          window.open("/login", "_self");
-        }, 1500);
-        
+        timeoutRef.current = setTimeout(() => {
+          // 1. LocalStorage ko saaf karein
+          localStorage.clear();
+
+          // 2. React ki memory (Context API) ko reset karein
+          if (setRole) setRole(null);
+          if (setSubrole) setSubrole(null);
+          if (setUser) setUser(null);
+
+          // 3. MAIN TRICK: Browser History Block karna
+          window.history.pushState(null, null, window.location.href);
+          window.onpopstate = function () {
+              window.history.go(1);
+          };
+
+          // 4. navigate with replace (window.open ki jagah)
+          navigate("/login", { replace: true });
+        }, 2000);
       } else {
         toast.error('Logout failed. Please try again.');
       }
@@ -87,11 +150,20 @@ const Header = ({ toggleMobileMenu }) => {
         toast.error('Network error during logout. Please try again.');
       }
     } finally {
-      setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         setIsLoggingOut(false);
       }, 1500);
     }
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const getUserInitials = () => {
     if (userData?.name) {
@@ -101,7 +173,7 @@ const Header = ({ toggleMobileMenu }) => {
       }
       return userData.name.substring(0, 2).toUpperCase();
     }
-    return 'U';
+    return 'LK';
   };
 
   return (
@@ -110,7 +182,7 @@ const Header = ({ toggleMobileMenu }) => {
 
       {/* ✅ FIXED Header - stays at top */}
       <header className="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50 h-16">
-        <div className="w-full h-full flex items-center justify-between px-6">
+        <div className="w-full h-full flex items-center justify-between px-4 md:px-6">
           
           {/* LEFT SECTION - Logo + Title */}
           <div className="flex items-center gap-3">
@@ -134,7 +206,7 @@ const Header = ({ toggleMobileMenu }) => {
                   Lokayukta Case Management
                 </h1>
                 <p className="text-xs text-gray-500">
-                  Office of Lokayukta, Uttar Pradesh
+                  {formatDateTime()}
                 </p>
               </div>
             )}
@@ -143,16 +215,20 @@ const Header = ({ toggleMobileMenu }) => {
           {/* RIGHT SECTION - Notifications + Profile */}
           <div className="flex items-center gap-5">
             
-            <div className="relative cursor-pointer">
+            <div className="relative cursor-pointer" aria-label="Notifications">
               <FiBell size={20} className="text-gray-700" />
               <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-500"></span>
             </div>
 
             {!isMobile && (
-              <FiHelpCircle size={20} className="text-gray-700 cursor-pointer" />
+              <FiHelpCircle 
+                size={20} 
+                className="text-gray-700 cursor-pointer" 
+                aria-label="Help"
+              />
             )}
 
-            <div className="relative">
+            <div className="relative" ref={dropdownRef}>
               <div 
                 className="flex items-center gap-2 cursor-pointer"
                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
@@ -168,11 +244,11 @@ const Header = ({ toggleMobileMenu }) => {
                     <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-700 capitalize">
                          {/* Display API Name */}
-                        {userData?.name || 'Loading...'}
+                        {userData?.name}
                       </span>
                       <span className="text-xs text-gray-500 capitalize">
-                        {/* Display API Subrole Label, fallback to Role Label */}
-                        {userData?.subrole?.label || userData?.role?.label || ''}
+                         {/* Display API Subrole Label, fallback to Role Label, fallback to string */}
+                        {userData?.subrole?.label || userData?.role?.label}
                       </span>
                     </div>
                     <FiChevronDown className="text-gray-600" />
@@ -184,8 +260,9 @@ const Header = ({ toggleMobileMenu }) => {
                 )}
               </div>
 
+              {/* DROPDOWN MENU */}
               {showProfileDropdown && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-[60]">
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-sm font-semibold text-gray-800 capitalize">
                       {userData?.name || 'Loading...'}
@@ -193,8 +270,7 @@ const Header = ({ toggleMobileMenu }) => {
                     <p className="text-xs text-gray-500">
                       {userData?.email || ''}
                     </p>
-                    <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full capitalize">
-                       {/* Display API Subrole Label, fallback to Role Label */}
+                    <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">
                       {userData?.subrole?.label || userData?.role?.label}
                     </span>
                   </div>
