@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import { AuthProvider } from './protectedUnknownRoutes/AuthContext.jsx';
+import './protectedUnknownRoutes/axiosSetup.js';
 
 const queryClient = new QueryClient({
   defaultOptions: {

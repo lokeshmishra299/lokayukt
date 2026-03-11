@@ -227,7 +227,7 @@ const Login = () => {
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
             
             {/* Username Field */}
             <div>
@@ -241,6 +241,7 @@ const Login = () => {
                   name="user_name"
                   value={formData.user_name}
                   onChange={handleInputChange}
+                  autoComplete="off"
                   className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
                     errors.user_name ? 'border-red-500' : 'border-gray-300'
                   }`}
@@ -281,6 +282,7 @@ const Login = () => {
     name="password"
     value={formData.password}
     onChange={handleInputChange}
+    autoComplete="new-password"
     className={`no-browser-eye w-full pl-10 pr-10 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
       errors.password || generalError ? "border-red-500" : "border-gray-300"
     }`}
